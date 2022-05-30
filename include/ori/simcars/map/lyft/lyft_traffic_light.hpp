@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/dictionary_interface.hpp>
-#include <ori/simcars/temporal/temporal_dictionary.hpp>
+#include <ori/simcars/temporal/proximal_temporal_dictionary.hpp>
 #include <ori/simcars/map/living_traffic_light_abstract.hpp>
 #include <ori/simcars/map/lyft/lyft_declarations.hpp>
 #include <ori/simcars/map/lyft/lyft_map.hpp>
@@ -26,11 +26,11 @@ class LyftTrafficLight : public ALivingTrafficLight<std::string>
     geometry::Vec position;
     FP_DATA_TYPE orientation;
     std::shared_ptr<structures::IDictionary<LyftTrafficLight::FaceColour, LyftTrafficLight::FaceType>> const face_colour_to_face_type_dict;
-    std::shared_ptr<temporal::TemporalDictionary<std::shared_ptr<const LyftTrafficLight::State>>> const timestamp_to_state_dict;
+    std::shared_ptr<temporal::ProximalTemporalDictionary<std::shared_ptr<const LyftTrafficLight::State>>> const timestamp_to_state_dict;
 
 public:
     typedef structures::IDictionary<ATrafficLight::FaceColour, ATrafficLight::FaceType> IFaceDictionary;
-    typedef temporal::TemporalDictionary<std::shared_ptr<const LyftTrafficLight::State>> TemporalStateDictionary;
+    typedef temporal::ProximalTemporalDictionary<std::shared_ptr<const LyftTrafficLight::State>> TemporalStateDictionary;
 
     LyftTrafficLight(const std::string& id, std::shared_ptr<const IMap<std::string>> map,
                      std::shared_ptr<IFaceDictionary> face_colour_to_face_type_dict,

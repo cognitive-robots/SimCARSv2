@@ -30,17 +30,12 @@ set_target_properties(simcars_utils PROPERTIES VERSION ${PROJECT_VERSION})
 add_library(simcars_structures STATIC
   src/structures/sanity_check.cpp
   include/ori/simcars/structures/container_interface.hpp
-  include/ori/simcars/structures/read_only_array_interface.hpp
   include/ori/simcars/structures/array_interface.hpp
-  include/ori/simcars/structures/read_only_array_abstract.hpp
-  include/ori/simcars/structures/array_abstract.hpp
   include/ori/simcars/structures/list_interface.hpp
   include/ori/simcars/structures/stack_interface.hpp
   include/ori/simcars/structures/stack_array_interface.hpp
-  include/ori/simcars/structures/stack_array_abstract.hpp
   include/ori/simcars/structures/queue_interface.hpp
   include/ori/simcars/structures/queue_array_interface.hpp
-  include/ori/simcars/structures/queue_array_abstract.hpp
   include/ori/simcars/structures/set_interface.hpp
   include/ori/simcars/structures/dictionary_interface.hpp
   include/ori/simcars/structures/stl/stl_stack_array.hpp
@@ -48,7 +43,6 @@ add_library(simcars_structures STATIC
   include/ori/simcars/structures/stl/stl_set.hpp
   include/ori/simcars/structures/stl/stl_dictionary.hpp
   include/ori/simcars/structures/stl/stl_ordered_dictionary.hpp
-  include/ori/simcars/structures/stl/stl_read_only_concat_array.hpp
   include/ori/simcars/structures/stl/stl_concat_array.hpp
 )
 target_include_directories(simcars_structures
@@ -91,7 +85,9 @@ set_target_properties(simcars_geometry PROPERTIES VERSION ${PROJECT_VERSION})
 add_library(simcars_temporal STATIC
   src/temporal/sanity_check.cpp
   include/ori/simcars/temporal/typedefs.hpp
-  include/ori/simcars/temporal/temporal_dictionary.hpp
+  include/ori/simcars/temporal/temporal_dictionary_abstract.hpp
+  include/ori/simcars/temporal/proximal_temporal_dictionary.hpp
+  include/ori/simcars/temporal/precedence_temporal_dictionary.hpp
   include/ori/simcars/temporal/stateful_interface.hpp
   include/ori/simcars/temporal/living_interface.hpp
 )
@@ -111,7 +107,8 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/soul_abstract.hpp
   include/ori/simcars/map/declarations.hpp
   include/ori/simcars/map/map_interface.hpp
-  include/ori/simcars/map/map_abstract.hpp
+  include/ori/simcars/map/file_based_map_interface.hpp
+  include/ori/simcars/map/file_based_map_abstract.hpp
   include/ori/simcars/map/map_object.hpp
   include/ori/simcars/map/lane_interface.hpp
   include/ori/simcars/map/lane_abstract.hpp
@@ -156,23 +153,33 @@ target_compile_options(simcars_map PRIVATE -fPIC)
 set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_agent STATIC
-  src/agent/agent_abstract.cpp
-  src/agent/simulated_agent_abstract.cpp
-  src/agent/inattentive_simulated_agent.cpp
-  src/agent/lyft/lyft_agent.cpp
+  src/agent/scene_abstract.cpp
+  src/agent/entity.cpp
+  src/agent/driving_agent_scene.cpp
   src/agent/lyft/lyft_scene.cpp
-  include/ori/simcars/agent/declarations.hpp
-  include/ori/simcars/agent/agent_state_holder_interface.hpp
-  include/ori/simcars/agent/agent_interface.hpp
+  src/agent/csv/csv_scene.cpp
+  include/ori/simcars/agent/defines.hpp
+  include/ori/simcars/agent/valueless_constant_interface.hpp
+  include/ori/simcars/agent/valueless_event_interface.hpp
+  include/ori/simcars/agent/valueless_variable_interface.hpp
+  include/ori/simcars/agent/constant_interface.hpp
+  include/ori/simcars/agent/event_interface.hpp
+  include/ori/simcars/agent/variable_interface.hpp
+  include/ori/simcars/agent/entity_interface.hpp
   include/ori/simcars/agent/scene_interface.hpp
-  include/ori/simcars/agent/agent_abstract.hpp
+  include/ori/simcars/agent/file_based_scene_interface.hpp
+  include/ori/simcars/agent/constant_abstract.hpp
+  include/ori/simcars/agent/event_abstract.hpp
+  include/ori/simcars/agent/variable_abstract.hpp
   include/ori/simcars/agent/scene_abstract.hpp
-  include/ori/simcars/agent/simulated_agent_abstract.hpp
-  include/ori/simcars/agent/inattentive_simulated_agent.hpp
-  include/ori/simcars/agent/lyft/lyft_declarations.hpp
-  include/ori/simcars/agent/lyft/lyft_agent.hpp
-  include/ori/simcars/agent/lyft/lyft_declarations.hpp
+  include/ori/simcars/agent/file_based_scene_abstract.hpp
+  include/ori/simcars/agent/constant.hpp
+  include/ori/simcars/agent/event.hpp
+  include/ori/simcars/agent/variable.hpp
+  include/ori/simcars/agent/entity.hpp
+  include/ori/simcars/agent/driving_agent_scene.hpp
   include/ori/simcars/agent/lyft/lyft_scene.hpp
+  include/ori/simcars/agent/csv/csv_scene.hpp
 )
 target_include_directories(simcars_agent
 PUBLIC
@@ -235,6 +242,10 @@ add_executable(lyft_scene_test src/lyft_scene_test/lyft_scene_test.cpp)
 target_link_libraries(lyft_scene_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent)
 add_dependencies(lyft_scene_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent)
 
+add_executable(lyft_scene_action_extraction src/lyft_scene_action_extraction/lyft_scene_action_extraction.cpp)
+target_link_libraries(lyft_scene_action_extraction simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent)
+add_dependencies(lyft_scene_action_extraction simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent)
+
 add_executable(qscene_widget_test src/qscene_widget_test/qscene_widget_test.cpp)
 target_link_libraries(qscene_widget_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
 add_dependencies(qscene_widget_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
@@ -243,7 +254,7 @@ add_executable(qmap_scene_widget_test src/qmap_scene_widget_test/qmap_scene_widg
 target_link_libraries(qmap_scene_widget_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
 add_dependencies(qmap_scene_widget_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
 
-add_executable(simcars_demo src/simcars_demo/simcars_demo.cpp)
-target_link_libraries(simcars_demo simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
-add_dependencies(simcars_demo simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
+#add_executable(simcars_demo src/simcars_demo/simcars_demo.cpp)
+#target_link_libraries(simcars_demo simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
+#add_dependencies(simcars_demo simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
 

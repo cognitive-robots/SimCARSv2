@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ori/simcars/structures/queue_array_abstract.hpp>
+#include <ori/simcars/structures/queue_array_interface.hpp>
 
 #include <deque>
 
@@ -14,7 +14,7 @@ namespace stl
 {
 
 template <typename T>
-class STLQueueArray : public virtual AQueueArray<T>
+class STLQueueArray : public virtual IQueueArray<T>
 {
 protected:
     std::deque<T> data;

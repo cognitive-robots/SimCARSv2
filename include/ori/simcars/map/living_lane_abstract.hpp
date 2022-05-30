@@ -106,9 +106,9 @@ public:
             fore_lanes = fore_lanes->get_true_self();
             weak_fore_lanes = fore_lanes;
         }
-        std::shared_ptr<structures::AArray<std::shared_ptr<const ILane<T_id>>>> fore_lanes(
+        std::shared_ptr<structures::IArray<std::shared_ptr<const ILane<T_id>>>> fore_lanes(
                     new structures::stl::STLStackArray<std::shared_ptr<const ILane<T_id>>>(weak_fore_lanes->count()));
-        fore_lanes->template map_from<std::weak_ptr<const ILane<T_id>>>(get_shared_lane_func, *weak_fore_lanes);
+        map_array(*weak_fore_lanes, *fore_lanes, get_shared_lane_func);
         return fore_lanes;
     }
     std::shared_ptr<const ILaneArray<T_id>> get_aft_lanes() const override
@@ -123,9 +123,9 @@ public:
             aft_lanes = aft_lanes->get_true_self();
             weak_aft_lanes = aft_lanes;
         }
-        std::shared_ptr<structures::AArray<std::shared_ptr<const ILane<T_id>>>> aft_lanes(
+        std::shared_ptr<structures::IArray<std::shared_ptr<const ILane<T_id>>>> aft_lanes(
                     new structures::stl::STLStackArray<std::shared_ptr<const ILane<T_id>>>(weak_aft_lanes->count()));
-        aft_lanes->template map_from<std::weak_ptr<const ILane<T_id>>>(get_shared_lane_func, *weak_aft_lanes);
+        map_array(*weak_aft_lanes, *aft_lanes, get_shared_lane_func);
         return aft_lanes;
     }
     std::shared_ptr<const ITrafficLightArray<T_id>> get_traffic_lights() const override
@@ -140,9 +140,9 @@ public:
             traffic_lights = traffic_lights->get_true_self();
             weak_traffic_lights = traffic_lights;
         }
-        std::shared_ptr<structures::AArray<std::shared_ptr<const ITrafficLight<T_id>>>> traffic_lights(
+        std::shared_ptr<structures::IArray<std::shared_ptr<const ITrafficLight<T_id>>>> traffic_lights(
                     new structures::stl::STLStackArray<std::shared_ptr<const ITrafficLight<T_id>>>(weak_traffic_lights->count()));
-        traffic_lights->template map_from<std::weak_ptr<const ITrafficLight<T_id>>>(get_shared_traffic_light_func, *weak_traffic_lights);
+        map_array(*weak_traffic_lights, *traffic_lights, get_shared_traffic_light_func);
         return traffic_lights;
     }
 };

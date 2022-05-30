@@ -57,6 +57,34 @@ int main(int argc, char* argv[])
 
     std::cout << "Finished scene load" << std::endl;
 
+    std::shared_ptr<structures::IStackArray<std::string>> focal_entities(
+                new structures::stl::STLStackArray<std::string>());
+
+    std::shared_ptr<structures::IArray<std::shared_ptr<const agent::IEntity>>> entities =
+            scene->get_entities();
+
+    for (size_t i = 0; i < entities->count(); ++i)
+    {
+        std::shared_ptr<const agent::IEntity> entity = (*entities)[i];
+        try
+        {
+            std::shared_ptr<const agent::IValuelessConstant> ego_valueless_constant =
+                    entity->get_constant_parameter(entity->get_name() + ".ego");
+
+            std::shared_ptr<const agent::IConstant<bool>> ego_constant =
+                    std::static_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
+
+            if (ego_constant->get_value())
+            {
+                focal_entities->push_back(entity->get_name());
+            }
+        }
+        catch (std::out_of_range)
+        {
+            // Entity does not have an ego parameter
+        }
+    }
+
     std::shared_ptr<QFrame> frame(new QFrame());
     frame->setWindowTitle("QSceneWidget Test");
     frame->setFixedSize(1000, 1000);
@@ -69,14 +97,7 @@ int main(int argc, char* argv[])
                     frame.get(),
                     QPoint(20, 20),
                     QSize(960, 960)));
-    std::shared_ptr<const structures::stl::STLStackArray<std::shared_ptr<const agent::IAgent>>> ego_agents =
-            scene->get_ego_agents();
-    std::shared_ptr<structures::IArray<uint32_t>> focal_agent_ids(
-                new structures::stl::STLStackArray<uint32_t>(ego_agents->count()));
-    scene->get_ego_agents()->map_to<uint32_t>(
-                [](const std::shared_ptr<const agent::IAgent> &agent) { return agent->get_id(); },
-                *focal_agent_ids);
-    map_scene_widget->set_focal_ego_agents(focal_agent_ids);
+    map_scene_widget->set_focal_entities(focal_entities);
     map_scene_widget->show();
 
     return app.exec();

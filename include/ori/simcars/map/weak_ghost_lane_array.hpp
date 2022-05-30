@@ -36,8 +36,7 @@ public:
             std::shared_ptr<const ILaneArray<T_id>> lanes = map->get_lanes(ids);
             std::shared_ptr<WeakLivingLaneStackArray<T_id>> weak_lanes(
                     new WeakLivingLaneStackArray<T_id>(lanes->count()));
-            weak_lanes->template map_from<std::shared_ptr<const ILane<T_id>>>(
-                        get_weak_lane_func, *lanes);
+            map_array(*lanes, *weak_lanes, get_weak_lane_func);
             return weak_lanes;
         }
         else

@@ -3,7 +3,7 @@
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/geometry/grid_dictionary.hpp>
-#include <ori/simcars/map/map_abstract.hpp>
+#include <ori/simcars/map/file_based_map_abstract.hpp>
 #include <ori/simcars/map/weak_living_lane_stack_array.hpp>
 #include <ori/simcars/map/weak_living_traffic_light_stack_array.hpp>
 #include <ori/simcars/map/map_grid_rect.hpp>
@@ -22,7 +22,7 @@ namespace map
 namespace lyft
 {
 
-class LyftMap : public AMap<std::string, LyftMap>
+class LyftMap : public virtual AFileBasedMap<std::string, LyftMap>
 {
     std::shared_ptr<structures::stl::STLDictionary<std::string, std::shared_ptr<LyftLane>>> id_to_lane_dict;
     std::shared_ptr<structures::stl::STLDictionary<std::string, std::shared_ptr<LyftTrafficLight>>> id_to_traffic_light_dict;

@@ -40,6 +40,34 @@ int main(int argc, char* argv[])
 
     std::cout << "Finished scene load" << std::endl;
 
+    std::shared_ptr<structures::IStackArray<std::string>> focal_entities(
+                new structures::stl::STLStackArray<std::string>());
+
+    std::shared_ptr<structures::IArray<std::shared_ptr<const agent::IEntity>>> entities =
+            scene->get_entities();
+
+    for (size_t i = 0; i < entities->count(); ++i)
+    {
+        std::shared_ptr<const agent::IEntity> entity = (*entities)[i];
+        try
+        {
+            std::shared_ptr<const agent::IValuelessConstant> ego_valueless_constant =
+                    entity->get_constant_parameter(entity->get_name() + ".ego");
+
+            std::shared_ptr<const agent::IConstant<bool>> ego_constant =
+                    std::static_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
+
+            if (ego_constant->get_value())
+            {
+                focal_entities->push_back(entity->get_name());
+            }
+        }
+        catch (std::out_of_range)
+        {
+            // Entity does not have an ego parameter
+        }
+    }
+
     std::shared_ptr<QFrame> frame(new QFrame());
     frame->setWindowTitle("QSceneWidget Test");
     frame->setFixedSize(800, 800);
@@ -51,11 +79,7 @@ int main(int argc, char* argv[])
                     frame.get(),
                     QPoint(20, 20),
                     QSize(760, 760)));
-    std::shared_ptr<structures::IArray<uint32_t>> focal_ego_agents(
-                new structures::stl::STLStackArray<uint32_t>
-                    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                      11, 12, 13, 14, 15, 16, 17, 18, 19 });
-    scene_widget->set_focal_ego_agents(focal_ego_agents);
+    scene_widget->set_focal_entities(focal_entities);
     scene_widget->show();
 
     return app.exec();

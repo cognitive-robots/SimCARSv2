@@ -33,50 +33,51 @@ sf::Color to_sfml_colour(map::ITrafficLightStateHolder::FaceColour face_colour)
     return sf::Color(255, 255, 255);
 }
 
-sf::Color to_sfml_colour(agent::IAgent::Class agent_class)
+sf::Color to_sfml_colour(agent::lyft::RoadAgentClass road_agent_class)
 {
-    switch(agent_class)
+    switch(road_agent_class)
     {
-    case agent::IAgent::Class::UNKNOWN:
+    case agent::lyft::RoadAgentClass::UNKNOWN:
         break;
 
-    case agent::IAgent::Class::CAR:
+    case agent::lyft::RoadAgentClass::CAR:
         return sf::Color(255, 128, 0);
 
-    case agent::IAgent::Class::VAN:
+    case agent::lyft::RoadAgentClass::VAN:
         return sf::Color(255, 255, 0);
 
-    case agent::IAgent::Class::TRAM:
+    case agent::lyft::RoadAgentClass::TRAM:
         return sf::Color(128, 255, 0);
 
-    case agent::IAgent::Class::BUS:
+    case agent::lyft::RoadAgentClass::BUS:
         return sf::Color(0, 255, 0);
 
-    case agent::IAgent::Class::TRUCK:
+    case agent::lyft::RoadAgentClass::TRUCK:
         return sf::Color(0, 255, 128);
 
-    case agent::IAgent::Class::EMERGENCY_VEHICLE:
+    case agent::lyft::RoadAgentClass::EMERGENCY_VEHICLE:
         return sf::Color(0, 255, 255);
 
-    case agent::IAgent::Class::BICYCLE:
+    case agent::lyft::RoadAgentClass::BICYCLE:
         return sf::Color(0, 128, 255);
 
-    case agent::IAgent::Class::MOTORCYCLE:
+    case agent::lyft::RoadAgentClass::MOTORCYCLE:
         return sf::Color(0, 0, 255);
 
-    case agent::IAgent::Class::PEDESTRIAN:
+    case agent::lyft::RoadAgentClass::PEDESTRIAN:
         return sf::Color(128, 0, 255);
 
-    case agent::IAgent::Class::ANIMAL:
+    case agent::lyft::RoadAgentClass::ANIMAL:
         return sf::Color(255, 0, 255);
 
-    case agent::IAgent::Class::OTHER_VEHICLE:
+    case agent::lyft::RoadAgentClass::OTHER_VEHICLE:
         return sf::Color(255, 0, 128);
     }
 
     return sf::Color(255, 255, 255);
 }
 
+/*
 sf::Color to_sfml_colour(agent::IAgent::Status agent_status)
 {
     switch(agent_status)
@@ -99,6 +100,7 @@ sf::Color to_sfml_colour(agent::IAgent::Status agent_status)
 
     return sf::Color(255, 255, 255);
 }
+*/
 
 }
 }

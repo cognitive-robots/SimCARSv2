@@ -9,10 +9,10 @@ namespace simcars
 {
 namespace agent
 {
-namespace lyft
+namespace csv
 {
 
-class LyftScene : public virtual AFileBasedScene<LyftScene>
+class CSVScene : public virtual AFileBasedScene<CSVScene>
 {
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
@@ -24,7 +24,7 @@ protected:
     void load_virt(std::ifstream& input_filestream) override;
 
 public:
-    static std::shared_ptr<const LyftScene> construct_from(std::shared_ptr<const IScene> scene);
+    static std::shared_ptr<const CSVScene> construct_from(std::shared_ptr<const IScene> scene);
 
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
@@ -34,22 +34,6 @@ public:
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const override;
     std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const override;
-};
-
-enum class RoadAgentClass
-{
-    UNKNOWN = -1,
-    CAR = 0,
-    VAN = 1,
-    TRAM = 2,
-    BUS = 3,
-    TRUCK = 4,
-    EMERGENCY_VEHICLE = 5,
-    BICYCLE = 6,
-    MOTORCYCLE = 7,
-    PEDESTRIAN = 8,
-    ANIMAL = 9,
-    OTHER_VEHICLE = 10
 };
 
 }

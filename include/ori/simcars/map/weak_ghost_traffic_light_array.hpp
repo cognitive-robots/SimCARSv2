@@ -36,8 +36,7 @@ public:
             std::shared_ptr<const ITrafficLightArray<T_id>> traffic_lights = map->get_traffic_lights(ids);
             std::shared_ptr<WeakLivingTrafficLightStackArray<T_id>> weak_traffic_lights(
                     new WeakLivingTrafficLightStackArray<T_id>(traffic_lights->count()));
-            weak_traffic_lights->template map_from<std::shared_ptr<const ITrafficLight<T_id>>>(
-                        get_weak_traffic_light_func, *traffic_lights);
+            map_array(*traffic_lights, *weak_traffic_lights, get_weak_traffic_light_func);
             return weak_traffic_lights;
         }
         else

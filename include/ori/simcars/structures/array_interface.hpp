@@ -1,6 +1,8 @@
 #pragma once
 
-#include <ori/simcars/structures/read_only_array_interface.hpp>
+#include <ori/simcars/structures/container_interface.hpp>
+
+#include <functional>
 
 namespace ori
 {
@@ -10,12 +12,32 @@ namespace structures
 {
 
 template <typename T>
-class IArray : public virtual IReadOnlyArray<T>
+class IArray : public virtual IContainer<T>
 {
 public:
-    const T& operator [](size_t idx) const override = 0;
+    virtual const T& operator [](size_t idx) const = 0;
     virtual T& operator [](size_t idx) = 0;
 };
+
+template<typename T_old, typename T_new>
+void cast_array(const IArray<T_old>& old_array, IArray<T_new>& new_array)
+{
+    size_t i;
+    for (i = 0; i < old_array.count() || i < new_array.count(); ++i)
+    {
+        new_array[i] = static_cast<T_new>(old_array[i]);
+    }
+}
+
+template<typename T_old, typename T_new>
+void map_array(const IArray<T_old>& old_array, IArray<T_new>& new_array, std::function<T_new(const T_old&)> func)
+{
+    size_t i;
+    for (i = 0; i < old_array.count() || i < new_array.count(); ++i)
+    {
+        new_array[i] = func(old_array[i]);
+    }
+}
 
 }
 }

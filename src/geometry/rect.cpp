@@ -89,12 +89,12 @@ bool Rect::check_bounds(const Vec &point) const
              || this->min_y > point.y() || this->max_y < point.y());
 }
 
-bool Rect::check_bounds(const Rect& rect) const
+bool Rect::check_bounds(const Rect& o_rect) const
 {
     if (this->calc_bounds_flag) this->calc_bounds();
-    if (rect.calc_bounds_flag) rect.calc_bounds();
-    return !(this->min_x > rect.max_x || this->max_x < rect.min_x
-             || this->min_y > rect.max_y || this->max_y < rect.min_y);
+    if (o_rect.calc_bounds_flag) o_rect.calc_bounds();
+    return !(this->min_x > o_rect.max_x || this->max_x < o_rect.min_x
+             || this->min_y > o_rect.max_y || this->max_y < o_rect.min_y);
 }
 
 bool Rect::check_collision_virt(const Rect& rect) const

@@ -81,8 +81,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    temporal::Time scene_half_way_timestamp = scene->get_earliest_birth()
-            + (scene->get_last_non_simulated_death() - scene->get_earliest_birth()) / 2;
+    temporal::Time scene_half_way_timestamp = scene->get_min_time() + (scene->get_max_time() - scene->get_min_time()) / 2;
 
     std::shared_ptr<const agent::IScene> simulated_scene =
             scene->fork_simulated_scene(ego_focal_agents, (*focal_agent_ids)[0], scene_half_way_timestamp, temporal::Duration(100));

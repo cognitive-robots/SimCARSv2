@@ -31,7 +31,6 @@ public:
 
     virtual ~IMap() = default;
 
-    virtual void save(const std::string& output_file_path_str) const = 0;
     virtual std::shared_ptr<const ILane<T_id>> get_lane(T_id id) const = 0;
     virtual std::shared_ptr<const ILane<T_id>> get_encapsulating_lane(geometry::Vec point) const = 0;
     virtual std::shared_ptr<const ILaneArray<T_id>> get_lanes(std::shared_ptr<const structures::IArray<T_id>> ids) const = 0;

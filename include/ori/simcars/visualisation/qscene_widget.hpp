@@ -28,9 +28,9 @@ class QSceneWidget : public AQSFMLCanvas
 
     bool focused;
     geometry::Vec focal_position;
-    std::shared_ptr<const structures::IArray<uint32_t>> focal_ego_agents, focal_non_ego_agents;
+    std::shared_ptr<const structures::IArray<std::string>> focal_entities;
 
-    temporal::Time earliest_time, latest_time, current_time;
+    temporal::Time current_time;
 
     temporal::Time last_time, last_realtime;
 
@@ -46,7 +46,7 @@ protected:
     void on_init() override;
     void on_update() override;
 
-    virtual void add_agent_to_render_stack(std::shared_ptr<const agent::IAgent> agent);
+    virtual void add_vehicle_to_render_stack(std::shared_ptr<const agent::IEntity> vehicle);
     virtual void add_scene_to_render_stack();
     virtual void populate_render_stack();
 
@@ -56,14 +56,10 @@ public:
 
     FP_DATA_TYPE get_pixels_per_metre() const;
     const geometry::Vec& get_focal_position() const;
-    std::shared_ptr<const structures::IArray<uint32_t>> get_focal_ego_agents() const;
-    std::shared_ptr<const structures::IArray<uint32_t>> get_focal_non_ego_agents() const;
+    std::shared_ptr<const structures::IArray<std::string>> get_focal_entities() const;
     temporal::Time get_time() const;
 
-    void set_focal_ego_agents(std::shared_ptr<const structures::IArray<uint32_t>> focal_ego_agents);
-    void set_focal_non_ego_agents(std::shared_ptr<const structures::IArray<uint32_t>> focal_non_ego_agents);
-    void set_focal_agents(std::shared_ptr<const structures::IArray<uint32_t>> focal_ego_agents,
-                          std::shared_ptr<const structures::IArray<uint32_t>> focal_non_ego_agents);
+    void set_focal_entities(std::shared_ptr<const structures::IArray<std::string>> focal_entities);
     void set_time(temporal::Time time);
 
 public slots:

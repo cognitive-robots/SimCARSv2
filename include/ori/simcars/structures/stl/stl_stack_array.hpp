@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ori/simcars/structures/stack_array_abstract.hpp>
+#include <ori/simcars/structures/stack_array_interface.hpp>
 
 #include <vector>
 
@@ -14,7 +14,7 @@ namespace stl
 {
 
 template <typename T>
-class STLStackArray : public virtual AStackArray<T>
+class STLStackArray : public virtual IStackArray<T>
 {
 protected:
     std::vector<T> data;
@@ -47,7 +47,7 @@ public:
 
     const T& operator [](size_t idx) const override
     {
-        return data[idx];
+        return data.at(idx);
     }
 
     void push_back(const T& val) override
@@ -72,7 +72,7 @@ public:
 
     T& operator [](size_t idx) override
     {
-        return data[idx];
+        return data.at(idx);
     }
 };
 
