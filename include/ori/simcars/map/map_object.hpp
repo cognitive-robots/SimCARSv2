@@ -1,9 +1,6 @@
 #pragma once
 
-#include <ori/simcars/map/declarations.hpp>
-#include <ori/simcars/map/map_interface.hpp>
-
-#include <memory>
+#include <ori/simcars/map/map_object_interface.hpp>
 
 namespace ori
 {
@@ -13,24 +10,19 @@ namespace map
 {
 
 template<typename T_id>
-class MapObject
+class MapObject : public virtual IMapObject<T_id>
 {
     const T_id id;
     const std::weak_ptr<const IMap<T_id>> map;
 
 public:
     MapObject(const T_id& id, std::shared_ptr<const IMap<T_id>> map) : id(id), map(map) {}
-    virtual ~MapObject() = default;
 
-    bool operator ==(const MapObject<T_id>& map_object) const
-    {
-        return this->id == map_object.id && this->map.lock() == map_object.map.lock();
-    }
-    T_id get_id() const
+    T_id get_id() const override
     {
         return id;
     }
-    std::shared_ptr<const IMap<T_id>> get_map() const
+    std::shared_ptr<const IMap<T_id>> get_map() const override
     {
         return map.lock();
     }

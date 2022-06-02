@@ -5,6 +5,7 @@
 #include <ori/simcars/temporal/stateful_interface.hpp>
 #include <ori/simcars/map/soul_interface.hpp>
 #include <ori/simcars/map/declarations.hpp>
+#include <ori/simcars/map/map_object_interface.hpp>
 #include <ori/simcars/map/traffic_light_state_holder_interface.hpp>
 
 #include <memory>
@@ -17,7 +18,7 @@ namespace map
 {
 
 template <typename T_id>
-class ITrafficLight : public ITrafficLightStateHolder, public temporal::IStateful<ITrafficLightStateHolder>, public virtual ISoul<ITrafficLight<T_id>>
+class ITrafficLight : public virtual IMapObject<T_id>, public ITrafficLightStateHolder, public temporal::IStateful<ITrafficLightStateHolder>, public virtual ISoul<ITrafficLight<T_id>>
 {
 public:
     virtual const geometry::Vec& get_position() const = 0;

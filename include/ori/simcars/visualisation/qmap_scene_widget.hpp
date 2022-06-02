@@ -41,7 +41,58 @@ protected:
             {
                 polygon->setPoint(j, to_sfml_vec(get_pixels_per_metre() * (*tris)[i][j]));
             }
-            polygon->setFillColor(sf::Color(204, 204, 204));
+
+            T_id id = lane->get_id();
+            size_t id_hash = std::hash<T_id>()(id);
+
+            float h = id_hash % 360;
+            float s = 0.5f;
+            float v = 1.0f;
+
+            float c = v * s;
+            float x = c * (1.0f - std::fabs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
+            float m = v - c;
+
+            uint8_t r, g, b;
+            if (0.0f <= h && h < 60.0f)
+            {
+                r = 255 * (c + m);
+                g = 255 * (x + m);
+                b = 255 * m;
+            }
+            else if (60.0f <= h && h < 120.0f)
+            {
+                r = 255 * (x + m);
+                g = 255 * (c + m);
+                b = 255 * m;
+            }
+            else if (120.0f <= h && h < 180.0f)
+            {
+                r = 255 * m;
+                g = 255 * (c + m);
+                b = 255 * (x + m);
+            }
+            else if (180.0f <= h && h < 240.0f)
+            {
+                r = 255 * m;
+                g = 255 * (x + m);
+                b = 255 * (c + m);
+            }
+            else if (240.0f <= h && h < 300.0f)
+            {
+                r = 255 * (x + m);
+                g = 255 * m;
+                b = 255 * (c + m);
+            }
+            else if (300.0f <= h && h < 360.0f)
+            {
+                r = 255 * (c + m);
+                g = 255 * m;
+                b = 255 * (x + m);
+            }
+
+            polygon->setFillColor(sf::Color(r, g, b, 128));
+
             render_stack.push_back(polygon);
         }
     }

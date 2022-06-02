@@ -6,6 +6,7 @@
 #include <ori/simcars/geometry/rect.hpp>
 #include <ori/simcars/map/soul_interface.hpp>
 #include <ori/simcars/map/declarations.hpp>
+#include <ori/simcars/map/map_object_interface.hpp>
 
 #include <memory>
 
@@ -17,7 +18,7 @@ namespace map
 {
 
 template <typename T_id>
-class ILane : public virtual ISoul<ILane<T_id>>
+class ILane : public virtual IMapObject<T_id>, public virtual ISoul<ILane<T_id>>
 {
 public:
     enum class AccessRestriction

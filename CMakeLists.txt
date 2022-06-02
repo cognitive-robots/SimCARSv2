@@ -108,6 +108,7 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/declarations.hpp
   include/ori/simcars/map/map_interface.hpp
   include/ori/simcars/map/file_based_map_interface.hpp
+  include/ori/simcars/map/map_object_interface.hpp
   include/ori/simcars/map/file_based_map_abstract.hpp
   include/ori/simcars/map/map_object.hpp
   include/ori/simcars/map/lane_interface.hpp

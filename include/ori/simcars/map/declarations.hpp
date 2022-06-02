@@ -15,6 +15,9 @@ template <typename T_id>
 class IMap;
 
 template <typename T_id>
+class IMapObject;
+
+template <typename T_id>
 class ILane;
 
 template <typename T_id>

@@ -151,7 +151,7 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
         }
         catch (std::out_of_range)
         {
-            std::cerr << "Position / Rotation not available for this time" << std::endl;
+            //std::cerr << "Position / Rotation not available for this time" << std::endl;
         }
     }
     catch (std::out_of_range)
@@ -194,7 +194,7 @@ void QSceneWidget::add_scene_to_render_stack()
                     }
                     catch (std::out_of_range)
                     {
-                        std::cerr << "Position not available for this time" << std::endl;
+                        //std::cerr << "Position not available for this time" << std::endl;
                     }
                 }
                 catch (std::out_of_range)
