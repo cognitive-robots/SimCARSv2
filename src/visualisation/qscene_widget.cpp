@@ -136,14 +136,7 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
             sf::Vector2f agent_text_position = agent_base_shape_position
                     - 0.5f * sf::Vector2f(text_bounds.width, agent_text_size);
             text->setPosition(agent_text_position);
-            if (ego_constant->get_value())
-            {
-                text->setFillColor(sf::Color(0, 0, 0));
-            }
-            else
-            {
-                text->setFillColor(sf::Color(255, 255, 255));
-            }
+            text->setFillColor(sf::Color(0, 0, 0));
 
             render_stack.push_back(rectangle);
             render_stack.push_back(circle);
