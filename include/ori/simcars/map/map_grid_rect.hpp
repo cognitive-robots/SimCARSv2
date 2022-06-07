@@ -28,19 +28,21 @@ public:
           traffic_lights(new structures::stl::STLSet<std::shared_ptr<const ITrafficLight<T_id>>>()) {}
     MapGridRect() : MapGridRect(geometry::Vec(0, 0), 0) {}
 
-    std::shared_ptr<const ILane<T_id>> get_encapsulating_lane(geometry::Vec point) const
+    std::shared_ptr<const ILaneArray<T_id>> get_encapsulating_lanes(geometry::Vec point) const
     {
         std::shared_ptr<const ILaneArray<T_id>> lanes = this->lanes->get_array();
+        std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const ILane<std::string>>>> encapsulating_lanes(
+                    new structures::stl::STLStackArray<std::shared_ptr<const ILane<std::string>>>());
         size_t i;
         for (i = 0; i < lanes->count(); ++i)
         {
             std::shared_ptr<const ILane<T_id>> lane = (*lanes)[i];
             if (lane->check_encapsulation(point))
             {
-                return lane;
+                encapsulating_lanes->push_back(lane);
             }
         }
-        return std::shared_ptr<const ILane<T_id>>();
+        return encapsulating_lanes;
     }
     std::shared_ptr<const structures::ISet<std::shared_ptr<const ILane<T_id>>>> get_lanes() const
     {

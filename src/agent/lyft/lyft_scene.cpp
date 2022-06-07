@@ -135,8 +135,8 @@ void LyftScene::load_virt(std::ifstream& input_filestream)
         //const std::shared_ptr<IVariable<FP_DATA_TYPE>> rate_of_steer_variable(new Variable<FP_DATA_TYPE>(entity_name, "rate_of_steer", IValuelessVariable::Type::INDIRECT_ACTUATION));
         //driving_agent->add_variable_parameter(rate_of_steer_variable->get_full_name(), rate_of_steer_variable);
 
-        const std::shared_ptr<IVariable<std::string>> lane_id_variable(new Variable<std::string>(entity_name, "lane_id", IValuelessVariable::Type::BASE));
-        driving_agent->add_variable_parameter(lane_id_variable->get_full_name(), lane_id_variable);
+        //const std::shared_ptr<IVariable<std::string>> lane_id_variable(new Variable<std::string>(entity_name, "lane_id", IValuelessVariable::Type::BASE));
+        //driving_agent->add_variable_parameter(lane_id_variable->get_full_name(), lane_id_variable);
 
         size_t i;
         for (i = 0; i < state_data_size; ++i)
@@ -182,9 +182,9 @@ void LyftScene::load_virt(std::ifstream& input_filestream)
             //const std::shared_ptr<IEvent<FP_DATA_TYPE>> rate_of_steer_event(new Event<FP_DATA_TYPE>(rate_of_steer_variable->get_full_name(), rate_of_steer, timestamp));
             //rate_of_steer_variable->add_event(rate_of_steer_event);
 
-            const std::string lane_id(state_data_entry["lane"].GetString());
-            const std::shared_ptr<IEvent<std::string>> lane_id_event(new Event<std::string>(lane_id_variable->get_full_name(), lane_id, timestamp));
-            lane_id_variable->add_event(lane_id_event);
+            //const std::string lane_id(state_data_entry["lane"].GetString());
+            //const std::shared_ptr<IEvent<std::string>> lane_id_event(new Event<std::string>(lane_id_variable->get_full_name(), lane_id, timestamp));
+            //lane_id_variable->add_event(lane_id_event);
         }
     }
 

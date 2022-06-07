@@ -249,18 +249,18 @@ std::shared_ptr<const ILane<std::string>> LyftMap::get_lane(std::string id) cons
     }
 }
 
-std::shared_ptr<const ILane<std::string>> LyftMap::get_encapsulating_lane(geometry::Vec point) const
+std::shared_ptr<const ILaneArray<std::string>> LyftMap::get_encapsulating_lanes(geometry::Vec point) const
 {
     if (map_grid_dict->contains(point))
     {
         std::shared_ptr<MapGridRect<std::string>> map_grid_rect = (*map_grid_dict)[point];
         if (map_grid_rect)
         {
-            return map_grid_rect->get_encapsulating_lane(point);
+            return map_grid_rect->get_encapsulating_lanes(point);
         }
     }
 
-    return std::shared_ptr<const ILane<std::string>>();
+    return std::shared_ptr<const ILaneArray<std::string>>(new structures::stl::STLStackArray<std::shared_ptr<const ILane<std::string>>>());
 }
 
 std::shared_ptr<const ILaneArray<std::string>> LyftMap::get_lanes(std::shared_ptr<const structures::IArray<std::string>> ids) const

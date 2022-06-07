@@ -15,7 +15,7 @@ namespace map
 {
 
 template<typename T_id>
-class ALivingLane : public ALane<T_id>
+class ALivingLane : public ALane<T_id>, public std::enable_shared_from_this<ALivingLane<T_id>>
 {
     mutable std::weak_ptr<const ILane<T_id>> left_adjacent_lane;
     mutable std::weak_ptr<const ILane<T_id>> right_adjacent_lane;
@@ -63,11 +63,15 @@ public:
 
     std::shared_ptr<const ILane<T_id>> get_true_self() const noexcept override
     {
-        return std::shared_ptr<const ILane<T_id>>(this);
+        return this->shared_from_this();
     }
 
     std::shared_ptr<const ILane<T_id>> get_left_adjacent_lane() const override
     {
+        if (this->left_adjacent_lane.expired())
+        {
+            return nullptr;
+        }
         std::shared_ptr<const ILane<T_id>> left_adjacent_lane = this->left_adjacent_lane.lock();
         try
         {
@@ -82,6 +86,10 @@ public:
     }
     std::shared_ptr<const ILane<T_id>> get_right_adjacent_lane() const override
     {
+        if (this->right_adjacent_lane.expired())
+        {
+            return nullptr;
+        }
         std::shared_ptr<const ILane<T_id>> right_adjacent_lane = this->right_adjacent_lane.lock();
         try
         {
@@ -99,12 +107,12 @@ public:
         std::shared_ptr<const IWeakLaneArray<T_id>> weak_fore_lanes;
         try
         {
-            weak_fore_lanes = fore_lanes->get_self();
+            weak_fore_lanes = this->fore_lanes->get_self();
         }
         catch (typename IWeakLaneArray<T_id>::GhostObjectException)
         {
-            fore_lanes = fore_lanes->get_true_self();
-            weak_fore_lanes = fore_lanes;
+            this->fore_lanes = this->fore_lanes->get_true_self();
+            weak_fore_lanes = this->fore_lanes;
         }
         std::shared_ptr<structures::IArray<std::shared_ptr<const ILane<T_id>>>> fore_lanes(
                     new structures::stl::STLStackArray<std::shared_ptr<const ILane<T_id>>>(weak_fore_lanes->count()));
@@ -116,12 +124,12 @@ public:
         std::shared_ptr<const IWeakLaneArray<T_id>> weak_aft_lanes;
         try
         {
-            weak_aft_lanes = aft_lanes->get_self();
+            weak_aft_lanes = this->aft_lanes->get_self();
         }
         catch (typename IWeakLaneArray<T_id>::GhostObjectException)
         {
-            aft_lanes = aft_lanes->get_true_self();
-            weak_aft_lanes = aft_lanes;
+            this->aft_lanes = this->aft_lanes->get_true_self();
+            weak_aft_lanes = this->aft_lanes;
         }
         std::shared_ptr<structures::IArray<std::shared_ptr<const ILane<T_id>>>> aft_lanes(
                     new structures::stl::STLStackArray<std::shared_ptr<const ILane<T_id>>>(weak_aft_lanes->count()));
@@ -133,12 +141,12 @@ public:
         std::shared_ptr<const IWeakTrafficLightArray<T_id>> weak_traffic_lights;
         try
         {
-            weak_traffic_lights = traffic_lights->get_self();
+            weak_traffic_lights = this->traffic_lights->get_self();
         }
         catch (typename IWeakTrafficLightArray<T_id>::GhostObjectException)
         {
-            traffic_lights = traffic_lights->get_true_self();
-            weak_traffic_lights = traffic_lights;
+            this->traffic_lights = this->traffic_lights->get_true_self();
+            weak_traffic_lights = this->traffic_lights;
         }
         std::shared_ptr<structures::IArray<std::shared_ptr<const ITrafficLight<T_id>>>> traffic_lights(
                     new structures::stl::STLStackArray<std::shared_ptr<const ITrafficLight<T_id>>>(weak_traffic_lights->count()));

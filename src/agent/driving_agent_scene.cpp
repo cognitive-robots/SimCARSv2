@@ -1,6 +1,7 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
+#include <ori/simcars/map/lane_interface.hpp>
 #include <ori/simcars/agent/defines.hpp>
 #include <ori/simcars/agent/event.hpp>
 #include <ori/simcars/agent/variable.hpp>
@@ -57,17 +58,6 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
 
         try
         {
-            std::shared_ptr<const IValuelessVariable> lane_valueless_variable =
-                    new_entity->get_variable_parameter(new_entity->get_name() + ".lane.base");
-        }
-        catch (std::out_of_range)
-        {
-            // Entity doesn't have a lane variable
-            std::cerr << "Could not extract lane goal variable" << std::endl;
-        }
-
-        try
-        {
             std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::get_instance();
 
             std::shared_ptr<const IValuelessVariable> linear_velocity_valueless_variable =
@@ -109,8 +99,6 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
             std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_acceleration_variable(
                         new Variable<FP_DATA_TYPE>(new_entity->get_name(), "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION));
 
-            //structures::stl::STLStackArray<std::pair<FP_DATA_TYPE, temporal::Time>> low_pass_accelerations;
-
             for (current_time = new_scene->min_temporal_limit; current_time <= new_scene->max_temporal_limit; current_time += time_step)
             {
                 try
@@ -121,26 +109,6 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
                     std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_acceleration_event(
                                 new Event<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration, current_time));
                     aligned_linear_acceleration_variable->add_event(aligned_linear_acceleration_event);
-
-                    /*
-                    FP_DATA_TYPE low_pass_acceleration = 0.0f;
-
-                    size_t j;
-                    for (j = 0; j < GAUSSIAN_KERNEL_SIZE; ++j)
-                    {
-                        size_t offset = j - (GAUSSIAN_KERNEL_SIZE / 2);
-                        temporal::Time adjusted_time =
-                                std::min(
-                                    std::max(temporal::Time(current_time + offset * time_step), new_scene->min_temporal_limit),
-                                    new_scene->max_temporal_limit);
-                        geometry::Vec linear_acceleration = linear_acceleration_variable->get_value(adjusted_time);
-                        FP_DATA_TYPE rotation = rotation_variable->get_value(current_time);
-                        FP_DATA_TYPE aligned_linear_acceleration = (trig_buff->get_rot_mat(-rotation) * linear_acceleration).x();
-                        low_pass_acceleration += gaussian_kernel[j] * aligned_linear_acceleration;
-                    }
-
-                    low_pass_accelerations.push_back(std::pair<FP_DATA_TYPE, temporal::Time>(low_pass_acceleration, current_time));
-                    */
                 }
                 catch (std::out_of_range)
                 {
@@ -155,7 +123,7 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
                         new Variable<temporal::Duration>(
                             new_entity->get_name(), "speed_goal_duration", IValuelessVariable::Type::GOAL_DURATION));
 
-            temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_DURATION_THRESHOLD));
+            temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_SPEED_CHANGE_DURATION_THRESHOLD));
 
             temporal::Time action_start_time = new_scene->min_temporal_limit;
             FP_DATA_TYPE action_start_speed = std::numeric_limits<FP_DATA_TYPE>::max();
@@ -357,92 +325,472 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
                 }
             }
 
-            /*
-            if (low_pass_accelerations.count() > 0)
+            new_entity->add_variable_parameter(speed_variable->get_full_name(), speed_variable);
+            new_entity->add_variable_parameter(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration_variable);
+            new_entity->add_variable_parameter(speed_goal_value_variable->get_full_name(), speed_goal_value_variable);
+            new_entity->add_variable_parameter(speed_goal_duration_variable->get_full_name(), speed_goal_duration_variable);
+        }
+        catch (std::out_of_range)
+        {
+            // Entity doesn't have a linear velocity variable
+            std::cerr << "Could not extract speed variable and speed goal variable" << std::endl;
+        }
+    }
+
+    return new_scene;
+}
+
+std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::shared_ptr<const IScene> scene,
+                                                                           std::shared_ptr<const map::IMap<std::string>> map)
+{
+    static_assert(GAUSSIAN_KERNEL_SIZE % 2, "Gaussian kernel size must be odd");
+
+    std::shared_ptr<DrivingAgentScene> new_scene(new DrivingAgentScene());
+    new_scene->map = map;
+
+    new_scene->min_spatial_limits = scene->get_min_spatial_limits();
+    new_scene->max_spatial_limits = scene->get_max_spatial_limits();
+    new_scene->min_temporal_limit = scene->get_min_temporal_limit();
+    new_scene->max_temporal_limit = scene->get_max_temporal_limit();
+
+    FP_DATA_TYPE gaussian_kernel[GAUSSIAN_KERNEL_SIZE];
+    FP_DATA_TYPE gaussian_kernel_sum = 0.0f;
+    size_t i;
+    for (i = 0; i < GAUSSIAN_KERNEL_SIZE; ++i)
+    {
+        size_t offset = i - (GAUSSIAN_KERNEL_SIZE / 2);
+        gaussian_kernel[i] = std::exp(-0.5 * std::pow((offset / GAUSSIAN_STD_DEV), 2.0));
+        gaussian_kernel_sum += gaussian_kernel[i];
+    }
+    for (i = 0; i < GAUSSIAN_KERNEL_SIZE; ++i)
+    {
+        gaussian_kernel[i] /= gaussian_kernel_sum;
+    }
+
+    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = scene->get_entities();
+
+    for(i = 0; i < entities->count(); ++i)
+    {
+        std::shared_ptr<IEntity> new_entity = (*entities)[i]->deep_copy();
+
+        new_scene->entity_dict.update(new_entity->get_name(), new_entity);
+
+        try
+        {
+            std::shared_ptr<const IValuelessVariable> position_valueless_variable =
+                    new_entity->get_variable_parameter(new_entity->get_name() + ".position.base");
+
+            std::shared_ptr<const IVariable<geometry::Vec>> position_variable =
+                    std::static_pointer_cast<const IVariable<geometry::Vec>>(position_valueless_variable);
+
+            temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_LANE_CHANGE_DURATION_THRESHOLD));
+
+            std::shared_ptr<IVariable<int32_t>> lane_goal_value_variable(
+                        new Variable<int32_t>(
+                            new_entity->get_name(), "lane_goal_value", IValuelessVariable::Type::GOAL_VALUE));
+            std::shared_ptr<IVariable<temporal::Duration>> lane_goal_duration_variable(
+                        new Variable<temporal::Duration>(
+                            new_entity->get_name(), "lane_goal_duration", IValuelessVariable::Type::GOAL_DURATION));
+
+            temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
+            temporal::Time current_time;
+            temporal::Time action_start_time;
+            temporal::Time lane_change_time = temporal::Time::max();
+            int32_t lane_change_offset = 0;
+            std::shared_ptr<const map::ILaneArray<std::string>> previous_lanes = nullptr;
+            for (current_time = new_scene->min_temporal_limit; current_time <= new_scene->max_temporal_limit; current_time += time_step)
             {
-                temporal::Duration min_duration_threshold(
-                            temporal::DurationRep(1000.0 * min_duration_threshold));
-
-                size_t current_cluster_start = 0;
-                size_t current_cluster_initial_count = 1;
-                FP_DATA_TYPE current_cluster_initial_sum = low_pass_accelerations[0].first;
-                temporal::Time current_cluster_start_time = low_pass_accelerations[0].second;
-
-                size_t j;
-                temporal::Time previous_time = low_pass_accelerations[0].second;
-                for (j = 1; j < low_pass_accelerations.count(); ++j)
+                try
                 {
-                    std::pair<FP_DATA_TYPE, temporal::Time> low_pass_accleration_time_pair = low_pass_accelerations[j];
-                    FP_DATA_TYPE low_pass_acceleration = low_pass_accleration_time_pair.first;
-                    temporal::Time time = low_pass_accleration_time_pair.second;
+                    geometry::Vec current_position = position_variable->get_value(current_time);
+                    std::shared_ptr<const map::ILaneArray<std::string>> current_lanes =
+                            map->get_encapsulating_lanes(current_position);
 
-                    if (previous_time - current_cluster_start_time >= min_duration_threshold)
+                    if (current_lanes->count() == 0)
                     {
-                        FP_DATA_TYPE current_cluster_mean = (current_cluster_initial_sum / current_cluster_initial_count);
-                        if (std::abs(low_pass_acceleration - current_cluster_mean) > ACCELERATION_CLUSTERING_THRESHOLD)
+                        // Vehicle is currently not on a lane segment. This can happen quite often due to small gaps inbetween the lane segments. As such we just disregard this timestep.
+                        continue;
+                    }
+
+                    if (previous_lanes != nullptr)
+                    {
+                        std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>> continuing_lanes(
+                                    new structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>());
+                        std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>> left_lanes(
+                                    new structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>());
+                        std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>> right_lanes(
+                                    new structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>());
+                        for (size_t j = 0; j < current_lanes->count(); ++j)
                         {
-                            if (std::abs(current_cluster_mean) >= ACTION_BACKED_ACCELERATION_THRESHOLD
-                                    || current_cluster_start == 0)
+                            std::shared_ptr<const map::ILane<std::string>> current_lane = (*current_lanes)[j];
+                            for (size_t k = 0; k < previous_lanes->count(); ++k)
                             {
-                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
-                                                                                                                     speed_variable->get_value(previous_time),
-                                                                                                                     current_cluster_start_time));
-                                speed_goal_value_variable->add_event(speed_goal_value_event);
-
-                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
-                                                                                                                     previous_time - current_cluster_start_time,
-                                                                                                                     current_cluster_start_time));
-                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                                std::shared_ptr<const map::ILane<std::string>> previous_lane = (*previous_lanes)[k];
+                                if (current_lane == previous_lane || current_lane->get_aft_lanes()->contains(previous_lane))
+                                {
+                                    continuing_lanes->push_back(current_lane);
+                                }
+                                else if (current_lane->get_right_adjacent_lane() == previous_lane)
+                                {
+                                    left_lanes->push_back(current_lane);
+                                }
+                                else if (current_lane->get_left_adjacent_lane() == previous_lane)
+                                {
+                                    right_lanes->push_back(current_lane);
+                                }
                             }
+                        }
 
-                            current_cluster_start = j;
-                            current_cluster_initial_count = 0;
-                            current_cluster_initial_sum = 0.0f;
-                            current_cluster_start_time = previous_time;
+                        if (continuing_lanes->count() == 0)
+                        {
+                            if (left_lanes->count() > 0)
+                            {
+                                --lane_change_offset;
+                                lane_change_time = current_time;
+                                previous_lanes = left_lanes;
+                            }
+                            else if (right_lanes->count() > 0)
+                            {
+                                ++lane_change_offset;
+                                lane_change_time = current_time;
+                                previous_lanes = right_lanes;
+                            }
+                            else
+                            {
+                                // This should be an exceptionally rare occurance, the vehicle is occupying at least one valid lane, but none of the occupied lanes are adjacent to the previously occupied lanes.
+                                // Because this is so rare, and difficult to handle, for now we essentially treat it as though the current lane occupation is a continuation of the previous lane occupation.
+                                previous_lanes = current_lanes;
+                            }
+                        }
+                        else
+                        {
+                            // We've found a valid continuation for the previous lanes, so now update the previous lanes with the lanes found to be valid continuations.
+                            previous_lanes = continuing_lanes;
                         }
                     }
                     else
                     {
-                        ++current_cluster_initial_count;
-                        current_cluster_initial_sum += low_pass_acceleration;
+                        // There were no previous lanes from which to calculate continuing lanes, so use current lanes for updating the previous lanes.
+                        previous_lanes = current_lanes;
                     }
 
-                    previous_time = time;
-                }
-
-                if (current_cluster_start == 0)
-                {
-                    std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
-                                                                                                         speed_variable->get_value(previous_time),
-                                                                                                         current_cluster_start_time));
-                    speed_goal_value_variable->add_event(speed_goal_value_event);
-
-                    std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
-                                                                                                         previous_time - current_cluster_start_time,
-                                                                                                         current_cluster_start_time));
-                    speed_goal_duration_variable->add_event(speed_goal_duration_event);
-                }
-                else
-                {
-                    if (previous_time - current_cluster_start_time >= min_duration_threshold)
+                    if (lane_change_time != temporal::Time::max())
                     {
-                        FP_DATA_TYPE current_cluster_mean = (current_cluster_initial_sum / current_cluster_initial_count);
-                        if (std::abs(current_cluster_mean) >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                        if (current_time - lane_change_time >= min_duration_threshold)
                         {
-                            std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
-                                                                                                                 speed_variable->get_value(previous_time),
-                                                                                                                 current_cluster_start_time));
-                            speed_goal_value_variable->add_event(speed_goal_value_event);
+                            if (lane_change_offset != 0)
+                            {
+                                std::shared_ptr<IEvent<int32_t>> lane_goal_value_event(new Event<int32_t>(lane_goal_value_variable->get_full_name(),
+                                                                                                                     lane_change_offset,
+                                                                                                                     action_start_time));
+                                lane_goal_value_variable->add_event(lane_goal_value_event);
 
-                            std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
-                                                                                                                 previous_time - current_cluster_start_time,
-                                                                                                                 current_cluster_start_time));
-                            speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                                std::shared_ptr<IEvent<temporal::Duration>> lane_goal_duration_event(new Event<temporal::Duration>(lane_goal_duration_variable->get_full_name(),
+                                                                                                                     current_time - action_start_time,
+                                                                                                                     action_start_time));
+                                lane_goal_duration_variable->add_event(lane_goal_duration_event);
+                            }
+                            else
+                            {
+                                // We ended up in the same lane as we started with too little time in any other lane to consider a lane change to have occured.
+                                // In other words, do nothing.
+                            }
+
+                            lane_change_time = temporal::Time::max();
+                        }
+                        else
+                        {
+                            // We haven't been in this lane long enough to consider it an actual lane change. Keep waiting!
+                        }
+                    }
+                    else
+                    {
+                        action_start_time = current_time;
+                    }
+                }
+                catch (std::out_of_range)
+                {
+                    // Attempt to get value from before variable was initialised
+                }
+            }
+
+            new_entity->add_variable_parameter(lane_goal_value_variable->get_full_name(), lane_goal_value_variable);
+            new_entity->add_variable_parameter(lane_goal_duration_variable->get_full_name(), lane_goal_duration_variable);
+        }
+        catch (std::out_of_range)
+        {
+            // Entity doesn't have a lane variable
+            std::cerr << "Could not extract lane goal variable" << std::endl;
+        }
+
+        try
+        {
+            std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::get_instance();
+
+            std::shared_ptr<const IValuelessVariable> linear_velocity_valueless_variable =
+                    new_entity->get_variable_parameter(new_entity->get_name() + ".linear_velocity.base");
+            std::shared_ptr<const IValuelessVariable> linear_acceleration_valueless_variable =
+                    new_entity->get_variable_parameter(new_entity->get_name() + ".linear_acceleration.indirect_actuation");
+            std::shared_ptr<const IValuelessVariable> rotation_valueless_variable =
+                    new_entity->get_variable_parameter(new_entity->get_name() + ".rotation.base");
+
+            std::shared_ptr<const IVariable<geometry::Vec>> linear_velocity_variable =
+                    std::static_pointer_cast<const IVariable<geometry::Vec>>(linear_velocity_valueless_variable);
+            std::shared_ptr<const IVariable<geometry::Vec>> linear_acceleration_variable =
+                    std::static_pointer_cast<const IVariable<geometry::Vec>>(linear_acceleration_valueless_variable);
+            std::shared_ptr<const IVariable<FP_DATA_TYPE>> rotation_variable =
+                    std::static_pointer_cast<const IVariable<FP_DATA_TYPE>>(rotation_valueless_variable);
+
+            std::shared_ptr<IVariable<FP_DATA_TYPE>> speed_variable(
+                        new Variable<FP_DATA_TYPE>(new_entity->get_name(), "speed", IValuelessVariable::Type::BASE));
+
+            temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
+            temporal::Time current_time;
+            for (current_time = new_scene->min_temporal_limit; current_time <= new_scene->max_temporal_limit; current_time += time_step)
+            {
+                try
+                {
+                    geometry::Vec linear_velocity = linear_velocity_variable->get_value(current_time);
+                    FP_DATA_TYPE speed = linear_velocity.norm();
+                    std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_event(
+                                new Event<FP_DATA_TYPE>(speed_variable->get_full_name(), speed, current_time));
+                    speed_variable->add_event(speed_event);
+                }
+                catch (std::out_of_range)
+                {
+                    // Attempt to get value from before variable was initialised
+                }
+            }
+
+
+            std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_acceleration_variable(
+                        new Variable<FP_DATA_TYPE>(new_entity->get_name(), "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION));
+
+            for (current_time = new_scene->min_temporal_limit; current_time <= new_scene->max_temporal_limit; current_time += time_step)
+            {
+                try
+                {
+                    geometry::Vec linear_acceleration = linear_acceleration_variable->get_value(current_time);
+                    FP_DATA_TYPE rotation = rotation_variable->get_value(current_time);
+                    FP_DATA_TYPE aligned_linear_acceleration = (trig_buff->get_rot_mat(-rotation) * linear_acceleration).x();
+                    std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_acceleration_event(
+                                new Event<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration, current_time));
+                    aligned_linear_acceleration_variable->add_event(aligned_linear_acceleration_event);
+                }
+                catch (std::out_of_range)
+                {
+                    // Attempt to get value from before variable was initialised
+                }
+            }
+
+            std::shared_ptr<IVariable<FP_DATA_TYPE>> speed_goal_value_variable(
+                        new Variable<FP_DATA_TYPE>(
+                            new_entity->get_name(), "speed_goal_value", IValuelessVariable::Type::GOAL_VALUE));
+            std::shared_ptr<IVariable<temporal::Duration>> speed_goal_duration_variable(
+                        new Variable<temporal::Duration>(
+                            new_entity->get_name(), "speed_goal_duration", IValuelessVariable::Type::GOAL_DURATION));
+
+            temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_SPEED_CHANGE_DURATION_THRESHOLD));
+
+            temporal::Time action_start_time = new_scene->min_temporal_limit;
+            FP_DATA_TYPE action_start_speed = std::numeric_limits<FP_DATA_TYPE>::max();
+            for (current_time = new_scene->min_temporal_limit + time_step; current_time <= new_scene->max_temporal_limit; current_time += time_step)
+            {
+                try
+                {
+                    FP_DATA_TYPE current_aligned_linear_acceleration = aligned_linear_acceleration_variable->get_value(current_time);
+                    FP_DATA_TYPE previous_aligned_linear_acceleration = aligned_linear_acceleration_variable->get_value(current_time - time_step);
+
+                    if (previous_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                    {
+                        if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                        {
+                            // STATUS QUO
+
+                            if (current_time + time_step > new_scene->max_temporal_limit)
+                            {
+                                if ((current_time - action_start_time >= min_duration_threshold
+                                     && std::abs(speed_variable->get_value(current_time) - action_start_speed) >= MIN_SPEED_DIFF_THRESHOLD)
+                                        || action_start_time == new_scene->min_temporal_limit)
+                                {
+                                    std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                         speed_variable->get_value(current_time),
+                                                                                                                         action_start_time));
+                                    speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                    std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                         current_time - action_start_time,
+                                                                                                                         action_start_time));
+                                    speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                                }
+                            }
+                        }
+                        else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+                        {
+                            if (((current_time - time_step) - action_start_time >= min_duration_threshold
+                                 && std::abs(speed_variable->get_value(current_time - time_step) - action_start_speed) >= MIN_SPEED_DIFF_THRESHOLD)
+                                    || (current_time + time_step > new_scene->max_temporal_limit
+                                        && action_start_time == new_scene->min_temporal_limit))
+                            {
+                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                     speed_variable->get_value(current_time - time_step),
+                                                                                                                     action_start_time));
+                                speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                     (current_time - time_step) - action_start_time,
+                                                                                                                     action_start_time));
+                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                            }
+
+                            action_start_time = current_time - time_step;
+                            action_start_speed = speed_variable->get_value(current_time - time_step);
+                        }
+                        else
+                        {
+                            if ((current_time - action_start_time >= min_duration_threshold
+                                 && std::abs(speed_variable->get_value(current_time) - action_start_speed) >= MIN_SPEED_DIFF_THRESHOLD)
+                                    || (current_time + time_step > new_scene->max_temporal_limit
+                                        && action_start_time == new_scene->min_temporal_limit))
+                            {
+                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                     speed_variable->get_value(current_time),
+                                                                                                                     action_start_time));
+                                speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                     current_time - action_start_time,
+                                                                                                                     action_start_time));
+                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                            }
+                        }
+                    }
+                    else if (previous_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+                    {
+                        if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                        {
+                            if (((current_time - time_step) - action_start_time >= min_duration_threshold
+                                 && std::abs(speed_variable->get_value(current_time - time_step) - action_start_speed) >= MIN_SPEED_DIFF_THRESHOLD)
+                                    || (current_time + time_step > new_scene->max_temporal_limit
+                                        && action_start_time == new_scene->min_temporal_limit))
+                            {
+                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                     speed_variable->get_value(current_time - time_step),
+                                                                                                                     action_start_time));
+                                speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                     (current_time - time_step) - action_start_time,
+                                                                                                                     action_start_time));
+                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                            }
+
+                            action_start_time = current_time - time_step;
+                            action_start_speed = speed_variable->get_value(current_time - time_step);
+                        }
+                        else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+                        {
+                            // STATUS QUO
+
+                            if (current_time + time_step > new_scene->max_temporal_limit)
+                            {
+                                if ((current_time - action_start_time >= min_duration_threshold
+                                     && std::abs(speed_variable->get_value(current_time) - action_start_speed) >= MIN_SPEED_DIFF_THRESHOLD)
+                                        || action_start_time == new_scene->min_temporal_limit)
+                                {
+                                    std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                         speed_variable->get_value(current_time),
+                                                                                                                         action_start_time));
+                                    speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                    std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                         current_time - action_start_time,
+                                                                                                                         action_start_time));
+                                    speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if ((current_time - action_start_time >= min_duration_threshold
+                                 && std::abs(speed_variable->get_value(current_time) - action_start_speed) >= MIN_SPEED_DIFF_THRESHOLD)
+                                    || (current_time + time_step > new_scene->max_temporal_limit
+                                        && action_start_time == new_scene->min_temporal_limit))
+                            {
+                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                     speed_variable->get_value(current_time),
+                                                                                                                     action_start_time));
+                                speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                     current_time - action_start_time,
+                                                                                                                     action_start_time));
+                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                        {
+                            if (action_start_time == new_scene->min_temporal_limit)
+                            {
+                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                     speed_variable->get_value(current_time - time_step),
+                                                                                                                     action_start_time));
+                                speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                     (current_time - time_step) - action_start_time,
+                                                                                                                     action_start_time));
+                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                            }
+
+                            action_start_time = current_time - time_step;
+                            action_start_speed = speed_variable->get_value(current_time - time_step);
+                        }
+                        else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+                        {
+                            if (action_start_time == new_scene->min_temporal_limit)
+                            {
+                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                     speed_variable->get_value(current_time - time_step),
+                                                                                                                     action_start_time));
+                                speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                     (current_time - time_step) - action_start_time,
+                                                                                                                     action_start_time));
+                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                            }
+
+                            action_start_time = current_time - time_step;
+                            action_start_speed = speed_variable->get_value(current_time - time_step);
+                        }
+                        else
+                        {
+                            // STATUS QUO
+
+                            if (current_time + time_step > new_scene->max_temporal_limit && action_start_time == new_scene->min_temporal_limit)
+                            {
+                                std::shared_ptr<IEvent<FP_DATA_TYPE>> speed_goal_value_event(new Event<FP_DATA_TYPE>(speed_goal_value_variable->get_full_name(),
+                                                                                                                     speed_variable->get_value(current_time),
+                                                                                                                     action_start_time));
+                                speed_goal_value_variable->add_event(speed_goal_value_event);
+
+                                std::shared_ptr<IEvent<temporal::Duration>> speed_goal_duration_event(new Event<temporal::Duration>(speed_goal_duration_variable->get_full_name(),
+                                                                                                                     current_time - action_start_time,
+                                                                                                                     action_start_time));
+                                speed_goal_duration_variable->add_event(speed_goal_duration_event);
+                            }
                         }
                     }
                 }
+                catch (std::out_of_range)
+                {
+                    // Attempt to get value from before variable was initialised
+                }
             }
-            */
 
             new_entity->add_variable_parameter(speed_variable->get_full_name(), speed_variable);
             new_entity->add_variable_parameter(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration_variable);
@@ -487,6 +835,16 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> DrivingAgent
 std::shared_ptr<const IEntity> DrivingAgentScene::get_entity(const std::string& entity_name) const
 {
     return entity_dict[entity_name];
+}
+
+bool DrivingAgentScene::has_map() const
+{
+    return map != nullptr;
+}
+
+std::shared_ptr<const map::IMap<std::string>> DrivingAgentScene::get_map() const
+{
+    return map;
 }
 
 }

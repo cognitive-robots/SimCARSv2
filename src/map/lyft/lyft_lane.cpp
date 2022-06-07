@@ -75,13 +75,25 @@ LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string
 
     access_restriction = AccessRestriction(json_lane_data["access_restriction"].GetInt());
 
-
     const std::string left_adjacent_lane_id(json_lane_data["adjacent_left_id"].GetString(), json_lane_data["adjacent_left_id"].GetStringLength());
-    set_left_adjacent_lane(GhostLane<std::string>::spawn(left_adjacent_lane_id, map));
-
+    if (left_adjacent_lane_id != "")
+    {
+        set_left_adjacent_lane(GhostLane<std::string>::spawn(left_adjacent_lane_id, map));
+    }
+    else
+    {
+        set_left_adjacent_lane(nullptr);
+    }
 
     const std::string right_adjacent_lane_id(json_lane_data["adjacent_right_id"].GetString(), json_lane_data["adjacent_right_id"].GetStringLength());
-    set_right_adjacent_lane(GhostLane<std::string>::spawn(right_adjacent_lane_id, map));
+    if (right_adjacent_lane_id != "")
+    {
+        set_right_adjacent_lane(GhostLane<std::string>::spawn(right_adjacent_lane_id, map));
+    }
+    else
+    {
+        set_right_adjacent_lane(nullptr);
+    }
 
 
     const rapidjson::Value::ConstArray fore_lane_data = json_lane_data["ahead_ids"].GetArray();

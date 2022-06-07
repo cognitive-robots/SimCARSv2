@@ -32,7 +32,7 @@ public:
     virtual ~IMap() = default;
 
     virtual std::shared_ptr<const ILane<T_id>> get_lane(T_id id) const = 0;
-    virtual std::shared_ptr<const ILane<T_id>> get_encapsulating_lane(geometry::Vec point) const = 0;
+    virtual std::shared_ptr<const ILaneArray<T_id>> get_encapsulating_lanes(geometry::Vec point) const = 0;
     virtual std::shared_ptr<const ILaneArray<T_id>> get_lanes(std::shared_ptr<const structures::IArray<T_id>> ids) const = 0;
     virtual std::shared_ptr<const ILaneArray<T_id>> get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
     virtual std::shared_ptr<const ITrafficLight<T_id>> get_traffic_light(T_id id) const = 0;

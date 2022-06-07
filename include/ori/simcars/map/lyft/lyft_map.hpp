@@ -34,7 +34,7 @@ protected:
 
 public:
     std::shared_ptr<const ILane<std::string>> get_lane(std::string id) const override;
-    std::shared_ptr<const ILane<std::string>> get_encapsulating_lane(geometry::Vec point) const override;
+    std::shared_ptr<const ILaneArray<std::string>> get_encapsulating_lanes(geometry::Vec point) const override;
     std::shared_ptr<const ILaneArray<std::string>> get_lanes(std::shared_ptr<const structures::IArray<std::string>> ids) const override;
     std::shared_ptr<const ILaneArray<std::string>> get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const override;
     std::shared_ptr<const ITrafficLight<std::string>> get_traffic_light(std::string id) const override;

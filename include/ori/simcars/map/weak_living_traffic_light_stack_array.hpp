@@ -11,14 +11,14 @@ namespace map
 {
 
 template <typename T_id>
-class WeakLivingTrafficLightStackArray : public virtual AWeakTrafficLightArray<T_id>, public virtual structures::stl::STLStackArray<std::weak_ptr<const ITrafficLight<T_id>>>
+class WeakLivingTrafficLightStackArray : public virtual AWeakTrafficLightArray<T_id>, public virtual structures::stl::STLStackArray<std::weak_ptr<const ITrafficLight<T_id>>>, public std::enable_shared_from_this<WeakLivingTrafficLightStackArray<T_id>>
 {
 public:
     using structures::stl::STLStackArray<std::weak_ptr<const ITrafficLight<T_id>>>::STLStackArray;
 
     std::shared_ptr<const IWeakTrafficLightArray<T_id>> get_true_self() const noexcept override
     {
-        return std::shared_ptr<const IWeakTrafficLightArray<T_id>>(this);
+        return this->shared_from_this();
     }
 };
 
