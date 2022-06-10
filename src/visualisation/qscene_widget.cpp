@@ -47,7 +47,7 @@ void QSceneWidget::on_update()
 
             populate_render_stack();
 
-            sf::View view(to_sfml_vec(focal_position), sf::Vector2f(this->width(), this->height()));
+            sf::View view(to_sfml_vec(focal_position, false, true), sf::Vector2f(this->width(), this->height()));
             setView(view);
 
             update_required = false;
@@ -107,12 +107,12 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
         temporal::Time current_time = this->get_time();
         try
         {
-            sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position_variable->get_value(current_time));
+            sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position_variable->get_value(current_time), false, true);
             sf::Vector2f agent_rectangle_position = agent_base_shape_position
-                    - to_sfml_vec(0.5f * trig_buff->get_rot_mat(rotation_variable->get_value(current_time))
+                    - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation_variable->get_value(current_time))
                                   * geometry::Vec(agent_rectangle_length, agent_rectangle_width));
             rectangle->setPosition(agent_rectangle_position);
-            rectangle->setRotation(180 * rotation_variable->get_value(current_time) / M_PI);
+            rectangle->setRotation(-180 * rotation_variable->get_value(current_time) / M_PI);
             rectangle->setFillColor(to_sfml_colour(road_agent_class_constant->get_value()));
             rectangle->setOutlineThickness(agent_rectangle_min_side * 0.1f);
 

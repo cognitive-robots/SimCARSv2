@@ -39,7 +39,7 @@ protected:
             polygon->setPointCount(3);
             for (j = 0; j < 3; ++j)
             {
-                polygon->setPoint(j, to_sfml_vec(get_pixels_per_metre() * (*tris)[i][j]));
+                polygon->setPoint(j, to_sfml_vec(get_pixels_per_metre() * (*tris)[i][j], false, true));
             }
 
             T_id id = lane->get_id();
@@ -100,7 +100,7 @@ protected:
     {
         std::shared_ptr<sf::CircleShape> circle(new sf::CircleShape(get_pixels_per_metre() * single_point_map_object_size));
         std::shared_ptr<const map::ITrafficLightStateHolder::State> traffic_light_state = traffic_light->get_state(this->get_time());
-        circle->setPosition(to_sfml_vec(get_pixels_per_metre() * traffic_light->get_position()));
+        circle->setPosition(to_sfml_vec(get_pixels_per_metre() * traffic_light->get_position(), false, true));
         circle->setFillColor(to_sfml_colour(traffic_light_state->active_face));
         render_stack.push_back(circle);
     }

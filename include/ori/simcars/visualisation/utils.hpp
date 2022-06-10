@@ -13,7 +13,7 @@ namespace simcars
 namespace visualisation
 {
 
-sf::Vector2f to_sfml_vec(const geometry::Vec& vec);
+sf::Vector2f to_sfml_vec(const geometry::Vec& vec, bool flip_x = false, bool flip_y = false);
 
 sf::Color to_sfml_colour(map::ITrafficLightStateHolder::FaceColour face_colour);
 
