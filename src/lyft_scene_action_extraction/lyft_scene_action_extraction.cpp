@@ -14,11 +14,27 @@ int main(int argc, char* argv[])
 {
     if (argc < 3)
     {
-        std::cerr << "Usage: ./lyft_scene_action_extraction input_scene_file_path input_map_file_path output_scene_file_path" << std::endl;
+        std::cerr << "Usage: ./lyft_scene_action_extraction input_map_file_path input_scene_file_path output_scene_file_path" << std::endl;
         return -1;
     }
 
     std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
+
+    std::cout << "Beginning map load" << std::endl;
+
+    std::shared_ptr<const map::IMap<std::string>> map;
+
+    try
+    {
+        map = map::lyft::LyftMap::load(argv[1]);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Exception occured during map load:" << std::endl << e.what() << std::endl;
+        return -1;
+    }
+
+    std::cout << "Finished map load" << std::endl;
 
     std::cout << "Beginning scene load" << std::endl;
 
@@ -26,7 +42,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        scene = agent::lyft::LyftScene::load(argv[1]);
+        scene = agent::lyft::LyftScene::load(argv[2]);
     }
     catch (const std::exception& e)
     {
@@ -38,22 +54,6 @@ int main(int argc, char* argv[])
 
     temporal::Duration scene_duration = scene->get_max_temporal_limit() - scene->get_min_temporal_limit();
     std::cout << "Scene is " << std::to_string(scene_duration.count() / 1000.0) << " s in length" << std::endl;
-
-    std::cout << "Beginning map load" << std::endl;
-
-    std::shared_ptr<const map::IMap<std::string>> map;
-
-    try
-    {
-        map = map::lyft::LyftMap::load(argv[2]);
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Exception occured during map load:" << std::endl << e.what() << std::endl;
-        return -1;
-    }
-
-    std::cout << "Finished map load" << std::endl;
 
     std::cout << "Beginning action extraction" << std::endl;
 
