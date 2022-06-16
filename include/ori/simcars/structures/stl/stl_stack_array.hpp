@@ -3,6 +3,7 @@
 #include <ori/simcars/structures/stack_array_interface.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace ori
 {
@@ -23,6 +24,13 @@ public:
     STLStackArray(size_t size = 0) : data(size) {}
     STLStackArray(std::initializer_list<T> init_list) : data(init_list) {}
     STLStackArray(const STLStackArray<T>& stl_stack_array) : data(stl_stack_array.data) {}
+    STLStackArray(std::shared_ptr<const IArray<T>> array) : data(array->count())
+    {
+        for (size_t i = 0; i < array->count(); ++i)
+        {
+            data[i] = array[i];
+        }
+    }
 
     size_t count() const override
     {

@@ -3,6 +3,7 @@
 #include <ori/simcars/structures/queue_array_interface.hpp>
 
 #include <deque>
+#include <memory>
 
 namespace ori
 {
@@ -23,6 +24,13 @@ public:
     STLQueueArray() {}
     STLQueueArray(std::initializer_list<T> init_list) : data(init_list) {}
     STLQueueArray(const STLQueueArray<T>& stl_queue_array) : data(stl_queue_array.data) {}
+    STLQueueArray(std::shared_ptr<const IArray<T>> array) : data(array->count())
+    {
+        for (size_t i = 0; i < array->count(); ++i)
+        {
+            data[i] = array[i];
+        }
+    }
 
     size_t count() const override
     {

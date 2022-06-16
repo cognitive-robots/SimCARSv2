@@ -4,6 +4,7 @@
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 
 #include <unordered_set>
+#include <memory>
 
 namespace ori
 {
@@ -25,6 +26,14 @@ public:
     STLSet(size_t bin_count = 10000) : data(bin_count) {}
     STLSet(std::initializer_list<T> init_list, size_t bin_count = 10000) : data(init_list, bin_count) {}
     STLSet(const STLSet& stl_set) : data(stl_set.data) {}
+    STLSet(std::shared_ptr<const ISet<T>> set)
+    {
+        std::shared_ptr<const IArray<T>> array = set->get_array();
+        for (size_t i; i < array->count(); ++i)
+        {
+            data.insert((*array)[i]);
+        }
+    }
 
     size_t count() const override
     {

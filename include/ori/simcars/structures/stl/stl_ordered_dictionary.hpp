@@ -27,6 +27,15 @@ protected:
 public:
     STLOrderedDictionary() : keys_cache(nullptr), values_cache(nullptr) {}
     STLOrderedDictionary(const STLOrderedDictionary<K, V, K_compare>& stl_dictionary) : data(stl_dictionary.data) {}
+    STLOrderedDictionary(std::shared_ptr<const IDictionary<K, V>> dictionary)
+    {
+        std::shared_ptr<const IArray<K>> keys = dictionary->get_keys();
+        for (size_t i = 0; i < keys->count(); ++i)
+        {
+            K key = (*keys)[i];
+            data[key] = dictionary[key];
+        }
+    }
 
     size_t count() const override
     {
