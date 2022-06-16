@@ -28,7 +28,7 @@ public:
     {
         for (size_t i = 0; i < array->count(); ++i)
         {
-            data[i] = array[i];
+            data[i] = (*array)[i];
         }
     }
 
