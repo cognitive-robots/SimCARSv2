@@ -111,7 +111,8 @@ temporal::Time CSVScene::get_max_temporal_limit() const
 
 std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> CSVScene::get_entities() const
 {
-    return entity_dict.get_values();
+    return std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>>(
+            new structures::stl::STLStackArray<std::shared_ptr<const IEntity>>(entity_dict.get_values()));
 }
 
 std::shared_ptr<const IEntity> CSVScene::get_entity(const std::string& entity_name) const

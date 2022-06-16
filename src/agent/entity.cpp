@@ -39,7 +39,8 @@ std::string Entity::get_name() const
 
 std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> Entity::get_constant_parameters() const
 {
-    return constant_dict.get_values();
+    return std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>>(
+            new structures::stl::STLStackArray<std::shared_ptr<const IValuelessConstant>>(constant_dict.get_values()));
 }
 
 std::shared_ptr<const IValuelessConstant> Entity::get_constant_parameter(const std::string& constant_name) const
@@ -75,7 +76,8 @@ bool Entity::remove_constant_parameter(const std::string& constant_name)
 
 std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> Entity::get_variable_parameters() const
 {
-    return variable_dict.get_values();
+    return std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>>(
+            new structures::stl::STLStackArray<std::shared_ptr<const IValuelessVariable>>(variable_dict.get_values()));
 }
 
 std::shared_ptr<const IValuelessVariable> Entity::get_variable_parameter(const std::string& variable_name) const

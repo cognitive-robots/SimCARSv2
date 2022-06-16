@@ -69,7 +69,8 @@ public:
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>> get_events() const override
     {
-        return time_event_dict.get_values();
+        return std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>>(
+                new structures::stl::STLStackArray<std::shared_ptr<const IEvent<T>>>(time_event_dict.get_values()));
     }
 
     std::shared_ptr<const IEvent<T>> get_event(temporal::Time time) const override

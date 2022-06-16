@@ -62,7 +62,7 @@ public:
 
         return false;
     }
-    std::shared_ptr<IArray<K>> get_keys() const override
+    std::shared_ptr<const IArray<K>> get_keys() const override
     {
         if (keys_cache)
         {
@@ -82,7 +82,7 @@ public:
             return keys_cache;
         }
     }
-    std::shared_ptr<IArray<V>> get_values() const override
+    std::shared_ptr<const IArray<V>> get_values() const override
     {
         if (values_cache)
         {
