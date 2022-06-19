@@ -1,5 +1,6 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
+#include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/agent/constant.hpp>
 #include <ori/simcars/agent/event.hpp>
 #include <ori/simcars/agent/variable.hpp>
@@ -123,8 +124,14 @@ void LyftScene::load_virt(std::ifstream& input_filestream)
         const std::shared_ptr<IVariable<geometry::Vec>> linear_velocity_variable(new Variable<geometry::Vec>(entity_name, "linear_velocity", IValuelessVariable::Type::BASE));
         driving_agent->add_variable_parameter(linear_velocity_variable->get_full_name(), linear_velocity_variable);
 
-        const std::shared_ptr<IVariable<geometry::Vec>> linear_acceleration_variable(new Variable<geometry::Vec>(entity_name, "linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION));
+        const std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_velocity_variable(new Variable<FP_DATA_TYPE>(entity_name, "aligned_linear_velocity", IValuelessVariable::Type::BASE));
+        driving_agent->add_variable_parameter(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity_variable);
+
+        const std::shared_ptr<IVariable<geometry::Vec>> linear_acceleration_variable(new Variable<geometry::Vec>(entity_name, "linear_acceleration", IValuelessVariable::Type::BASE));
         driving_agent->add_variable_parameter(linear_acceleration_variable->get_full_name(), linear_acceleration_variable);
+
+        const std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_acceleration_variable(new Variable<FP_DATA_TYPE>(entity_name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION));
+        driving_agent->add_variable_parameter(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration_variable);
 
         const std::shared_ptr<IVariable<FP_DATA_TYPE>> rotation_variable(new Variable<FP_DATA_TYPE>(entity_name, "rotation", IValuelessVariable::Type::BASE));
         driving_agent->add_variable_parameter(rotation_variable->get_full_name(), rotation_variable);
@@ -137,6 +144,8 @@ void LyftScene::load_virt(std::ifstream& input_filestream)
 
         //const std::shared_ptr<IVariable<std::string>> lane_id_variable(new Variable<std::string>(entity_name, "lane_id", IValuelessVariable::Type::BASE));
         //driving_agent->add_variable_parameter(lane_id_variable->get_full_name(), lane_id_variable);
+
+        std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::get_instance();
 
         size_t i;
         for (i = 0; i < state_data_size; ++i)
@@ -171,9 +180,16 @@ void LyftScene::load_virt(std::ifstream& input_filestream)
             const std::shared_ptr<IEvent<FP_DATA_TYPE>> rotation_event(new Event<FP_DATA_TYPE>(rotation_variable->get_full_name(), rotation, timestamp));
             rotation_variable->add_event(rotation_event);
 
-            // Note: Should probably only use component parallel to orientation of the vehicle.
+            FP_DATA_TYPE aligned_linear_velocity = (trig_buff->get_rot_mat(-rotation) * linear_velocity).x();
+            std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_event(new Event<FP_DATA_TYPE>(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity, timestamp));
+            aligned_linear_velocity_variable->add_event(aligned_linear_velocity_event);
+
+            FP_DATA_TYPE aligned_linear_acceleration = (trig_buff->get_rot_mat(-rotation) * linear_acceleration).x();
+            std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_acceleration_event(new Event<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration, timestamp));
+            aligned_linear_acceleration_variable->add_event(aligned_linear_acceleration_event);
+
             const FP_DATA_TYPE angular_velocity(state_data_entry["angular_velocity"].GetDouble());
-            const FP_DATA_TYPE steer = angular_velocity / linear_velocity.norm();
+            const FP_DATA_TYPE steer = angular_velocity / aligned_linear_velocity;
             const std::shared_ptr<IEvent<FP_DATA_TYPE>> steer_event(new Event<FP_DATA_TYPE>(steer_variable->get_full_name(), steer, timestamp));
             steer_variable->add_event(steer_event);
 

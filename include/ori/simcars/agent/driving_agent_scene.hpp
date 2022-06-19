@@ -20,7 +20,7 @@ class DrivingAgentScene : public virtual AScene
 
     std::shared_ptr<const map::IMap<std::string>> map = nullptr;
 
-    void extract_speed_change_events(std::shared_ptr<IEntity> entity);
+    void extract_aligned_linear_velocity_change_events(std::shared_ptr<IEntity> entity);
     void extract_lane_change_events(std::shared_ptr<IEntity> entity, std::shared_ptr<const map::IMap<std::string>> map);
 
 public:

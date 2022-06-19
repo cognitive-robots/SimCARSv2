@@ -131,7 +131,8 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> Enti
 {
     std::shared_ptr<const structures::IArray<std::string>> variable_names = variable_dict.get_keys();
 
-    std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const IValuelessEvent>>> events;
+    std::shared_ptr<structures::IStackArray<std::shared_ptr<const IValuelessEvent>>> events(
+                new structures::stl::STLStackArray<std::shared_ptr<const IValuelessEvent>>());
 
     std::shared_ptr<const IValuelessEvent> event;
 
