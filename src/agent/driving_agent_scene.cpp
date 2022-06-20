@@ -440,28 +440,12 @@ void DrivingAgentScene::extract_lane_change_events(std::shared_ptr<IEntity> enti
 
 std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::shared_ptr<const IScene> scene)
 {
-    static_assert(GAUSSIAN_KERNEL_SIZE % 2, "Gaussian kernel size must be odd");
-
     std::shared_ptr<DrivingAgentScene> new_scene(new DrivingAgentScene());
 
     new_scene->min_spatial_limits = scene->get_min_spatial_limits();
     new_scene->max_spatial_limits = scene->get_max_spatial_limits();
     new_scene->min_temporal_limit = scene->get_min_temporal_limit();
     new_scene->max_temporal_limit = scene->get_max_temporal_limit();
-
-    FP_DATA_TYPE gaussian_kernel[GAUSSIAN_KERNEL_SIZE];
-    FP_DATA_TYPE gaussian_kernel_sum = 0.0f;
-    size_t i;
-    for (i = 0; i < GAUSSIAN_KERNEL_SIZE; ++i)
-    {
-        size_t offset = i - (GAUSSIAN_KERNEL_SIZE / 2);
-        gaussian_kernel[i] = std::exp(-0.5 * std::pow((offset / GAUSSIAN_STD_DEV), 2.0));
-        gaussian_kernel_sum += gaussian_kernel[i];
-    }
-    for (i = 0; i < GAUSSIAN_KERNEL_SIZE; ++i)
-    {
-        gaussian_kernel[i] /= gaussian_kernel_sum;
-    }
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = scene->get_entities();
 
@@ -480,8 +464,6 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
 std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::shared_ptr<const IScene> scene,
                                                                            std::shared_ptr<const map::IMap<std::string>> map)
 {
-    static_assert(GAUSSIAN_KERNEL_SIZE % 2, "Gaussian kernel size must be odd");
-
     std::shared_ptr<DrivingAgentScene> new_scene(new DrivingAgentScene());
     new_scene->map = map;
 
@@ -489,20 +471,6 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
     new_scene->max_spatial_limits = scene->get_max_spatial_limits();
     new_scene->min_temporal_limit = scene->get_min_temporal_limit();
     new_scene->max_temporal_limit = scene->get_max_temporal_limit();
-
-    FP_DATA_TYPE gaussian_kernel[GAUSSIAN_KERNEL_SIZE];
-    FP_DATA_TYPE gaussian_kernel_sum = 0.0f;
-    size_t i;
-    for (i = 0; i < GAUSSIAN_KERNEL_SIZE; ++i)
-    {
-        size_t offset = i - (GAUSSIAN_KERNEL_SIZE / 2);
-        gaussian_kernel[i] = std::exp(-0.5 * std::pow((offset / GAUSSIAN_STD_DEV), 2.0));
-        gaussian_kernel_sum += gaussian_kernel[i];
-    }
-    for (i = 0; i < GAUSSIAN_KERNEL_SIZE; ++i)
-    {
-        gaussian_kernel[i] /= gaussian_kernel_sum;
-    }
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = scene->get_entities();
 
