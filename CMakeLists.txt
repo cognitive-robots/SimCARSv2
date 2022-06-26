@@ -158,6 +158,7 @@ add_library(simcars_agent STATIC
   src/agent/entity.cpp
   src/agent/driving_agent_scene.cpp
   src/agent/driving_agent_controller.cpp
+  src/agent/driving_agent_simulator.cpp
   src/agent/lyft/lyft_scene.cpp
   src/agent/csv/csv_scene.cpp
   include/ori/simcars/agent/defines.hpp
@@ -171,6 +172,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/scene_interface.hpp
   include/ori/simcars/agent/file_based_scene_interface.hpp
   include/ori/simcars/agent/controller_interface.hpp
+  include/ori/simcars/agent/simulator_interface.hpp
   include/ori/simcars/agent/constant_abstract.hpp
   include/ori/simcars/agent/event_abstract.hpp
   include/ori/simcars/agent/variable_abstract.hpp
@@ -182,6 +184,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/entity.hpp
   include/ori/simcars/agent/driving_agent_scene.hpp
   include/ori/simcars/agent/driving_agent_controller.hpp
+  include/ori/simcars/agent/driving_agent_simulator.hpp
   include/ori/simcars/agent/lyft/lyft_scene.hpp
   include/ori/simcars/agent/csv/csv_scene.hpp
 )

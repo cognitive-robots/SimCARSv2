@@ -32,7 +32,7 @@ std::shared_ptr<const CSVScene> CSVScene::construct_from(std::shared_ptr<const I
     size_t i;
     for(i = 0; i < entities->count(); ++i)
     {
-        std::shared_ptr<IEntity> new_entity = (*entities)[i];
+        std::shared_ptr<const IEntity> new_entity = (*entities)[i];
 
         new_scene->entity_dict.update(new_entity->get_name(), new_entity);
     }

@@ -21,6 +21,8 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> Driv
     std::shared_ptr<structures::IStackArray<std::shared_ptr<const IValuelessEvent>>> new_events(
                 new structures::stl::STLStackArray<std::shared_ptr<const IValuelessEvent>>());
 
+    FP_DATA_TYPE aligned_linear_velocity;
+    FP_DATA_TYPE aligned_linear_acceleration;
     try
     {
         std::shared_ptr<const IValuelessVariable> aligned_linear_velocity_valueless_variable =
@@ -37,12 +39,12 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> Driv
         std::shared_ptr<const IVariable<temporal::Duration>> aligned_linear_velocity_goal_duration_variable =
                 std::static_pointer_cast<const IVariable<temporal::Duration>>(aligned_linear_velocity_goal_duration_valueless_variable);
 
-        FP_DATA_TYPE aligned_linear_velocity = aligned_linear_velocity_variable->get_value(time);
+        aligned_linear_velocity = aligned_linear_velocity_variable->get_value(time);
         FP_DATA_TYPE aligned_linear_velocity_goal_value = aligned_linear_velocity_goal_value_variable->get_value(time);
         temporal::Duration aligned_linear_velocity_goal_duration = aligned_linear_velocity_goal_duration_variable->get_value(time);
 
         FP_DATA_TYPE aligned_linear_velocity_error = aligned_linear_velocity_goal_value - aligned_linear_velocity;
-        FP_DATA_TYPE aligned_linear_acceleration = aligned_linear_velocity_error / aligned_linear_velocity_goal_duration.count();
+        aligned_linear_acceleration = aligned_linear_velocity_error / aligned_linear_velocity_goal_duration.count();
 
         std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_acceleration_event(new Event<FP_DATA_TYPE>(entity->get_name() + ".aligned_linear_acceleration.indirect_actuation", aligned_linear_acceleration, time));
         new_events->push_back(aligned_linear_acceleration_event);

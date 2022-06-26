@@ -449,7 +449,7 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = scene->get_entities();
 
-    for(i = 0; i < entities->count(); ++i)
+    for(size_t i = 0; i < entities->count(); ++i)
     {
         std::shared_ptr<IEntity> new_entity = (*entities)[i]->deep_copy();
 
@@ -474,7 +474,7 @@ std::shared_ptr<const DrivingAgentScene> DrivingAgentScene::construct_from(std::
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = scene->get_entities();
 
-    for(i = 0; i < entities->count(); ++i)
+    for(size_t i = 0; i < entities->count(); ++i)
     {
         std::shared_ptr<IEntity> new_entity = (*entities)[i]->deep_copy();
 
