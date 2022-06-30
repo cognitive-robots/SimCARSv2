@@ -154,11 +154,13 @@ target_compile_options(simcars_map PRIVATE -fPIC)
 set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_agent STATIC
+  src/agent/driving_agent_abstract.cpp
   src/agent/scene_abstract.cpp
-  src/agent/entity.cpp
-  src/agent/driving_agent_scene.cpp
+  src/agent/driving_goal_extraction_agent.cpp
+  src/agent/driving_goal_extraction_scene.cpp
   src/agent/driving_agent_controller.cpp
   src/agent/driving_agent_simulator.cpp
+  src/agent/lyft/lyft_driving_agent.cpp
   src/agent/lyft/lyft_scene.cpp
   src/agent/csv/csv_scene.cpp
   include/ori/simcars/agent/defines.hpp
@@ -168,23 +170,31 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/constant_interface.hpp
   include/ori/simcars/agent/event_interface.hpp
   include/ori/simcars/agent/variable_interface.hpp
+  include/ori/simcars/agent/state_interface.hpp
   include/ori/simcars/agent/entity_interface.hpp
+  include/ori/simcars/agent/driving_enums.hpp
+  include/ori/simcars/agent/driving_agent_state_interface.hpp
+  include/ori/simcars/agent/driving_agent_interface.hpp
   include/ori/simcars/agent/scene_interface.hpp
+  include/ori/simcars/agent/driving_scene_state_interface.hpp
+  include/ori/simcars/agent/driving_scene_interface.hpp
   include/ori/simcars/agent/file_based_scene_interface.hpp
   include/ori/simcars/agent/controller_interface.hpp
   include/ori/simcars/agent/simulator_interface.hpp
   include/ori/simcars/agent/constant_abstract.hpp
   include/ori/simcars/agent/event_abstract.hpp
   include/ori/simcars/agent/variable_abstract.hpp
+  include/ori/simcars/agent/driving_agent_abstract.hpp
   include/ori/simcars/agent/scene_abstract.hpp
   include/ori/simcars/agent/file_based_scene_abstract.hpp
   include/ori/simcars/agent/constant.hpp
   include/ori/simcars/agent/event.hpp
   include/ori/simcars/agent/variable.hpp
-  include/ori/simcars/agent/entity.hpp
-  include/ori/simcars/agent/driving_agent_scene.hpp
+  include/ori/simcars/agent/driving_goal_extraction_agent.hpp
+  include/ori/simcars/agent/driving_goal_extraction_scene.hpp
   include/ori/simcars/agent/driving_agent_controller.hpp
   include/ori/simcars/agent/driving_agent_simulator.hpp
+  include/ori/simcars/agent/lyft/lyft_driving_agent.hpp
   include/ori/simcars/agent/lyft/lyft_scene.hpp
   include/ori/simcars/agent/csv/csv_scene.hpp
 )

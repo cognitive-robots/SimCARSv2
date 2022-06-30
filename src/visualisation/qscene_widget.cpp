@@ -81,8 +81,8 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
                 std::static_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
         std::shared_ptr<const agent::IConstant<uint32_t>> id_constant =
                 std::static_pointer_cast<const agent::IConstant<uint32_t>>(id_valueless_constant);
-        std::shared_ptr<const agent::IConstant<agent::lyft::RoadAgentClass>> road_agent_class_constant =
-                std::static_pointer_cast<const agent::IConstant<agent::lyft::RoadAgentClass>>(road_agent_class_valueless_constant);
+        std::shared_ptr<const agent::IConstant<agent::DrivingAgentClass>> road_agent_class_constant =
+                std::static_pointer_cast<const agent::IConstant<agent::DrivingAgentClass>>(road_agent_class_valueless_constant);
         std::shared_ptr<const agent::IConstant<FP_DATA_TYPE>> bb_length_constant =
                 std::static_pointer_cast<const agent::IConstant<FP_DATA_TYPE>>(bb_length_valueless_constant);
         std::shared_ptr<const agent::IConstant<FP_DATA_TYPE>> bb_width_constant =

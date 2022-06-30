@@ -67,22 +67,6 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> ASce
     return events;
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> AScene::get_events(temporal::Time time) const
-{
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = this->get_entities();
-
-    std::shared_ptr<structures::stl::STLConcatArray<std::shared_ptr<const IValuelessEvent>>> events(
-                new structures::stl::STLConcatArray<std::shared_ptr<const IValuelessEvent>>(entities->count()));
-
-    size_t i;
-    for(i = 0; i < entities->count(); ++i)
-    {
-        events->get_array(i) = (*entities)[i]->get_events(time);
-    }
-
-    return events;
-}
-
 }
 }
 }

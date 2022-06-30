@@ -17,7 +17,7 @@ sf::Vector2f to_sfml_vec(const geometry::Vec& vec, bool flip_x = false, bool fli
 
 sf::Color to_sfml_colour(map::ITrafficLightStateHolder::FaceColour face_colour);
 
-sf::Color to_sfml_colour(agent::lyft::RoadAgentClass road_agent_class);
+sf::Color to_sfml_colour(agent::DrivingAgentClass driving_agent_class);
 
 //sf::Color to_sfml_colour(agent::IAgent::Status agent_status);
 

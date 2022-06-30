@@ -19,7 +19,6 @@ public:
     std::shared_ptr<const IValuelessVariable> get_variable(const std::string& variable_name) const override;
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const override;
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events(temporal::Time time) const override;
 };
 
 }

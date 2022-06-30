@@ -4,7 +4,6 @@
 #include <ori/simcars/agent/constant.hpp>
 #include <ori/simcars/agent/event.hpp>
 #include <ori/simcars/agent/variable.hpp>
-#include <ori/simcars/agent/entity.hpp>
 #include <ori/simcars/agent/csv/csv_scene.hpp>
 
 #include <iostream>
@@ -32,9 +31,7 @@ std::shared_ptr<const CSVScene> CSVScene::construct_from(std::shared_ptr<const I
     size_t i;
     for(i = 0; i < entities->count(); ++i)
     {
-        std::shared_ptr<const IEntity> new_entity = (*entities)[i];
-
-        new_scene->entity_dict.update(new_entity->get_name(), new_entity);
+        new_scene->entity_dict.update((*entities)[i]->get_name(), (*entities)[i]);
     }
 
     return new_scene;
@@ -118,6 +115,11 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> CSVScene::ge
 std::shared_ptr<const IEntity> CSVScene::get_entity(const std::string& entity_name) const
 {
     return entity_dict[entity_name];
+}
+
+std::shared_ptr<const IState> CSVScene::get_state(temporal::Time time) const
+{
+    throw utils::NotImplementedException();
 }
 
 }

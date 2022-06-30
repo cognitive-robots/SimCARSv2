@@ -1,6 +1,7 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/agent/event.hpp>
+#include <ori/simcars/agent/variable_interface.hpp>
 #include <ori/simcars/agent/driving_agent_controller.hpp>
 
 #include <iostream>

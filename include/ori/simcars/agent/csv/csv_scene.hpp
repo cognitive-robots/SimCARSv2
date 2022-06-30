@@ -34,6 +34,8 @@ public:
 
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const override;
     std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const override;
+
+    std::shared_ptr<const IState> get_state(temporal::Time time) const override;
 };
 
 }

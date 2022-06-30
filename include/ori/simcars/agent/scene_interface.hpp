@@ -3,9 +3,10 @@
 #include <ori/simcars/structures/array_interface.hpp>
 #include <ori/simcars/geometry/typedefs.hpp>
 #include <ori/simcars/temporal/typedefs.hpp>
-#include <ori/simcars/agent/constant_interface.hpp>
-#include <ori/simcars/agent/event_interface.hpp>
-#include <ori/simcars/agent/variable_interface.hpp>
+#include <ori/simcars/agent/valueless_constant_interface.hpp>
+#include <ori/simcars/agent/valueless_event_interface.hpp>
+#include <ori/simcars/agent/valueless_variable_interface.hpp>
+#include <ori/simcars/agent/state_interface.hpp>
 #include <ori/simcars/agent/entity_interface.hpp>
 
 #include <string>
@@ -39,7 +40,8 @@ public:
     virtual std::shared_ptr<const IValuelessVariable> get_variable(const std::string& variable_name) const = 0;
 
     virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const = 0;
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events(temporal::Time time) const = 0;
+
+    virtual std::shared_ptr<const IState> get_state(temporal::Time time) const = 0;
 };
 
 }

@@ -28,7 +28,7 @@ protected:
 public:
     ~AFileBasedMap() override
     {
-        static_assert(std::is_base_of<AFileBasedMap, T_map>::value, "T_map is not derived from AMap");
+        static_assert(std::is_base_of<AFileBasedMap, T_map>::value, "T_map is not derived from AFileBasedMap");
     }
 
     void save(const std::string& output_file_path_str) const override
@@ -47,7 +47,7 @@ public:
 
     virtual std::shared_ptr<T_map> copy() const = 0;
 
-    static std::shared_ptr<const IFileBasedMap<T_id>> load(const std::string& input_file_path_str)
+    static std::shared_ptr<const T_map> load(const std::string& input_file_path_str)
     {
         std::filesystem::path input_file_path(input_file_path_str);
 
@@ -62,7 +62,7 @@ public:
 
         map->load_virt(input_filestream);
 
-        return map;
+        return std::dynamic_pointer_cast<const T_map>(map);
     }
 };
 

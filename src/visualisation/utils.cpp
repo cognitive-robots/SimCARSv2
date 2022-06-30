@@ -51,44 +51,44 @@ sf::Color to_sfml_colour(map::ITrafficLightStateHolder::FaceColour face_colour)
     return sf::Color(255, 255, 255);
 }
 
-sf::Color to_sfml_colour(agent::lyft::RoadAgentClass road_agent_class)
+sf::Color to_sfml_colour(agent::DrivingAgentClass driving_agent_class)
 {
-    switch(road_agent_class)
+    switch(driving_agent_class)
     {
-    case agent::lyft::RoadAgentClass::UNKNOWN:
+    case agent::DrivingAgentClass::UNKNOWN:
         break;
 
-    case agent::lyft::RoadAgentClass::CAR:
+    case agent::DrivingAgentClass::CAR:
         return sf::Color(255, 128, 0);
 
-    case agent::lyft::RoadAgentClass::VAN:
+    case agent::DrivingAgentClass::VAN:
         return sf::Color(255, 255, 0);
 
-    case agent::lyft::RoadAgentClass::TRAM:
+    case agent::DrivingAgentClass::TRAM:
         return sf::Color(128, 255, 0);
 
-    case agent::lyft::RoadAgentClass::BUS:
+    case agent::DrivingAgentClass::BUS:
         return sf::Color(0, 255, 0);
 
-    case agent::lyft::RoadAgentClass::TRUCK:
+    case agent::DrivingAgentClass::TRUCK:
         return sf::Color(0, 255, 128);
 
-    case agent::lyft::RoadAgentClass::EMERGENCY_VEHICLE:
+    case agent::DrivingAgentClass::EMERGENCY_VEHICLE:
         return sf::Color(0, 255, 255);
 
-    case agent::lyft::RoadAgentClass::BICYCLE:
+    case agent::DrivingAgentClass::BICYCLE:
         return sf::Color(0, 128, 255);
 
-    case agent::lyft::RoadAgentClass::MOTORCYCLE:
+    case agent::DrivingAgentClass::MOTORCYCLE:
         return sf::Color(0, 0, 255);
 
-    case agent::lyft::RoadAgentClass::PEDESTRIAN:
+    case agent::DrivingAgentClass::PEDESTRIAN:
         return sf::Color(128, 0, 255);
 
-    case agent::lyft::RoadAgentClass::ANIMAL:
+    case agent::DrivingAgentClass::ANIMAL:
         return sf::Color(255, 0, 255);
 
-    case agent::lyft::RoadAgentClass::OTHER_VEHICLE:
+    case agent::DrivingAgentClass::OTHER_VEHICLE:
         return sf::Color(255, 0, 128);
     }
 

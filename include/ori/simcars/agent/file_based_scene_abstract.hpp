@@ -24,6 +24,11 @@ protected:
     virtual void load_virt(std::ifstream& input_filestream) = 0;
 
 public:
+    ~AFileBasedScene() override
+    {
+        static_assert(std::is_base_of<AFileBasedScene, T_scene>::value, "T_map is not derived from AFileBasedScene");
+    }
+
     void save(const std::string& output_file_path_str) const override
     {
         std::filesystem::path output_file_path(output_file_path_str);
@@ -38,7 +43,7 @@ public:
         this->save_virt(output_filestream);
     }
 
-    static std::shared_ptr<const IFileBasedScene> load(const std::string& input_file_path_str)
+    static std::shared_ptr<const T_scene> load(const std::string& input_file_path_str)
     {
         std::filesystem::path input_file_path(input_file_path_str);
 
@@ -53,7 +58,7 @@ public:
 
         scene->load_virt(input_filestream);
 
-        return scene;
+        return std::dynamic_pointer_cast<const T_scene>(scene);
     }
 };
 

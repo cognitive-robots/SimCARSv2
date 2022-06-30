@@ -1,7 +1,7 @@
 
 #include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/map/lyft/lyft_map.hpp>
-#include <ori/simcars/agent/driving_agent_scene.hpp>
+#include <ori/simcars/agent/driving_goal_extraction_scene.hpp>
 #include <ori/simcars/agent/lyft/lyft_scene.hpp>
 #include <ori/simcars/agent/csv/csv_scene.hpp>
 
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    std::shared_ptr<const agent::IFileBasedScene> scene;
+    std::shared_ptr<const agent::IDrivingScene> scene;
 
     try
     {
@@ -57,11 +57,11 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning action extraction" << std::endl;
 
-    std::shared_ptr<const agent::IScene> scene_with_actions;
+    std::shared_ptr<const agent::IDrivingScene> scene_with_actions;
 
     try
     {
-        scene_with_actions = agent::DrivingAgentScene::construct_from(scene, map);
+        scene_with_actions = agent::DrivingGoalExtractionScene::construct_from(scene, map);
     }
     catch (const std::exception& e)
     {

@@ -1,4 +1,5 @@
 
+#include <ori/simcars/agent/variable_interface.hpp>
 #include <ori/simcars/agent/driving_agent_simulator.hpp>
 
 #include <iostream>
