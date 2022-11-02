@@ -1,18 +1,21 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14)
 
 project(simcars VERSION 0.0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 find_package(Eigen3 REQUIRED)
 find_package(RapidJSON REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(SFML REQUIRED COMPONENTS graphics)
+
+add_subdirectory(extern/magic_enum)
+add_subdirectory(extern/lz4_stream)
 
 add_library(simcars_utils STATIC
   src/utils/sanity_check.cpp
@@ -77,6 +80,8 @@ target_link_libraries(simcars_geometry
 PUBLIC
   simcars_utils
   Eigen3::Eigen
+PRIVATE
+  magic_enum::magic_enum
 )
 add_dependencies(simcars_geometry simcars_utils)
 target_compile_options(simcars_geometry PRIVATE -fPIC)
@@ -138,6 +143,7 @@ target_include_directories(simcars_map
 PUBLIC
   $<INSTALL_INTERFACE:include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+PRIVATE
   ${RAPIDJSON_INCLUDE_DIRS}
 )
 target_link_libraries(simcars_map
@@ -147,7 +153,7 @@ PUBLIC
   simcars_structures
   simcars_temporal
 PRIVATE
-  lz4
+  lz4_stream
 )
 add_dependencies(simcars_map simcars_utils simcars_structures simcars_temporal simcars_geometry)
 target_compile_options(simcars_map PRIVATE -fPIC)
@@ -230,8 +236,9 @@ PUBLIC
   simcars_geometry
   simcars_structures
   simcars_temporal
+  magic_enum::magic_enum
 PRIVATE
-  lz4
+  lz4_stream
 )
 add_dependencies(simcars_agent simcars_utils simcars_structures simcars_temporal simcars_geometry)
 target_compile_options(simcars_agent PRIVATE -fPIC)

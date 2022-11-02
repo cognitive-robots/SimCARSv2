@@ -7,7 +7,7 @@
 #include <ori/simcars/agent/basic_variable.hpp>
 #include <ori/simcars/agent/lyft/lyft_driving_agent.hpp>
 
-#include <neargye/magic_enum/magic_enum.hpp>
+#include <magic_enum.hpp>
 
 namespace ori
 {

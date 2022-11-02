@@ -1,6 +1,6 @@
 #pragma once
 
-#include <neargye/magic_enum/magic_enum.hpp>
+#include <magic_enum.hpp>
 
 namespace ori
 {
