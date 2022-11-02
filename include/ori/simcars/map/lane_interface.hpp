@@ -38,9 +38,11 @@ public:
     virtual const geometry::Vec& get_centroid() const = 0;
     virtual size_t get_point_count() const = 0;
     virtual const geometry::Rect& get_bounding_box() const = 0;
+    virtual FP_DATA_TYPE get_mean_steer() const = 0;
     virtual ILane<T_id>::AccessRestriction get_access_restriction() const = 0;
     virtual std::shared_ptr<const ILane<T_id>> get_left_adjacent_lane() const = 0;
     virtual std::shared_ptr<const ILane<T_id>> get_right_adjacent_lane() const = 0;
+    virtual std::shared_ptr<const ILane<T_id>> get_straight_fore_lane() const = 0;
     virtual std::shared_ptr<const ILaneArray<T_id>> get_fore_lanes() const = 0;
     virtual std::shared_ptr<const ILaneArray<T_id>> get_aft_lanes() const = 0;
     virtual std::shared_ptr<const ITrafficLightArray<T_id>> get_traffic_lights() const = 0;

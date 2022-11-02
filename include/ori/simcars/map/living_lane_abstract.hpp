@@ -19,6 +19,7 @@ class ALivingLane : public ALane<T_id>, public std::enable_shared_from_this<ALiv
 {
     mutable std::weak_ptr<const ILane<T_id>> left_adjacent_lane;
     mutable std::weak_ptr<const ILane<T_id>> right_adjacent_lane;
+    mutable std::weak_ptr<const ILane<T_id>> straight_fore_lane;
     mutable std::shared_ptr<const IWeakLaneArray<T_id>> fore_lanes;
     mutable std::shared_ptr<const IWeakLaneArray<T_id>> aft_lanes;
     mutable std::shared_ptr<const IWeakTrafficLightArray<T_id>> traffic_lights;
@@ -100,6 +101,34 @@ public:
             right_adjacent_lane = right_adjacent_lane->get_true_self();
             this->right_adjacent_lane = right_adjacent_lane;
             return right_adjacent_lane;
+        }
+    }
+    std::shared_ptr<const ILane<T_id>> get_straight_fore_lane() const override
+    {
+        if (this->straight_fore_lane.expired())
+        {
+            std::shared_ptr<const ILaneArray<T_id>> fore_lanes = this->get_fore_lanes();
+            if (fore_lanes->count() > 0)
+            {
+                std::shared_ptr<const ILane<T_id>> min_abs_steer_fore_lane = (*fore_lanes)[0];
+                for (size_t i = 1; i < fore_lanes->count(); ++i)
+                {
+                    if (std::abs((*fore_lanes)[i]->get_mean_steer()) < std::abs(min_abs_steer_fore_lane->get_mean_steer()))
+                    {
+                        min_abs_steer_fore_lane = (*fore_lanes)[i];
+                    }
+                }
+                this->straight_fore_lane = std::weak_ptr<const ILane<T_id>>(min_abs_steer_fore_lane);
+                return min_abs_steer_fore_lane;
+            }
+            else
+            {
+                return nullptr;
+            }
+        }
+        else
+        {
+            return this->straight_fore_lane.lock();
         }
     }
     std::shared_ptr<const ILaneArray<T_id>> get_fore_lanes() const override

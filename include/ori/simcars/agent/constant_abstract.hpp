@@ -12,7 +12,7 @@ namespace agent
 {
 
 template <typename T>
-class AConstant : public IConstant<T>
+class AConstant : public virtual IConstant<T>
 {
 public:
     std::string get_full_name() const override

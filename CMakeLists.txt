@@ -154,19 +154,28 @@ target_compile_options(simcars_map PRIVATE -fPIC)
 set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_agent STATIC
+  src/agent/driving_agent_state_abstract.cpp
   src/agent/driving_agent_abstract.cpp
   src/agent/scene_abstract.cpp
+  src/agent/driving_scene_abstract.cpp
+  src/agent/basic_driving_agent_state.cpp
+  src/agent/basic_driving_scene_state.cpp
+  src/agent/goal_driving_agent_state.cpp
   src/agent/driving_goal_extraction_agent.cpp
   src/agent/driving_goal_extraction_scene.cpp
-  src/agent/driving_agent_controller.cpp
-  src/agent/driving_agent_simulator.cpp
+  src/agent/basic_driving_simulator.cpp
+  src/agent/driving_simulation_agent.cpp
+  src/agent/driving_simulation_scene.cpp
+  src/agent/basic_driving_agent_controller.cpp
   src/agent/lyft/lyft_driving_agent.cpp
   src/agent/lyft/lyft_scene.cpp
   src/agent/csv/csv_scene.cpp
   include/ori/simcars/agent/defines.hpp
+  include/ori/simcars/agent/declarations.hpp
   include/ori/simcars/agent/valueless_constant_interface.hpp
   include/ori/simcars/agent/valueless_event_interface.hpp
   include/ori/simcars/agent/valueless_variable_interface.hpp
+  include/ori/simcars/agent/simulated_valueless_variable_interface.hpp
   include/ori/simcars/agent/constant_interface.hpp
   include/ori/simcars/agent/event_interface.hpp
   include/ori/simcars/agent/variable_interface.hpp
@@ -181,19 +190,30 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/file_based_scene_interface.hpp
   include/ori/simcars/agent/controller_interface.hpp
   include/ori/simcars/agent/simulator_interface.hpp
+  include/ori/simcars/agent/simulation_scene_interface.hpp
+  include/ori/simcars/agent/driving_agent_controller_interface.hpp
+  include/ori/simcars/agent/driving_simulator_interface.hpp
   include/ori/simcars/agent/constant_abstract.hpp
   include/ori/simcars/agent/event_abstract.hpp
   include/ori/simcars/agent/variable_abstract.hpp
+  include/ori/simcars/agent/driving_agent_state_abstract.hpp
   include/ori/simcars/agent/driving_agent_abstract.hpp
   include/ori/simcars/agent/scene_abstract.hpp
+  include/ori/simcars/agent/driving_scene_abstract.hpp
   include/ori/simcars/agent/file_based_scene_abstract.hpp
-  include/ori/simcars/agent/constant.hpp
-  include/ori/simcars/agent/event.hpp
-  include/ori/simcars/agent/variable.hpp
+  include/ori/simcars/agent/basic_constant.hpp
+  include/ori/simcars/agent/basic_event.hpp
+  include/ori/simcars/agent/basic_variable.hpp
+  include/ori/simcars/agent/basic_driving_agent_state.hpp
+  include/ori/simcars/agent/basic_driving_scene_state.hpp
+  include/ori/simcars/agent/goal_driving_agent_state.hpp
   include/ori/simcars/agent/driving_goal_extraction_agent.hpp
   include/ori/simcars/agent/driving_goal_extraction_scene.hpp
-  include/ori/simcars/agent/driving_agent_controller.hpp
-  include/ori/simcars/agent/driving_agent_simulator.hpp
+  include/ori/simcars/agent/simulated_variable.hpp
+  include/ori/simcars/agent/basic_driving_simulator.hpp
+  include/ori/simcars/agent/driving_simulation_agent.hpp
+  include/ori/simcars/agent/driving_simulation_scene.hpp
+  include/ori/simcars/agent/basic_driving_agent_controller.hpp
   include/ori/simcars/agent/lyft/lyft_driving_agent.hpp
   include/ori/simcars/agent/lyft/lyft_scene.hpp
   include/ori/simcars/agent/csv/csv_scene.hpp
@@ -271,7 +291,7 @@ add_executable(qmap_scene_widget_test src/qmap_scene_widget_test/qmap_scene_widg
 target_link_libraries(qmap_scene_widget_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
 add_dependencies(qmap_scene_widget_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
 
-#add_executable(simcars_demo src/simcars_demo/simcars_demo.cpp)
-#target_link_libraries(simcars_demo simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
-#add_dependencies(simcars_demo simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
+add_executable(simcars_demo src/simcars_demo/simcars_demo.cpp)
+target_link_libraries(simcars_demo simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
+add_dependencies(simcars_demo simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
 

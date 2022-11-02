@@ -1,8 +1,9 @@
 #pragma once
 
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
-#include <ori/simcars/agent/driving_scene_interface.hpp>
 #include <ori/simcars/agent/file_based_scene_abstract.hpp>
+#include <ori/simcars/agent/driving_scene_abstract.hpp>
+#include <ori/simcars/agent/lyft/lyft_driving_agent.hpp>
 
 namespace ori
 {
@@ -13,7 +14,7 @@ namespace agent
 namespace lyft
 {
 
-class LyftScene : public virtual AFileBasedScene<LyftScene>, public virtual IDrivingScene
+class LyftScene : public virtual AFileBasedScene<LyftScene>, public virtual ADrivingScene
 {
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
@@ -36,12 +37,8 @@ public:
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const override;
     std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const override;
 
-    std::shared_ptr<const IState> get_state(temporal::Time time) const override;
-
     std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> get_driving_agents() const override;
     std::shared_ptr<const IDrivingAgent> get_driving_agent(const std::string& driving_agent_name) const override;
-
-    std::shared_ptr<const IDrivingSceneState> get_driving_scene_state(temporal::Time time) const override;
 };
 
 }

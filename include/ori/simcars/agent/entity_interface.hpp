@@ -36,7 +36,7 @@ public:
 
     virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const = 0;
 
-    virtual std::shared_ptr<const IState> get_state(temporal::Time time) const = 0;
+    virtual std::shared_ptr<IState> get_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
 };
 
 }

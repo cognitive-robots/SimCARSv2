@@ -1,6 +1,5 @@
 
 #include <ori/simcars/utils/exceptions.hpp>
-#include <ori/simcars/agent/lyft/lyft_driving_agent.hpp>
 #include <ori/simcars/agent/lyft/lyft_scene.hpp>
 
 #include <laudrup/lz4_stream/lz4_stream.hpp>
@@ -62,7 +61,7 @@ void LyftScene::load_virt(std::ifstream& input_filestream)
     {
         const rapidjson::Value::ConstObject& json_agent_data = json_document_element.GetObject();
 
-        std::shared_ptr<const IDrivingAgent> driving_agent = std::shared_ptr<const IDrivingAgent>(new LyftDrivingAgent(json_agent_data));
+        std::shared_ptr<const LyftDrivingAgent> driving_agent(new LyftDrivingAgent(json_agent_data));
 
         driving_agent_dict.update(driving_agent->get_name(), driving_agent);
 
@@ -116,25 +115,16 @@ std::shared_ptr<const IEntity> LyftScene::get_entity(const std::string& entity_n
     return this->get_driving_agent(entity_name);
 }
 
-std::shared_ptr<const IState> LyftScene::get_state(temporal::Time time) const
-{
-    return this->get_driving_scene_state(time);
-}
-
 std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> LyftScene::get_driving_agents() const
 {
     return std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>>(
-            new structures::stl::STLStackArray<std::shared_ptr<const IDrivingAgent>>(driving_agent_dict.get_values()));
+                new structures::stl::STLStackArray<std::shared_ptr<const IDrivingAgent>>(
+                    driving_agent_dict.get_values()));
 }
 
 std::shared_ptr<const IDrivingAgent> LyftScene::get_driving_agent(const std::string& driving_agent_name) const
 {
     return driving_agent_dict[driving_agent_name];
-}
-
-std::shared_ptr<const IDrivingSceneState> LyftScene::get_driving_scene_state(temporal::Time time) const
-{
-    throw utils::NotImplementedException();
 }
 
 }

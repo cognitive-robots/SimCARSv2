@@ -1,8 +1,7 @@
 #pragma once
 
-#include <ori/simcars/structures/array_interface.hpp>
 #include <ori/simcars/temporal/typedefs.hpp>
-#include <ori/simcars/agent/valueless_event_interface.hpp>
+#include <ori/simcars/agent/state_interface.hpp>
 
 namespace ori
 {
@@ -16,7 +15,7 @@ class ISimulator
 public:
     virtual ~ISimulator() = default;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> simulate(temporal::Time current_time, temporal::Duration time_step) const = 0;
+    virtual void simulate(std::shared_ptr<const agent::IState> current_state, std::shared_ptr<agent::IState> next_state, temporal::Duration time_step) const = 0;
 };
 
 }

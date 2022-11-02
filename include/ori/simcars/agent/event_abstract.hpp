@@ -12,12 +12,12 @@ namespace agent
 {
 
 template <typename T>
-class AEvent : public IEvent<T>
+class AEvent : public virtual IEvent<T>
 {
 protected:
     bool is_equal(std::shared_ptr<const IValuelessEvent> event) const override
     {
-        std::shared_ptr<const AEvent<T>> cast_event = std::static_pointer_cast<const AEvent<T>>(event);
+        std::shared_ptr<const AEvent<T>> cast_event = std::dynamic_pointer_cast<const AEvent<T>>(event);
         return this->get_variable_name() == cast_event->get_variable_name() &&
                 this->get_value() == cast_event->get_value() &&
                 this->get_time() == cast_event->get_time();

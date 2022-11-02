@@ -17,8 +17,6 @@ namespace temporal
 template <typename V>
 class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
 {
-    const Duration time_diff_threshold;
-
     Time search(const Time& timestamp) const override
     {
         const structures::IArray<Time>& timestamps = *(this->get_keys());
@@ -33,8 +31,8 @@ class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
            throw std::out_of_range("Temporal dictionary is empty");
         }
 
-        if (timestamp < timestamps[search_window_start] - time_diff_threshold
-                || timestamp > timestamps[search_window_end - 1] + time_diff_threshold)
+        if (timestamp < timestamps[search_window_start] - this->get_time_diff_threshold()
+                || timestamp > timestamps[search_window_end - 1] + this->get_time_diff_threshold())
         {
             throw std::out_of_range("Specified timestamp is outside the period covered by the temporal dictionary");
         }
@@ -75,7 +73,7 @@ class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
             closest_timestamp = timestamps[search_window_end];
         }
 
-        if (min_diff > time_diff_threshold)
+        if (min_diff > this->get_time_diff_threshold())
         {
             throw std::out_of_range("Specified timestamp is too far from the closest timestamp to be considered a match");
         }
@@ -96,8 +94,8 @@ class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
             return false;
         }
 
-        if (timestamp < timestamps[search_window_start] - time_diff_threshold
-                || timestamp > timestamps[search_window_end - 1] + time_diff_threshold)
+        if (timestamp < timestamps[search_window_start] - this->get_time_diff_threshold()
+                || timestamp > timestamps[search_window_end - 1] + this->get_time_diff_threshold())
         {
             return false;
         }
@@ -138,7 +136,7 @@ class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
             closest_timestamp = timestamps[search_window_end];
         }
 
-        if (min_diff > time_diff_threshold)
+        if (min_diff > this->get_time_diff_threshold())
         {
             return false;
         }
@@ -147,11 +145,12 @@ class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
     }
 
 public:
+    ProximalTemporalDictionary(size_t max_cache_size)
+        : ProximalTemporalDictionary<V>(Duration::max() / 2, max_cache_size) {}
     ProximalTemporalDictionary(Duration time_diff_threshold, size_t max_cache_size)
-        : AbstractTemporalDictionary<V>(max_cache_size), time_diff_threshold(time_diff_threshold) {}
+        : AbstractTemporalDictionary<V>(time_diff_threshold, max_cache_size) {}
     ProximalTemporalDictionary(const ProximalTemporalDictionary<V>& temporal_dictionary)
-        : AbstractTemporalDictionary<V>(temporal_dictionary),
-          time_diff_threshold(temporal_dictionary.time_diff_threshold) {}
+        : AbstractTemporalDictionary<V>(temporal_dictionary) {}
 
 };
 

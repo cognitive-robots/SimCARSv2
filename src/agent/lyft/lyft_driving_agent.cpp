@@ -2,9 +2,9 @@
 #include <ori/simcars/utils/exceptions.hpp>
 #include <ori/simcars/structures/stl/stl_concat_array.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
-#include <ori/simcars/agent/constant.hpp>
-#include <ori/simcars/agent/event.hpp>
-#include <ori/simcars/agent/variable.hpp>
+#include <ori/simcars/agent/basic_constant.hpp>
+#include <ori/simcars/agent/basic_event.hpp>
+#include <ori/simcars/agent/basic_variable.hpp>
 #include <ori/simcars/agent/lyft/lyft_driving_agent.hpp>
 
 #include <neargye/magic_enum/magic_enum.hpp>
@@ -35,20 +35,20 @@ LyftDrivingAgent::LyftDrivingAgent(const rapidjson::Value::ConstObject& json_age
 
     this->name = (ego ? "ego_vehicle_" : "non_ego_vehicle_") + std::to_string(id);
 
-    const std::shared_ptr<IConstant<uint32_t>> id_constant(new Constant<uint32_t>(this->name, "id", id));
+    const std::shared_ptr<IConstant<uint32_t>> id_constant(new BasicConstant<uint32_t>(this->name, "id", id));
     this->constant_dict.update(id_constant->get_full_name(), id_constant);
 
-    const std::shared_ptr<IConstant<bool>> ego_constant(new Constant<bool>(this->name, "ego", ego));
+    const std::shared_ptr<IConstant<bool>> ego_constant(new BasicConstant<bool>(this->name, "ego", ego));
     this->constant_dict.update(ego_constant->get_full_name(), ego_constant);
 
     const rapidjson::Value::ConstArray bounding_box_data = json_agent_data["bounding_box"].GetArray();
     const FP_DATA_TYPE bb_length = bounding_box_data[0].GetDouble();
     const FP_DATA_TYPE bb_width = bounding_box_data[1].GetDouble();
 
-    const std::shared_ptr<IConstant<FP_DATA_TYPE>> bb_length_constant(new Constant<FP_DATA_TYPE>(this->name, "bb_length", bb_length));
+    const std::shared_ptr<IConstant<FP_DATA_TYPE>> bb_length_constant(new BasicConstant<FP_DATA_TYPE>(this->name, "bb_length", bb_length));
     this->constant_dict.update(bb_length_constant->get_full_name(), bb_length_constant);
 
-    const std::shared_ptr<IConstant<FP_DATA_TYPE>> bb_width_constant(new Constant<FP_DATA_TYPE>(this->name, "bb_width", bb_width));
+    const std::shared_ptr<IConstant<FP_DATA_TYPE>> bb_width_constant(new BasicConstant<FP_DATA_TYPE>(this->name, "bb_width", bb_width));
     this->constant_dict.update(bb_width_constant->get_full_name(), bb_width_constant);
 
     std::string class_label = json_agent_data["class_label"].GetString();
@@ -66,32 +66,38 @@ LyftDrivingAgent::LyftDrivingAgent(const rapidjson::Value::ConstObject& json_age
         class_value = DrivingAgentClass::UNKNOWN;
     }
 
-    const std::shared_ptr<IConstant<DrivingAgentClass>> road_agent_class_constant(new Constant<DrivingAgentClass>(this->name, "road_agent_class", class_value));
-    this->constant_dict.update(road_agent_class_constant->get_full_name(), road_agent_class_constant);
+    const std::shared_ptr<IConstant<DrivingAgentClass>> driving_agent_class_constant(new BasicConstant<DrivingAgentClass>(this->name, "driving_agent_class", class_value));
+    this->constant_dict.update(driving_agent_class_constant->get_full_name(), driving_agent_class_constant);
 
     const rapidjson::Value::ConstArray state_data = json_agent_data["states"].GetArray();
     const size_t state_data_size = state_data.Capacity();
 
-    const std::shared_ptr<IVariable<geometry::Vec>> position_variable(new Variable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE));
+    const std::shared_ptr<IVariable<geometry::Vec>> position_variable(new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, temporal::Duration(100)));
     this->variable_dict.update(position_variable->get_full_name(), position_variable);
 
-    const std::shared_ptr<IVariable<geometry::Vec>> linear_velocity_variable(new Variable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE));
+    const std::shared_ptr<IVariable<geometry::Vec>> linear_velocity_variable(new BasicVariable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100)));
     this->variable_dict.update(linear_velocity_variable->get_full_name(), linear_velocity_variable);
 
-    const std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_velocity_variable(new Variable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE));
+    const std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_velocity_variable(new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100)));
     this->variable_dict.update(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity_variable);
 
-    const std::shared_ptr<IVariable<geometry::Vec>> linear_acceleration_variable(new Variable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE));
+    const std::shared_ptr<IVariable<geometry::Vec>> linear_acceleration_variable(new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE, temporal::Duration(100)));
     this->variable_dict.update(linear_acceleration_variable->get_full_name(), linear_acceleration_variable);
 
-    const std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_acceleration_variable(new Variable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION));
+    const std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_acceleration_variable(new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(100)));
     this->variable_dict.update(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration_variable);
 
-    const std::shared_ptr<IVariable<FP_DATA_TYPE>> rotation_variable(new Variable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE));
+    const std::shared_ptr<IVariable<geometry::Vec>> external_linear_acceleration_variable(new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::EXTERNAL, temporal::Duration(100)));
+    this->variable_dict.update(external_linear_acceleration_variable->get_full_name(), external_linear_acceleration_variable);
+
+    const std::shared_ptr<IVariable<FP_DATA_TYPE>> rotation_variable(new BasicVariable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE, temporal::Duration(100)));
     this->variable_dict.update(rotation_variable->get_full_name(), rotation_variable);
 
-    const std::shared_ptr<IVariable<FP_DATA_TYPE>> steer_variable(new Variable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION));
+    const std::shared_ptr<IVariable<FP_DATA_TYPE>> steer_variable(new BasicVariable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(100)));
     this->variable_dict.update(steer_variable->get_full_name(), steer_variable);
+
+    const std::shared_ptr<IVariable<FP_DATA_TYPE>> angular_velocity_variable(new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100)));
+    this->variable_dict.update(angular_velocity_variable->get_full_name(), angular_velocity_variable);
 
     std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::get_instance();
 
@@ -111,34 +117,41 @@ LyftDrivingAgent::LyftDrivingAgent(const rapidjson::Value::ConstObject& json_age
         min_position_y = std::min(position_y, min_position_y);
         max_position_y = std::max(position_y, max_position_y);
         const geometry::Vec position(position_x, position_y);
-        const std::shared_ptr<IEvent<geometry::Vec>> position_event(new Event<geometry::Vec>(position_variable->get_full_name(), position, timestamp));
+        const std::shared_ptr<IEvent<geometry::Vec>> position_event(new BasicEvent<geometry::Vec>(position_variable->get_full_name(), position, timestamp));
         position_variable->add_event(position_event);
 
         const rapidjson::Value::ConstArray linear_velocity_data = state_data_entry["linear_velocity"].GetArray();
         const geometry::Vec linear_velocity(linear_velocity_data[0].GetDouble(), linear_velocity_data[1].GetDouble());
-        const std::shared_ptr<IEvent<geometry::Vec>> linear_velocity_event(new Event<geometry::Vec>(linear_velocity_variable->get_full_name(), linear_velocity, timestamp));
+        const std::shared_ptr<IEvent<geometry::Vec>> linear_velocity_event(new BasicEvent<geometry::Vec>(linear_velocity_variable->get_full_name(), linear_velocity, timestamp));
         linear_velocity_variable->add_event(linear_velocity_event);
 
         const rapidjson::Value::ConstArray linear_acceleration_data = state_data_entry["linear_acceleration"].GetArray();
         const geometry::Vec linear_acceleration(linear_acceleration_data[0].GetDouble(), linear_acceleration_data[1].GetDouble());
-        const std::shared_ptr<IEvent<geometry::Vec>> linear_acceleration_event(new Event<geometry::Vec>(linear_acceleration_variable->get_full_name(), linear_acceleration, timestamp));
+        const std::shared_ptr<IEvent<geometry::Vec>> linear_acceleration_event(new BasicEvent<geometry::Vec>(linear_acceleration_variable->get_full_name(), linear_acceleration, timestamp));
         linear_acceleration_variable->add_event(linear_acceleration_event);
 
         const FP_DATA_TYPE rotation(state_data_entry["rotation"].GetDouble());
-        const std::shared_ptr<IEvent<FP_DATA_TYPE>> rotation_event(new Event<FP_DATA_TYPE>(rotation_variable->get_full_name(), rotation, timestamp));
+        const std::shared_ptr<IEvent<FP_DATA_TYPE>> rotation_event(new BasicEvent<FP_DATA_TYPE>(rotation_variable->get_full_name(), rotation, timestamp));
         rotation_variable->add_event(rotation_event);
 
         FP_DATA_TYPE aligned_linear_velocity = (trig_buff->get_rot_mat(-rotation) * linear_velocity).x();
-        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_event(new Event<FP_DATA_TYPE>(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity, timestamp));
+        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity, timestamp));
         aligned_linear_velocity_variable->add_event(aligned_linear_velocity_event);
 
         FP_DATA_TYPE aligned_linear_acceleration = (trig_buff->get_rot_mat(-rotation) * linear_acceleration).x();
-        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_acceleration_event(new Event<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration, timestamp));
+        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_acceleration_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration, timestamp));
         aligned_linear_acceleration_variable->add_event(aligned_linear_acceleration_event);
 
+        geometry::Vec external_linear_acceleration = linear_acceleration - (trig_buff->get_rot_mat(rotation) * geometry::Vec(aligned_linear_acceleration, 0));
+        std::shared_ptr<IEvent<geometry::Vec>> external_linear_acceleration_event(new BasicEvent<geometry::Vec>(external_linear_acceleration_variable->get_full_name(), external_linear_acceleration, timestamp));
+        external_linear_acceleration_variable->add_event(external_linear_acceleration_event);
+
         const FP_DATA_TYPE angular_velocity(state_data_entry["angular_velocity"].GetDouble());
+        const std::shared_ptr<IEvent<FP_DATA_TYPE>> angular_velocity_event(new BasicEvent<FP_DATA_TYPE>(angular_velocity_variable->get_full_name(), angular_velocity, timestamp));
+        angular_velocity_variable->add_event(angular_velocity_event);
+
         const FP_DATA_TYPE steer = angular_velocity / aligned_linear_velocity;
-        const std::shared_ptr<IEvent<FP_DATA_TYPE>> steer_event(new Event<FP_DATA_TYPE>(steer_variable->get_full_name(), steer, timestamp));
+        const std::shared_ptr<IEvent<FP_DATA_TYPE>> steer_event(new BasicEvent<FP_DATA_TYPE>(steer_variable->get_full_name(), steer, timestamp));
         steer_variable->add_event(steer_event);
     }
 
@@ -233,11 +246,6 @@ std::shared_ptr<IDrivingAgent> LyftDrivingAgent::driving_agent_deep_copy() const
     }
 
     return driving_agent;
-}
-
-std::shared_ptr<const IDrivingAgentState> LyftDrivingAgent::get_driving_agent_state(temporal::Time time) const
-{
-    throw utils::NotImplementedException();
 }
 
 }

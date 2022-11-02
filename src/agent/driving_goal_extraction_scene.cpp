@@ -97,11 +97,6 @@ std::shared_ptr<const IEntity> DrivingGoalExtractionScene::get_entity(const std:
     return this->get_driving_agent(entity_name);
 }
 
-std::shared_ptr<const IState> DrivingGoalExtractionScene::get_state(temporal::Time time) const
-{
-    return this->get_driving_scene_state(time);
-}
-
 std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> DrivingGoalExtractionScene::get_driving_agents() const
 {
     return std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>>(
@@ -111,11 +106,6 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> Drivin
 std::shared_ptr<const IDrivingAgent> DrivingGoalExtractionScene::get_driving_agent(const std::string& driving_agent_name) const
 {
     return driving_agent_dict[driving_agent_name];
-}
-
-std::shared_ptr<const IDrivingSceneState> DrivingGoalExtractionScene::get_driving_scene_state(temporal::Time time) const
-{
-    throw utils::NotImplementedException();
 }
 
 bool DrivingGoalExtractionScene::has_map() const

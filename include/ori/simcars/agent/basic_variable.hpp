@@ -13,7 +13,7 @@ namespace agent
 {
 
 template <typename T>
-class Variable : public AVariable<T>
+class BasicVariable : public AVariable<T>
 {
     const std::string entity_name;
     const std::string parameter_name;
@@ -23,9 +23,9 @@ class Variable : public AVariable<T>
     temporal::PrecedenceTemporalDictionary<std::shared_ptr<const IEvent<T>>> time_event_dict;
 
 public:
-    Variable(const std::string& entity_name, const std::string& parameter_name, IValuelessVariable::Type type,
-             size_t max_cache_size = 10) : entity_name(entity_name), parameter_name(parameter_name), type(type),
-        time_event_dict(max_cache_size) {}
+    BasicVariable(const std::string& entity_name, const std::string& parameter_name, IValuelessVariable::Type type,
+             temporal::Duration time_diff_threshold = temporal::Duration::max() / 2, size_t max_cache_size = 10) : entity_name(entity_name), parameter_name(parameter_name), type(type),
+        time_event_dict(time_diff_threshold, max_cache_size) {}
 
     std::shared_ptr<IValuelessVariable> valueless_deep_copy() const override
     {
@@ -34,12 +34,16 @@ public:
 
     std::shared_ptr<IVariable<T>> deep_copy() const override
     {
-        std::shared_ptr<Variable<T>> variable(new Variable<T>(entity_name, parameter_name, type, time_event_dict.get_max_cache_size()));
-
-        size_t i;
+        std::shared_ptr<BasicVariable<T>> variable(
+                    new BasicVariable<T>(
+                        entity_name,
+                        parameter_name,
+                        type,
+                        time_event_dict.get_time_diff_threshold(),
+                        time_event_dict.get_max_cache_size()));
 
         std::shared_ptr<const structures::IArray<temporal::Time>> times = time_event_dict.get_keys();
-        for(i = 0; i < times->count(); ++i)
+        for(size_t i = 0; i < times->count(); ++i)
         {
             variable->time_event_dict.update((*times)[i], time_event_dict[(*times)[i]]->shallow_copy());
         }
@@ -62,15 +66,40 @@ public:
         return type;
     }
 
+    temporal::Time get_min_temporal_limit() const override
+    {
+        return time_event_dict.get_earliest_timestamp();
+    }
+
+    temporal::Time get_max_temporal_limit() const override
+    {
+        return time_event_dict.get_latest_timestamp();
+    }
+
     T get_value(temporal::Time time) const override
     {
         return time_event_dict[time]->get_value();
     }
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>> get_events() const override
+    std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>> get_events(
+            temporal::Time time_window_start,
+            temporal::Time time_window_end) const override
     {
-        return std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>>(
-                new structures::stl::STLStackArray<std::shared_ptr<const IEvent<T>>>(time_event_dict.get_values()));
+        std::shared_ptr<const structures::IArray<std::shared_ptr<const IEvent<T>>>> unfiltered_events =
+                time_event_dict.get_values();
+        std::shared_ptr<structures::IStackArray<std::shared_ptr<const IEvent<T>>>> filtered_events(
+                new structures::stl::STLStackArray<std::shared_ptr<const IEvent<T>>>());
+
+        for (size_t i = 0; i < unfiltered_events->count(); ++i)
+        {
+            if ((*unfiltered_events)[i]->get_time() >= time_window_start
+                    && (*unfiltered_events)[i]->get_time() <= time_window_end)
+            {
+                filtered_events->push_back((*unfiltered_events)[i]);
+            }
+        }
+
+        return filtered_events;
     }
 
     std::shared_ptr<const IEvent<T>> get_event(temporal::Time time) const override
@@ -86,9 +115,11 @@ public:
         }
     }
 
-    void add_event(std::shared_ptr<const IEvent<T>> event) override
+    bool add_event(std::shared_ptr<const IEvent<T>> event) override
     {
         time_event_dict.update(event->get_time(), event);
+
+        return true;
     }
 
     bool remove_event(std::shared_ptr<const IEvent<T>> event) override

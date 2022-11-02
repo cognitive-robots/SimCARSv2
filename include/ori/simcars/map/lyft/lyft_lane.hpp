@@ -22,6 +22,7 @@ class LyftLane : public ALivingLane<std::string>
     geometry::Vec centroid;
     std::shared_ptr<structures::IStackArray<geometry::Tri>> tris;
     size_t point_count;
+    FP_DATA_TYPE mean_steer;
     geometry::Rect bounding_box;
     AccessRestriction access_restriction;
 
@@ -35,6 +36,7 @@ public:
     const geometry::Vec& get_centroid() const override;
     size_t get_point_count() const override;
     const geometry::Rect& get_bounding_box() const override;
+    FP_DATA_TYPE get_mean_steer() const override;
     LyftLane::AccessRestriction get_access_restriction() const override;
 };
 

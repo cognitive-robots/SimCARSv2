@@ -2,8 +2,7 @@
 
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/map/map_interface.hpp>
-#include <ori/simcars/agent/driving_scene_interface.hpp>
-#include <ori/simcars/agent/scene_abstract.hpp>
+#include <ori/simcars/agent/driving_scene_abstract.hpp>
 
 namespace ori
 {
@@ -12,7 +11,7 @@ namespace simcars
 namespace agent
 {
 
-class DrivingGoalExtractionScene : public virtual AScene, public virtual IDrivingScene
+class DrivingGoalExtractionScene : public virtual ADrivingScene
 {
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
@@ -35,12 +34,8 @@ public:
     std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const override;
     std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const override;
 
-    std::shared_ptr<const IState> get_state(temporal::Time time) const override;
-
     std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> get_driving_agents() const override;
     std::shared_ptr<const IDrivingAgent> get_driving_agent(const std::string& driving_agent_name) const override;
-
-    std::shared_ptr<const IDrivingSceneState> get_driving_scene_state(temporal::Time time) const override;
 
     bool has_map() const;
     std::shared_ptr<const map::IMap<std::string>> get_map() const;

@@ -1,5 +1,6 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
+#include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/map/lyft/lyft_lane.hpp>
 #include <ori/simcars/map/ghost_lane.hpp>
 #include <ori/simcars/map/weak_ghost_lane_array.hpp>
@@ -17,27 +18,89 @@ namespace lyft
 
 LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string>> map, const rapidjson::Value::ConstObject& json_lane_data) : ALivingLane(id, map)
 {
+    std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::get_instance();
+
     const rapidjson::Value::ConstArray left_boundary_data = json_lane_data["left_boundary_coord_array"].GetArray();
     const size_t left_boundary_size = left_boundary_data.Capacity();
     left_boundary = geometry::Vecs::Zero(2, left_boundary_size);
+    FP_DATA_TYPE left_mean_steer = 0.0f;
 
     size_t i;
+    geometry::Vec current_link, previous_link;
     for (i = 0; i < left_boundary_size; ++i)
     {
         left_boundary(0, i) = left_boundary_data[i][0].GetDouble();
         left_boundary(1, i) = left_boundary_data[i][1].GetDouble();
+        if (i > 0)
+        {
+            current_link = left_boundary.col(i) - left_boundary.col(i - 1);
+            if (i > 1)
+            {
+                FP_DATA_TYPE angle_mag = std::acos(current_link.dot(previous_link));
+                FP_DATA_TYPE angle;
+                if (current_link.dot(trig_buff->get_rot_mat(angle_mag) * previous_link) >=
+                        current_link.dot(trig_buff->get_rot_mat(-angle_mag) * previous_link))
+                {
+                    angle = angle_mag;
+                }
+                else
+                {
+                    angle = -angle_mag;
+                }
+                FP_DATA_TYPE distance_between_link_midpoints = (current_link.norm() + previous_link.norm()) / 2.0f;
+                FP_DATA_TYPE lane_midpoint_steer = angle / distance_between_link_midpoints;
+                left_mean_steer += lane_midpoint_steer;
+            }
+            previous_link = current_link;
+        }
     }
 
+    left_mean_steer /= left_boundary_size - 2;
+    if (left_boundary_size < 3)
+    {
+        left_mean_steer = 0.0f;
+    }
 
     const rapidjson::Value::ConstArray right_boundary_data = json_lane_data["right_boundary_coord_array"].GetArray();
     const size_t right_boundary_size = right_boundary_data.Capacity();
     right_boundary = geometry::Vecs::Zero(2, right_boundary_size);
+    FP_DATA_TYPE right_mean_steer = 0.0f;
 
     for (i = 0; i < right_boundary_size; ++i)
     {
         right_boundary(0, i) = right_boundary_data[i][0].GetDouble();
         right_boundary(1, i) = right_boundary_data[i][1].GetDouble();
+        if (i > 0)
+        {
+            current_link = right_boundary.col(i) - right_boundary.col(i - 1);
+            if (i > 1)
+            {
+                FP_DATA_TYPE angle_mag = std::acos(current_link.dot(previous_link));
+                FP_DATA_TYPE angle;
+                if (current_link.dot(trig_buff->get_rot_mat(angle_mag) * previous_link) >=
+                        current_link.dot(trig_buff->get_rot_mat(-angle_mag) * previous_link))
+                {
+                    angle = angle_mag;
+                }
+                else
+                {
+                    angle = -angle_mag;
+                }
+                FP_DATA_TYPE distance_between_link_midpoints = (current_link.norm() + previous_link.norm()) / 2.0f;
+                FP_DATA_TYPE lane_midpoint_steer = angle / distance_between_link_midpoints;
+                right_mean_steer += lane_midpoint_steer;
+            }
+            previous_link = current_link;
+        }
     }
+
+    right_mean_steer /= right_boundary_size - 2;
+    if (right_boundary_size < 3)
+    {
+        right_mean_steer = 0.0f;
+    }
+
+    mean_steer = (left_mean_steer + right_mean_steer) / 2.0f;
 
 
     tris.reset(new structures::stl::STLStackArray<geometry::Tri>);
@@ -183,6 +246,11 @@ size_t LyftLane::get_point_count() const
 const geometry::Rect& LyftLane::get_bounding_box() const
 {
     return bounding_box;
+}
+
+FP_DATA_TYPE LyftLane::get_mean_steer() const
+{
+    return mean_steer;
 }
 
 LyftLane::AccessRestriction LyftLane::get_access_restriction() const

@@ -13,12 +13,8 @@ namespace agent
 
 class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 {
-    std::string name;
+    std::shared_ptr<const IDrivingAgent> driving_agent;
 
-    geometry::Vec min_spatial_limits, max_spatial_limits;
-    temporal::Time min_temporal_limit, max_temporal_limit;
-
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IValuelessConstant>> constant_dict;
     structures::stl::STLDictionary<std::string, std::shared_ptr<const IValuelessVariable>> variable_dict;
 
     DrivingGoalExtractionAgent();
@@ -48,7 +44,7 @@ public:
 
     std::shared_ptr<IDrivingAgent> driving_agent_deep_copy() const override;
 
-    std::shared_ptr<const IDrivingAgentState> get_driving_agent_state(temporal::Time time) const override;
+    std::shared_ptr<IDrivingAgentState> get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
 };
 
 }

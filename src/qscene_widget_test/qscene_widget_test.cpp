@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
                     entity->get_constant_parameter(entity->get_name() + ".ego");
 
             std::shared_ptr<const agent::IConstant<bool>> ego_constant =
-                    std::static_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
+                    std::dynamic_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
 
             if (ego_constant->get_value())
             {

@@ -46,8 +46,6 @@ public:
     std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const override;
 
     std::shared_ptr<IDrivingAgent> driving_agent_deep_copy() const override;
-
-    std::shared_ptr<const IDrivingAgentState> get_driving_agent_state(temporal::Time time) const override;
 };
 
 }

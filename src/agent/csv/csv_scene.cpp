@@ -1,9 +1,9 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/agent/defines.hpp>
-#include <ori/simcars/agent/constant.hpp>
-#include <ori/simcars/agent/event.hpp>
-#include <ori/simcars/agent/variable.hpp>
+#include <ori/simcars/agent/basic_constant.hpp>
+#include <ori/simcars/agent/basic_event.hpp>
+#include <ori/simcars/agent/basic_variable.hpp>
 #include <ori/simcars/agent/csv/csv_scene.hpp>
 
 #include <iostream>
@@ -117,7 +117,7 @@ std::shared_ptr<const IEntity> CSVScene::get_entity(const std::string& entity_na
     return entity_dict[entity_name];
 }
 
-std::shared_ptr<const IState> CSVScene::get_state(temporal::Time time) const
+std::shared_ptr<IState> CSVScene::get_state(temporal::Time time) const
 {
     throw utils::NotImplementedException();
 }

@@ -31,7 +31,8 @@ class PrecedenceTemporalDictionary : public virtual AbstractTemporalDictionary<V
            throw std::out_of_range("Temporal dictionary is empty");
         }
 
-        if (timestamp < timestamps[search_window_start])
+        if (timestamp < timestamps[search_window_start]
+                || timestamp > timestamps[search_window_end - 1] + this->get_time_diff_threshold())
         {
             throw std::out_of_range("Specified timestamp is outside the period covered by the temporal dictionary");
         }
@@ -72,7 +73,8 @@ class PrecedenceTemporalDictionary : public virtual AbstractTemporalDictionary<V
             return false;
         }
 
-        if (timestamp < timestamps[search_window_start])
+        if (timestamp < timestamps[search_window_start]
+                || timestamp > timestamps[search_window_end - 1] + this->get_time_diff_threshold())
         {
             return false;
         }
@@ -104,7 +106,9 @@ class PrecedenceTemporalDictionary : public virtual AbstractTemporalDictionary<V
 
 public:
     PrecedenceTemporalDictionary(size_t max_cache_size)
-        : AbstractTemporalDictionary<V>(max_cache_size) {}
+        : PrecedenceTemporalDictionary<V>(Duration::max() / 2, max_cache_size) {}
+    PrecedenceTemporalDictionary(Duration time_diff_threshold, size_t max_cache_size)
+        : AbstractTemporalDictionary<V>(time_diff_threshold, max_cache_size) {}
     PrecedenceTemporalDictionary(const PrecedenceTemporalDictionary<V>& temporal_dictionary)
         : AbstractTemporalDictionary<V>(temporal_dictionary) {}
 

@@ -10,7 +10,7 @@ namespace agent
 {
 
 template <typename T>
-class IConstant : public IValuelessConstant
+class IConstant : public virtual IValuelessConstant
 {
 public:
     virtual std::shared_ptr<IConstant<T>> shallow_copy() const = 0;

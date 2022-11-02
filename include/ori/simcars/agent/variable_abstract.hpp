@@ -13,7 +13,7 @@ namespace agent
 {
 
 template <typename T>
-class AVariable : public IVariable<T>
+class AVariable : public virtual IVariable<T>
 {
 public:
     std::string get_full_name() const override
@@ -39,6 +39,9 @@ public:
 
             case IValuelessVariable::Type::GOAL_DURATION:
                 return "goal_duration";
+
+            case IValuelessVariable::Type::EXTERNAL:
+                return "external";
 
             default:
                 throw std::runtime_error("Type indicated by value: '" + std::to_string((uint8_t) this->get_type()) + "' is not supported");
@@ -91,9 +94,13 @@ public:
         return updated_string_stream.str();
     }
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_valueless_events() const override
+    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_valueless_events(
+            temporal::Time time_window_start,
+            temporal::Time time_window_end) const override
     {
-        const std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>> events = this->get_events();
+        const std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>> events = this->get_events(
+                    time_window_start,
+                    time_window_end);
         const std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> valueless_events(
                     new structures::stl::STLStackArray<std::shared_ptr<const IValuelessEvent>>(events->count()));
         cast_array(*events, *valueless_events);

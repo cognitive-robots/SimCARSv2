@@ -70,23 +70,23 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
                 vehicle->get_constant_parameter(vehicle->get_name() + ".ego");
         std::shared_ptr<const agent::IValuelessConstant> id_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".id");
-        std::shared_ptr<const agent::IValuelessConstant> road_agent_class_valueless_constant =
-                vehicle->get_constant_parameter(vehicle->get_name() + ".road_agent_class");
+        std::shared_ptr<const agent::IValuelessConstant> driving_agent_class_valueless_constant =
+                vehicle->get_constant_parameter(vehicle->get_name() + ".driving_agent_class");
         std::shared_ptr<const agent::IValuelessConstant> bb_length_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".bb_length");
         std::shared_ptr<const agent::IValuelessConstant> bb_width_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".bb_width");
 
         std::shared_ptr<const agent::IConstant<bool>> ego_constant =
-                std::static_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
+                std::dynamic_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
         std::shared_ptr<const agent::IConstant<uint32_t>> id_constant =
-                std::static_pointer_cast<const agent::IConstant<uint32_t>>(id_valueless_constant);
-        std::shared_ptr<const agent::IConstant<agent::DrivingAgentClass>> road_agent_class_constant =
-                std::static_pointer_cast<const agent::IConstant<agent::DrivingAgentClass>>(road_agent_class_valueless_constant);
+                std::dynamic_pointer_cast<const agent::IConstant<uint32_t>>(id_valueless_constant);
+        std::shared_ptr<const agent::IConstant<agent::DrivingAgentClass>> driving_agent_class_constant =
+                std::dynamic_pointer_cast<const agent::IConstant<agent::DrivingAgentClass>>(driving_agent_class_valueless_constant);
         std::shared_ptr<const agent::IConstant<FP_DATA_TYPE>> bb_length_constant =
-                std::static_pointer_cast<const agent::IConstant<FP_DATA_TYPE>>(bb_length_valueless_constant);
+                std::dynamic_pointer_cast<const agent::IConstant<FP_DATA_TYPE>>(bb_length_valueless_constant);
         std::shared_ptr<const agent::IConstant<FP_DATA_TYPE>> bb_width_constant =
-                std::static_pointer_cast<const agent::IConstant<FP_DATA_TYPE>>(bb_width_valueless_constant);
+                std::dynamic_pointer_cast<const agent::IConstant<FP_DATA_TYPE>>(bb_width_valueless_constant);
 
         FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
         FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
@@ -100,9 +100,9 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
                 vehicle->get_variable_parameter(vehicle->get_name() + ".rotation.base");
 
         std::shared_ptr<const agent::IVariable<geometry::Vec>> position_variable =
-                std::static_pointer_cast<const agent::IVariable<geometry::Vec>>(position_valueless_variable);
+                std::dynamic_pointer_cast<const agent::IVariable<geometry::Vec>>(position_valueless_variable);
         std::shared_ptr<const agent::IVariable<FP_DATA_TYPE>> rotation_variable =
-                std::static_pointer_cast<const agent::IVariable<FP_DATA_TYPE>>(rotation_valueless_variable);
+                std::dynamic_pointer_cast<const agent::IVariable<FP_DATA_TYPE>>(rotation_valueless_variable);
 
         temporal::Time current_time = this->get_time();
         try
@@ -113,7 +113,7 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
                                   * geometry::Vec(agent_rectangle_length, agent_rectangle_width));
             rectangle->setPosition(agent_rectangle_position);
             rectangle->setRotation(-180 * rotation_variable->get_value(current_time) / M_PI);
-            rectangle->setFillColor(to_sfml_colour(road_agent_class_constant->get_value()));
+            rectangle->setFillColor(to_sfml_colour(driving_agent_class_constant->get_value()));
             rectangle->setOutlineThickness(agent_rectangle_min_side * 0.1f);
 
             FP_DATA_TYPE agent_circle_radius = 0.25f * agent_rectangle_min_side;
@@ -176,7 +176,7 @@ void QSceneWidget::add_scene_to_render_stack()
                             entity->get_variable_parameter(entity->get_name() + ".position.base");
 
                     std::shared_ptr<const agent::IVariable<geometry::Vec>> position_variable =
-                            std::static_pointer_cast<const agent::IVariable<geometry::Vec>>(position_valueless_variable);
+                            std::dynamic_pointer_cast<const agent::IVariable<geometry::Vec>>(position_valueless_variable);
 
                     // TODO: Replace this with something more efficient
                     try

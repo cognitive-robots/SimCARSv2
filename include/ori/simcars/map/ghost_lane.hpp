@@ -61,6 +61,10 @@ public:
     {
         throw typename GhostLane<T_id>::GhostObjectException();
     }
+    FP_DATA_TYPE get_mean_steer() const override
+    {
+        throw typename GhostLane<T_id>::GhostObjectException();
+    }
     GhostLane<T_id>::AccessRestriction get_access_restriction() const override
     {
         throw typename GhostLane<T_id>::GhostObjectException();
@@ -70,6 +74,10 @@ public:
         throw typename GhostLane<T_id>::GhostObjectException();
     }
     std::shared_ptr<const ILane<T_id>> get_right_adjacent_lane() const override
+    {
+        throw typename GhostLane<T_id>::GhostObjectException();
+    }
+    std::shared_ptr<const ILane<T_id>> get_straight_fore_lane() const override
     {
         throw typename GhostLane<T_id>::GhostObjectException();
     }

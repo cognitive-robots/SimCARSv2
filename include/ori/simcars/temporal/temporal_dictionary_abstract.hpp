@@ -17,6 +17,7 @@ template <typename V>
 class AbstractTemporalDictionary : public virtual structures::stl::STLOrderedDictionary<Time, V>
 {
     const size_t max_cache_size;
+    const Duration time_diff_threshold;
     mutable structures::stl::STLOrderedDictionary<Time, Time> closest_timestamp_cache_dict;
     mutable structures::stl::STLQueueArray<Time> timestamp_cache_queue;
 
@@ -34,9 +35,12 @@ class AbstractTemporalDictionary : public virtual structures::stl::STLOrderedDic
 
 public:
     AbstractTemporalDictionary(size_t max_cache_size)
-        : max_cache_size(max_cache_size) {}
+        : AbstractTemporalDictionary<V>(Duration::max() / 2, max_cache_size) {}
+    AbstractTemporalDictionary(Duration time_diff_threshold, size_t max_cache_size)
+        : time_diff_threshold(time_diff_threshold), max_cache_size(max_cache_size) {}
     AbstractTemporalDictionary(const AbstractTemporalDictionary<V>& temporal_dictionary)
         : structures::stl::STLOrderedDictionary<Time, V>(temporal_dictionary),
+          time_diff_threshold(temporal_dictionary.time_diff_threshold),
           max_cache_size(temporal_dictionary.max_cache_size) {}
 
     bool contains(const Time& timestamp) const override
@@ -110,6 +114,10 @@ public:
         }
 
         return timestamps[timestamps.count() - 1];
+    }
+    Duration get_time_diff_threshold() const
+    {
+        return time_diff_threshold;
     }
     size_t get_max_cache_size() const
     {

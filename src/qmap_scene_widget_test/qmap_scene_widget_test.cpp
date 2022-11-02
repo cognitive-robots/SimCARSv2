@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
                     entity->get_constant_parameter(entity->get_name() + ".ego");
 
             std::shared_ptr<const agent::IConstant<bool>> ego_constant =
-                    std::static_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
+                    std::dynamic_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
 
             if (ego_constant->get_value())
             {
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     }
 
     std::shared_ptr<QFrame> frame(new QFrame());
-    frame->setWindowTitle("QSceneWidget Test");
+    frame->setWindowTitle("QMapSceneWidget Test");
     frame->setFixedSize(1000, 1000);
     frame->show();
 

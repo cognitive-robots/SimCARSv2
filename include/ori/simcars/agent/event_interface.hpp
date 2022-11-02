@@ -10,7 +10,7 @@ namespace agent
 {
 
 template <typename T>
-class IEvent : public IValuelessEvent
+class IEvent : public virtual IValuelessEvent
 {
 public:
     virtual std::shared_ptr<IEvent<T>> shallow_copy() const = 0;

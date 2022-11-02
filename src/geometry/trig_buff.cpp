@@ -71,14 +71,19 @@ std::shared_ptr<const TrigBuff> TrigBuff::get_instance()
 
 FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle) const
 {
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
+
     switch (default_angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_sin(angle + 2.0f * M_PI);
+        if (angle < 0.0f) return get_sin(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f));
         return sin_bins[int(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_sin(angle + 360.0f);
+        if (angle < 0.0f) return get_sin(angle + 360.0f * (int(-angle / 360.0f) + 1.0f));
         return sin_bins[int(angle * degree_multi) % num_bins];
 
     default:
@@ -88,14 +93,19 @@ FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle) const
 
 FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle, AngleType angle_type) const
 {
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
+
     switch (angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_sin(angle + 2.0f * M_PI, angle_type);
+        if (angle < 0.0f) return get_sin(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f), angle_type);
         return sin_bins[int(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_sin(angle + 360.0f, angle_type);
+        if (angle < 0.0f) return get_sin(angle + 360.0f * (int(-angle / 360.0f) + 1.0f), angle_type);
         return sin_bins[int(angle * degree_multi) % num_bins];
 
     default:
@@ -105,14 +115,19 @@ FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle, AngleType angle_type) const
 
 FP_DATA_TYPE TrigBuff::get_cos(FP_DATA_TYPE angle) const
 {
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
+
     switch (default_angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_cos(angle + 2.0f * M_PI);
+        if (angle < 0.0f) return get_cos(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f));
         return cos_bins[int(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_cos(angle + 360.0f);
+        if (angle < 0.0f) return get_cos(angle + 360.0f * (int(-angle / 360.0f) + 1.0f));
         return cos_bins[int(angle * degree_multi) % num_bins];
 
     default:
@@ -122,14 +137,19 @@ FP_DATA_TYPE TrigBuff::get_cos(FP_DATA_TYPE angle) const
 
 FP_DATA_TYPE TrigBuff::get_cos(FP_DATA_TYPE angle, AngleType angle_type) const
 {
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
+
     switch (angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_cos(angle + 2.0f * M_PI, angle_type);
+        if (angle < 0.0f) return get_cos(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f), angle_type);
         return cos_bins[int(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_cos(angle + 360.0f, angle_type);
+        if (angle < 0.0f) return get_cos(angle + 360.0f * (int(-angle / 360.0f) + 1.0f), angle_type);
         return cos_bins[int(angle * degree_multi) % num_bins];
 
     default:
@@ -139,14 +159,19 @@ FP_DATA_TYPE TrigBuff::get_cos(FP_DATA_TYPE angle, AngleType angle_type) const
 
 FP_DATA_TYPE TrigBuff::get_tan(FP_DATA_TYPE angle) const
 {
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
+
     switch (default_angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_tan(angle + 2.0f * M_PI);
+        if (angle < 0.0f) return get_tan(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f));
         return tan_bins[int(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_tan(angle + 360.0f);
+        if (angle < 0.0f) return get_tan(angle + 360.0f * (int(-angle / 360.0f) + 1.0f));
         return tan_bins[int(angle * degree_multi) % num_bins];
 
     default:
@@ -156,14 +181,19 @@ FP_DATA_TYPE TrigBuff::get_tan(FP_DATA_TYPE angle) const
 
 FP_DATA_TYPE TrigBuff::get_tan(FP_DATA_TYPE angle, AngleType angle_type) const
 {
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
+
     switch (angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_tan(angle + 2.0f * M_PI, angle_type);
+        if (angle < 0.0f) return get_tan(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f), angle_type);
         return tan_bins[int(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_tan(angle + 360.0f, angle_type);
+        if (angle < 0.0f) return get_tan(angle + 360.0f * (int(-angle / 360.0f) + 1.0f), angle_type);
         return tan_bins[int(angle * degree_multi) % num_bins];
 
     default:

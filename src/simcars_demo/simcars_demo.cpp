@@ -1,6 +1,10 @@
 
 #include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/map/lyft/lyft_map.hpp>
+#include <ori/simcars/agent/driving_goal_extraction_scene.hpp>
+#include <ori/simcars/agent/basic_driving_agent_controller.hpp>
+#include <ori/simcars/agent/basic_driving_simulator.hpp>
+#include <ori/simcars/agent/driving_simulation_scene.hpp>
 #include <ori/simcars/agent/lyft/lyft_scene.hpp>
 #include <ori/simcars/visualisation/qmap_scene_widget.hpp>
 
@@ -43,7 +47,7 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    std::shared_ptr<const agent::IScene> scene;
+    std::shared_ptr<const agent::IDrivingScene> scene;
 
     try
     {
@@ -57,40 +61,76 @@ int main(int argc, char* argv[])
 
     std::cout << "Finished scene load" << std::endl;
 
-    std::shared_ptr<const structures::IArray<std::shared_ptr<const agent::IAgent>>> ego_agents = scene->get_ego_agents();
-    bool ego_focal_agents = true;
+    std::cout << "Beginning action extraction" << std::endl;
 
-    std::shared_ptr<structures::IArray<uint32_t>> focal_agent_ids(new structures::stl::STLStackArray<uint32_t>(1));
-    if (ego_agents->count() > 0)
+    std::shared_ptr<const agent::IDrivingScene> scene_with_actions;
+
+    try
     {
-        (*focal_agent_ids)[0] = (*ego_agents)[0]->get_id();
+        scene_with_actions = agent::DrivingGoalExtractionScene::construct_from(scene, map);
     }
-    else
+    catch (const std::exception& e)
     {
-        std::shared_ptr<const structures::IArray<std::shared_ptr<const agent::IAgent>>> non_ego_agents = scene->get_non_ego_agents();
-        ego_focal_agents = false;
-
-        if (non_ego_agents->count() > 0)
-        {
-            (*focal_agent_ids)[0] = (*non_ego_agents)[0]->get_id();
-        }
-        else
-        {
-            std::cerr << "No agents were present in the scene" << std::endl;
-            return -1;
-        }
+        std::cerr << "Exception occured during action extraction:" << std::endl << e.what() << std::endl;
+        return -1;
     }
 
-    temporal::Time scene_half_way_timestamp = scene->get_min_time() + (scene->get_max_time() - scene->get_min_time()) / 2;
+    std::cout << "Finished action extraction" << std::endl;
 
-    std::shared_ptr<const agent::IScene> simulated_scene =
-            scene->fork_simulated_scene(ego_focal_agents, (*focal_agent_ids)[0], scene_half_way_timestamp, temporal::Duration(100));
+    std::shared_ptr<const structures::IArray<std::shared_ptr<const agent::IEntity>>> entities = scene->get_entities();
+
+    if (entities->count() == 0)
+    {
+        std::cerr << "No agents were present in the scene" << std::endl;
+        return -1;
+    }
+
+    bool ego_focal_agents = false;
+    std::shared_ptr<structures::IArray<std::string>> focal_agent_ids(new structures::stl::STLStackArray<std::string>(1));
+
+    size_t i;
+
+    for (i = 0; i < entities->count(); ++i)
+    {
+        std::shared_ptr<const agent::IDrivingAgent> driving_agent =
+                std::dynamic_pointer_cast<const agent::IDrivingAgent>((*entities)[i]);
+
+        if (driving_agent->get_ego_constant()->get_value())
+        {
+            ego_focal_agents = true;
+            (*focal_agent_ids)[0] = driving_agent->get_name();
+            break;
+        }
+    }
+
+    if (!ego_focal_agents)
+    {
+        std::shared_ptr<const agent::IDrivingAgent> driving_agent =
+                std::dynamic_pointer_cast<const agent::IDrivingAgent>((*entities)[0]);
+        (*focal_agent_ids)[0] = driving_agent->get_name();
+    }
+
+    temporal::Time scene_half_way_timestamp = scene->get_min_temporal_limit() +
+            (scene->get_max_temporal_limit() - scene->get_min_temporal_limit()) / 2;
+
+    temporal::Duration time_step(100);
+
+    std::shared_ptr<agent::IDrivingAgentController> driving_agent_controller(
+                new agent::BasicDrivingAgentController(map, time_step, 10));
+
+    std::shared_ptr<agent::IDrivingSimulator> driving_simulator(
+                new agent::BasicDrivingSimulator(driving_agent_controller));
+
+    std::shared_ptr<const agent::IDrivingScene> simulated_scene =
+            agent::DrivingSimulationScene::construct_from(
+                scene_with_actions, driving_simulator, time_step, scene_half_way_timestamp);
 
     std::shared_ptr<QFrame> frame(new QFrame());
-    frame->setWindowTitle("QSceneWidget Test");
+    frame->setWindowTitle("SIMCARS Demo");
     frame->setFixedSize(1600, 800);
     frame->show();
 
+    /*
     std::shared_ptr<visualisation::QMapSceneWidget<std::string>> map_scene_widget(
                 new visualisation::QMapSceneWidget<std::string>(
                     map,
@@ -99,17 +139,11 @@ int main(int argc, char* argv[])
                     QPoint(20, 20),
                     QSize(760, 760),
                     1.0f,
-                    30.0f,
+                    10.0f,
                     1.0f));
-    if (ego_focal_agents)
-    {
-        map_scene_widget->set_focal_ego_agents(focal_agent_ids);
-    }
-    else
-    {
-        map_scene_widget->set_focal_non_ego_agents(focal_agent_ids);
-    }
+    map_scene_widget->set_focal_entities(focal_agent_ids);
     map_scene_widget->show();
+    */
 
     std::shared_ptr<visualisation::QMapSceneWidget<std::string>> map_simulated_scene_widget(
                 new visualisation::QMapSceneWidget<std::string>(
@@ -121,14 +155,7 @@ int main(int argc, char* argv[])
                     1.0f,
                     30.0f,
                     1.0f));
-    if (ego_focal_agents)
-    {
-        map_simulated_scene_widget->set_focal_ego_agents(focal_agent_ids);
-    }
-    else
-    {
-        map_simulated_scene_widget->set_focal_non_ego_agents(focal_agent_ids);
-    }
+    map_simulated_scene_widget->set_focal_entities(focal_agent_ids);
     map_simulated_scene_widget->show();
 
     return app.exec();
