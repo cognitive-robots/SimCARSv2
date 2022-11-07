@@ -76,9 +76,10 @@ PUBLIC
 target_link_libraries(simcars_geometry
 PUBLIC
   simcars_utils
+  simcars_structures
   Eigen3::Eigen
 )
-add_dependencies(simcars_geometry simcars_utils)
+add_dependencies(simcars_geometry simcars_utils simcars_structures)
 target_compile_options(simcars_geometry PRIVATE -fPIC)
 set_target_properties(simcars_geometry PROPERTIES VERSION ${PROJECT_VERSION})
 
@@ -96,6 +97,12 @@ PUBLIC
   $<INSTALL_INTERFACE:include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
+target_link_libraries(simcars_temporal
+PUBLIC
+  simcars_utils
+  simcars_structures
+)
+add_dependencies(simcars_temporal simcars_utils simcars_structures)
 target_compile_options(simcars_temporal PRIVATE -fPIC)
 set_target_properties(simcars_temporal PROPERTIES VERSION ${PROJECT_VERSION})
 
@@ -143,13 +150,13 @@ PUBLIC
 target_link_libraries(simcars_map
 PUBLIC
   simcars_utils
-  simcars_geometry
   simcars_structures
+  simcars_geometry
   simcars_temporal
 PRIVATE
   lz4
 )
-add_dependencies(simcars_map simcars_utils simcars_structures simcars_temporal simcars_geometry)
+add_dependencies(simcars_map simcars_utils simcars_structures simcars_geometry simcars_temporal)
 target_compile_options(simcars_map PRIVATE -fPIC)
 set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 
@@ -227,13 +234,14 @@ PUBLIC
 target_link_libraries(simcars_agent
 PUBLIC
   simcars_utils
-  simcars_geometry
   simcars_structures
+  simcars_geometry
   simcars_temporal
+  simcars_map
 PRIVATE
   lz4
 )
-add_dependencies(simcars_agent simcars_utils simcars_structures simcars_temporal simcars_geometry)
+add_dependencies(simcars_agent simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 target_compile_options(simcars_agent PRIVATE -fPIC)
 set_target_properties(simcars_agent PROPERTIES VERSION ${PROJECT_VERSION})
 
@@ -254,44 +262,44 @@ PUBLIC
 target_link_libraries(simcars_visualisation
 PUBLIC
   simcars_utils
-  simcars_geometry
   simcars_structures
+  simcars_geometry
   simcars_temporal
   simcars_map
   simcars_agent
-  Qt5::Widgets
 PRIVATE
+  Qt5::Widgets
   sfml-graphics
 )
-add_dependencies(simcars_visualisation simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent)
+add_dependencies(simcars_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 target_compile_options(simcars_visualisation PRIVATE -fPIC)
 set_target_properties(simcars_visualisation PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_executable(trig_buff_test src/trig_buff_test/trig_buff_test.cpp)
-target_link_libraries(trig_buff_test simcars_geometry)
-add_dependencies(trig_buff_test simcars_utils simcars_geometry)
+target_link_libraries(trig_buff_test simcars_utils simcars_structures simcars_geometry)
+add_dependencies(trig_buff_test simcars_utils simcars_structures simcars_geometry)
 
 add_executable(lyft_map_test src/lyft_map_test/lyft_map_test.cpp)
-target_link_libraries(lyft_map_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map)
-add_dependencies(lyft_map_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map)
+target_link_libraries(lyft_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
+add_dependencies(lyft_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 
 add_executable(lyft_scene_test src/lyft_scene_test/lyft_scene_test.cpp)
-target_link_libraries(lyft_scene_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent)
-add_dependencies(lyft_scene_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent)
+target_link_libraries(lyft_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+add_dependencies(lyft_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 
 add_executable(lyft_scene_action_extraction src/lyft_scene_action_extraction/lyft_scene_action_extraction.cpp)
-target_link_libraries(lyft_scene_action_extraction simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent)
-add_dependencies(lyft_scene_action_extraction simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent)
+target_link_libraries(lyft_scene_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+add_dependencies(lyft_scene_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 
 add_executable(qscene_widget_test src/qscene_widget_test/qscene_widget_test.cpp)
-target_link_libraries(qscene_widget_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
-add_dependencies(qscene_widget_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
+target_link_libraries(qscene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+add_dependencies(qscene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 
 add_executable(qmap_scene_widget_test src/qmap_scene_widget_test/qmap_scene_widget_test.cpp)
-target_link_libraries(qmap_scene_widget_test simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
-add_dependencies(qmap_scene_widget_test simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
+target_link_libraries(qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+add_dependencies(qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 
 add_executable(simcars_demo src/simcars_demo/simcars_demo.cpp)
-target_link_libraries(simcars_demo simcars_utils simcars_geometry simcars_structures simcars_temporal simcars_map simcars_agent simcars_visualisation)
-add_dependencies(simcars_demo simcars_utils simcars_structures simcars_temporal simcars_geometry simcars_map simcars_agent simcars_visualisation)
+target_link_libraries(simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+add_dependencies(simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 
