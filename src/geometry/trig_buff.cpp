@@ -2,7 +2,7 @@
 #include <ori/simcars/utils/exceptions.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
 
-#include <neargye/magic_enum/magic_enum.hpp>
+#include <magic_enum.hpp>
 
 #include <string>
 #include <exception>

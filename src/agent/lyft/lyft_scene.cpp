@@ -2,7 +2,7 @@
 #include <ori/simcars/utils/exceptions.hpp>
 #include <ori/simcars/agent/lyft/lyft_scene.hpp>
 
-#include <laudrup/lz4_stream/lz4_stream.hpp>
+#include <lz4_stream.h>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 

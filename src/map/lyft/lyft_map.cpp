@@ -4,7 +4,7 @@
 #include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/map/lyft/lyft_map.hpp>
 
-#include <laudrup/lz4_stream/lz4_stream.hpp>
+#include <lz4_stream.h>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
 
