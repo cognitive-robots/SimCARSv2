@@ -13,7 +13,7 @@ template <typename T>
 class IList : public virtual IContainer<T>
 {
 public:
-    virtual void push_back(const T& val) = 0;
+    virtual void push_back(T const &val) = 0;
     virtual void clear() = 0;
 };
 

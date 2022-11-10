@@ -2,7 +2,6 @@
 
 #include <ori/simcars/geometry/rect.hpp>
 
-#include <memory>
 #include <cassert>
 
 namespace ori
@@ -15,7 +14,7 @@ namespace geometry
 template <class T_grid_rect>
 class GridRect : public Rect
 {
-    std::weak_ptr<T_grid_rect> above, below, left, right;
+    T_grid_rect const *above, *below, *left, *right;
 
 public:
     GridRect() : Rect() {}
@@ -24,31 +23,31 @@ public:
         : Rect(min_x, min_y, max_x, max_y) {}
     GridRect(Vecs points)
         : Rect(points) {}
-    GridRect(const GridRect<T_grid_rect>& grid_rect)
+    GridRect(GridRect<T_grid_rect> const &grid_rect)
         : Rect(grid_rect), above(grid_rect.above), below(grid_rect.below), left(grid_rect.left), right(grid_rect.right) {}
     ~GridRect() override
     {
         static_assert(std::is_base_of<GridRect<T_grid_rect>, T_grid_rect>::value, "T_grid_rect is not derived from GridRect");
     }
 
-    std::shared_ptr<const T_grid_rect> get_above() const
+    T_grid_rect const* get_above() const
     {
-        return above.lock();
+        return above;
     }
-    std::shared_ptr<const T_grid_rect> get_below() const
+    T_grid_rect const* get_below() const
     {
-        return below.lock();
+        return below;
     }
-    std::shared_ptr<const T_grid_rect> get_left() const
+    T_grid_rect const* get_left() const
     {
-        return left.lock();
+        return left;
     }
-    std::shared_ptr<const T_grid_rect> get_right() const
+    T_grid_rect const* get_right() const
     {
-        return right.lock();
+        return right;
     }
 
-    void set_above(std::shared_ptr<const T_grid_rect> above)
+    void set_above(T_grid_rect const *above)
     {
         assert(this->get_min_x() == above->get_min_x());
         assert(this->get_max_x() == above->get_max_x());
@@ -56,7 +55,7 @@ public:
 
         this->above = above;
     }
-    void set_below(std::shared_ptr<const T_grid_rect> below)
+    void set_below(T_grid_rect const *below)
     {
         assert(this->get_min_x() == above->get_min_x());
         assert(this->get_max_x() == above->get_max_x());
@@ -64,7 +63,7 @@ public:
 
         this->below = below;
     }
-    void set_left(std::shared_ptr<const T_grid_rect> left)
+    void set_left(T_grid_rect const *left)
     {
         assert(this->get_min_y() == above->get_min_y());
         assert(this->get_max_y() == above->get_max_y());
@@ -72,7 +71,7 @@ public:
 
         this->left = left;
     }
-    void set_right(std::shared_ptr<const T_grid_rect> right)
+    void set_right(T_grid_rect const *right)
     {
         assert(this->get_min_y() == above->get_min_y());
         assert(this->get_max_y() == above->get_max_y());

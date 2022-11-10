@@ -30,12 +30,12 @@ Rect::Rect(FP_DATA_TYPE min_x, FP_DATA_TYPE min_y, FP_DATA_TYPE max_x, FP_DATA_T
 Rect::Rect(Vecs points)
     : Rect(points.row(0).minCoeff(), points.row(1).minCoeff(), points.row(0).maxCoeff(), points.row(1).maxCoeff()) {}
 
-Rect::Rect(const Rect &rect)
+Rect::Rect(Rect const &rect)
     : origin(rect.origin), half_width(rect.half_width), half_height(rect.half_height),
       min_x(rect.min_x), min_y(rect.min_y), max_x(rect.max_x), max_y(rect.max_y),
       calc_bounds_flag(rect.calc_bounds_flag) {}
 
-Rect::Rect(const Rect &rect_1, const Rect &rect_2)
+Rect::Rect(Rect const &rect_1, Rect const &rect_2)
     : Rect(fmin(rect_1.get_min_x(), rect_2.get_min_x()),
            fmin(rect_1.get_min_y(), rect_2.get_min_y()),
            fmax(rect_1.get_max_x(), rect_2.get_max_x()),
@@ -82,22 +82,22 @@ void Rect::calc_bounds() const
     calc_bounds_flag = false;
 }
 
-bool Rect::check_bounds(const Vec &point) const
+bool Rect::check_bounds(Vec const &point) const
 {
     if (this->calc_bounds_flag) calc_bounds();
     return !(this->min_x > point.x() || this->max_x < point.x()
              || this->min_y > point.y() || this->max_y < point.y());
 }
 
-bool Rect::check_bounds(const Rect& o_rect) const
+bool Rect::check_bounds(Rect const &rect) const
 {
     if (this->calc_bounds_flag) this->calc_bounds();
-    if (o_rect.calc_bounds_flag) o_rect.calc_bounds();
-    return !(this->min_x > o_rect.max_x || this->max_x < o_rect.min_x
-             || this->min_y > o_rect.max_y || this->max_y < o_rect.min_y);
+    if (rect.calc_bounds_flag) rect.calc_bounds();
+    return !(this->min_x > rect.max_x || this->max_x < rect.min_x
+             || this->min_y > rect.max_y || this->max_y < rect.min_y);
 }
 
-bool Rect::check_collision_virt(const Rect& rect) const
+bool Rect::check_collision_virt(Rect const &rect) const
 {
     return this->check_bounds(rect);
 }
@@ -110,12 +110,12 @@ void Rect::calc_bounds_virt() const
     max_y = origin.y() + half_height;
 }
 
-bool Rect::operator ==(const Rect& rect) const
+bool Rect::operator ==(Rect const &rect) const
 {
     return this->origin == rect.origin && this->half_width == rect.half_width && this->half_height == rect.half_height;
 }
 
-const Vec& Rect::get_origin() const
+Vec const& Rect::get_origin() const
 {
     return origin;
 }
@@ -150,12 +150,12 @@ FP_DATA_TYPE Rect::get_max_y() const
     return max_y;
 }
 
-bool Rect::check_collision(const Rect& rect) const
+bool Rect::check_collision(Rect const &rect) const
 {
     return this->check_collision_virt(rect) && rect.check_collision_virt(*this);
 }
 
-void Rect::set_origin(const Vec& origin)
+void Rect::set_origin(Vec const &origin)
 {
     this->origin = origin;
     set_calc_bounds_flag();
@@ -179,7 +179,7 @@ void Rect::translate(Vec translation)
     set_calc_bounds_flag();
 }
 
-bool Rect::check_encapsulation(const Vec &point) const
+bool Rect::check_encapsulation(Vec const &point) const
 {
     return check_bounds(point);
 }

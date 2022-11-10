@@ -2,8 +2,6 @@
 
 #include <ori/simcars/temporal/typedefs.hpp>
 
-#include <memory>
-
 namespace ori
 {
 namespace simcars
@@ -19,7 +17,7 @@ public:
 
     virtual ~IStateful() = default;
 
-    virtual std::shared_ptr<const TState> get_state(Time timestamp) const = 0;
+    virtual TState const* get_state(Time timestamp) const = 0;
 };
 
 }

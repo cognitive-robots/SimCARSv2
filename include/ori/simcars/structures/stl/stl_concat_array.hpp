@@ -3,7 +3,6 @@
 #include <ori/simcars/structures/array_interface.hpp>
 
 #include <vector>
-#include <memory>
 
 namespace ori
 {
@@ -19,12 +18,12 @@ class STLConcatArray : public virtual IArray<T>
 {
 public:
 protected:
-    std::vector<std::shared_ptr<IArray<T>>> data;
+    std::vector<IArray<T>*> data;
 
 public:
     STLConcatArray(size_t size = 0) : data(size) {}
-    STLConcatArray(std::initializer_list<std::shared_ptr<const IArray<T>>> init_list) : data(init_list) {}
-    STLConcatArray(const STLConcatArray<T>& stl_concat_array) : data(stl_concat_array.data) {}
+    STLConcatArray(std::initializer_list<IArray<T> const*> init_list) : data(init_list) {}
+    STLConcatArray(STLConcatArray<T> const &stl_concat_array) : data(stl_concat_array.data) {}
 
     size_t count() const override
     {
@@ -39,7 +38,7 @@ public:
 
         return cumil_count;
     }
-    bool contains(const T& val) const override
+    bool contains(T const &val) const override
     {
         size_t i;
         for (i = 0; i < data.size(); ++i)
@@ -53,7 +52,7 @@ public:
         return false;
     }
 
-    const T& operator [](size_t idx) const override
+    T const& operator [](size_t idx) const override
     {
         size_t i = 0;
         while (true)
@@ -92,9 +91,9 @@ public:
         return data.size();
     }
 
-    bool contains_array(std::shared_ptr<const IArray<T>> val) const
+    bool contains_array(IArray<T> const *val) const
     {
-        for (std::shared_ptr<const IArray<T>> data_val : data)
+        for (IArray<T> *data_val : data)
         {
             if (data_val == val)
             {
@@ -105,12 +104,12 @@ public:
         return false;
     }
 
-    const std::shared_ptr<IArray<T>>& get_array(size_t idx) const
+    IArray<T>* const& get_array(size_t idx) const
     {
         return data.at(idx);
     }
 
-    std::shared_ptr<IArray<T>>& get_array(size_t idx)
+    IArray<T>* & get_array(size_t idx)
     {
         return data.at(idx);
     }

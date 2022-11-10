@@ -16,8 +16,8 @@ namespace temporal
 template <typename V>
 class AbstractTemporalDictionary : public virtual structures::stl::STLOrderedDictionary<Time, V>
 {
-    const size_t max_cache_size;
-    const Duration time_diff_threshold;
+    size_t const max_cache_size;
+    Duration const time_diff_threshold;
     mutable structures::stl::STLOrderedDictionary<Time, Time> closest_timestamp_cache_dict;
     mutable structures::stl::STLQueueArray<Time> timestamp_cache_queue;
 
@@ -30,20 +30,20 @@ class AbstractTemporalDictionary : public virtual structures::stl::STLOrderedDic
         }
     }
 
-    virtual Time search(const Time& timestamp) const = 0;
-    virtual bool search(const Time& timestamp, Time& closest_timestamp) const = 0;
+    virtual Time search(Time const &timestamp) const = 0;
+    virtual bool search(Time const &timestamp, Time &closest_timestamp) const = 0;
 
 public:
     AbstractTemporalDictionary(size_t max_cache_size)
         : AbstractTemporalDictionary<V>(Duration::max() / 2, max_cache_size) {}
     AbstractTemporalDictionary(Duration time_diff_threshold, size_t max_cache_size)
         : time_diff_threshold(time_diff_threshold), max_cache_size(max_cache_size) {}
-    AbstractTemporalDictionary(const AbstractTemporalDictionary<V>& temporal_dictionary)
+    AbstractTemporalDictionary(AbstractTemporalDictionary<V> const &temporal_dictionary)
         : structures::stl::STLOrderedDictionary<Time, V>(temporal_dictionary),
           time_diff_threshold(temporal_dictionary.time_diff_threshold),
           max_cache_size(temporal_dictionary.max_cache_size) {}
 
-    bool contains(const Time& timestamp) const override
+    bool contains(Time const &timestamp) const override
     {
         if (structures::stl::STLOrderedDictionary<Time, V>::contains(timestamp))
         {
@@ -68,7 +68,7 @@ public:
         return found_match;
     }
 
-    const V& operator [](const Time& timestamp) const override
+    V const& operator [](Time const &timestamp) const override
     {
         if (structures::stl::STLOrderedDictionary<Time, V>::contains(timestamp))
         {
@@ -95,7 +95,7 @@ public:
 
     Time get_earliest_timestamp() const
     {
-        const structures::IArray<Time>& timestamps = *(this->get_keys());
+        structures::IArray<Time> const &timestamps = *(this->get_keys());
 
         if (timestamps.count() == 0)
         {
@@ -106,7 +106,7 @@ public:
     }
     Time get_latest_timestamp() const
     {
-        const structures::IArray<Time>& timestamps = *(this->get_keys());
+        structures::IArray<Time> const &timestamps = *(this->get_keys());
 
         if (timestamps.count() == 0)
         {

@@ -15,12 +15,12 @@ template <typename T>
 class IArray : public virtual IContainer<T>
 {
 public:
-    virtual const T& operator [](size_t idx) const = 0;
-    virtual T& operator [](size_t idx) = 0;
+    virtual T const& operator [](size_t idx) const = 0;
+    virtual T & operator [](size_t idx) = 0;
 };
 
 template<typename T_old, typename T_new>
-void cast_array(const IArray<T_old>& old_array, IArray<T_new>& new_array)
+void cast_array(IArray<T_old> const &old_array, IArray<T_new> &new_array)
 {
     size_t i;
     for (i = 0; i < old_array.count() || i < new_array.count(); ++i)
@@ -30,7 +30,7 @@ void cast_array(const IArray<T_old>& old_array, IArray<T_new>& new_array)
 }
 
 template<typename T_old, typename T_new>
-void map_array(const IArray<T_old>& old_array, IArray<T_new>& new_array, std::function<T_new(const T_old&)> func)
+void map_array(IArray<T_old> const &old_array, IArray<T_new> &new_array, std::function<T_new(T_old const&)> func)
 {
     size_t i;
     for (i = 0; i < old_array.count() || i < new_array.count(); ++i)

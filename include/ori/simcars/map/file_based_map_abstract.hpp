@@ -7,7 +7,6 @@
 #include <string>
 #include <fstream>
 #include <filesystem>
-#include <memory>
 
 namespace ori
 {
@@ -17,13 +16,13 @@ namespace map
 {
 
 template <typename T_id, class T_map>
-class AFileBasedMap : public virtual IFileBasedMap<T_id>, public std::enable_shared_from_this<AFileBasedMap<T_id, T_map>>
+class AFileBasedMap : public virtual IFileBasedMap<T_id>
 {
 protected:
     AFileBasedMap() = default;
 
-    virtual void save_virt(std::ofstream& output_filestream) const = 0;
-    virtual void load_virt(std::ifstream& input_filestream) = 0;
+    virtual void save_virt(std::ofstream &output_filestream) const = 0;
+    virtual void load_virt(std::ifstream &input_filestream) = 0;
 
 public:
     ~AFileBasedMap() override
@@ -31,7 +30,7 @@ public:
         static_assert(std::is_base_of<AFileBasedMap, T_map>::value, "T_map is not derived from AFileBasedMap");
     }
 
-    void save(const std::string& output_file_path_str) const override
+    void save(std::string const &output_file_path_str) const override
     {
         std::filesystem::path output_file_path(output_file_path_str);
 
@@ -45,9 +44,9 @@ public:
         this->save_virt(output_filestream);
     }
 
-    virtual std::shared_ptr<T_map> copy() const = 0;
+    virtual T_map* copy() const = 0;
 
-    static std::shared_ptr<const T_map> load(const std::string& input_file_path_str)
+    static T_map const* load(std::string const &input_file_path_str)
     {
         std::filesystem::path input_file_path(input_file_path_str);
 
@@ -58,11 +57,11 @@ public:
 
         std::ifstream input_filestream(input_file_path, std::ios_base::binary);
 
-        std::shared_ptr<AFileBasedMap<T_id, T_map>> map(new T_map());
+        AFileBasedMap<T_id, T_map> *map = new T_map();
 
         map->load_virt(input_filestream);
 
-        return std::dynamic_pointer_cast<const T_map>(map);
+        return dynamic_cast<T_map const*>(map);
     }
 };
 

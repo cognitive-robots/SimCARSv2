@@ -3,7 +3,6 @@
 #include <ori/simcars/structures/stack_array_interface.hpp>
 
 #include <vector>
-#include <memory>
 
 namespace ori
 {
@@ -23,8 +22,8 @@ protected:
 public:
     STLStackArray(size_t size = 0) : data(size) {}
     STLStackArray(std::initializer_list<T> init_list) : data(init_list) {}
-    STLStackArray(const STLStackArray<T>& stl_stack_array) : data(stl_stack_array.data) {}
-    STLStackArray(std::shared_ptr<const IArray<T>> array) : data(array->count())
+    STLStackArray(STLStackArray<T> const &stl_stack_array) : data(stl_stack_array.data) {}
+    STLStackArray(IArray<T> const *array) : data(array->count())
     {
         for (size_t i = 0; i < array->count(); ++i)
         {
@@ -36,9 +35,9 @@ public:
     {
         return data.size();
     }
-    bool contains(const T& val) const override
+    bool contains(T const &val) const override
     {
-        for (const T& data_val : data)
+        for (T const &data_val : data)
         {
             if (data_val == val)
             {
@@ -48,17 +47,17 @@ public:
         return false;
     }
 
-    const T& peek_back() const override
+    T const& peek_back() const override
     {
         return data.back();
     }
 
-    const T& operator [](size_t idx) const override
+    T const& operator [](size_t idx) const override
     {
         return data.at(idx);
     }
 
-    void push_back(const T& val) override
+    void push_back(T const &val) override
     {
         data.push_back(val);
     }
@@ -73,7 +72,7 @@ public:
     }
     T pop_back() override
     {
-        const T val = peek_back();
+        T const val = peek_back();
         data.pop_back();
         return val;
     }

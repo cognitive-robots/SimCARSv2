@@ -17,9 +17,9 @@ namespace temporal
 template <typename V>
 class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
 {
-    Time search(const Time& timestamp) const override
+    Time search(Time const &timestamp) const override
     {
-        const structures::IArray<Time>& timestamps = *(this->get_keys());
+        structures::IArray<Time> const &timestamps = *(this->get_keys());
 
         size_t search_window_start = 0;
         size_t search_window_end = timestamps.count();
@@ -80,9 +80,9 @@ class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
 
         return closest_timestamp;
     }
-    bool search(const Time& timestamp, Time& closest_timestamp) const override
+    bool search(Time const &timestamp, Time &closest_timestamp) const override
     {
-        const structures::IArray<Time>& timestamps = *(this->get_keys());
+        structures::IArray<Time> const &timestamps = *(this->get_keys());
 
         size_t search_window_start = 0;
         size_t search_window_end = timestamps.count();
@@ -149,7 +149,7 @@ public:
         : ProximalTemporalDictionary<V>(Duration::max() / 2, max_cache_size) {}
     ProximalTemporalDictionary(Duration time_diff_threshold, size_t max_cache_size)
         : AbstractTemporalDictionary<V>(time_diff_threshold, max_cache_size) {}
-    ProximalTemporalDictionary(const ProximalTemporalDictionary<V>& temporal_dictionary)
+    ProximalTemporalDictionary(ProximalTemporalDictionary<V> const &temporal_dictionary)
         : AbstractTemporalDictionary<V>(temporal_dictionary) {}
 
 };

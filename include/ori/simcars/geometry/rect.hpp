@@ -25,10 +25,10 @@ protected:
     void set_max_y(FP_DATA_TYPE max_y) const;
     void set_calc_bounds_flag() const;
     void calc_bounds() const;
-    bool check_bounds(const Vec& point) const;
-    bool check_bounds(const Rect& rect) const;
+    bool check_bounds(Vec const &point) const;
+    bool check_bounds(Rect const &rect) const;
 
-    virtual bool check_collision_virt(const Rect& rect) const;
+    virtual bool check_collision_virt(Rect const &rect) const;
     virtual void calc_bounds_virt() const;
 
 public:
@@ -36,26 +36,26 @@ public:
     Rect(Vec origin, FP_DATA_TYPE width, FP_DATA_TYPE height);
     Rect(FP_DATA_TYPE min_x, FP_DATA_TYPE min_y, FP_DATA_TYPE max_x, FP_DATA_TYPE max_y);
     Rect(Vecs points);
-    Rect(const Rect& rect);
-    Rect(const Rect& rect_1, const Rect& rect_2);
+    Rect(Rect const &rect);
+    Rect(Rect const &rect_1, Rect const &rect_2);
     virtual ~Rect() = default;
 
-    bool operator ==(const Rect& rect) const;
-    const Vec& get_origin() const;
+    bool operator ==(Rect const &rect) const;
+    Vec const& get_origin() const;
     FP_DATA_TYPE get_width() const;
     FP_DATA_TYPE get_height() const;
     FP_DATA_TYPE get_min_x() const;
     FP_DATA_TYPE get_min_y() const;
     FP_DATA_TYPE get_max_x() const;
     FP_DATA_TYPE get_max_y() const;
-    bool check_collision(const Rect& rect) const;
+    bool check_collision(Rect const &rect) const;
 
-    void set_origin(const Vec& origin);
+    void set_origin(Vec const &origin);
     void set_width(FP_DATA_TYPE width);
     void set_height(FP_DATA_TYPE height);
     void translate(Vec translation);
 
-    virtual bool check_encapsulation(const Vec& point) const;
+    virtual bool check_encapsulation(Vec const &point) const;
 };
 
 }

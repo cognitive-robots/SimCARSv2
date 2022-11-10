@@ -15,15 +15,15 @@ ORect::ORect() : orientation(0.0f) {}
 ORect::ORect(Vec origin, FP_DATA_TYPE width, FP_DATA_TYPE height, FP_DATA_TYPE orientation)
     : Rect(origin, width, height), orientation(orientation), trig_buff(TrigBuff::get_instance()) {}
 
-ORect::ORect(const Rect& rect) : ORect(rect, 0.0f) {}
+ORect::ORect(Rect const &rect) : ORect(rect, 0.0f) {}
 
-ORect::ORect(const Rect& rect, FP_DATA_TYPE orientation)
+ORect::ORect(Rect const &rect, FP_DATA_TYPE orientation)
     : Rect(rect), orientation(orientation), trig_buff(TrigBuff::get_instance()) {}
 
-ORect::ORect(const ORect &o_rect)
+ORect::ORect(ORect const &o_rect)
     : Rect(o_rect), orientation(o_rect.orientation), trig_buff(o_rect.trig_buff) {}
 
-bool ORect::check_collision_virt(const Rect& rect) const
+bool ORect::check_collision_virt(Rect const &rect) const
 {
     return this->check_bounds(rect) && this->align_and_check_bounds(rect);
 }
@@ -40,14 +40,14 @@ void ORect::calc_bounds_virt() const
     set_max_y(get_origin().y() + aligned_half_height);
 }
 
-bool ORect::align_and_check_bounds(const Vec &point) const
+bool ORect::align_and_check_bounds(Vec const &point) const
 {
     ORect aligned_this(this->get_origin(), this->get_width(), this->get_height(), 0.0f);
     Vec aligned_point = this->get_origin() + trig_buff->get_rot_mat(-this->orientation) * (point - this->get_origin());
     return aligned_this.check_bounds(aligned_point);
 }
 
-bool ORect::align_and_check_bounds(const ORect &o_rect) const
+bool ORect::align_and_check_bounds(ORect const &o_rect) const
 {
     ORect aligned_this(this->get_origin(), this->get_width(), this->get_height(), 0.0f);
     ORect aligned_o_rect = o_rect;
@@ -55,17 +55,17 @@ bool ORect::align_and_check_bounds(const ORect &o_rect) const
     return aligned_this.check_bounds(aligned_o_rect);
 }
 
-bool ORect::check_collision_virt(const ORect& o_rect) const
+bool ORect::check_collision_virt(ORect const &o_rect) const
 {
     return this->check_bounds(o_rect) && this->align_and_check_bounds(o_rect);
 }
 
-bool ORect::operator ==(const ORect& rect) const
+bool ORect::operator ==(ORect const &o_rect) const
 {
-    return Rect::operator ==(rect) && this->orientation == rect.orientation;
+    return Rect::operator ==(o_rect) && this->orientation == o_rect.orientation;
 }
 
-bool ORect::check_collision(const ORect& o_rect) const
+bool ORect::check_collision(ORect const &o_rect) const
 {
     return this->check_collision_virt(o_rect) && o_rect.check_collision_virt(*this);
 }
@@ -82,7 +82,7 @@ void ORect::rotate(FP_DATA_TYPE rotation, Vec rotation_centre)
     rotate(rotation);
 }
 
-bool ORect::check_encapsulation(const Vec &point) const
+bool ORect::check_encapsulation(Vec const &point) const
 {
     return check_bounds(point) && align_and_check_bounds(point);
 }

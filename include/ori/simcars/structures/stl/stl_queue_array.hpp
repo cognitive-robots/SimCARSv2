@@ -3,7 +3,6 @@
 #include <ori/simcars/structures/queue_array_interface.hpp>
 
 #include <deque>
-#include <memory>
 
 namespace ori
 {
@@ -23,8 +22,8 @@ protected:
 public:
     STLQueueArray() {}
     STLQueueArray(std::initializer_list<T> init_list) : data(init_list) {}
-    STLQueueArray(const STLQueueArray<T>& stl_queue_array) : data(stl_queue_array.data) {}
-    STLQueueArray(std::shared_ptr<const IArray<T>> array) : data(array->count())
+    STLQueueArray(STLQueueArray<T> const &stl_queue_array) : data(stl_queue_array.data) {}
+    STLQueueArray(IArray<T> const *array) : data(array->count())
     {
         for (size_t i = 0; i < array->count(); ++i)
         {
@@ -36,9 +35,9 @@ public:
     {
         return data.size();
     }
-    bool contains(const T& val) const override
+    bool contains(T const &val) const override
     {
-        for (const T& data_val : data)
+        for (T const &data_val : data)
         {
             if (data_val == val)
             {
@@ -48,17 +47,17 @@ public:
         return false;
     }
 
-    const T& peek_front() const override
+    T const& peek_front() const override
     {
         return data.front();
     }
 
-    const T& operator [](size_t idx) const override
+    T const& operator [](size_t idx) const override
     {
         return data[idx];
     }
 
-    void push_back(const T& val) override
+    void push_back(T const &val) override
     {
         data.push_back(val);
     }
@@ -73,7 +72,7 @@ public:
     }
     T pop_front() override
     {
-        const T val = peek_front();
+        T const val = peek_front();
         data.pop_front();
         return val;
     }

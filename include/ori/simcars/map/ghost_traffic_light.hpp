@@ -13,12 +13,12 @@ template<typename T_id>
 class GhostTrafficLight : public ATrafficLight<T_id>
 {
 protected:
-    mutable std::shared_ptr<const GhostTrafficLight<T_id>> tether;
+    mutable GhostTrafficLight<T_id> const *tether;
 
-    GhostTrafficLight(const T_id& id, std::shared_ptr<const IMap<T_id>> map) : ATrafficLight<T_id>(id, map) {}
+    GhostTrafficLight(T_id const &id, IMap<T_id> const *map) : ATrafficLight<T_id>(id, map) {}
 
 public:
-    std::shared_ptr<const ITrafficLight<T_id>> get_self() const override
+    ITrafficLight<T_id> const* get_self() const override
     {
         throw GhostTrafficLight<T_id>::GhostObjectException;
     }
@@ -26,14 +26,14 @@ public:
     {
         tether.reset();
     }
-    std::shared_ptr<const ITrafficLight<T_id>> get_true_self() const noexcept override
+    ITrafficLight<T_id> const* get_true_self() const noexcept override
     {
-        std::shared_ptr<const ITrafficLight<T_id>> true_self = this->get_map()->get_traffic_light(this->get_id());
+        ITrafficLight<T_id> const *true_self = this->get_map()->get_traffic_light(this->get_id());
         tether.reset();
         return true_self;
     }
 
-    const geometry::Vec& get_position() const override
+    geometry::Vec const& get_position() const override
     {
         throw GhostTrafficLight<T_id>::GhostObjectException;
     }
@@ -41,7 +41,7 @@ public:
     {
         throw GhostTrafficLight<T_id>::GhostObjectException;
     }
-    std::shared_ptr<const structures::IArray<ITrafficLightStateHolder::FaceColour>> get_face_colours() const override
+    structures::IArray<ITrafficLightStateHolder::FaceColour> const* get_face_colours() const override
     {
         throw GhostTrafficLight<T_id>::GhostObjectException;
     }
@@ -50,9 +50,9 @@ public:
         throw GhostTrafficLight<T_id>::GhostObjectException;
     }
 
-    static std::shared_ptr<GhostTrafficLight<T_id>> spawn(const T_id& id, std::shared_ptr<const IMap<T_id>> map)
+    static GhostTrafficLight<T_id>* spawn(T_id const &id, IMap<T_id> const *map)
     {
-        std::shared_ptr<GhostTrafficLight<T_id>> spawned_ghost_traffic_light(new GhostTrafficLight<T_id>(id, map));
+        GhostTrafficLight<T_id> *spawned_ghost_traffic_light = new GhostTrafficLight<T_id>(id, map);
         spawned_ghost_traffic_light->tether = spawned_ghost_traffic_light;
         return spawned_ghost_traffic_light;
     }

@@ -4,7 +4,6 @@
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 
 #include <unordered_set>
-#include <memory>
 
 namespace ori
 {
@@ -20,18 +19,26 @@ class STLSet : public virtual ISet<T>
 {
     std::unordered_set<T> data;
 
-    mutable std::shared_ptr<IStackArray<T>> values_cache;
+    mutable IStackArray<T> *values_cache;
 
 public:
     STLSet(size_t bin_count = 10000) : data(bin_count) {}
     STLSet(std::initializer_list<T> init_list, size_t bin_count = 10000) : data(init_list, bin_count) {}
-    STLSet(const STLSet& stl_set) : data(stl_set.data) {}
-    STLSet(std::shared_ptr<const ISet<T>> set)
+    STLSet(STLSet const &stl_set) : data(stl_set.data) {}
+    STLSet(ISet<T> const *set)
     {
-        std::shared_ptr<const IArray<T>> array = set->get_array();
+        IArray<T> const *array = set->get_array();
         for (size_t i; i < array->count(); ++i)
         {
             data.insert((*array)[i]);
+        }
+    }
+
+    ~STLSet() override
+    {
+        if (values_cache != nullptr)
+        {
+            delete values_cache;
         }
     }
 
@@ -39,12 +46,12 @@ public:
     {
         return data.size();
     }
-    bool contains(const T& val) const override
+    bool contains(T const &val) const override
     {
         return data.count(val) > 0;
     }
 
-    std::shared_ptr<const IArray<T>> get_array() const override
+    IArray<T> const* get_array() const override
     {
         if (values_cache)
         {
@@ -55,7 +62,7 @@ public:
             values_cache.reset(new STLStackArray<T>(count()));
 
             size_t i = 0;
-            for (const T& val : data)
+            for (T const &val : data)
             {
                 (*values_cache)[i] = val;
                 ++i;
@@ -65,20 +72,19 @@ public:
         }
     }
 
-    void union_with(std::shared_ptr<const ISet<T>> set) override
+    void union_with(IArray<T> const *set) override
     {
-        std::shared_ptr<const IArray<T>> array = set->get_array();
+        IArray<T> const *array = set->get_array();
         size_t i;
         for (i = 0; i < array->count(); ++i)
         {
             this->insert((*array)[i]);
         }
     }
-    void intersect_with(std::shared_ptr<const ISet<T>> set) override
+    void intersect_with(IArray<T> const *set) override
     {
-        std::shared_ptr<const IArray<T>> array;
+        IArray<T> const *array = this->get_array();
         size_t i;
-        array = this->get_array();
         for (i = 0; i < array->count(); ++i)
         {
             if (!set->contains((*array)[i]))
@@ -87,9 +93,9 @@ public:
             }
         }
     }
-    void difference_with(std::shared_ptr<const ISet<T>> set) override
+    void difference_with(IArray<T> const *set) override
     {
-        std::shared_ptr<const IArray<T>> array;
+        IArray<T> const *array;
         size_t i;
         if (this->count() <= set->count())
         {
@@ -111,7 +117,7 @@ public:
             }
         }
     }
-    void insert(const T& val) override
+    void insert(T const &val) override
     {
         data.insert(val);
 
@@ -120,7 +126,7 @@ public:
             values_cache->push_back(val);
         }
     }
-    void erase(const T& val) override
+    void erase(T const &val) override
     {
         data.erase(val);
 

@@ -13,7 +13,7 @@ template <typename T_id>
 class IFileBasedMap : public virtual IMap<T_id>
 {
 public:
-    virtual void save(const std::string& output_file_path_str) const = 0;
+    virtual void save(std::string const &output_file_path_str) const = 0;
 };
 
 }

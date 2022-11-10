@@ -14,13 +14,13 @@ class Tri
     Vec points[3];
 
 public:
-    Tri(const Vec& point_1, const Vec& point_2, const Vec& point_3);
+    Tri(Vec const &point_1, Vec const &point_2, Vec const &point_3);
     Tri();
     virtual ~Tri() = default;
 
-    bool operator ==(const Tri& tri) const;
-    const Vec& operator [](size_t idx) const;
-    bool check_encapsulation(const Vec& point) const;
+    bool operator ==(Tri const &tri) const;
+    Vec const& operator [](size_t idx) const;
+    bool check_encapsulation(Vec const &point) const;
 
     Vec& operator [](size_t idx);
 };

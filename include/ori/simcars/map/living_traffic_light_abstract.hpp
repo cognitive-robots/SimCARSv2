@@ -10,12 +10,12 @@ namespace map
 {
 
 template<typename T_id>
-class ALivingTrafficLight : public ATrafficLight<T_id>, public std::enable_shared_from_this<ALivingTrafficLight<T_id>>
+class ALivingTrafficLight : public ATrafficLight<T_id>
 {
 public:
-    ALivingTrafficLight(const T_id& id, std::shared_ptr<const IMap<T_id>> map) : ATrafficLight<T_id>(id, map) {}
+    ALivingTrafficLight(T_id const &id, IMap<T_id> const *map) : ATrafficLight<T_id>(id, map) {}
 
-    std::shared_ptr<const ITrafficLight<T_id>> get_true_self() const noexcept override
+    ITrafficLight<T_id> const* get_true_self() const noexcept override
     {
         return this->shared_from_this();
     }

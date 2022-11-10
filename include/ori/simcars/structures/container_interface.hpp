@@ -16,7 +16,7 @@ public:
     virtual ~IContainer() = default;
 
     virtual size_t count() const = 0;
-    virtual bool contains(const T& val) const = 0;
+    virtual bool contains(T const &val) const = 0;
 };
 
 }

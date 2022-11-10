@@ -15,7 +15,7 @@ template <typename T_id>
 class ALane : public ILane<T_id>, public MapObject<T_id>, public virtual ASoul<ILane<T_id>>
 {
 public:
-    ALane(const T_id& id, std::shared_ptr<const IMap<T_id>> map) : MapObject<T_id>(id, map) {}
+    ALane(T_id const &id, IMap<T_id> const *map) : MapObject<T_id>(id, map) {}
 };
 
 }

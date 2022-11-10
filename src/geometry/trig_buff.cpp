@@ -16,7 +16,7 @@ namespace simcars
 namespace geometry
 {
 
-std::weak_ptr<TrigBuff> TrigBuff::instance = std::weak_ptr<TrigBuff>();
+TrigBuff *TrigBuff::instance = nullptr;
 
 TrigBuff::TrigBuff(size_t num_bins, AngleType default_angle_type)
     : num_bins(num_bins), default_angle_type(default_angle_type), radian_multi(num_bins / (2.0f * M_PI)), degree_multi(num_bins / 360.0f)
@@ -34,9 +34,9 @@ TrigBuff::TrigBuff(size_t num_bins, AngleType default_angle_type)
                                     + std::to_string(magic_enum::enum_integer(default_angle_type)) + "'");
     }
 
-    sin_bins = std::unique_ptr<FP_DATA_TYPE[]>(new FP_DATA_TYPE[num_bins]);
-    cos_bins = std::unique_ptr<FP_DATA_TYPE[]>(new FP_DATA_TYPE[num_bins]);
-    tan_bins = std::unique_ptr<FP_DATA_TYPE[]>(new FP_DATA_TYPE[num_bins]);
+    sin_bins = new FP_DATA_TYPE[num_bins];
+    cos_bins = new FP_DATA_TYPE[num_bins];
+    tan_bins = new FP_DATA_TYPE[num_bins];
 
     FP_DATA_TYPE angle;
     size_t i;
@@ -49,19 +49,37 @@ TrigBuff::TrigBuff(size_t num_bins, AngleType default_angle_type)
     }
 }
 
-std::shared_ptr<const TrigBuff> TrigBuff::init_instance(size_t num_bins, AngleType default_angle_type)
+TrigBuff::~TrigBuff()
 {
-    std::shared_ptr<TrigBuff> instance(new TrigBuff(num_bins, default_angle_type));
-    TrigBuff::instance = instance;
-    return instance;
+    delete[] sin_bins;
+    delete[] cos_bins;
+    delete[] tan_bins;
 }
 
-std::shared_ptr<const TrigBuff> TrigBuff::get_instance()
+TrigBuff const* TrigBuff::init_instance(size_t num_bins, AngleType default_angle_type)
 {
-    std::shared_ptr<TrigBuff> instance = TrigBuff::instance.lock();
-    if (instance != nullptr)
+    TrigBuff::instance = new TrigBuff(num_bins, default_angle_type);
+    return TrigBuff::instance;
+}
+
+void TrigBuff::destroy_instance()
+{
+    if (TrigBuff::instance != nullptr)
     {
-        return instance;
+        delete TrigBuff::instance;
+        TrigBuff::instance = nullptr;
+    }
+    else
+    {
+        throw std::runtime_error("A trigonometry buffer instance has not been initialised");
+    }
+}
+
+TrigBuff const* TrigBuff::get_instance()
+{
+    if (TrigBuff::instance != nullptr)
+    {
+        return TrigBuff::instance;
     }
     else
     {

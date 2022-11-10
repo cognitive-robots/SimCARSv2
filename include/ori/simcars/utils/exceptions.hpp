@@ -13,7 +13,7 @@ class NotImplementedException : public std::exception {
 public:
     using std::exception::exception;
 
-    const char* what() const noexcept override
+    char const * what() const noexcept override
     {
         return "This functionality has not been implemented yet";
     }
