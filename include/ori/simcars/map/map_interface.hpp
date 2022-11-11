@@ -4,7 +4,6 @@
 #include <ori/simcars/structures/array_interface.hpp>
 #include <ori/simcars/map/declarations.hpp>
 
-#include <memory>
 #include <exception>
 
 namespace ori
@@ -23,7 +22,7 @@ public:
     public:
         using std::exception::exception;
 
-        const char* what() const noexcept override
+        char const* what() const noexcept override
         {
             return "Could not find a map object when a lookup was performed";
         }
@@ -31,13 +30,13 @@ public:
 
     virtual ~IMap() = default;
 
-    virtual std::shared_ptr<const ILane<T_id>> get_lane(T_id id) const = 0;
-    virtual std::shared_ptr<const ILaneArray<T_id>> get_encapsulating_lanes(geometry::Vec point) const = 0;
-    virtual std::shared_ptr<const ILaneArray<T_id>> get_lanes(std::shared_ptr<const structures::IArray<T_id>> ids) const = 0;
-    virtual std::shared_ptr<const ILaneArray<T_id>> get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
-    virtual std::shared_ptr<const ITrafficLight<T_id>> get_traffic_light(T_id id) const = 0;
-    virtual std::shared_ptr<const ITrafficLightArray<T_id>> get_traffic_lights(std::shared_ptr<const structures::IArray<T_id>> ids) const = 0;
-    virtual std::shared_ptr<const ITrafficLightArray<T_id>> get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
+    virtual ILane<T_id> const* get_lane(T_id id) const = 0;
+    virtual ILaneArray<T_id> const* get_encapsulating_lanes(geometry::Vec point) const = 0;
+    virtual ILaneArray<T_id> const* get_lanes(structures::IArray<T_id> const *ids) const = 0;
+    virtual ILaneArray<T_id> const* get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
+    virtual ITrafficLight<T_id> const* get_traffic_light(T_id id) const = 0;
+    virtual ITrafficLightArray<T_id> const* get_traffic_lights(structures::IArray<T_id> const *ids) const = 0;
+    virtual ITrafficLightArray<T_id> const* get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
 };
 
 }

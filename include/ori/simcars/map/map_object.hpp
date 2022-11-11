@@ -12,19 +12,19 @@ namespace map
 template<typename T_id>
 class MapObject : public virtual IMapObject<T_id>
 {
-    const T_id id;
-    const std::weak_ptr<const IMap<T_id>> map;
+    T_id const id;
+    IMap<T_id> const* const map;
 
 public:
-    MapObject(const T_id& id, std::shared_ptr<const IMap<T_id>> map) : id(id), map(map) {}
+    MapObject(T_id const &id, IMap<T_id> const *map) : id(id), map(map) {}
 
     T_id get_id() const override
     {
         return id;
     }
-    std::shared_ptr<const IMap<T_id>> get_map() const override
+    IMap<T_id> const* get_map() const override
     {
-        return map.lock();
+        return map;
     }
 };
 

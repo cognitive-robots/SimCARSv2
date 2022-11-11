@@ -13,7 +13,7 @@ template<typename T>
 class ASoul : public virtual ISoul<T>
 {
 public:
-    std::shared_ptr<const T> get_self() const override
+    T const* get_self() const override
     {
         return this->get_true_self();
     }

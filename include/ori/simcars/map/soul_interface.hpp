@@ -1,7 +1,6 @@
 #pragma once
 
 #include <exception>
-#include <memory>
 
 namespace ori
 {
@@ -18,7 +17,7 @@ public:
     public:
         using std::exception::exception;
 
-        const char* what() const noexcept override
+        char const* what() const noexcept override
         {
             return "Object is a ghost";
         }
@@ -26,10 +25,10 @@ public:
 
     virtual ~ISoul() = default;
 
-    virtual std::shared_ptr<const T> get_self() const = 0;
+    virtual T const* get_self() const = 0;
     virtual void banish() const = 0;
 
-    virtual std::shared_ptr<const T> get_true_self() const noexcept = 0;
+    virtual T const* get_true_self() const noexcept = 0;
 };
 
 }

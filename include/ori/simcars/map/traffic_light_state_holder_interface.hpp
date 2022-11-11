@@ -39,10 +39,10 @@ public:
 
         State(ITrafficLightStateHolder::FaceColour active_face = ITrafficLightStateHolder::FaceColour::UNKNOWN)
             : active_face(active_face) {}
-        State(const State& state) : State(state.active_face) {}
+        State(State const &state) : State(state.active_face) {}
         virtual ~State() = default;
 
-        virtual bool operator ==(const ITrafficLightStateHolder::State& state) const
+        virtual bool operator ==(ITrafficLightStateHolder::State const &state) const
         {
             return this->active_face == state.active_face;
         }
