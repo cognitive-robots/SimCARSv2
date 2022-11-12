@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ori/simcars/temporal/proximal_temporal_dictionary.hpp>
+
 namespace ori
 {
 namespace simcars
@@ -47,6 +49,9 @@ public:
             return this->active_face == state.active_face;
         }
     };
+
+    typedef structures::IDictionary<FaceColour, FaceType> IFaceDictionary;
+    typedef temporal::ProximalTemporalDictionary<State const*> TemporalStateDictionary;
 
     ~ITrafficLightStateHolder() = default;
 };

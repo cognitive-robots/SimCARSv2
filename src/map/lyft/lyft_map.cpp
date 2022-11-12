@@ -19,12 +19,12 @@ namespace map
 namespace lyft
 {
 
-void LyftMap::save_virt(std::ofstream& output_filestream) const
+void LyftMap::save_virt(std::ofstream &output_filestream) const
 {
     throw utils::NotImplementedException();
 }
 
-void LyftMap::load_virt(std::ifstream& input_filestream)
+void LyftMap::load_virt(std::ifstream &input_filestream)
 {
     lz4_stream::istream input_lz4_stream(input_filestream);
     rapidjson::BasicIStreamWrapper input_lz4_json_stream(input_lz4_stream);
@@ -32,14 +32,14 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
     rapidjson::Document json_document;
     json_document.ParseStream(input_lz4_json_stream);
 
-    id_to_lane_dict.reset(new structures::stl::STLDictionary<std::string, std::shared_ptr<LyftLane>>());
-    id_to_traffic_light_dict.reset(new structures::stl::STLDictionary<std::string, std::shared_ptr<LyftTrafficLight>>());
-    map_grid_dict.reset(new geometry::GridDictionary<MapGridRect<std::string>>(geometry::Vec(0, 0), 100));
+    id_to_lane_dict = new structures::stl::STLDictionary<std::string, LyftLane*>();
+    id_to_traffic_light_dict = new structures::stl::STLDictionary<std::string, LyftTrafficLight*>();
+    map_grid_dict = new geometry::GridDictionary<MapGridRect<std::string>>(geometry::Vec(0, 0), 100);
 
-    std::shared_ptr<structures::IDictionary<std::string, std::shared_ptr<LyftTrafficLight::IFaceDictionary>>> id_to_face_colour_to_face_type_dict(
-                new structures::stl::STLDictionary<std::string, std::shared_ptr<LyftTrafficLight::IFaceDictionary>>);
-    std::shared_ptr<structures::IDictionary<std::string, std::shared_ptr<LyftTrafficLight::TemporalStateDictionary>>> id_to_timestamp_to_state_dict(
-                new structures::stl::STLDictionary<std::string, std::shared_ptr<LyftTrafficLight::TemporalStateDictionary>>);
+    structures::IDictionary<std::string, ITrafficLightStateHolder::IFaceDictionary*> *id_to_face_colour_to_face_type_dict =
+                new structures::stl::STLDictionary<std::string, ITrafficLightStateHolder::IFaceDictionary*>;
+    structures::IDictionary<std::string, ITrafficLightStateHolder::TemporalStateDictionary*> *id_to_timestamp_to_state_dict =
+                new structures::stl::STLDictionary<std::string, ITrafficLightStateHolder::TemporalStateDictionary*>;
 
     rapidjson::Value::Object traffic_light_face_id_to_traffic_light_id =
             json_document["id_traffic_light_face_id_traffic_light_dict"].GetObject();
@@ -61,33 +61,33 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
          traffic_light_face_id_to_traffic_light_face_data.MemberEnd();
          ++traffic_light_face_id_to_traffic_light_face_itr)
     {
-        const std::string& traffic_light_face_id =
+        std::string const &traffic_light_face_id =
                 traffic_light_face_id_to_traffic_light_face_itr->name.GetString();
         if (!traffic_light_face_id_to_traffic_light_id.HasMember(traffic_light_face_id.c_str()))
         {
             continue;
         }
-        const std::string& traffic_light_id =
+        std::string const &traffic_light_id =
                 traffic_light_face_id_to_traffic_light_id[traffic_light_face_id.c_str()].GetString();
 
-        std::shared_ptr<LyftTrafficLight::IFaceDictionary> face_colour_to_face_type_dict;
+        ITrafficLightStateHolder::IFaceDictionary *face_colour_to_face_type_dict;
         if (id_to_face_colour_to_face_type_dict->contains(traffic_light_id))
         {
             face_colour_to_face_type_dict = (*id_to_face_colour_to_face_type_dict)[traffic_light_id];
         }
         else
         {
-            face_colour_to_face_type_dict.reset(
-                        new structures::stl::STLDictionary<LyftTrafficLight::FaceColour, LyftTrafficLight::FaceType>());
+            face_colour_to_face_type_dict =
+                    new structures::stl::STLDictionary<ITrafficLightStateHolder::FaceColour, ITrafficLightStateHolder::FaceType>();
             id_to_face_colour_to_face_type_dict->update(traffic_light_id, face_colour_to_face_type_dict);
         }
 
-        rapidjson::Value::ConstObject traffic_light_face_data =
+        rapidjson::Value::ConstObject const &traffic_light_face_data =
                 traffic_light_face_id_to_traffic_light_face_itr->value.GetObject();
-        const std::string& traffic_light_face_type_str = traffic_light_face_data["traffic_light_face_type"].GetString();
+        std::string const &traffic_light_face_type_str = traffic_light_face_data["traffic_light_face_type"].GetString();
 
-        LyftTrafficLight::FaceColour face_colour = LyftTrafficLight::FaceColour::UNKNOWN;
-        LyftTrafficLight::FaceType face_type = LyftTrafficLight::FaceType::UNKNOWN;
+        ITrafficLightStateHolder::FaceColour face_colour = ITrafficLightStateHolder::FaceColour::UNKNOWN;
+        ITrafficLightStateHolder::FaceType face_type = ITrafficLightStateHolder::FaceType::UNKNOWN;
 
         std::string token;
         size_t current_delim, next_delim;
@@ -99,35 +99,35 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
 
             if (token == "signal")
             {
-                face_type = LyftTrafficLight::FaceType::STANDARD;
+                face_type = ITrafficLightStateHolder::FaceType::STANDARD;
             }
             else if (token == "red")
             {
-                face_colour = LyftTrafficLight::FaceColour::RED;
+                face_colour = ITrafficLightStateHolder::FaceColour::RED;
             }
             else if (token == "yellow")
             {
-                face_colour = LyftTrafficLight::FaceColour::YELLOW;
+                face_colour = ITrafficLightStateHolder::FaceColour::YELLOW;
             }
             else if (token == "green")
             {
-                face_colour = LyftTrafficLight::FaceColour::GREEN;
+                face_colour = ITrafficLightStateHolder::FaceColour::GREEN;
             }
             else if (token == "arrow")
             {
-                face_type = LyftTrafficLight::FaceType(static_cast<int>(face_type) | static_cast<int>(LyftTrafficLight::FaceType::ARROW));
+                face_type = ITrafficLightStateHolder::FaceType(static_cast<int>(face_type) | static_cast<int>(ITrafficLightStateHolder::FaceType::ARROW));
             }
             else if (token == "left")
             {
-                face_type = LyftTrafficLight::FaceType(static_cast<int>(face_type) | static_cast<int>(LyftTrafficLight::FaceType::LEFT));
+                face_type = ITrafficLightStateHolder::FaceType(static_cast<int>(face_type) | static_cast<int>(ITrafficLightStateHolder::FaceType::LEFT));
             }
             else if (token == "right")
             {
-                face_type = LyftTrafficLight::FaceType(static_cast<int>(face_type) | static_cast<int>(LyftTrafficLight::FaceType::RIGHT));
+                face_type = ITrafficLightStateHolder::FaceType(static_cast<int>(face_type) | static_cast<int>(ITrafficLightStateHolder::FaceType::RIGHT));
             }
             else if (token == "upper")
             {
-                face_type = LyftTrafficLight::FaceType(static_cast<int>(face_type) | static_cast<int>(LyftTrafficLight::FaceType::UPPER));
+                face_type = ITrafficLightStateHolder::FaceType(static_cast<int>(face_type) | static_cast<int>(ITrafficLightStateHolder::FaceType::UPPER));
             }
             else if (token == "u")
             {
@@ -137,44 +137,44 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
 
                 if (token == "turn")
                 {
-                    face_type = LyftTrafficLight::FaceType(static_cast<int>(face_type) | static_cast<int>(LyftTrafficLight::FaceType::UTURN));
+                    face_type = ITrafficLightStateHolder::FaceType(static_cast<int>(face_type) | static_cast<int>(ITrafficLightStateHolder::FaceType::UTURN));
                 }
                 else
                 {
-                    face_type = LyftTrafficLight::FaceType::UNKNOWN;
+                    face_type = ITrafficLightStateHolder::FaceType::UNKNOWN;
                 }
             }
             else if (token == "flashing")
             {
-                face_type = LyftTrafficLight::FaceType(static_cast<int>(face_type) | static_cast<int>(LyftTrafficLight::FaceType::FLASHING));
+                face_type = ITrafficLightStateHolder::FaceType(static_cast<int>(face_type) | static_cast<int>(ITrafficLightStateHolder::FaceType::FLASHING));
             }
             else
             {
-                face_type = LyftTrafficLight::FaceType::UNKNOWN;
+                face_type = ITrafficLightStateHolder::FaceType::UNKNOWN;
             }
         }
 
         face_colour_to_face_type_dict->update(face_colour, face_type);
 
 
-        std::shared_ptr<LyftTrafficLight::TemporalStateDictionary> timestamp_to_state_dict;
+        ITrafficLightStateHolder::TemporalStateDictionary *timestamp_to_state_dict;
         if (id_to_timestamp_to_state_dict->contains(traffic_light_id))
         {
             timestamp_to_state_dict = (*id_to_timestamp_to_state_dict)[traffic_light_id];
         }
         else
         {
-            timestamp_to_state_dict.reset(
-                    new LyftTrafficLight::TemporalStateDictionary(temporal::Duration(50), 10));
+            timestamp_to_state_dict =
+                    new ITrafficLightStateHolder::TemporalStateDictionary(temporal::Duration(50), 10);
             id_to_timestamp_to_state_dict->update(traffic_light_id, timestamp_to_state_dict);
         }
 
         if (traffic_light_face_id_to_state_data.HasMember(traffic_light_face_id.c_str()))
         {
             rapidjson::Value::Array state_data = traffic_light_face_id_to_state_data[traffic_light_face_id.c_str()].GetArray();
-            for (const rapidjson::Value& state_data_element : state_data)
+            for (rapidjson::Value const &state_data_element : state_data)
             {
-                rapidjson::Value::ConstArray state_pair = state_data_element.GetArray();
+                rapidjson::Value::ConstArray const &state_pair = state_data_element.GetArray();
                 temporal::Time timestamp(temporal::Duration(state_pair[0].GetInt64()));
                 LyftTrafficLightFaceState face_state = static_cast<LyftTrafficLightFaceState>(state_pair[1].GetInt());
 
@@ -182,8 +182,7 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
                 {
                     timestamp_to_state_dict->update(
                                 timestamp,
-                                std::shared_ptr<LyftTrafficLight::State>(
-                                    new LyftTrafficLight::State(face_colour)));
+                                new ITrafficLightStateHolder::State(face_colour));
                 }
             }
         }
@@ -194,15 +193,15 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
     for (rapidjson::Value::ConstMemberIterator lane_id_to_lane_itr = lane_id_to_lane_data.MemberBegin();
          lane_id_to_lane_itr != lane_id_to_lane_data.MemberEnd(); ++lane_id_to_lane_itr)
     {
-        const std::string& lane_id = lane_id_to_lane_itr->name.GetString();
-        std::shared_ptr<LyftLane> lane(new LyftLane(lane_id, shared_from_this(), lane_id_to_lane_itr->value.GetObject()));
+        std::string const &lane_id = lane_id_to_lane_itr->name.GetString();
+        LyftLane *lane = new LyftLane(lane_id, this, lane_id_to_lane_itr->value.GetObject());
         id_to_lane_dict->update(lane_id, lane);
-        const geometry::Rect& lane_bounding_box = lane->get_bounding_box();
+        geometry::Rect const &lane_bounding_box = lane->get_bounding_box();
         map_grid_dict->chebyshev_proliferate(
             lane_bounding_box.get_origin(),
             lane_bounding_box.get_width() / 2.0f,
             lane_bounding_box.get_height() / 2.0f);
-        std::shared_ptr<structures::IArray<std::shared_ptr<MapGridRect<std::string>>>> map_grid_rects =
+        structures::IArray<MapGridRect<std::string>*> *map_grid_rects =
                 map_grid_dict->chebyshev_grid_rects_in_range(
                     lane_bounding_box.get_origin(),
                     lane_bounding_box.get_width() / 2.0f,
@@ -219,17 +218,17 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
     for (rapidjson::Value::ConstMemberIterator traffic_light_id_to_traffic_light_itr = traffic_light_id_to_traffic_light_data.MemberBegin();
          traffic_light_id_to_traffic_light_itr != traffic_light_id_to_traffic_light_data.MemberEnd(); ++traffic_light_id_to_traffic_light_itr)
     {
-        const std::string& traffic_light_id = traffic_light_id_to_traffic_light_itr->name.GetString();
-        std::shared_ptr<LyftTrafficLight::IFaceDictionary> face_colour_to_face_type_dict;
-        std::shared_ptr<LyftTrafficLight::TemporalStateDictionary> timestamp_to_state_dict;
+        std::string const &traffic_light_id = traffic_light_id_to_traffic_light_itr->name.GetString();
+        ITrafficLightStateHolder::IFaceDictionary *face_colour_to_face_type_dict;
+        ITrafficLightStateHolder::TemporalStateDictionary *timestamp_to_state_dict;
         try
         {
             face_colour_to_face_type_dict = (*id_to_face_colour_to_face_type_dict)[traffic_light_id];
             timestamp_to_state_dict = (*id_to_timestamp_to_state_dict)[traffic_light_id];
         }
-        catch (const std::exception&) {}
-        std::shared_ptr<LyftTrafficLight> traffic_light(
-            new LyftTrafficLight(traffic_light_id, shared_from_this(), face_colour_to_face_type_dict,
+        catch (std::exception const&) {}
+        LyftTrafficLight *traffic_light(
+            new LyftTrafficLight(traffic_light_id, this, face_colour_to_face_type_dict,
                                  timestamp_to_state_dict, traffic_light_id_to_traffic_light_itr->value.GetObject()));
         (*id_to_traffic_light_dict).update(traffic_light_id, traffic_light);
         map_grid_dict->chebyshev_proliferate(traffic_light->get_position(), 0.0f);
@@ -237,37 +236,37 @@ void LyftMap::load_virt(std::ifstream& input_filestream)
     }
 }
 
-std::shared_ptr<const ILane<std::string>> LyftMap::get_lane(std::string id) const
+ILane<std::string> const* LyftMap::get_lane(std::string id) const
 {
     try
     {
         return (*id_to_lane_dict)[id];
     }
-    catch (const std::out_of_range&)
+    catch (std::out_of_range const&)
     {
-        throw LyftMap::ObjectNotFound();
+        throw IMap::ObjectNotFound();
     }
 }
 
-std::shared_ptr<const ILaneArray<std::string>> LyftMap::get_encapsulating_lanes(geometry::Vec point) const
+ILaneArray<std::string> const* LyftMap::get_encapsulating_lanes(geometry::Vec point) const
 {
     if (map_grid_dict->contains(point))
     {
-        std::shared_ptr<MapGridRect<std::string>> map_grid_rect = (*map_grid_dict)[point];
+        MapGridRect<std::string> *map_grid_rect = (*map_grid_dict)[point];
         if (map_grid_rect)
         {
             return map_grid_rect->get_encapsulating_lanes(point);
         }
     }
 
-    return std::shared_ptr<const ILaneArray<std::string>>(new structures::stl::STLStackArray<std::shared_ptr<const ILane<std::string>>>());
+    return new structures::stl::STLStackArray<ILane<std::string> const*>;
 }
 
-std::shared_ptr<const ILaneArray<std::string>> LyftMap::get_lanes(std::shared_ptr<const structures::IArray<std::string>> ids) const
+ILaneArray<std::string> const* LyftMap::get_lanes(structures::IArray<std::string> const *ids) const
 {
     const size_t lane_count = ids->count();
-    std::shared_ptr<ILaneArray<std::string>> lanes(
-                new structures::stl::STLStackArray<std::shared_ptr<const ILane<std::string>>>(lane_count));
+    ILaneArray<std::string> *lanes =
+            new structures::stl::STLStackArray<ILane<std::string> const*>(lane_count);
 
     size_t i;
     for (i = 0; i < lane_count; ++i)
@@ -278,13 +277,13 @@ std::shared_ptr<const ILaneArray<std::string>> LyftMap::get_lanes(std::shared_pt
     return lanes;
 }
 
-std::shared_ptr<const ILaneArray<std::string>> LyftMap::get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const
+ILaneArray<std::string> const* LyftMap::get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const
 {
-    std::shared_ptr<structures::IArray<std::shared_ptr<MapGridRect<std::string>>>> map_grid_rects =
+    structures::IArray<MapGridRect<std::string>*> *map_grid_rects =
             map_grid_dict->chebyshev_grid_rects_in_range(point, distance);
 
-    std::shared_ptr<structures::ISet<std::shared_ptr<const ILane<std::string>>>> lanes(
-                new structures::stl::STLSet<std::shared_ptr<const ILane<std::string>>>());
+    structures::ISet<ILane<std::string> const*> *lanes =
+            new structures::stl::STLSet<ILane<std::string> const*>();
 
     size_t i;
     for (i = 0; i < map_grid_rects->count(); ++i)
@@ -295,23 +294,23 @@ std::shared_ptr<const ILaneArray<std::string>> LyftMap::get_lanes_in_range(geome
     return lanes->get_array();
 }
 
-std::shared_ptr<const ITrafficLight<std::string>> LyftMap::get_traffic_light(std::string id) const
+ITrafficLight<std::string> const* LyftMap::get_traffic_light(std::string id) const
 {
     try
     {
         return (*id_to_traffic_light_dict)[id];
     }
-    catch (const std::out_of_range&)
+    catch (std::out_of_range const&)
     {
-        throw LyftMap::ObjectNotFound();
+        throw IMap::ObjectNotFound();
     }
 }
 
-std::shared_ptr<const ITrafficLightArray<std::string>> LyftMap::get_traffic_lights(std::shared_ptr<const structures::IArray<std::string>> ids) const
+ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights(structures::IArray<std::string> const *ids) const
 {
-    const size_t traffic_light_count = ids->count();
-    std::shared_ptr<ITrafficLightArray<std::string>> traffic_lights(
-                new structures::stl::STLStackArray<std::shared_ptr<const ITrafficLight<std::string>>>(traffic_light_count));
+    size_t const traffic_light_count = ids->count();
+    ITrafficLightArray<std::string> *traffic_lights =
+            new structures::stl::STLStackArray<ITrafficLight<std::string> const*>(traffic_light_count);
 
     size_t i;
     for (i = 0; i < traffic_light_count; ++i)
@@ -322,13 +321,13 @@ std::shared_ptr<const ITrafficLightArray<std::string>> LyftMap::get_traffic_ligh
     return traffic_lights;
 }
 
-std::shared_ptr<const ITrafficLightArray<std::string>> LyftMap::get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const
+ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const
 {
-    std::shared_ptr<structures::IArray<std::shared_ptr<MapGridRect<std::string>>>> map_grid_rects =
+    structures::IArray<MapGridRect<std::string>*> *map_grid_rects =
             map_grid_dict->chebyshev_grid_rects_in_range(point, distance);
 
-    std::shared_ptr<structures::ISet<std::shared_ptr<const ITrafficLight<std::string>>>> traffic_lights(
-                new structures::stl::STLSet<std::shared_ptr<const ITrafficLight<std::string>>>());
+    structures::ISet<ITrafficLight<std::string> const*> *traffic_lights =
+                new structures::stl::STLSet<ITrafficLight<std::string> const*>();
 
     size_t i;
     for (i = 0; i < map_grid_rects->count(); ++i)
@@ -339,17 +338,17 @@ std::shared_ptr<const ITrafficLightArray<std::string>> LyftMap::get_traffic_ligh
     return traffic_lights->get_array();
 }
 
-std::shared_ptr<LyftMap> LyftMap::copy() const
+LyftMap* LyftMap::copy() const
 {
-    std::shared_ptr<LyftMap> map_copy(new LyftMap());
-    map_copy->id_to_lane_dict.reset(
-                new structures::stl::STLDictionary<std::string, std::shared_ptr<LyftLane>>(
-                    *this->id_to_lane_dict));
-    map_copy->id_to_traffic_light_dict.reset(
-                new structures::stl::STLDictionary<std::string, std::shared_ptr<LyftTrafficLight>>(
-                    *this->id_to_traffic_light_dict));
-    map_copy->map_grid_dict.reset(new geometry::GridDictionary<MapGridRect<std::string>>(
-                                      *this->map_grid_dict));
+    LyftMap *map_copy = new LyftMap();
+    map_copy->id_to_lane_dict =
+                new structures::stl::STLDictionary<std::string, LyftLane*>(
+                    this->id_to_lane_dict);
+    map_copy->id_to_traffic_light_dict =
+                new structures::stl::STLDictionary<std::string, LyftTrafficLight*>(
+                    this->id_to_traffic_light_dict);
+    map_copy->map_grid_dict = new geometry::GridDictionary<MapGridRect<std::string>>(
+                                      *this->map_grid_dict);
     return map_copy;
 }
 

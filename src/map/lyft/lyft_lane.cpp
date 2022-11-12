@@ -3,9 +3,9 @@
 #include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/map/lyft/lyft_lane.hpp>
 #include <ori/simcars/map/ghost_lane.hpp>
-#include <ori/simcars/map/weak_ghost_lane_array.hpp>
+#include <ori/simcars/map/ghost_lane_array.hpp>
 #include <ori/simcars/map/ghost_traffic_light.hpp>
-#include <ori/simcars/map/weak_ghost_traffic_light_array.hpp>
+#include <ori/simcars/map/ghost_traffic_light_array.hpp>
 
 namespace ori
 {
@@ -16,12 +16,12 @@ namespace map
 namespace lyft
 {
 
-LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string>> map, const rapidjson::Value::ConstObject& json_lane_data) : ALivingLane(id, map)
+LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjson::Value::ConstObject const &json_lane_data) : ALivingLane(id, map)
 {
-    std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::get_instance();
+    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
-    const rapidjson::Value::ConstArray left_boundary_data = json_lane_data["left_boundary_coord_array"].GetArray();
-    const size_t left_boundary_size = left_boundary_data.Capacity();
+    rapidjson::Value::ConstArray const &left_boundary_data = json_lane_data["left_boundary_coord_array"].GetArray();
+    size_t const left_boundary_size = left_boundary_data.Capacity();
     left_boundary = geometry::Vecs::Zero(2, left_boundary_size);
     FP_DATA_TYPE left_mean_steer = 0.0f;
 
@@ -61,8 +61,8 @@ LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string
         left_mean_steer = 0.0f;
     }
 
-    const rapidjson::Value::ConstArray right_boundary_data = json_lane_data["right_boundary_coord_array"].GetArray();
-    const size_t right_boundary_size = right_boundary_data.Capacity();
+    rapidjson::Value::ConstArray const &right_boundary_data = json_lane_data["right_boundary_coord_array"].GetArray();
+    size_t const right_boundary_size = right_boundary_data.Capacity();
     right_boundary = geometry::Vecs::Zero(2, right_boundary_size);
     FP_DATA_TYPE right_mean_steer = 0.0f;
 
@@ -103,7 +103,7 @@ LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string
     mean_steer = (left_mean_steer + right_mean_steer) / 2.0f;
 
 
-    tris.reset(new structures::stl::STLStackArray<geometry::Tri>);
+    tris = new structures::stl::STLStackArray<geometry::Tri>;
     i = 0;
     size_t j = 0;
     while (i < left_boundary_size - 1 || j < right_boundary_size - 1)
@@ -124,13 +124,13 @@ LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string
     }
 
 
-    const rapidjson::Value::ConstArray centroid_data = json_lane_data["aerial_centroid"].GetArray();
+    rapidjson::Value::ConstArray const &centroid_data = json_lane_data["aerial_centroid"].GetArray();
 
     centroid(0) = centroid_data[0].GetDouble();
     centroid(1) = centroid_data[1].GetDouble();
 
 
-    const rapidjson::Value::ConstArray bounding_box_data = json_lane_data["aerial_bb"].GetArray();
+    rapidjson::Value::ConstArray const &bounding_box_data = json_lane_data["aerial_bb"].GetArray();
 
     bounding_box = geometry::Rect(bounding_box_data[0].GetDouble(), bounding_box_data[1].GetDouble(),
             bounding_box_data[2].GetDouble(), bounding_box_data[3].GetDouble());
@@ -138,7 +138,7 @@ LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string
 
     access_restriction = AccessRestriction(json_lane_data["access_restriction"].GetInt());
 
-    const std::string left_adjacent_lane_id(json_lane_data["adjacent_left_id"].GetString(), json_lane_data["adjacent_left_id"].GetStringLength());
+    std::string const left_adjacent_lane_id(json_lane_data["adjacent_left_id"].GetString(), json_lane_data["adjacent_left_id"].GetStringLength());
     if (left_adjacent_lane_id != "")
     {
         set_left_adjacent_lane(GhostLane<std::string>::spawn(left_adjacent_lane_id, map));
@@ -148,7 +148,7 @@ LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string
         set_left_adjacent_lane(nullptr);
     }
 
-    const std::string right_adjacent_lane_id(json_lane_data["adjacent_right_id"].GetString(), json_lane_data["adjacent_right_id"].GetStringLength());
+    std::string const right_adjacent_lane_id(json_lane_data["adjacent_right_id"].GetString(), json_lane_data["adjacent_right_id"].GetStringLength());
     if (right_adjacent_lane_id != "")
     {
         set_right_adjacent_lane(GhostLane<std::string>::spawn(right_adjacent_lane_id, map));
@@ -159,65 +159,65 @@ LyftLane::LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string
     }
 
 
-    const rapidjson::Value::ConstArray fore_lane_data = json_lane_data["ahead_ids"].GetArray();
-    const size_t fore_lane_count = fore_lane_data.Capacity();
-    const std::shared_ptr<structures::stl::STLStackArray<std::string>> fore_lane_ids(
-                new structures::stl::STLStackArray<std::string>(fore_lane_count));
+    rapidjson::Value::ConstArray const &fore_lane_data = json_lane_data["ahead_ids"].GetArray();
+    size_t const fore_lane_count = fore_lane_data.Capacity();
+    structures::stl::STLStackArray<std::string>* const fore_lane_ids =
+            new structures::stl::STLStackArray<std::string>(fore_lane_count);
 
     for (i = 0; i < fore_lane_count; ++i)
     {
         (*fore_lane_ids)[i] = std::string(fore_lane_data[i].GetString(), fore_lane_data[i].GetStringLength());
     }
 
-    const std::shared_ptr<const IWeakLaneArray<std::string>> fore_lanes(new GhostLaneArray<std::string>(fore_lane_ids, map));
+    ILaneArray<std::string> const* const fore_lanes = new GhostLaneArray<std::string>(fore_lane_ids, map);
     set_fore_lanes(fore_lanes);
 
 
-    const rapidjson::Value::ConstArray aft_lane_data = json_lane_data["behind_ids"].GetArray();
-    const size_t aft_lane_count = aft_lane_data.Capacity();
-    const std::shared_ptr<structures::stl::STLStackArray<std::string>> aft_lane_ids(
-            new structures::stl::STLStackArray<std::string>(aft_lane_count));
+    rapidjson::Value::ConstArray const &aft_lane_data = json_lane_data["behind_ids"].GetArray();
+    size_t const aft_lane_count = aft_lane_data.Capacity();
+    structures::stl::STLStackArray<std::string>* const aft_lane_ids =
+            new structures::stl::STLStackArray<std::string>(aft_lane_count);
 
     for (i = 0; i < aft_lane_count; ++i)
     {
         (*aft_lane_ids)[i] = std::string(aft_lane_data[i].GetString(), aft_lane_data[i].GetStringLength());
     }
 
-    const std::shared_ptr<const IWeakLaneArray<std::string>> aft_lanes(new GhostLaneArray<std::string>(aft_lane_ids, map));
+    ILaneArray<std::string> const* const aft_lanes = new GhostLaneArray<std::string>(aft_lane_ids, map);
     set_aft_lanes(aft_lanes);
 
 
-    const rapidjson::Value::ConstArray traffic_light_data = json_lane_data["traffic_control_ids"].GetArray();
-    const size_t traffic_light_count = traffic_light_data.Capacity();
-    const std::shared_ptr<structures::stl::STLStackArray<std::string>> traffic_light_ids(
-                new structures::stl::STLStackArray<std::string>(traffic_light_count));
+    rapidjson::Value::ConstArray const &traffic_light_data = json_lane_data["traffic_control_ids"].GetArray();
+    size_t const traffic_light_count = traffic_light_data.Capacity();
+    structures::stl::STLStackArray<std::string>* const traffic_light_ids =
+            new structures::stl::STLStackArray<std::string>(traffic_light_count);
 
     for (i = 0; i < traffic_light_count; ++i)
     {
         (*traffic_light_ids)[i] = std::string(traffic_light_data[i].GetString(), traffic_light_data[i].GetStringLength());
     }
 
-    const std::shared_ptr<const IWeakTrafficLightArray<std::string>> traffic_lights(
-                new GhostTrafficLightArray<std::string>(traffic_light_ids, map));
+    ITrafficLightArray<std::string> const* const traffic_lights =
+            new GhostTrafficLightArray<std::string>(traffic_light_ids, map);
     set_traffic_lights(traffic_lights);
 }
 
-const geometry::Vecs& LyftLane::get_left_boundary() const
+geometry::Vecs const& LyftLane::get_left_boundary() const
 {
     return left_boundary;
 }
 
-const geometry::Vecs& LyftLane::get_right_boundary() const
+geometry::Vecs const& LyftLane::get_right_boundary() const
 {
     return right_boundary;
 }
 
-std::shared_ptr<const structures::IArray<geometry::Tri>> LyftLane::get_tris() const
+structures::IArray<geometry::Tri> const* LyftLane::get_tris() const
 {
     return tris;
 }
 
-bool LyftLane::check_encapsulation(const geometry::Vec& point) const
+bool LyftLane::check_encapsulation(geometry::Vec const &point) const
 {
     if (bounding_box.check_encapsulation(point))
     {
@@ -233,7 +233,7 @@ bool LyftLane::check_encapsulation(const geometry::Vec& point) const
     return false;
 }
 
-const geometry::Vec& LyftLane::get_centroid() const
+geometry::Vec const& LyftLane::get_centroid() const
 {
     return centroid;
 }
@@ -243,7 +243,7 @@ size_t LyftLane::get_point_count() const
     return point_count;
 }
 
-const geometry::Rect& LyftLane::get_bounding_box() const
+geometry::Rect const& LyftLane::get_bounding_box() const
 {
     return bounding_box;
 }

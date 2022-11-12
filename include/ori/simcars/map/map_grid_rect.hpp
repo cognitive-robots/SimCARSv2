@@ -4,8 +4,8 @@
 #include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/geometry/grid_rect.hpp>
 #include <ori/simcars/map/map_object.hpp>
-#include <ori/simcars/map/weak_living_lane_stack_array.hpp>
-#include <ori/simcars/map/weak_living_traffic_light_stack_array.hpp>
+#include <ori/simcars/map/living_lane_stack_array.hpp>
+#include <ori/simcars/map/living_traffic_light_stack_array.hpp>
 
 namespace ori
 {

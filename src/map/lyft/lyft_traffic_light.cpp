@@ -14,14 +14,14 @@ namespace map
 namespace lyft
 {
 
-LyftTrafficLight::LyftTrafficLight(const std::string& id, std::shared_ptr<const IMap<std::string>> map,
-                                   std::shared_ptr<IFaceDictionary> face_colour_to_face_type_dict,
-                                   std::shared_ptr<TemporalStateDictionary> timestamp_to_state_dict,
-                                   const rapidjson::Value::ConstObject& json_traffic_light_data)
+LyftTrafficLight::LyftTrafficLight(std::string const &id, IMap<std::string> const *map,
+                                   ITrafficLightStateHolder::IFaceDictionary *face_colour_to_face_type_dict,
+                                   ITrafficLightStateHolder::TemporalStateDictionary *timestamp_to_state_dict,
+                                   rapidjson::Value::ConstObject const &json_traffic_light_data)
     : ALivingTrafficLight(id, map), face_colour_to_face_type_dict(face_colour_to_face_type_dict),
       timestamp_to_state_dict(timestamp_to_state_dict)
 {
-    const rapidjson::Value::ConstArray position_data = json_traffic_light_data["coord"].GetArray();
+    rapidjson::Value::ConstArray const &position_data = json_traffic_light_data["coord"].GetArray();
 
     position(0) = position_data[0].GetDouble();
     position(1) = position_data[1].GetDouble();
@@ -29,7 +29,7 @@ LyftTrafficLight::LyftTrafficLight(const std::string& id, std::shared_ptr<const 
     orientation = M_PI * json_traffic_light_data["bearing_degrees"].GetDouble() / 180.0;
 }
 
-std::shared_ptr<const LyftTrafficLight::State> LyftTrafficLight::get_state(temporal::Time timestamp) const
+ITrafficLightStateHolder::State const* LyftTrafficLight::get_state(temporal::Time timestamp) const
 {
     if (timestamp_to_state_dict && timestamp_to_state_dict->contains(timestamp))
     {
@@ -37,11 +37,11 @@ std::shared_ptr<const LyftTrafficLight::State> LyftTrafficLight::get_state(tempo
     }
     else
     {
-        return std::shared_ptr<const LyftTrafficLight::State>(new LyftTrafficLight::State());
+        return new ITrafficLightStateHolder::State();
     }
 }
 
-const geometry::Vec& LyftTrafficLight::get_position() const
+geometry::Vec const& LyftTrafficLight::get_position() const
 {
     return position;
 }
@@ -51,7 +51,7 @@ FP_DATA_TYPE LyftTrafficLight::get_orientation() const
     return orientation;
 }
 
-std::shared_ptr<const structures::IArray<LyftTrafficLight::FaceColour>> LyftTrafficLight::get_face_colours() const
+structures::IArray<ITrafficLightStateHolder::FaceColour> const* LyftTrafficLight::get_face_colours() const
 {
     if (!face_colour_to_face_type_dict)
     {
@@ -61,7 +61,7 @@ std::shared_ptr<const structures::IArray<LyftTrafficLight::FaceColour>> LyftTraf
     return face_colour_to_face_type_dict->get_keys();
 }
 
-LyftTrafficLight::FaceType LyftTrafficLight::get_face_type(LyftTrafficLight::FaceColour face_colour) const
+ITrafficLightStateHolder::FaceType LyftTrafficLight::get_face_type(ITrafficLightStateHolder::FaceColour face_colour) const
 {
     if (face_colour_to_face_type_dict && face_colour_to_face_type_dict->contains(face_colour))
     {

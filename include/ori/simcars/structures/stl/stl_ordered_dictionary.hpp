@@ -32,7 +32,7 @@ public:
         for (size_t i = 0; i < keys->count(); ++i)
         {
             K key = (*keys)[i];
-            data[key] = dictionary[key];
+            data[key] = (*dictionary)[key];
         }
     }
 
@@ -81,7 +81,7 @@ public:
         }
         else
         {
-            keys_cache.reset(new STLStackArray<K>(count()));
+            keys_cache = new STLStackArray<K>(count());
 
             size_t i = 0;
             for (auto const &entry : data)
@@ -101,7 +101,7 @@ public:
         }
         else
         {
-            values_cache.reset(new STLStackArray<V>(count()));
+            values_cache = new STLStackArray<V>(count());
 
             size_t i = 0;
             for (auto const &entry : data)
@@ -118,15 +118,33 @@ public:
     {
         data[key] = val;
 
-        keys_cache.reset();
-        values_cache.reset();
+        if (keys_cache != nullptr)
+        {
+            delete keys_cache;
+            keys_cache = nullptr;
+        }
+
+        if (values_cache != nullptr)
+        {
+            delete values_cache;
+            values_cache = nullptr;
+        }
     }
     void erase(K const &key) override
     {
         data.erase(key);
 
-        keys_cache.reset();
-        values_cache.reset();
+        if (keys_cache != nullptr)
+        {
+            delete keys_cache;
+            keys_cache = nullptr;
+        }
+
+        if (values_cache != nullptr)
+        {
+            delete values_cache;
+            values_cache = nullptr;
+        }
     }
 };
 

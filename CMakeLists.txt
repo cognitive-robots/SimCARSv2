@@ -125,21 +125,17 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/map_object.hpp
   include/ori/simcars/map/lane_interface.hpp
   include/ori/simcars/map/lane_abstract.hpp
-  include/ori/simcars/map/weak_lane_array_interface.hpp
-  include/ori/simcars/map/weak_lane_array_abstract.hpp
   include/ori/simcars/map/living_lane_abstract.hpp
-  include/ori/simcars/map/weak_living_lane_stack_array.hpp
+  include/ori/simcars/map/living_lane_stack_array.hpp
   include/ori/simcars/map/ghost_lane.hpp
-  include/ori/simcars/map/weak_ghost_lane_array.hpp
+  include/ori/simcars/map/ghost_lane_array.hpp
   include/ori/simcars/map/traffic_light_state_holder_interface.hpp
   include/ori/simcars/map/traffic_light_interface.hpp
   include/ori/simcars/map/traffic_light_abstract.hpp
-  include/ori/simcars/map/weak_traffic_light_array_interface.hpp
-  include/ori/simcars/map/weak_traffic_light_array_abstract.hpp
   include/ori/simcars/map/living_traffic_light_abstract.hpp
-  include/ori/simcars/map/weak_living_traffic_light_stack_array.hpp
+  include/ori/simcars/map/living_traffic_light_stack_array.hpp
   include/ori/simcars/map/ghost_traffic_light.hpp
-  include/ori/simcars/map/weak_ghost_traffic_light_array.hpp
+  include/ori/simcars/map/ghost_traffic_light_array.hpp
   include/ori/simcars/map/map_grid_rect.hpp
   include/ori/simcars/map/lyft/lyft_declarations.hpp
   include/ori/simcars/map/lyft/lyft_map.hpp

@@ -22,16 +22,10 @@ template <typename T_id>
 using ILaneArray = structures::IArray<ILane<T_id> const*>;
 
 template <typename T_id>
-class IWeakLaneArray;
-
-template <typename T_id>
 class ITrafficLight;
 
 template <typename T_id>
 using ITrafficLightArray = structures::IArray<ITrafficLight<T_id> const*>;
-
-template <typename T_id>
-class IWeakTrafficLightArray;
 
 }
 }

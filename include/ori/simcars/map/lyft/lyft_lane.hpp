@@ -20,24 +20,24 @@ class LyftLane : public ALivingLane<std::string>
 {
     geometry::Vecs left_boundary, right_boundary;
     geometry::Vec centroid;
-    std::shared_ptr<structures::IStackArray<geometry::Tri>> tris;
+    structures::IStackArray<geometry::Tri> *tris;
     size_t point_count;
     FP_DATA_TYPE mean_steer;
     geometry::Rect bounding_box;
     AccessRestriction access_restriction;
 
 public:
-    LyftLane(const std::string& id, std::shared_ptr<const IMap<std::string>> map, const rapidjson::Value::ConstObject& json_lane_data);
+    LyftLane(std::string const &id, IMap<std::string> const *map, rapidjson::Value::ConstObject const &json_lane_data);
 
-    const geometry::Vecs& get_left_boundary() const override;
-    const geometry::Vecs& get_right_boundary() const override;
-    std::shared_ptr<const structures::IArray<geometry::Tri>> get_tris() const override;
-    bool check_encapsulation(const geometry::Vec& point) const override;
-    const geometry::Vec& get_centroid() const override;
+    geometry::Vecs const& get_left_boundary() const override;
+    geometry::Vecs const& get_right_boundary() const override;
+    structures::IArray<geometry::Tri> const* get_tris() const override;
+    bool check_encapsulation(geometry::Vec const &point) const override;
+    geometry::Vec const& get_centroid() const override;
     size_t get_point_count() const override;
-    const geometry::Rect& get_bounding_box() const override;
+    geometry::Rect const& get_bounding_box() const override;
     FP_DATA_TYPE get_mean_steer() const override;
-    LyftLane::AccessRestriction get_access_restriction() const override;
+    ILane::AccessRestriction get_access_restriction() const override;
 };
 
 

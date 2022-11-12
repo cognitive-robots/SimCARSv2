@@ -59,7 +59,7 @@ public:
         }
         else
         {
-            values_cache.reset(new STLStackArray<T>(count()));
+            values_cache = new STLStackArray<T>(count());
 
             size_t i = 0;
             for (T const &val : data)
@@ -72,7 +72,7 @@ public:
         }
     }
 
-    void union_with(IArray<T> const *set) override
+    void union_with(ISet<T> const *set) override
     {
         IArray<T> const *array = set->get_array();
         size_t i;
@@ -81,7 +81,7 @@ public:
             this->insert((*array)[i]);
         }
     }
-    void intersect_with(IArray<T> const *set) override
+    void intersect_with(ISet<T> const *set) override
     {
         IArray<T> const *array = this->get_array();
         size_t i;
@@ -93,7 +93,7 @@ public:
             }
         }
     }
-    void difference_with(IArray<T> const *set) override
+    void difference_with(ISet<T> const *set) override
     {
         IArray<T> const *array;
         size_t i;
@@ -130,7 +130,11 @@ public:
     {
         data.erase(val);
 
-        values_cache.reset();
+        if (values_cache != nullptr)
+        {
+            delete values_cache;
+            values_cache = nullptr;
+        }
     }
 };
 

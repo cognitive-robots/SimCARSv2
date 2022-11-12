@@ -20,12 +20,6 @@ public:
     virtual IMap<T_id> const* get_map() const = 0;
 };
 
-template <typename T_id>
-inline bool operator ==(IMapObject<T_id> const *lhs, IMapObject<T_id> const *rhs)
-{
-    return lhs->get_id() == rhs->get_id() && lhs->get_map() == rhs->get_map();
-}
-
 }
 }
 }

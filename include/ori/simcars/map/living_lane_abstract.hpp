@@ -18,9 +18,9 @@ class ALivingLane : public ALane<T_id>
     mutable ILane<T_id> const *left_adjacent_lane;
     mutable ILane<T_id> const *right_adjacent_lane;
     mutable ILane<T_id> const *straight_fore_lane;
-    mutable IWeakLaneArray<T_id> const *fore_lanes;
-    mutable IWeakLaneArray<T_id> const *aft_lanes;
-    mutable IWeakTrafficLightArray<T_id> const *traffic_lights;
+    mutable ILaneArray<T_id> const *fore_lanes;
+    mutable ILaneArray<T_id> const *aft_lanes;
+    mutable ITrafficLightArray<T_id> const *traffic_lights;
 
 protected:
     void set_left_adjacent_lane(ILane<T_id> const *left_adjacent_lane)
@@ -31,15 +31,15 @@ protected:
     {
         this->right_adjacent_lane = right_adjacent_lane;
     }
-    void set_fore_lanes(IWeakLaneArray<T_id> const *fore_lanes)
+    void set_fore_lanes(ILaneArray<T_id> const *fore_lanes)
     {
         this->fore_lanes = fore_lanes;
     }
-    void set_aft_lanes(IWeakLaneArray<T_id> const *aft_lanes)
+    void set_aft_lanes(ILaneArray<T_id> const *aft_lanes)
     {
         this->aft_lanes = aft_lanes;
     }
-    void set_traffic_lights(IWeakTrafficLightArray<T_id> const *traffic_lights)
+    void set_traffic_lights(ITrafficLightArray<T_id> const *traffic_lights)
     {
         this->traffic_lights = traffic_lights;
     }
@@ -135,53 +135,44 @@ public:
     }
     ILaneArray<T_id> const* get_fore_lanes() const override
     {
-        IWeakLaneArray<T_id> const *fore_lanes;
+        ILaneArray<T_id> const *fore_lanes;
         try
         {
             fore_lanes = this->fore_lanes->get_self();
         }
-        catch (typename IWeakLaneArray<T_id>::GhostObjectException)
+        catch (typename ILaneArray<T_id>::GhostObjectException)
         {
             this->fore_lanes = this->fore_lanes->get_true_self();
             fore_lanes = this->fore_lanes;
         }
-        structures::IArray<ILane<T_id> const*> *fore_lanes =
-                new structures::stl::STLStackArray<ILane<T_id> const*>(fore_lanes->count());
-        map_array(*fore_lanes, *fore_lanes, get_shared_lane_func);
         return fore_lanes;
     }
     ILaneArray<T_id> const* get_aft_lanes() const override
     {
-        IWeakLaneArray<T_id> const *aft_lanes;
+        ILaneArray<T_id> const *aft_lanes;
         try
         {
             aft_lanes = this->aft_lanes->get_self();
         }
-        catch (typename IWeakLaneArray<T_id>::GhostObjectException)
+        catch (typename ILaneArray<T_id>::GhostObjectException)
         {
             this->aft_lanes = this->aft_lanes->get_true_self();
             aft_lanes = this->aft_lanes;
         }
-        structures::IArray<ILane<T_id> const*> *aft_lanes =
-                new structures::stl::STLStackArray<ILane<T_id> const*>(aft_lanes->count());
-        map_array(*aft_lanes, *aft_lanes, get_shared_lane_func);
         return aft_lanes;
     }
     ITrafficLightArray<T_id> const* get_traffic_lights() const override
     {
-        IWeakTrafficLightArray<T_id> const *traffic_lights;
+        ITrafficLightArray<T_id> const *traffic_lights;
         try
         {
             traffic_lights = this->traffic_lights->get_self();
         }
-        catch (typename IWeakTrafficLightArray<T_id>::GhostObjectException)
+        catch (typename ITrafficLightArray<T_id>::GhostObjectException)
         {
             this->traffic_lights = this->traffic_lights->get_true_self();
             traffic_lights = this->traffic_lights;
         }
-        structures::IArray<ITrafficLight<T_id> const*> *traffic_lights =
-                new structures::stl::STLStackArray<ITrafficLight<T_id> const*>(traffic_lights->count());
-        map_array(*traffic_lights, *traffic_lights, get_shared_traffic_light_func);
         return traffic_lights;
     }
 };

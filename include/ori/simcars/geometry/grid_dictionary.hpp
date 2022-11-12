@@ -46,9 +46,9 @@ class GridDictionary : public virtual structures::stl::STLDictionary<Vec, V_grid
 
 public:
     GridDictionary(Vec origin, FP_DATA_TYPE spacing, size_t bin_count = 10000)
-        : structures::stl::STLDictionary<Vec, *V_grid_rect, VecHasher>(bin_count), origin(origin), spacing(spacing) {}
+        : structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>(bin_count), origin(origin), spacing(spacing) {}
     GridDictionary(GridDictionary const &grid_dictionary)
-        : structures::stl::STLDictionary<Vec, *V_grid_rect, VecHasher>(grid_dictionary),
+        : structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>(grid_dictionary),
           origin(grid_dictionary.origin), spacing(grid_dictionary.spacing) {}
     ~GridDictionary() override
     {
@@ -57,12 +57,12 @@ public:
 
     bool contains(Vec const &key) const override
     {
-        return structures::stl::STLDictionary<Vec, *V_grid_rect, VecHasher>::contains(round(key));
+        return structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::contains(round(key));
     }
 
     V_grid_rect* const& operator [](Vec const &key) const override
     {
-        return structures::stl::STLDictionary<Vec, *V_grid_rect, VecHasher>::operator [](round(key));
+        return structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::operator [](round(key));
     }
 
     structures::IArray<geometry::Vec>* chebyshev_grid_points_in_range(Vec const &key, FP_DATA_TYPE distance) const
