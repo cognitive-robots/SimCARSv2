@@ -15,33 +15,33 @@ class BasicDrivingAgentState : public virtual ADrivingAgentState
     std::string driving_agent_name;
 
 protected:
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IValuelessConstant>> parameter_dict;
+    structures::stl::STLDictionary<std::string, IValuelessConstant const*> parameter_dict;
 
 public:
-    BasicDrivingAgentState(const std::string& driving_agent_name);
-    BasicDrivingAgentState(std::shared_ptr<const IDrivingAgentState> driving_agent_state);
+    BasicDrivingAgentState(std::string const &driving_agent_name);
+    BasicDrivingAgentState(IDrivingAgentState const *driving_agent_state);
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_parameter_values() const override;
-    std::shared_ptr<const IValuelessConstant> get_parameter_value(const std::string& parameter_name) const override;
+    structures::IArray<IValuelessConstant const*>* get_parameter_values() const override;
+    IValuelessConstant const* get_parameter_value(std::string const &parameter_name) const override;
 
     std::string get_driving_agent_name() const override;
 
-    void set_driving_agent_name(const std::string& driving_agent_name) override;
+    void set_driving_agent_name(std::string const &driving_agent_name) override;
 
-    void set_id_constant(std::shared_ptr<const IConstant<uint32_t>> id_constant) override;
-    void set_ego_constant(std::shared_ptr<const IConstant<bool>> ego_constant) override;
-    void set_bb_length_constant(std::shared_ptr<const IConstant<FP_DATA_TYPE>> bb_length_constant) override;
-    void set_bb_width_constant(std::shared_ptr<const IConstant<FP_DATA_TYPE>> bb_width_constant) override;
-    void set_driving_agent_class_constant(std::shared_ptr<const IConstant<DrivingAgentClass>> driving_agent_class_constant) override;
-    void set_position_variable(std::shared_ptr<const IConstant<geometry::Vec>> position_variable) override;
-    void set_linear_velocity_variable(std::shared_ptr<const IConstant<geometry::Vec>> linear_velocity_variable) override;
-    void set_aligned_linear_velocity_variable(std::shared_ptr<const IConstant<FP_DATA_TYPE>> aligned_linear_velocity_variable) override;
-    void set_linear_acceleration_variable(std::shared_ptr<const IConstant<geometry::Vec>> linear_acceleration_variable) override;
-    void set_aligned_linear_acceleration_variable(std::shared_ptr<const IConstant<FP_DATA_TYPE>> aligned_linear_acceleration_variable) override;
-    void set_external_linear_acceleration_variable(std::shared_ptr<const IConstant<geometry::Vec>> external_linear_acceleration_variable) override;
-    void set_rotation_variable(std::shared_ptr<const IConstant<FP_DATA_TYPE>> rotation_variable) override;
-    void set_steer_variable(std::shared_ptr<const IConstant<FP_DATA_TYPE>> steer_variable) override;
-    void set_angular_velocity_variable(std::shared_ptr<const IConstant<FP_DATA_TYPE>> angular_velocity_variable) override;
+    void set_id_constant(IConstant<uint32_t> const *id_constant) override;
+    void set_ego_constant(IConstant<bool> const *ego_constant) override;
+    void set_bb_length_constant(IConstant<FP_DATA_TYPE> const *bb_length_constant) override;
+    void set_bb_width_constant(IConstant<FP_DATA_TYPE> const *bb_width_constant) override;
+    void set_driving_agent_class_constant(IConstant<DrivingAgentClass> const *driving_agent_class_constant) override;
+    void set_position_variable(IConstant<geometry::Vec> const *position_variable) override;
+    void set_linear_velocity_variable(IConstant<geometry::Vec> const *linear_velocity_variable) override;
+    void set_aligned_linear_velocity_variable(IConstant<FP_DATA_TYPE> const *aligned_linear_velocity_variable) override;
+    void set_linear_acceleration_variable(IConstant<geometry::Vec> const *linear_acceleration_variable) override;
+    void set_aligned_linear_acceleration_variable(IConstant<FP_DATA_TYPE> const *aligned_linear_acceleration_variable) override;
+    void set_external_linear_acceleration_variable(IConstant<geometry::Vec> const *external_linear_acceleration_variable) override;
+    void set_rotation_variable(IConstant<FP_DATA_TYPE> const *rotation_variable) override;
+    void set_steer_variable(IConstant<FP_DATA_TYPE> const *steer_variable) override;
+    void set_angular_velocity_variable(IConstant<FP_DATA_TYPE> const *angular_velocity_variable) override;
 };
 
 }

@@ -16,7 +16,7 @@ class IController
 public:
     virtual ~IController() = default;
 
-    virtual void modify_state(std::shared_ptr<const agent::IState> original_state, std::shared_ptr<agent::IState> modified_state) const = 0;
+    virtual void modify_state(agent::IState const *original_state, agent::IState *modified_state) const = 0;
 };
 
 }

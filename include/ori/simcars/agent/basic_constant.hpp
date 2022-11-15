@@ -13,23 +13,23 @@ namespace agent
 template <typename T>
 class BasicConstant : public AConstant<T>
 {
-    const std::string entity_name;
-    const std::string parameter_name;
+    std::string const entity_name;
+    std::string const parameter_name;
 
-    const T value;
+    T const value;
 
 public:
-    BasicConstant(const std::string& entity_name, const std::string& parameter_name, T value) :
+    BasicConstant(std::string const &entity_name, std::string const &parameter_name, T value) :
         entity_name(entity_name), parameter_name(parameter_name), value(value) {}
 
-    std::shared_ptr<IValuelessConstant> valueless_shallow_copy() const
+    IValuelessConstant* valueless_shallow_copy() const
     {
         return shallow_copy();
     }
 
-    std::shared_ptr<IConstant<T>> shallow_copy() const
+    IConstant<T>* shallow_copy() const
     {
-        return std::shared_ptr<BasicConstant<T>>(new BasicConstant<T>(entity_name, parameter_name, value));
+        return new BasicConstant<T>(entity_name, parameter_name, value);
     }
 
     std::string get_entity_name() const override

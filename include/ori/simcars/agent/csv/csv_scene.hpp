@@ -17,14 +17,14 @@ class CSVScene : public virtual AFileBasedScene<CSVScene>
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
 
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IEntity>> entity_dict;
+    structures::stl::STLDictionary<std::string, IEntity const*> entity_dict;
 
 protected:
-    void save_virt(std::ofstream& output_filestream) const override;
-    void load_virt(std::ifstream& input_filestream) override;
+    void save_virt(std::ofstream &output_filestream) const override;
+    void load_virt(std::ifstream &input_filestream) override;
 
 public:
-    static std::shared_ptr<const CSVScene> construct_from(std::shared_ptr<const IScene> scene);
+    static CSVScene const* construct_from(IScene const *scene);
 
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
@@ -32,10 +32,10 @@ public:
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const override;
-    std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const override;
+    structures::IArray<IEntity const*>* get_entities() const override;
+    IEntity const* get_entity(std::string const &entity_name) const override;
 
-    std::shared_ptr<IState> get_state(temporal::Time time) const override;
+    IState* get_state(temporal::Time time) const override;
 };
 
 }

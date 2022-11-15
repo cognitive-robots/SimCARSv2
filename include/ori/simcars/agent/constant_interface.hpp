@@ -13,7 +13,7 @@ template <typename T>
 class IConstant : public virtual IValuelessConstant
 {
 public:
-    virtual std::shared_ptr<IConstant<T>> shallow_copy() const = 0;
+    virtual IConstant<T>* shallow_copy() const = 0;
 
     virtual T get_value() const = 0;
 };

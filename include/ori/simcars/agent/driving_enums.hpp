@@ -27,7 +27,7 @@ enum class DrivingAgentClass
 
 }
 
-inline std::ostream& operator <<(std::ostream& output_stream, const agent::DrivingAgentClass& driving_agent_class)
+inline std::ostream& operator <<(std::ostream &output_stream, agent::DrivingAgentClass const &driving_agent_class)
 {
     return output_stream << magic_enum::enum_name(driving_agent_class);
 }

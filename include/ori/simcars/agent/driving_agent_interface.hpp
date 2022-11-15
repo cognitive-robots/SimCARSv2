@@ -17,25 +17,25 @@ namespace agent
 class IDrivingAgent : public virtual IEntity
 {
 public:
-    virtual std::shared_ptr<IDrivingAgent> driving_agent_deep_copy() const = 0;
+    virtual IDrivingAgent* driving_agent_deep_copy() const = 0;
 
-    virtual std::shared_ptr<const IConstant<uint32_t>> get_id_constant() const = 0;
-    virtual std::shared_ptr<const IConstant<bool>> get_ego_constant() const = 0;
-    virtual std::shared_ptr<const IConstant<FP_DATA_TYPE>> get_bb_length_constant() const = 0;
-    virtual std::shared_ptr<const IConstant<FP_DATA_TYPE>> get_bb_width_constant() const = 0;
-    virtual std::shared_ptr<const IConstant<DrivingAgentClass>> get_driving_agent_class_constant() const = 0;
+    virtual IConstant<uint32_t> const* get_id_constant() const = 0;
+    virtual IConstant<bool> const* get_ego_constant() const = 0;
+    virtual IConstant<FP_DATA_TYPE> const* get_bb_length_constant() const = 0;
+    virtual IConstant<FP_DATA_TYPE> const* get_bb_width_constant() const = 0;
+    virtual IConstant<DrivingAgentClass> const* get_driving_agent_class_constant() const = 0;
 
-    virtual std::shared_ptr<const IVariable<geometry::Vec>> get_position_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<geometry::Vec>> get_linear_velocity_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<FP_DATA_TYPE>> get_aligned_linear_velocity_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<geometry::Vec>> get_linear_acceleration_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<FP_DATA_TYPE>> get_aligned_linear_acceleration_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<geometry::Vec>> get_external_linear_acceleration_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<FP_DATA_TYPE>> get_rotation_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<FP_DATA_TYPE>> get_steer_variable() const = 0;
-    virtual std::shared_ptr<const IVariable<FP_DATA_TYPE>> get_angular_velocity_variable() const = 0;
+    virtual IVariable<geometry::Vec> const* get_position_variable() const = 0;
+    virtual IVariable<geometry::Vec> const* get_linear_velocity_variable() const = 0;
+    virtual IVariable<FP_DATA_TYPE> const* get_aligned_linear_velocity_variable() const = 0;
+    virtual IVariable<geometry::Vec> const* get_linear_acceleration_variable() const = 0;
+    virtual IVariable<FP_DATA_TYPE> const* get_aligned_linear_acceleration_variable() const = 0;
+    virtual IVariable<geometry::Vec> const* get_external_linear_acceleration_variable() const = 0;
+    virtual IVariable<FP_DATA_TYPE> const* get_rotation_variable() const = 0;
+    virtual IVariable<FP_DATA_TYPE> const* get_steer_variable() const = 0;
+    virtual IVariable<FP_DATA_TYPE> const* get_angular_velocity_variable() const = 0;
 
-    virtual std::shared_ptr<IDrivingAgentState> get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
+    virtual IDrivingAgentState* get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
 };
 
 }

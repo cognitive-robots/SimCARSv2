@@ -13,15 +13,15 @@ namespace agent
 
 class BasicDrivingSimulator : public virtual IDrivingSimulator
 {
-    std::shared_ptr<const IDrivingAgentController> controller;
+    IDrivingAgentController const *controller;
 
 public:
-    BasicDrivingSimulator(std::shared_ptr<const IDrivingAgentController> controller);
+    BasicDrivingSimulator(IDrivingAgentController const *controller);
 
-    void simulate(std::shared_ptr<const agent::IState> current_state, std::shared_ptr<agent::IState> next_state, temporal::Duration time_step) const override;
+    void simulate(agent::IState const *current_state, agent::IState *next_state, temporal::Duration time_step) const override;
 
-    void simulate_driving_scene(std::shared_ptr<const agent::IDrivingSceneState> current_state, std::shared_ptr<agent::IDrivingSceneState> next_state, temporal::Duration time_step) const override;
-    void simulate_driving_agent(std::shared_ptr<const agent::IDrivingAgentState> current_state, std::shared_ptr<agent::IDrivingAgentState> next_state, temporal::Duration time_step) const override;
+    void simulate_driving_scene(agent::IDrivingSceneState const *current_state, agent::IDrivingSceneState *next_state, temporal::Duration time_step) const override;
+    void simulate_driving_agent(agent::IDrivingAgentState const *current_state, agent::IDrivingAgentState *next_state, temporal::Duration time_step) const override;
 };
 
 }

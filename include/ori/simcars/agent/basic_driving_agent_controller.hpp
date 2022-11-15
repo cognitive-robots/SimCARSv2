@@ -15,19 +15,19 @@ namespace agent
 
 class BasicDrivingAgentController : public virtual IDrivingAgentController
 {
-    std::shared_ptr<const geometry::TrigBuff> trig_buff;
+    geometry::TrigBuff const *trig_buff;
 
-    std::shared_ptr<const map::IMap<std::string>> map;
+    map::IMap<std::string> const *map;
 
     temporal::Duration time_step;
     size_t steering_lookahead_steps;
 
 public:
-    BasicDrivingAgentController(std::shared_ptr<const map::IMap<std::string>> map, temporal::Duration time_step, size_t steering_lookahead_steps);
+    BasicDrivingAgentController(map::IMap<std::string> const *map, temporal::Duration time_step, size_t steering_lookahead_steps);
 
-    void modify_state(std::shared_ptr<const agent::IState> original_state, std::shared_ptr<agent::IState> modified_state) const override;
+    void modify_state(agent::IState const *original_state, agent::IState *modified_state) const override;
 
-    void modify_driving_agent_state(std::shared_ptr<const agent::IDrivingAgentState> original_state, std::shared_ptr<agent::IDrivingAgentState> modified_state) const override;
+    void modify_driving_agent_state(agent::IDrivingAgentState const *original_state, agent::IDrivingAgentState *modified_state) const override;
 };
 
 }
