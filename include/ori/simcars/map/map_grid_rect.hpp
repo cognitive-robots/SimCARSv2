@@ -28,9 +28,9 @@ public:
 
     ILaneArray<T_id> const* get_encapsulating_lanes(geometry::Vec point) const
     {
-        ILaneArray<T_id> const *lanes = this->lanes->get_array();
-        structures::stl::STLStackArray<ILane<std::string> const*> *encapsulating_lanes =
-                new structures::stl::STLStackArray<ILane<std::string> const*>();
+        structures::IArray<ILane<T_id> const*> const *lanes = this->lanes->get_array();
+        LivingLaneStackArray<std::string> *encapsulating_lanes =
+                new LivingLaneStackArray<std::string>;
         size_t i;
         for (i = 0; i < lanes->count(); ++i)
         {

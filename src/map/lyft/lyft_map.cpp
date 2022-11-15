@@ -259,14 +259,14 @@ ILaneArray<std::string> const* LyftMap::get_encapsulating_lanes(geometry::Vec po
         }
     }
 
-    return new structures::stl::STLStackArray<ILane<std::string> const*>;
+    return new LivingLaneStackArray<std::string>;
 }
 
 ILaneArray<std::string> const* LyftMap::get_lanes(structures::IArray<std::string> const *ids) const
 {
     const size_t lane_count = ids->count();
     ILaneArray<std::string> *lanes =
-            new structures::stl::STLStackArray<ILane<std::string> const*>(lane_count);
+            new LivingLaneStackArray<std::string>(lane_count);
 
     size_t i;
     for (i = 0; i < lane_count; ++i)
@@ -282,16 +282,19 @@ ILaneArray<std::string> const* LyftMap::get_lanes_in_range(geometry::Vec point, 
     structures::IArray<MapGridRect<std::string>*> *map_grid_rects =
             map_grid_dict->chebyshev_grid_rects_in_range(point, distance);
 
-    structures::ISet<ILane<std::string> const*> *lanes =
-            new structures::stl::STLSet<ILane<std::string> const*>();
+    structures::stl::STLSet<ILane<std::string> const*> lanes;
 
     size_t i;
     for (i = 0; i < map_grid_rects->count(); ++i)
     {
-        lanes->union_with(((*map_grid_rects)[i]->get_lanes()));
+        lanes.union_with((*map_grid_rects)[i]->get_lanes());
     }
 
-    return lanes->get_array();
+    LivingLaneStackArray<std::string> *lane_array = new LivingLaneStackArray<std::string>;
+
+    lanes.get_array(lane_array);
+
+    return lane_array;
 }
 
 ITrafficLight<std::string> const* LyftMap::get_traffic_light(std::string id) const
@@ -310,7 +313,7 @@ ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights(structures::I
 {
     size_t const traffic_light_count = ids->count();
     ITrafficLightArray<std::string> *traffic_lights =
-            new structures::stl::STLStackArray<ITrafficLight<std::string> const*>(traffic_light_count);
+            new LivingTrafficLightStackArray<std::string>(traffic_light_count);
 
     size_t i;
     for (i = 0; i < traffic_light_count; ++i)
@@ -326,16 +329,19 @@ ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights_in_range(geom
     structures::IArray<MapGridRect<std::string>*> *map_grid_rects =
             map_grid_dict->chebyshev_grid_rects_in_range(point, distance);
 
-    structures::ISet<ITrafficLight<std::string> const*> *traffic_lights =
-                new structures::stl::STLSet<ITrafficLight<std::string> const*>();
+    structures::stl::STLSet<ITrafficLight<std::string> const*> traffic_lights;
 
     size_t i;
     for (i = 0; i < map_grid_rects->count(); ++i)
     {
-        traffic_lights->union_with((*map_grid_rects)[i]->get_traffic_lights());
+        traffic_lights.union_with((*map_grid_rects)[i]->get_traffic_lights());
     }
 
-    return traffic_lights->get_array();
+    LivingTrafficLightStackArray<std::string> *traffic_light_array = new LivingTrafficLightStackArray<std::string>;
+
+    traffic_lights.get_array(traffic_light_array);
+
+    return traffic_light_array;
 }
 
 LyftMap* LyftMap::copy() const

@@ -12,24 +12,17 @@ namespace map
 template<typename T_id>
 class GhostLane : public ALane<T_id>
 {
-protected:
-    mutable GhostLane<T_id> const *tether;
-
+public:
     GhostLane(T_id const &id, IMap<T_id> const *map) : ALane<T_id>(id, map) {}
 
-public:
     ILane<T_id> const* get_self() const override
     {
         throw typename GhostLane<T_id>::GhostObjectException();
     }
-    void banish() const override
-    {
-        tether.reset();
-    }
     ILane<T_id> const* get_true_self() const noexcept override
     {
         ILane<T_id> const *true_self = this->get_map()->get_lane(this->get_id());
-        tether.reset();
+        delete this;
         return true_self;
     }
 
@@ -92,13 +85,6 @@ public:
     ITrafficLightArray<T_id> const* get_traffic_lights() const override
     {
         throw typename GhostLane<T_id>::GhostObjectException();
-    }
-
-    static GhostLane<T_id> const* spawn(T_id const &id, IMap<T_id> const *map)
-    {
-        GhostLane<T_id> const *spawned_ghost_lane = new GhostLane<T_id>(id, map);
-        spawned_ghost_lane->tether = spawned_ghost_lane;
-        return spawned_ghost_lane;
     }
 };
 

@@ -141,7 +141,7 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
     std::string const left_adjacent_lane_id(json_lane_data["adjacent_left_id"].GetString(), json_lane_data["adjacent_left_id"].GetStringLength());
     if (left_adjacent_lane_id != "")
     {
-        set_left_adjacent_lane(GhostLane<std::string>::spawn(left_adjacent_lane_id, map));
+        set_left_adjacent_lane(new GhostLane<std::string>(left_adjacent_lane_id, map));
     }
     else
     {
@@ -151,7 +151,7 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
     std::string const right_adjacent_lane_id(json_lane_data["adjacent_right_id"].GetString(), json_lane_data["adjacent_right_id"].GetStringLength());
     if (right_adjacent_lane_id != "")
     {
-        set_right_adjacent_lane(GhostLane<std::string>::spawn(right_adjacent_lane_id, map));
+        set_right_adjacent_lane(new GhostLane<std::string>(right_adjacent_lane_id, map));
     }
     else
     {

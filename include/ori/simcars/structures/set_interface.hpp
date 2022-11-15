@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/container_interface.hpp>
-#include <ori/simcars/structures/array_interface.hpp>
+#include <ori/simcars/structures/stack_array_interface.hpp>
 
 namespace ori
 {
@@ -15,6 +15,7 @@ class ISet : public virtual IContainer<T>
 {
 public:
     virtual IArray<T> const* get_array() const = 0;
+    virtual void get_array(IStackArray<T> *array) const = 0;
 
     virtual void union_with(ISet<T> const *set) = 0;
     virtual void intersect_with(ISet<T> const *set) = 0;

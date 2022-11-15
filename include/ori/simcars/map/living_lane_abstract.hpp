@@ -48,66 +48,51 @@ public:
     ALivingLane(T_id const &id, IMap<T_id> const *map) : ALane<T_id>(id, map) {}
     ~ALivingLane() override
     {
-        if (fore_lanes != nullptr)
-        {
-            delete fore_lanes;
-        }
-
-        if (aft_lanes != nullptr)
-        {
-            delete aft_lanes;
-        }
-
-        if (traffic_lights != nullptr)
-        {
-            delete traffic_lights;
-        }
+        delete fore_lanes;
+        delete aft_lanes;
+        delete traffic_lights;
     }
 
     ILane<T_id> const* get_true_self() const noexcept override
     {
-        return this->shared_from_this();
+        return this;
     }
 
     ILane<T_id> const* get_left_adjacent_lane() const override
     {
-        if (this->left_adjacent_lane.expired())
+        if (this->left_adjacent_lane == nullptr)
         {
             return nullptr;
         }
-        ILane<T_id> const *left_adjacent_lane = this->left_adjacent_lane.lock();
         try
         {
-            return left_adjacent_lane->get_self();
+            return this->left_adjacent_lane->get_self();
         }
         catch (typename ALane<T_id>::GhostObjectException)
         {
-            left_adjacent_lane = left_adjacent_lane->get_true_self();
-            this->left_adjacent_lane = left_adjacent_lane;
-            return left_adjacent_lane;
+            this->left_adjacent_lane = left_adjacent_lane->get_true_self();
+            return this->left_adjacent_lane;
         }
     }
     ILane<T_id> const* get_right_adjacent_lane() const override
     {
-        if (this->right_adjacent_lane.expired())
+        if (this->right_adjacent_lane == nullptr)
         {
             return nullptr;
         }
-        ILane<T_id> const *right_adjacent_lane = this->right_adjacent_lane.lock();
         try
         {
-            return right_adjacent_lane->get_self();
+            return this->right_adjacent_lane->get_self();
         }
         catch (typename ALane<T_id>::GhostObjectException)
         {
-            right_adjacent_lane = right_adjacent_lane->get_true_self();
-            this->right_adjacent_lane = right_adjacent_lane;
-            return right_adjacent_lane;
+            this->right_adjacent_lane = right_adjacent_lane->get_true_self();
+            return this->right_adjacent_lane;
         }
     }
     ILane<T_id> const* get_straight_fore_lane() const override
     {
-        if (this->straight_fore_lane.expired())
+        if (this->straight_fore_lane == nullptr)
         {
             ILaneArray<T_id> const *fore_lanes = this->get_fore_lanes();
             if (fore_lanes->count() > 0)
@@ -130,7 +115,7 @@ public:
         }
         else
         {
-            return this->straight_fore_lane.lock();
+            return this->straight_fore_lane;
         }
     }
     ILaneArray<T_id> const* get_fore_lanes() const override

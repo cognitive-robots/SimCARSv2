@@ -17,7 +17,7 @@ public:
 
     ITrafficLight<T_id> const* get_true_self() const noexcept override
     {
-        return this->shared_from_this();
+        return this;
     }
 };
 

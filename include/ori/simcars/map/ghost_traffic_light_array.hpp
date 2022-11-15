@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/array_interface.hpp>
+#include <ori/simcars/map/traffic_light_array_abstract.hpp>
 #include <ori/simcars/map/living_traffic_light_stack_array.hpp>
 
 namespace ori
@@ -11,7 +12,7 @@ namespace map
 {
 
 template<typename T_id>
-class GhostTrafficLightArray : public virtual ITrafficLightArray<T_id>
+class GhostTrafficLightArray : public virtual ATrafficLightArray<T_id>
 {
     structures::IArray<T_id> const* const ids;
     IMap<T_id> const* const map;
@@ -25,14 +26,9 @@ public:
     }
     ITrafficLightArray<T_id> const* get_true_self() const noexcept override
     {
-        if (map)
-        {
-            return map->get_traffic_lights(ids);
-        }
-        else
-        {
-            return nullptr;
-        }
+        ITrafficLightArray<T_id> const *true_self = map->get_traffic_lights(ids);
+        delete this;
+        return true_self;
     }
 
     size_t count() const override

@@ -17,7 +17,6 @@ public:
     {
         return this->get_true_self();
     }
-    void banish() const override {}
 };
 
 }

@@ -36,10 +36,7 @@ public:
 
     ~STLSet() override
     {
-        if (values_cache != nullptr)
-        {
-            delete values_cache;
-        }
+        delete values_cache;
     }
 
     size_t count() const override
@@ -60,15 +57,25 @@ public:
         else
         {
             values_cache = new STLStackArray<T>(count());
-
-            size_t i = 0;
-            for (T const &val : data)
+            get_array(values_cache);
+            return values_cache;
+        }
+    }
+    void get_array(IStackArray<T> *array) const override
+    {
+        size_t i = 0;
+        for (T const &val : data)
+        {
+            if (i >= array->count())
             {
-                (*values_cache)[i] = val;
+                array->push_back(val);
                 ++i;
             }
-
-            return values_cache;
+            else
+            {
+                (*array)[i] = val;
+                ++i;
+            }
         }
     }
 
@@ -130,11 +137,8 @@ public:
     {
         data.erase(val);
 
-        if (values_cache != nullptr)
-        {
-            delete values_cache;
-            values_cache = nullptr;
-        }
+        delete values_cache;
+        values_cache = nullptr;
     }
 };
 

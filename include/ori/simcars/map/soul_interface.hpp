@@ -26,7 +26,6 @@ public:
     virtual ~ISoul() = default;
 
     virtual T const* get_self() const = 0;
-    virtual void banish() const = 0;
 
     virtual T const* get_true_self() const noexcept = 0;
 };

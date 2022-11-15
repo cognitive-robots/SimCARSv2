@@ -124,14 +124,18 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/file_based_map_abstract.hpp
   include/ori/simcars/map/map_object.hpp
   include/ori/simcars/map/lane_interface.hpp
+  include/ori/simcars/map/lane_array_interface.hpp
   include/ori/simcars/map/lane_abstract.hpp
+  include/ori/simcars/map/lane_array_abstract.hpp
   include/ori/simcars/map/living_lane_abstract.hpp
   include/ori/simcars/map/living_lane_stack_array.hpp
   include/ori/simcars/map/ghost_lane.hpp
   include/ori/simcars/map/ghost_lane_array.hpp
   include/ori/simcars/map/traffic_light_state_holder_interface.hpp
   include/ori/simcars/map/traffic_light_interface.hpp
+  include/ori/simcars/map/traffic_light_array_interface.hpp
   include/ori/simcars/map/traffic_light_abstract.hpp
+  include/ori/simcars/map/traffic_light_array_abstract.hpp
   include/ori/simcars/map/living_traffic_light_abstract.hpp
   include/ori/simcars/map/living_traffic_light_stack_array.hpp
   include/ori/simcars/map/ghost_traffic_light.hpp

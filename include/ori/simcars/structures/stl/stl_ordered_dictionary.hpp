@@ -38,14 +38,8 @@ public:
 
     ~STLOrderedDictionary() override
     {
-        if (keys_cache != nullptr)
-        {
-            delete keys_cache;
-        }
-        if (values_cache != nullptr)
-        {
-            delete values_cache;
-        }
+        delete keys_cache;
+        delete values_cache;
     }
 
     size_t count() const override
@@ -82,15 +76,25 @@ public:
         else
         {
             keys_cache = new STLStackArray<K>(count());
-
-            size_t i = 0;
-            for (auto const &entry : data)
+            get_keys(keys_cache);
+            return keys_cache;
+        }
+    }
+    void get_keys(IStackArray<K> *keys) const override
+    {
+        size_t i = 0;
+        for (auto const &entry : data)
+        {
+            if (i >= keys->count())
             {
-                (*keys_cache)[i] = entry.first;
+                keys->push_back(entry.first);
                 ++i;
             }
-
-            return keys_cache;
+            else
+            {
+                (*keys)[i] = entry.first;
+                ++i;
+            }
         }
     }
     IArray<V> const* get_values() const override
@@ -102,15 +106,25 @@ public:
         else
         {
             values_cache = new STLStackArray<V>(count());
-
-            size_t i = 0;
-            for (auto const &entry : data)
+            get_values(values_cache);
+            return values_cache;
+        }
+    }
+    void get_values(IStackArray<V> *values) const override
+    {
+        size_t i = 0;
+        for (auto const &entry : data)
+        {
+            if (i >= values->count())
             {
-                (*values_cache)[i] = entry.second;
+                values->push_back(entry.second);
                 ++i;
             }
-
-            return values_cache;
+            else
+            {
+                (*values)[i] = entry.second;
+                ++i;
+            }
         }
     }
 
@@ -118,33 +132,21 @@ public:
     {
         data[key] = val;
 
-        if (keys_cache != nullptr)
-        {
-            delete keys_cache;
-            keys_cache = nullptr;
-        }
+        delete keys_cache;
+        keys_cache = nullptr;
 
-        if (values_cache != nullptr)
-        {
-            delete values_cache;
-            values_cache = nullptr;
-        }
+        delete values_cache;
+        values_cache = nullptr;
     }
     void erase(K const &key) override
     {
         data.erase(key);
 
-        if (keys_cache != nullptr)
-        {
-            delete keys_cache;
-            keys_cache = nullptr;
-        }
+        delete keys_cache;
+        keys_cache = nullptr;
 
-        if (values_cache != nullptr)
-        {
-            delete values_cache;
-            values_cache = nullptr;
-        }
+        delete values_cache;
+        values_cache = nullptr;
     }
 };
 

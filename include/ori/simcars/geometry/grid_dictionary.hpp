@@ -53,6 +53,13 @@ public:
     ~GridDictionary() override
     {
         static_assert(std::is_base_of<GridRect<V_grid_rect>, V_grid_rect>::value, "V_grid_rect is not derived from GridRect");
+
+        structures::IArray<V_grid_rect*> const* grid_rects = this->get_values();
+
+        for (size_t i = 0; i < grid_rects->count(); ++i)
+        {
+            delete (*grid_rects)[i];
+        }
     }
 
     bool contains(Vec const &key) const override
