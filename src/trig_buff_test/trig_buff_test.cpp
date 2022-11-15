@@ -5,7 +5,6 @@
 #include <random>
 #include <cmath>
 #include <iostream>
-#include <memory>
 
 #define ARRAY_SIZE 1000000
 #define GENERATED_NUM_DEMONINATOR 10e-3
@@ -15,13 +14,13 @@ using namespace std::chrono;
 
 int main()
 {
-    std::shared_ptr<const TrigBuff> trig_buff = TrigBuff::init_instance(2000, AngleType::RADIANS);
+    TrigBuff const *trig_buff = TrigBuff::init_instance(2000, AngleType::RADIANS);
 
     time_point<high_resolution_clock> start_time;
     microseconds time_elapsed;
 
-    std::unique_ptr<FP_DATA_TYPE[]> input_array(new FP_DATA_TYPE[ARRAY_SIZE]);
-    std::unique_ptr<FP_DATA_TYPE[]> output_array(new FP_DATA_TYPE[ARRAY_SIZE]);
+    FP_DATA_TYPE *input_array = new FP_DATA_TYPE[ARRAY_SIZE];
+    FP_DATA_TYPE *output_array = new FP_DATA_TYPE[ARRAY_SIZE];
 
     std::minstd_rand generator(system_clock::now().time_since_epoch().count());
 
@@ -96,4 +95,9 @@ int main()
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
     std::cout << "Trig Buff Tan: " << time_elapsed.count() << " us" << std::endl;
+
+    delete[] input_array;
+    delete[] output_array;
+
+    TrigBuff::destroy_instance();
 }
