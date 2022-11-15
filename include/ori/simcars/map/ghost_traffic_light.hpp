@@ -15,6 +15,10 @@ class GhostTrafficLight : public ATrafficLight<T_id>
 public:
     GhostTrafficLight(T_id const &id, IMap<T_id> const *map) : ATrafficLight<T_id>(id, map) {}
 
+    bool is_ghost() const override
+    {
+        return true;
+    }
     ITrafficLight<T_id> const* get_self() const override
     {
         throw GhostTrafficLight<T_id>::GhostObjectException;
@@ -22,6 +26,7 @@ public:
     ITrafficLight<T_id> const* get_true_self() const noexcept override
     {
         ITrafficLight<T_id> const *true_self = this->get_map()->get_traffic_light(this->get_id());
+        this->get_map()->unregister_stray_ghost(this);
         delete this;
         return true_self;
     }

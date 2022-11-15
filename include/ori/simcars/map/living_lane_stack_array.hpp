@@ -16,6 +16,10 @@ class LivingLaneStackArray : public virtual ALaneArray<T_id>, public virtual str
 public:
     using structures::stl::STLStackArray<ILane<T_id> const*>::STLStackArray;
 
+    bool is_ghost() const override
+    {
+        return false;
+    }
     ILaneArray<T_id> const* get_true_self() const noexcept override
     {
         return this;

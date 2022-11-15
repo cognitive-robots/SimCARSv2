@@ -25,8 +25,9 @@ protected:
 
 public:
     STLOrderedDictionary() : keys_cache(nullptr), values_cache(nullptr) {}
-    STLOrderedDictionary(STLOrderedDictionary<K, V, K_compare> const &stl_dictionary) : data(stl_dictionary.data) {}
-    STLOrderedDictionary(IDictionary<K, V> const *dictionary)
+    STLOrderedDictionary(STLOrderedDictionary<K, V, K_compare> const &stl_dictionary) :
+        data(stl_dictionary.data), keys_cache(nullptr), values_cache(nullptr) {}
+    STLOrderedDictionary(IDictionary<K, V> const *dictionary) : keys_cache(nullptr), values_cache(nullptr)
     {
         IArray<K> const *keys = dictionary->get_keys();
         for (size_t i = 0; i < keys->count(); ++i)

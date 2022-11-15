@@ -37,6 +37,8 @@ public:
     virtual ITrafficLight<T_id> const* get_traffic_light(T_id id) const = 0;
     virtual ITrafficLightArray<T_id> const* get_traffic_lights(structures::IArray<T_id> const *ids) const = 0;
     virtual ITrafficLightArray<T_id> const* get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
+    virtual void register_stray_ghost(IMapObject<T_id> const *ghost) const = 0;
+    virtual void unregister_stray_ghost(IMapObject<T_id> const *ghost) const = 0;
 };
 
 }

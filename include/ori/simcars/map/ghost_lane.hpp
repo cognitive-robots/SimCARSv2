@@ -15,6 +15,10 @@ class GhostLane : public ALane<T_id>
 public:
     GhostLane(T_id const &id, IMap<T_id> const *map) : ALane<T_id>(id, map) {}
 
+    bool is_ghost() const override
+    {
+        return true;
+    }
     ILane<T_id> const* get_self() const override
     {
         throw typename GhostLane<T_id>::GhostObjectException();
@@ -22,6 +26,7 @@ public:
     ILane<T_id> const* get_true_self() const noexcept override
     {
         ILane<T_id> const *true_self = this->get_map()->get_lane(this->get_id());
+        this->get_map()->unregister_stray_ghost(this);
         delete this;
         return true_self;
     }

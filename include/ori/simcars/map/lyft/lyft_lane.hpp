@@ -28,6 +28,7 @@ class LyftLane : public ALivingLane<std::string>
 
 public:
     LyftLane(std::string const &id, IMap<std::string> const *map, rapidjson::Value::ConstObject const &json_lane_data);
+    ~LyftLane() override;
 
     geometry::Vecs const& get_left_boundary() const override;
     geometry::Vecs const& get_right_boundary() const override;

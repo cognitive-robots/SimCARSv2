@@ -16,6 +16,10 @@ class LivingTrafficLightStackArray : public virtual ATrafficLightArray<T_id>, pu
 public:
     using structures::stl::STLStackArray<ITrafficLight<T_id> const*>::STLStackArray;
 
+    bool is_ghost() const override
+    {
+        return false;
+    }
     ITrafficLightArray<T_id> const* get_true_self() const noexcept override
     {
         return this;

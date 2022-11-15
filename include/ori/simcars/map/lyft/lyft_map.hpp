@@ -1,8 +1,9 @@
 #pragma once
 
-#include <ori/simcars/structures/stl/stl_stack_array.hpp>
-#include <ori/simcars/structures/stl/stl_dictionary.hpp>
+#include <ori/simcars/structures/dictionary_interface.hpp>
+#include <ori/simcars/structures/set_interface.hpp>
 #include <ori/simcars/geometry/grid_dictionary.hpp>
+#include <ori/simcars/map/map_object_interface.hpp>
 #include <ori/simcars/map/file_based_map_abstract.hpp>
 #include <ori/simcars/map/living_lane_stack_array.hpp>
 #include <ori/simcars/map/living_traffic_light_stack_array.hpp>
@@ -26,6 +27,9 @@ class LyftMap : public virtual AFileBasedMap<std::string, LyftMap>
 {
     structures::IDictionary<std::string, LyftLane*> *id_to_lane_dict;
     structures::IDictionary<std::string, LyftTrafficLight*> *id_to_traffic_light_dict;
+
+    structures::ISet<IMapObject<std::string> const*> *stray_ghosts;
+
     geometry::GridDictionary<MapGridRect<std::string>> *map_grid_dict;
 
 protected:
@@ -33,6 +37,8 @@ protected:
     void load_virt(std::ifstream &input_filestream) override;
 
 public:
+    ~LyftMap() override;
+
     ILane<std::string> const* get_lane(std::string id) const override;
     ILaneArray<std::string> const* get_encapsulating_lanes(geometry::Vec point) const override;
     ILaneArray<std::string> const* get_lanes(structures::IArray<std::string> const *ids) const override;
@@ -40,6 +46,8 @@ public:
     ITrafficLight<std::string> const* get_traffic_light(std::string id) const override;
     ITrafficLightArray<std::string> const* get_traffic_lights(structures::IArray<std::string> const *ids) const override;
     ITrafficLightArray<std::string> const* get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const override;
+    void register_stray_ghost(IMapObject<std::string> const *ghost) const override;
+    void unregister_stray_ghost(IMapObject<std::string> const *ghost) const override;
 
     LyftMap* copy() const override;
 };

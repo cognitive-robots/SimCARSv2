@@ -29,9 +29,24 @@ LyftTrafficLight::LyftTrafficLight(std::string const &id, IMap<std::string> cons
     orientation = M_PI * json_traffic_light_data["bearing_degrees"].GetDouble() / 180.0;
 }
 
+LyftTrafficLight::~LyftTrafficLight()
+{
+    delete face_colour_to_face_type_dict;
+
+    if (timestamp_to_state_dict != nullptr)
+    {
+        structures::IArray<ITrafficLightStateHolder::State const*> const *state_array = timestamp_to_state_dict->get_values();
+        for (size_t i = 0; i < state_array->count(); ++i)
+        {
+            delete (*state_array)[i];
+        }
+    }
+    delete timestamp_to_state_dict;
+}
+
 ITrafficLightStateHolder::State const* LyftTrafficLight::get_state(temporal::Time timestamp) const
 {
-    if (timestamp_to_state_dict && timestamp_to_state_dict->contains(timestamp))
+    if (timestamp_to_state_dict != nullptr && timestamp_to_state_dict->contains(timestamp))
     {
         return (*timestamp_to_state_dict)[timestamp];
     }
@@ -53,7 +68,7 @@ FP_DATA_TYPE LyftTrafficLight::get_orientation() const
 
 structures::IArray<ITrafficLightStateHolder::FaceColour> const* LyftTrafficLight::get_face_colours() const
 {
-    if (!face_colour_to_face_type_dict)
+    if (face_colour_to_face_type_dict == nullptr)
     {
         throw std::runtime_error("Traffic light face colours not available");
     }
@@ -63,7 +78,7 @@ structures::IArray<ITrafficLightStateHolder::FaceColour> const* LyftTrafficLight
 
 ITrafficLightStateHolder::FaceType LyftTrafficLight::get_face_type(ITrafficLightStateHolder::FaceColour face_colour) const
 {
-    if (face_colour_to_face_type_dict && face_colour_to_face_type_dict->contains(face_colour))
+    if (face_colour_to_face_type_dict != nullptr && face_colour_to_face_type_dict->contains(face_colour))
     {
         return (*face_colour_to_face_type_dict)[face_colour];
     }

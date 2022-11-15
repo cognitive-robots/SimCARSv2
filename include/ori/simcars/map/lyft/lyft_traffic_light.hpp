@@ -29,6 +29,7 @@ public:
                      ITrafficLightStateHolder::IFaceDictionary *face_colour_to_face_type_dict,
                      ITrafficLightStateHolder::TemporalStateDictionary *timestamp_to_state_dict,
                      rapidjson::Value::ConstObject const &json_traffic_light_data);
+    ~LyftTrafficLight();
 
     ITrafficLightStateHolder::State const* get_state(temporal::Time timestamp) const override;
 

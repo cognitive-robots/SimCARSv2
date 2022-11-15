@@ -53,6 +53,10 @@ public:
         delete traffic_lights;
     }
 
+    bool is_ghost() const override
+    {
+        return false;
+    }
     ILane<T_id> const* get_true_self() const noexcept override
     {
         return this;
@@ -60,39 +64,39 @@ public:
 
     ILane<T_id> const* get_left_adjacent_lane() const override
     {
-        if (this->left_adjacent_lane == nullptr)
+        if (left_adjacent_lane == nullptr)
         {
             return nullptr;
         }
         try
         {
-            return this->left_adjacent_lane->get_self();
+            return left_adjacent_lane->get_self();
         }
         catch (typename ALane<T_id>::GhostObjectException)
         {
-            this->left_adjacent_lane = left_adjacent_lane->get_true_self();
-            return this->left_adjacent_lane;
+            left_adjacent_lane = left_adjacent_lane->get_true_self();
+            return left_adjacent_lane;
         }
     }
     ILane<T_id> const* get_right_adjacent_lane() const override
     {
-        if (this->right_adjacent_lane == nullptr)
+        if (right_adjacent_lane == nullptr)
         {
             return nullptr;
         }
         try
         {
-            return this->right_adjacent_lane->get_self();
+            return right_adjacent_lane->get_self();
         }
         catch (typename ALane<T_id>::GhostObjectException)
         {
-            this->right_adjacent_lane = right_adjacent_lane->get_true_self();
-            return this->right_adjacent_lane;
+            right_adjacent_lane = right_adjacent_lane->get_true_self();
+            return right_adjacent_lane;
         }
     }
     ILane<T_id> const* get_straight_fore_lane() const override
     {
-        if (this->straight_fore_lane == nullptr)
+        if (straight_fore_lane == nullptr)
         {
             ILaneArray<T_id> const *fore_lanes = this->get_fore_lanes();
             if (fore_lanes->count() > 0)
@@ -105,7 +109,7 @@ public:
                         min_abs_steer_fore_lane = (*fore_lanes)[i];
                     }
                 }
-                this->straight_fore_lane = min_abs_steer_fore_lane;
+                straight_fore_lane = min_abs_steer_fore_lane;
                 return min_abs_steer_fore_lane;
             }
             else
@@ -115,50 +119,44 @@ public:
         }
         else
         {
-            return this->straight_fore_lane;
+            return straight_fore_lane;
         }
     }
     ILaneArray<T_id> const* get_fore_lanes() const override
     {
-        ILaneArray<T_id> const *fore_lanes;
         try
         {
-            fore_lanes = this->fore_lanes->get_self();
+            return fore_lanes->get_self();
         }
         catch (typename ILaneArray<T_id>::GhostObjectException)
         {
-            this->fore_lanes = this->fore_lanes->get_true_self();
-            fore_lanes = this->fore_lanes;
+            fore_lanes = fore_lanes->get_true_self();
+            return fore_lanes;
         }
-        return fore_lanes;
     }
     ILaneArray<T_id> const* get_aft_lanes() const override
     {
-        ILaneArray<T_id> const *aft_lanes;
         try
         {
-            aft_lanes = this->aft_lanes->get_self();
+            return aft_lanes->get_self();
         }
         catch (typename ILaneArray<T_id>::GhostObjectException)
         {
-            this->aft_lanes = this->aft_lanes->get_true_self();
-            aft_lanes = this->aft_lanes;
+            aft_lanes = aft_lanes->get_true_self();
+            return aft_lanes;
         }
-        return aft_lanes;
     }
     ITrafficLightArray<T_id> const* get_traffic_lights() const override
     {
-        ITrafficLightArray<T_id> const *traffic_lights;
         try
         {
-            traffic_lights = this->traffic_lights->get_self();
+            return traffic_lights->get_self();
         }
         catch (typename ITrafficLightArray<T_id>::GhostObjectException)
         {
-            this->traffic_lights = this->traffic_lights->get_true_self();
-            traffic_lights = this->traffic_lights;
+            traffic_lights = traffic_lights->get_true_self();
+            return traffic_lights;
         }
-        return traffic_lights;
     }
 };
 

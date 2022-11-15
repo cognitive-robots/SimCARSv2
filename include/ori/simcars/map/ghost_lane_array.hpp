@@ -19,7 +19,15 @@ class GhostLaneArray : public virtual ALaneArray<T_id>
 
 public:
     GhostLaneArray(structures::IArray<T_id> const *ids, IMap<T_id> const *map) : ids(ids), map(map) {}
+    ~GhostLaneArray()
+    {
+        delete ids;
+    }
 
+    bool is_ghost() const override
+    {
+        return true;
+    }
     ILaneArray<T_id> const* get_self() const override
     {
         throw typename GhostLaneArray<T_id>::GhostObjectException();

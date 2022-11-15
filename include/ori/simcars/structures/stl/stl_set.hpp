@@ -22,10 +22,11 @@ class STLSet : public virtual ISet<T>
     mutable IStackArray<T> *values_cache;
 
 public:
-    STLSet(size_t bin_count = 10000) : data(bin_count) {}
-    STLSet(std::initializer_list<T> init_list, size_t bin_count = 10000) : data(init_list, bin_count) {}
-    STLSet(STLSet const &stl_set) : data(stl_set.data) {}
-    STLSet(ISet<T> const *set)
+    STLSet(size_t bin_count = 10000) : data(bin_count), values_cache(nullptr) {}
+    STLSet(std::initializer_list<T> init_list, size_t bin_count = 10000) :
+        data(init_list, bin_count), values_cache(nullptr) {}
+    STLSet(STLSet const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
+    STLSet(ISet<T> const *set, size_t bin_count = 10000) : data(bin_count), values_cache(nullptr)
     {
         IArray<T> const *array = set->get_array();
         for (size_t i; i < array->count(); ++i)
@@ -50,7 +51,7 @@ public:
 
     IArray<T> const* get_array() const override
     {
-        if (values_cache)
+        if (values_cache != nullptr)
         {
             return values_cache;
         }
@@ -128,7 +129,7 @@ public:
     {
         data.insert(val);
 
-        if (values_cache)
+        if (values_cache != nullptr)
         {
             values_cache->push_back(val);
         }

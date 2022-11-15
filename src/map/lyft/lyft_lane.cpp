@@ -141,7 +141,9 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
     std::string const left_adjacent_lane_id(json_lane_data["adjacent_left_id"].GetString(), json_lane_data["adjacent_left_id"].GetStringLength());
     if (left_adjacent_lane_id != "")
     {
-        set_left_adjacent_lane(new GhostLane<std::string>(left_adjacent_lane_id, map));
+        ILane *left_adjacent_lane = new GhostLane<std::string>(left_adjacent_lane_id, map);
+        set_left_adjacent_lane(left_adjacent_lane);
+        map->register_stray_ghost(left_adjacent_lane);
     }
     else
     {
@@ -151,7 +153,9 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
     std::string const right_adjacent_lane_id(json_lane_data["adjacent_right_id"].GetString(), json_lane_data["adjacent_right_id"].GetStringLength());
     if (right_adjacent_lane_id != "")
     {
-        set_right_adjacent_lane(new GhostLane<std::string>(right_adjacent_lane_id, map));
+        ILane *right_adjacent_lane = new GhostLane<std::string>(right_adjacent_lane_id, map);
+        set_right_adjacent_lane(right_adjacent_lane);
+        map->register_stray_ghost(right_adjacent_lane);
     }
     else
     {
@@ -200,6 +204,11 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
     ITrafficLightArray<std::string> const* const traffic_lights =
             new GhostTrafficLightArray<std::string>(traffic_light_ids, map);
     set_traffic_lights(traffic_lights);
+}
+
+LyftLane::~LyftLane()
+{
+    delete tris;
 }
 
 geometry::Vecs const& LyftLane::get_left_boundary() const

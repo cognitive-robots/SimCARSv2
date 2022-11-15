@@ -1,6 +1,7 @@
 
 #include <ori/simcars/utils/exceptions.hpp>
-#include <ori/simcars/structures/array_interface.hpp>
+#include <ori/simcars/structures/stl/stl_stack_array.hpp>
+#include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/map/lyft/lyft_map.hpp>
 
@@ -19,6 +20,37 @@ namespace map
 namespace lyft
 {
 
+LyftMap::~LyftMap()
+{
+    size_t i;
+
+    structures::IArray<LyftLane*> const *lane_array =
+            id_to_lane_dict->get_values();
+    for (i = 0; i < lane_array->count(); ++i)
+    {
+        delete (*lane_array)[i];
+    }
+    delete id_to_lane_dict;
+
+    structures::IArray<LyftTrafficLight*> const *traffic_light_array =
+            id_to_traffic_light_dict->get_values();
+    for (i = 0; i < traffic_light_array->count(); ++i)
+    {
+        delete (*traffic_light_array)[i];
+    }
+    delete id_to_traffic_light_dict;
+
+    structures::IArray<IMapObject<std::string> const*> const *ghost_array =
+            stray_ghosts->get_array();
+    for (i = 0; i < ghost_array->count(); ++i)
+    {
+        delete (*ghost_array)[i];
+    }
+    delete stray_ghosts;
+
+    delete map_grid_dict;
+}
+
 void LyftMap::save_virt(std::ofstream &output_filestream) const
 {
     throw utils::NotImplementedException();
@@ -34,6 +66,9 @@ void LyftMap::load_virt(std::ifstream &input_filestream)
 
     id_to_lane_dict = new structures::stl::STLDictionary<std::string, LyftLane*>();
     id_to_traffic_light_dict = new structures::stl::STLDictionary<std::string, LyftTrafficLight*>();
+
+    stray_ghosts = new structures::stl::STLSet<IMapObject<std::string> const*>();
+
     map_grid_dict = new geometry::GridDictionary<MapGridRect<std::string>>(geometry::Vec(0, 0), 100);
 
     structures::IDictionary<std::string, ITrafficLightStateHolder::IFaceDictionary*> *id_to_face_colour_to_face_type_dict =
@@ -180,6 +215,12 @@ void LyftMap::load_virt(std::ifstream &input_filestream)
 
                 if (face_state == LyftTrafficLightFaceState::ACTIVE)
                 {
+                    if (timestamp_to_state_dict->contains(timestamp))
+                    {
+                        // TODO: Find a better way of handling duplicate timestamps, likely the result of multiple lights
+                        // being active at once on a traffic light
+                        delete (*timestamp_to_state_dict)[timestamp];
+                    }
                     timestamp_to_state_dict->update(
                                 timestamp,
                                 new ITrafficLightStateHolder::State(face_colour));
@@ -196,6 +237,7 @@ void LyftMap::load_virt(std::ifstream &input_filestream)
         std::string const &lane_id = lane_id_to_lane_itr->name.GetString();
         LyftLane *lane = new LyftLane(lane_id, this, lane_id_to_lane_itr->value.GetObject());
         id_to_lane_dict->update(lane_id, lane);
+
         geometry::Rect const &lane_bounding_box = lane->get_bounding_box();
         map_grid_dict->chebyshev_proliferate(
             lane_bounding_box.get_origin(),
@@ -206,11 +248,11 @@ void LyftMap::load_virt(std::ifstream &input_filestream)
                     lane_bounding_box.get_origin(),
                     lane_bounding_box.get_width() / 2.0f,
                     lane_bounding_box.get_height() / 2.0f);
-        size_t i;
-        for (i = 0; i < map_grid_rects->count(); ++i)
+        for (size_t i = 0; i < map_grid_rects->count(); ++i)
         {
             (*map_grid_rects)[i]->insert_lane(lane);
         }
+        delete map_grid_rects;
     }
 
     rapidjson::Value::Object traffic_light_id_to_traffic_light_data = json_document["id_traffic_light_dict"].GetObject();
@@ -219,21 +261,54 @@ void LyftMap::load_virt(std::ifstream &input_filestream)
          traffic_light_id_to_traffic_light_itr != traffic_light_id_to_traffic_light_data.MemberEnd(); ++traffic_light_id_to_traffic_light_itr)
     {
         std::string const &traffic_light_id = traffic_light_id_to_traffic_light_itr->name.GetString();
-        ITrafficLightStateHolder::IFaceDictionary *face_colour_to_face_type_dict;
-        ITrafficLightStateHolder::TemporalStateDictionary *timestamp_to_state_dict;
+
+        ITrafficLightStateHolder::IFaceDictionary *face_colour_to_face_type_dict = nullptr;
+        ITrafficLightStateHolder::TemporalStateDictionary *timestamp_to_state_dict = nullptr;
         try
         {
             face_colour_to_face_type_dict = (*id_to_face_colour_to_face_type_dict)[traffic_light_id];
             timestamp_to_state_dict = (*id_to_timestamp_to_state_dict)[traffic_light_id];
         }
         catch (std::exception const&) {}
-        LyftTrafficLight *traffic_light(
+
+        LyftTrafficLight *traffic_light =
             new LyftTrafficLight(traffic_light_id, this, face_colour_to_face_type_dict,
-                                 timestamp_to_state_dict, traffic_light_id_to_traffic_light_itr->value.GetObject()));
-        (*id_to_traffic_light_dict).update(traffic_light_id, traffic_light);
+                                 timestamp_to_state_dict, traffic_light_id_to_traffic_light_itr->value.GetObject());
+        id_to_traffic_light_dict->update(traffic_light_id, traffic_light);
         map_grid_dict->chebyshev_proliferate(traffic_light->get_position(), 0.0f);
         (*map_grid_dict)[traffic_light->get_position()]->insert_traffic_light(traffic_light);
+
+        if (face_colour_to_face_type_dict != nullptr)
+        {
+            id_to_face_colour_to_face_type_dict->erase(traffic_light_id);
+        }
+        if (timestamp_to_state_dict != nullptr)
+        {
+            id_to_timestamp_to_state_dict->erase(traffic_light_id);
+        }
     }
+
+    structures::IArray<ITrafficLightStateHolder::IFaceDictionary*> const *face_colour_to_face_type_dict_array =
+            id_to_face_colour_to_face_type_dict->get_values();
+    for (size_t i = 0; i < face_colour_to_face_type_dict_array->count(); ++i)
+    {
+        delete (*face_colour_to_face_type_dict_array)[i];
+    }
+    delete id_to_face_colour_to_face_type_dict;
+
+    structures::IArray<ITrafficLightStateHolder::TemporalStateDictionary*> const *timestamp_to_state_dict_array =
+            id_to_timestamp_to_state_dict->get_values();
+    for (size_t i = 0; i < timestamp_to_state_dict_array->count(); ++i)
+    {
+        structures::IArray<ITrafficLightStateHolder::State const*> const *state_array =
+                (*timestamp_to_state_dict_array)[i]->get_values();
+        for (size_t j = 0; j < state_array->count(); ++j)
+        {
+            delete (*state_array)[j];
+        }
+        delete (*timestamp_to_state_dict_array)[i];
+    }
+    delete id_to_timestamp_to_state_dict;
 }
 
 ILane<std::string> const* LyftMap::get_lane(std::string id) const
@@ -268,8 +343,7 @@ ILaneArray<std::string> const* LyftMap::get_lanes(structures::IArray<std::string
     ILaneArray<std::string> *lanes =
             new LivingLaneStackArray<std::string>(lane_count);
 
-    size_t i;
-    for (i = 0; i < lane_count; ++i)
+    for (size_t i = 0; i < lane_count; ++i)
     {
         (*lanes)[i] = get_lane((*ids)[i]);
     }
@@ -284,8 +358,7 @@ ILaneArray<std::string> const* LyftMap::get_lanes_in_range(geometry::Vec point, 
 
     structures::stl::STLSet<ILane<std::string> const*> lanes;
 
-    size_t i;
-    for (i = 0; i < map_grid_rects->count(); ++i)
+    for (size_t i = 0; i < map_grid_rects->count(); ++i)
     {
         lanes.union_with((*map_grid_rects)[i]->get_lanes());
     }
@@ -315,8 +388,7 @@ ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights(structures::I
     ITrafficLightArray<std::string> *traffic_lights =
             new LivingTrafficLightStackArray<std::string>(traffic_light_count);
 
-    size_t i;
-    for (i = 0; i < traffic_light_count; ++i)
+    for (size_t i = 0; i < traffic_light_count; ++i)
     {
         (*traffic_lights)[i] = get_traffic_light((*ids)[i]);
     }
@@ -331,8 +403,7 @@ ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights_in_range(geom
 
     structures::stl::STLSet<ITrafficLight<std::string> const*> traffic_lights;
 
-    size_t i;
-    for (i = 0; i < map_grid_rects->count(); ++i)
+    for (size_t i = 0; i < map_grid_rects->count(); ++i)
     {
         traffic_lights.union_with((*map_grid_rects)[i]->get_traffic_lights());
     }
@@ -342,6 +413,16 @@ ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights_in_range(geom
     traffic_lights.get_array(traffic_light_array);
 
     return traffic_light_array;
+}
+
+void LyftMap::register_stray_ghost(IMapObject<std::string> const *ghost) const
+{
+    stray_ghosts->insert(ghost);
+}
+
+void LyftMap::unregister_stray_ghost(IMapObject<std::string> const *ghost) const
+{
+    stray_ghosts->erase(ghost);
 }
 
 LyftMap* LyftMap::copy() const

@@ -109,7 +109,9 @@ public:
     structures::IArray<V_grid_rect*>* chebyshev_grid_rects_in_range(Vec const &key, FP_DATA_TYPE x_distance, FP_DATA_TYPE y_distance) const
     {
         structures::IArray<geometry::Vec> *grid_points = chebyshev_grid_points_in_range(key, x_distance, y_distance);
+
         structures::stl::STLStackArray<V_grid_rect*> *grid_rects = new structures::stl::STLStackArray<V_grid_rect*>();
+
         size_t i;
         for (i = 0; i < grid_points->count(); ++i)
         {
@@ -120,6 +122,8 @@ public:
                                 (*grid_points)[i]));
             }
         }
+
+        delete grid_points;
 
         return grid_rects;
     }
@@ -140,6 +144,7 @@ public:
     void chebyshev_proliferate(Vec const &key, FP_DATA_TYPE x_distance, FP_DATA_TYPE y_distance)
     {
         structures::IArray<geometry::Vec> *grid_points = chebyshev_grid_points_in_range(key, x_distance, y_distance);
+
         size_t i;
         for (i = 0; i < grid_points->count(); ++i)
         {
@@ -150,6 +155,8 @@ public:
                             new V_grid_rect((*grid_points)[i], spacing));
             }
         }
+
+        delete grid_points;
     }
 };
 

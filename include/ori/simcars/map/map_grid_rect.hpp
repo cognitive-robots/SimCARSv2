@@ -25,16 +25,21 @@ public:
         : geometry::GridRect<MapGridRect<T_id>>(origin, size, size), lanes(new structures::stl::STLSet<ILane<T_id> const*>()),
           traffic_lights(new structures::stl::STLSet<ITrafficLight<T_id> const*>()) {}
     MapGridRect() : MapGridRect(geometry::Vec(0, 0), 0) {}
+    ~MapGridRect()
+    {
+        delete lanes;
+        delete traffic_lights;
+    }
 
     ILaneArray<T_id> const* get_encapsulating_lanes(geometry::Vec point) const
     {
-        structures::IArray<ILane<T_id> const*> const *lanes = this->lanes->get_array();
+        structures::IArray<ILane<T_id> const*> const *lane_array = lanes->get_array();
         LivingLaneStackArray<std::string> *encapsulating_lanes =
                 new LivingLaneStackArray<std::string>;
         size_t i;
-        for (i = 0; i < lanes->count(); ++i)
+        for (i = 0; i < lane_array->count(); ++i)
         {
-            ILane<T_id> const *lane = (*lanes)[i];
+            ILane<T_id> const *lane = (*lane_array)[i];
             if (lane->check_encapsulation(point))
             {
                 encapsulating_lanes->push_back(lane);

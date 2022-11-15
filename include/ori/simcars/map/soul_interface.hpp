@@ -25,6 +25,8 @@ public:
 
     virtual ~ISoul() = default;
 
+    virtual bool is_ghost() const = 0;
+
     virtual T const* get_self() const = 0;
 
     virtual T const* get_true_self() const noexcept = 0;

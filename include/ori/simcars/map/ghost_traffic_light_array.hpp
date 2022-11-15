@@ -19,7 +19,15 @@ class GhostTrafficLightArray : public virtual ATrafficLightArray<T_id>
 
 public:
     GhostTrafficLightArray(structures::IArray<T_id> const *ids, IMap<T_id> const *map) : ids(ids), map(map) {}
+    ~GhostTrafficLightArray()
+    {
+        delete ids;
+    }
 
+    bool is_ghost() const override
+    {
+        return true;
+    }
     ITrafficLightArray<T_id> const* get_self() const override
     {
         throw typename GhostTrafficLightArray<T_id>::GhostObjectException();

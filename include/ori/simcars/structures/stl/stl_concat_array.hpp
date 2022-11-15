@@ -74,13 +74,13 @@ public:
         size_t i = 0;
         while (true)
         {
-            if (idx < this->data.at(i)->count())
+            if (idx < data.at(i)->count())
             {
-                return (*this->data[i])[idx];
+                return (*data[i])[idx];
             }
             else
             {
-                idx -= this->data[i]->count();
+                idx -= data[i]->count();
                 ++i;
             }
         }

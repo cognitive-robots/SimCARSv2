@@ -25,8 +25,10 @@ protected:
 
 public:
     STLDictionary(size_t bin_count = 10000) : data(bin_count), keys_cache(nullptr), values_cache(nullptr) {}
-    STLDictionary(STLDictionary<K, V, K_hash, K_equal> const &stl_dictionary) : data(stl_dictionary.data) {}
-    STLDictionary(IDictionary<K, V> const *dictionary)
+    STLDictionary(STLDictionary<K, V, K_hash, K_equal> const &stl_dictionary) :
+        data(stl_dictionary.data), keys_cache(nullptr), values_cache(nullptr) {}
+    STLDictionary(IDictionary<K, V> const *dictionary, size_t bin_count = 10000) :
+        data(bin_count), keys_cache(nullptr), values_cache(nullptr)
     {
         IArray<K> const *keys = dictionary->get_keys();
         for (size_t i = 0; i < keys->count(); ++i)
