@@ -16,17 +16,17 @@ namespace simcars
 namespace agent
 {
 
-BasicDrivingAgentController::BasicDrivingAgentController(std::shared_ptr<const map::IMap<std::string>> map, temporal::Duration time_step, size_t steering_lookahead_steps)
+BasicDrivingAgentController::BasicDrivingAgentController(map::IMap<std::string> const *map, temporal::Duration time_step, size_t steering_lookahead_steps)
     : trig_buff(geometry::TrigBuff::get_instance()), map(map), time_step(time_step), steering_lookahead_steps(steering_lookahead_steps) {}
 
-void BasicDrivingAgentController::modify_state(std::shared_ptr<const agent::IState> original_state, std::shared_ptr<agent::IState> modified_state) const
+void BasicDrivingAgentController::modify_state(agent::IState const *original_state, agent::IState *modified_state) const
 {
     this->modify_driving_agent_state(
-                std::dynamic_pointer_cast<const IDrivingAgentState>(original_state),
-                std::dynamic_pointer_cast<IDrivingAgentState>(modified_state));
+                dynamic_cast<IDrivingAgentState const*>(original_state),
+                dynamic_cast<IDrivingAgentState*>(modified_state));
 }
 
-void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<const agent::IDrivingAgentState> original_state, std::shared_ptr<agent::IDrivingAgentState> modified_state) const
+void BasicDrivingAgentController::modify_driving_agent_state(agent::IDrivingAgentState const *original_state, agent::IDrivingAgentState *modified_state) const
 {
     FP_DATA_TYPE aligned_linear_velocity = original_state->get_aligned_linear_velocity_variable()->get_value();
 
@@ -34,15 +34,15 @@ void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<con
 
     try
     {
-        std::shared_ptr<const IValuelessConstant> aligned_linear_velocity_goal_value_valueless_variable =
+        IValuelessConstant const *aligned_linear_velocity_goal_value_valueless_variable =
                 original_state->get_parameter_value(original_state->get_driving_agent_name() + ".aligned_linear_velocity.goal_value");
-        std::shared_ptr<const IValuelessConstant> aligned_linear_velocity_goal_duration_valueless_variable =
+        IValuelessConstant const *aligned_linear_velocity_goal_duration_valueless_variable =
                 original_state->get_parameter_value(original_state->get_driving_agent_name() + ".aligned_linear_velocity.goal_duration");
 
-        std::shared_ptr<const IConstant<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_variable =
-                std::dynamic_pointer_cast<const IConstant<FP_DATA_TYPE>>(aligned_linear_velocity_goal_value_valueless_variable);
-        std::shared_ptr<const IConstant<temporal::Duration>> aligned_linear_velocity_goal_duration_variable =
-                std::dynamic_pointer_cast<const IConstant<temporal::Duration>>(aligned_linear_velocity_goal_duration_valueless_variable);
+        IConstant<FP_DATA_TYPE> const *aligned_linear_velocity_goal_value_variable =
+                dynamic_cast<IConstant<FP_DATA_TYPE> const*>(aligned_linear_velocity_goal_value_valueless_variable);
+        IConstant<temporal::Duration> const *aligned_linear_velocity_goal_duration_variable =
+                dynamic_cast<IConstant<temporal::Duration> const*>(aligned_linear_velocity_goal_duration_valueless_variable);
 
         FP_DATA_TYPE aligned_linear_velocity_goal_value = aligned_linear_velocity_goal_value_variable->get_value();
         temporal::Duration aligned_linear_velocity_goal_duration = aligned_linear_velocity_goal_duration_variable->get_value();
@@ -52,11 +52,11 @@ void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<con
         new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
         new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
 
-        std::shared_ptr<const IConstant<FP_DATA_TYPE>> new_aligned_linear_acceleration_variable(
+        IConstant<FP_DATA_TYPE> const *new_aligned_linear_acceleration_variable =
                     new BasicConstant(
                         modified_state->get_driving_agent_name(),
                         "aligned_linear_acceleration.indirect_actuation",
-                        new_aligned_linear_acceleration));
+                        new_aligned_linear_acceleration);
         modified_state->set_aligned_linear_acceleration_variable(new_aligned_linear_acceleration_variable);
     }
     catch (std::out_of_range)
@@ -82,13 +82,13 @@ void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<con
     try
     {
         // TODO: Accomodate branching lanes
-        std::shared_ptr<const map::ILaneArray<std::string>> lanes = map->get_encapsulating_lanes(position);
+        map::ILaneArray<std::string> const *lanes = map->get_encapsulating_lanes(position);
 
         if (lanes->count() > 0)
         {
-            std::shared_ptr<const map::ILane<std::string>> lane = (*lanes)[0];
+            map::ILane<std::string> const *lane = (*lanes)[0];
 
-            std::shared_ptr<const map::ILane<std::string>> current_lane = lane;
+            map::ILane<std::string> const *current_lane = lane;
 
             bool found_start = false;
 
@@ -102,7 +102,7 @@ void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<con
 
             while (true)
             {
-                const geometry::Vecs& left_boundary = current_lane->get_left_boundary();
+                geometry::Vecs const &left_boundary = current_lane->get_left_boundary();
 
                 for (i = 0;
                      i < left_boundary.cols() - 1;
@@ -163,7 +163,7 @@ void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<con
 
                 if (distance_remaining >= 0)
                 {
-                    std::shared_ptr<const map::ILane<std::string>> straight_fore_lane = current_lane->get_straight_fore_lane();
+                    map::ILane<std::string> const *straight_fore_lane = current_lane->get_straight_fore_lane();
                     if (straight_fore_lane != nullptr)
                     {
                         //std::cerr << "new lane!" << std::endl;
@@ -192,7 +192,7 @@ void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<con
             start_direction = geometry::Vec(std::cos(rotation), std::sin(rotation));
 
 
-            const geometry::Vecs& right_boundary = current_lane->get_right_boundary();
+            geometry::Vecs const &right_boundary = current_lane->get_right_boundary();
 
             geometry::Vec closest_right_boundary_point = right_boundary.col(0);
             FP_DATA_TYPE closest_right_boundary_point_distance =
@@ -243,11 +243,11 @@ void BasicDrivingAgentController::modify_driving_agent_state(std::shared_ptr<con
 
             FP_DATA_TYPE new_steer = (lane_midpoint_steer + lane_orientation_steer) / 2.0f;
 
-            std::shared_ptr<const IConstant<FP_DATA_TYPE>> new_steer_variable(
+            IConstant<FP_DATA_TYPE> const *new_steer_variable =
                         new BasicConstant(
                             modified_state->get_driving_agent_name(),
                             "steer.indirect_actuation",
-                            new_steer));
+                            new_steer);
             modified_state->set_steer_variable(new_steer_variable);
         }
         else

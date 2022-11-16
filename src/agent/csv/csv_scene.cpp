@@ -17,16 +17,16 @@ namespace agent
 namespace csv
 {
 
-std::shared_ptr<const CSVScene> CSVScene::construct_from(std::shared_ptr<const IScene> scene)
+CSVScene const* CSVScene::construct_from(IScene const *scene)
 {
-    std::shared_ptr<CSVScene> new_scene(new CSVScene());
+    CSVScene *new_scene = new CSVScene();
 
     new_scene->min_spatial_limits = scene->get_min_spatial_limits();
     new_scene->max_spatial_limits = scene->get_max_spatial_limits();
     new_scene->min_temporal_limit = scene->get_min_temporal_limit();
     new_scene->max_temporal_limit = scene->get_max_temporal_limit();
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = scene->get_entities();
+    structures::IArray<IEntity const*> *entities = scene->get_entities();
 
     size_t i;
     for(i = 0; i < entities->count(); ++i)
@@ -39,8 +39,8 @@ std::shared_ptr<const CSVScene> CSVScene::construct_from(std::shared_ptr<const I
 
 void CSVScene::save_virt(std::ofstream &output_filestream) const
 {
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> constants = this->get_constants();
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> variables = this->get_variables();
+    structures::IArray<IValuelessConstant const*> *constants = this->get_constants();
+    structures::IArray<IValuelessVariable const*> *variables = this->get_variables();
 
     size_t i;
     for (i = 0; i < variables->count(); ++i)
@@ -81,7 +81,7 @@ void CSVScene::save_virt(std::ofstream &output_filestream) const
     }
 }
 
-void CSVScene::load_virt(std::ifstream& input_filestream)
+void CSVScene::load_virt(std::ifstream &input_filestream)
 {
     throw utils::NotImplementedException();
 }
@@ -106,18 +106,20 @@ temporal::Time CSVScene::get_max_temporal_limit() const
     return this->max_temporal_limit;
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> CSVScene::get_entities() const
+structures::IArray<IEntity const*>* CSVScene::get_entities() const
 {
-    return std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>>(
-            new structures::stl::STLStackArray<std::shared_ptr<const IEntity>>(entity_dict.get_values()));
+    structures::stl::STLStackArray<IEntity const*> *entities =
+            new structures::stl::STLStackArray<IEntity const*>(entity_dict.count());
+    entity_dict.get_values(entities)
+    return entities;
 }
 
-std::shared_ptr<const IEntity> CSVScene::get_entity(const std::string& entity_name) const
+IEntity const* CSVScene::get_entity(std::string const &entity_name) const
 {
     return entity_dict[entity_name];
 }
 
-std::shared_ptr<IState> CSVScene::get_state(temporal::Time time) const
+IState* CSVScene::get_state(temporal::Time time) const
 {
     throw utils::NotImplementedException();
 }

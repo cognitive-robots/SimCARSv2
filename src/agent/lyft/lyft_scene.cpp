@@ -117,9 +117,10 @@ std::shared_ptr<const IEntity> LyftScene::get_entity(const std::string& entity_n
 
 std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> LyftScene::get_driving_agents() const
 {
-    return std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>>(
-                new structures::stl::STLStackArray<std::shared_ptr<const IDrivingAgent>>(
-                    driving_agent_dict.get_values()));
+    structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
+            new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.count());
+    driving_agent_dict.get_values(driving_agents);
+    return driving_agents;
 }
 
 std::shared_ptr<const IDrivingAgent> LyftScene::get_driving_agent(const std::string& driving_agent_name) const
