@@ -21,13 +21,13 @@ namespace agent
 template <typename T>
 class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulatedValuelessVariable
 {
-    std::shared_ptr<const IVariable<T>> original_variable;
-    std::shared_ptr<const ISimulationScene> simulation_scene;
+    IVariable<T> const *original_variable;
+    ISimulationScene const *simulation_scene;
 
     temporal::Time simulation_start_time;
     temporal::Time simulation_end_time;
 
-    mutable temporal::PrecedenceTemporalDictionary<std::shared_ptr<const IEvent<T>>> time_event_dict;
+    mutable temporal::PrecedenceTemporalDictionary<IEvent<T> const*> time_event_dict;
 
     void simulation_check(temporal::Time time) const
     {
@@ -46,15 +46,15 @@ class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulated
     }
 
 public:
-    SimulatedVariable(std::shared_ptr<const IVariable<T>> original_variable,
-                      std::shared_ptr<const ISimulationScene> simulation_scene,
+    SimulatedVariable(IVariable<T> const *original_variable,
+                      ISimulationScene const *simulation_scene,
                       temporal::Time simulation_start_time,
                       size_t max_cache_size = 10) :
         SimulatedVariable(original_variable, simulation_scene, simulation_start_time, original_variable->get_max_temporal_limit(),
                           max_cache_size) {}
 
-    SimulatedVariable(std::shared_ptr<const IVariable<T>> original_variable,
-                      std::shared_ptr<const ISimulationScene> simulation_scene,
+    SimulatedVariable(IVariable<T> const *original_variable,
+                      ISimulationScene const *simulation_scene,
                       temporal::Time simulation_start_time, temporal::Time simulation_end_time,
                       size_t max_cache_size = 10) :
         original_variable(original_variable), simulation_scene(simulation_scene),
@@ -77,7 +77,7 @@ public:
         }
     }
 
-    std::shared_ptr<IValuelessVariable> valueless_deep_copy() const override
+    IValuelessVariable* valueless_deep_copy() const override
     {
         return deep_copy();
     }
@@ -86,14 +86,14 @@ public:
      * NOTE: This should not be called directly by external code, as the simulation scene will not have a pointer to the
      * resulting copy and thus any new simulation data will not be propogated to the copy.
      */
-    std::shared_ptr<IVariable<T>> deep_copy() const override
+    IVariable<T>* deep_copy() const override
     {
-        std::shared_ptr<SimulatedVariable<T>> variable(
-                    new SimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
-                                             simulation_end_time, time_event_dict.get_max_cache_size()));
+        SimulatedVariable<T> *variable =
+                new SimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
+                                         simulation_end_time, time_event_dict.get_max_cache_size());
         size_t i;
 
-        std::shared_ptr<const structures::IArray<temporal::Time>> times = time_event_dict.get_keys();
+        structures::IArray<temporal::Time> const *times = time_event_dict.get_keys();
         for(i = 0; i < times->count(); ++i)
         {
             variable->time_event_dict.update((*times)[i], time_event_dict[(*times)[i]]->shallow_copy());
@@ -102,9 +102,9 @@ public:
         return variable;
     }
 
-    std::shared_ptr<ISimulatedValuelessVariable> simulated_valueless_deep_copy() const override
+    ISimulatedValuelessVariable* simulated_valueless_deep_copy() const override
     {
-        return std::dynamic_pointer_cast<ISimulatedValuelessVariable>(deep_copy());
+        return dynamic_cast<ISimulatedValuelessVariable*>(deep_copy());
     }
 
     std::string get_entity_name() const override
@@ -146,21 +146,21 @@ public:
         }
     }
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>> get_events(
+    structures::IArray<IEvent<T> const*>* get_events(
             temporal::Time time_window_start,
             temporal::Time time_window_end) const override
     {
         simulation_check(time_window_end);
 
-        std::shared_ptr<structures::stl::STLConcatArray<std::shared_ptr<const IEvent<T>>>> events(
-                    new structures::stl::STLConcatArray<std::shared_ptr<const IEvent<T>>>(2));
+        structures::stl::STLConcatArray<IEvent<T> const*> *events =
+                new structures::stl::STLConcatArray<IEvent<T> const*>(2);
 
         events->get_array(0) = original_variable->get_events(time_window_start, time_window_end);
 
-        std::shared_ptr<const structures::IArray<std::shared_ptr<const IEvent<T>>>> unfiltered_simulated_events =
+        structures::IArray<IEvent<T> const*> const *unfiltered_simulated_events =
                 time_event_dict.get_values();
-        std::shared_ptr<structures::IStackArray<std::shared_ptr<const IEvent<T>>>> filtered_simulated_events(
-                new structures::stl::STLStackArray<std::shared_ptr<const IEvent<T>>>());
+        structures::IStackArray<IEvent<T> const*> *filtered_simulated_events =
+                new structures::stl::STLStackArray<IEvent<T> const*>;
 
         for (size_t i = 0; i < unfiltered_simulated_events->count(); ++i)
         {
@@ -176,7 +176,7 @@ public:
         return events;
     }
 
-    std::shared_ptr<const IEvent<T>> get_event(temporal::Time time) const override
+    IEvent<T> const* get_event(temporal::Time time) const override
     {
         simulation_check(time);
 
@@ -186,7 +186,7 @@ public:
         }
         else
         {
-            std::shared_ptr<const IEvent<T>> prospective_event = time_event_dict[time];
+            IEvent<T> const *prospective_event = time_event_dict[time];
             if (prospective_event->get_time() == time)
             {
                 return prospective_event;
@@ -198,7 +198,7 @@ public:
         }
     }
 
-    bool add_event(std::shared_ptr<const IEvent<T>> event) override
+    bool add_event(IEvent<T> const *event) override
     {
         if (event->get_time() <= simulation_start_time
                 || event->get_time() > simulation_end_time)
@@ -213,7 +213,7 @@ public:
         }
     }
 
-    bool remove_event(std::shared_ptr<const IEvent<T>> event) override
+    bool remove_event(IEvent<T> const *event) override
     {
         try
         {
@@ -233,7 +233,7 @@ public:
         }
     }
 
-    bool simulation_update(temporal::Time time, std::shared_ptr<const IState> state) const override
+    bool simulation_update(temporal::Time time, IState const *state) const override
     {
         if (time <= simulation_start_time
                 || time > simulation_end_time)
@@ -244,12 +244,12 @@ public:
         {
             try
             {
-                std::shared_ptr<const IValuelessConstant> valueless_parameter_value =
+                IValuelessConstant const *valueless_parameter_value =
                         state->get_parameter_value(this->get_full_name());
 
-                std::shared_ptr<const IConstant<T>> parameter_value =
-                        std::dynamic_pointer_cast<const IConstant<T>>(valueless_parameter_value);
-                std::shared_ptr<IEvent<T>> update_event(new BasicEvent(parameter_value, time));
+                IConstant<T> const *parameter_value =
+                        dynamic_cast<IConstant<T> const*>(valueless_parameter_value);
+                IEvent<T> *update_event = new BasicEvent(parameter_value, time);
 
                 time_event_dict.update(update_event->get_time(), update_event);
             }

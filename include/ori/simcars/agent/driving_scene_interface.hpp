@@ -14,10 +14,10 @@ namespace agent
 class IDrivingScene : public virtual IScene
 {
 public:
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> get_driving_agents() const = 0;
-    virtual std::shared_ptr<const IDrivingAgent> get_driving_agent(const std::string& driving_agent_name) const = 0;
+    virtual structures::IArray<IDrivingAgent const*>* get_driving_agents() const = 0;
+    virtual IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const = 0;
 
-    virtual std::shared_ptr<IDrivingSceneState> get_driving_scene_state(temporal::Time time) const = 0;
+    virtual IDrivingSceneState* get_driving_scene_state(temporal::Time time) const = 0;
 };
 
 }

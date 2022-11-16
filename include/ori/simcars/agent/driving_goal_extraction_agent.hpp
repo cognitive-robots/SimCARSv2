@@ -13,18 +13,18 @@ namespace agent
 
 class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 {
-    std::shared_ptr<const IDrivingAgent> driving_agent;
+    IDrivingAgent const *driving_agent;
 
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IValuelessVariable>> variable_dict;
+    structures::stl::STLDictionary<std::string, IValuelessVariable const*> variable_dict;
 
     DrivingGoalExtractionAgent();
 
     void extract_aligned_linear_velocity_change_events();
-    void extract_lane_change_events(std::shared_ptr<const map::IMap<std::string>> map);
+    void extract_lane_change_events(map::IMap<std::string> const *map);
 
 public:
-    DrivingGoalExtractionAgent(std::shared_ptr<const IDrivingAgent> driving_agent);
-    DrivingGoalExtractionAgent(std::shared_ptr<const IDrivingAgent> driving_agent, std::shared_ptr<const map::IMap<std::string>> map);
+    DrivingGoalExtractionAgent(IDrivingAgent const *driving_agent);
+    DrivingGoalExtractionAgent(IDrivingAgent const *driving_agent, map::IMap<std::string> const *map);
 
     std::string get_name() const override;
 
@@ -34,17 +34,17 @@ public:
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_constant_parameters() const override;
-    std::shared_ptr<const IValuelessConstant> get_constant_parameter(const std::string& constant_name) const override;
+    structures::IArray<IValuelessConstant const*>* get_constant_parameters() const override;
+    IValuelessConstant const* get_constant_parameter(std::string const &constant_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> get_variable_parameters() const override;
-    std::shared_ptr<const IValuelessVariable> get_variable_parameter(const std::string& variable_name) const override;
+    structures::IArray<IValuelessVariable const*>* get_variable_parameters() const override;
+    IValuelessVariable const* get_variable_parameter(std::string const &variable_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const override;
+    structures::IArray<IValuelessEvent const*>* get_events() const override;
 
-    std::shared_ptr<IDrivingAgent> driving_agent_deep_copy() const override;
+    IDrivingAgent* driving_agent_deep_copy() const override;
 
-    std::shared_ptr<IDrivingAgentState> get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
+    IDrivingAgentState* get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
 };
 
 }

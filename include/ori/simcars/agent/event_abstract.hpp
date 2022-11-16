@@ -15,9 +15,9 @@ template <typename T>
 class AEvent : public virtual IEvent<T>
 {
 protected:
-    bool is_equal(std::shared_ptr<const IValuelessEvent> event) const override
+    bool is_equal(IValuelessEvent const *event) const override
     {
-        std::shared_ptr<const AEvent<T>> cast_event = std::dynamic_pointer_cast<const AEvent<T>>(event);
+        AEvent<T> const *cast_event = dynamic_cast<AEvent<T> const*>(event);
         return this->get_variable_name() == cast_event->get_variable_name() &&
                 this->get_value() == cast_event->get_value() &&
                 this->get_time() == cast_event->get_time();

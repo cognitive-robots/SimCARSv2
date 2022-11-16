@@ -12,13 +12,13 @@ namespace agent
 class AScene : public virtual IScene
 {
 public:
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_constants() const override;
-    std::shared_ptr<const IValuelessConstant> get_constant(const std::string& constant_name) const override;
+    structures::IArray<IValuelessConstant const*>* get_constants() const override;
+    IValuelessConstant const* get_constant(std::string const &constant_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> get_variables() const override;
-    std::shared_ptr<const IValuelessVariable> get_variable(const std::string& variable_name) const override;
+    structures::IArray<IValuelessVariable const*>* get_variables() const override;
+    IValuelessVariable const* get_variable(std::string const &variable_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const override;
+    structures::IArray<IValuelessEvent const*>* get_events() const override;
 };
 
 }

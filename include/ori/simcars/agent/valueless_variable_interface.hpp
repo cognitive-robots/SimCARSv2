@@ -5,7 +5,6 @@
 #include <ori/simcars/agent/valueless_event_interface.hpp>
 
 #include <string>
-#include <memory>
 #include <functional>
 
 namespace ori
@@ -30,7 +29,7 @@ public:
 
     virtual ~IValuelessVariable() = default;
 
-    virtual std::shared_ptr<IValuelessVariable> valueless_deep_copy() const = 0;
+    virtual IValuelessVariable* valueless_deep_copy() const = 0;
 
     virtual std::string get_full_name() const = 0;
     virtual std::string get_entity_name() const = 0;
@@ -44,10 +43,10 @@ public:
     virtual temporal::Time get_min_temporal_limit() const = 0;
     virtual temporal::Time get_max_temporal_limit() const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_valueless_events(
+    virtual structures::IArray<IValuelessEvent const*>* get_valueless_events(
             temporal::Time time_window_start = temporal::Time::min(),
             temporal::Time time_window_end = temporal::Time::max()) const = 0;
-    virtual std::shared_ptr<const IValuelessEvent> get_valueless_event(temporal::Time time) const = 0;
+    virtual IValuelessEvent const* get_valueless_event(temporal::Time time) const = 0;
 };
 
 }

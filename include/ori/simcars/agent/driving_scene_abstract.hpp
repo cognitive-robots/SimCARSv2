@@ -13,9 +13,9 @@ namespace agent
 class ADrivingScene : public virtual AScene, public virtual IDrivingScene
 {
 public:
-    std::shared_ptr<IState> get_state(temporal::Time time) const override;
+    IState* get_state(temporal::Time time) const override;
 
-    std::shared_ptr<IDrivingSceneState> get_driving_scene_state(temporal::Time time) const override;
+    IDrivingSceneState* get_driving_scene_state(temporal::Time time) const override;
 };
 
 }

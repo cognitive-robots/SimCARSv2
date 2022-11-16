@@ -16,14 +16,17 @@ class DrivingGoalExtractionScene : public virtual ADrivingScene
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
 
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IDrivingAgent>> driving_agent_dict;
+    structures::stl::STLDictionary<std::string, IDrivingAgent const*> driving_agent_dict;
 
-    std::shared_ptr<const map::IMap<std::string>> map = nullptr;
+    map::IMap<std::string> const *map;
+
+protected:
+    DrivingGoalExtractionScene() : map(nullptr) {}
 
 public:
-    static std::shared_ptr<const DrivingGoalExtractionScene> construct_from(std::shared_ptr<const IDrivingScene> driving_scene);
-    static std::shared_ptr<const DrivingGoalExtractionScene> construct_from(std::shared_ptr<const IDrivingScene> driving_scene,
-                                                                   std::shared_ptr<const map::IMap<std::string>> map);
+    static DrivingGoalExtractionScene const* construct_from(IDrivingScene const *driving_scene);
+    static DrivingGoalExtractionScene const* construct_from(IDrivingScene const *driving_scene,
+                                                            map::IMap<std::string> const *map);
 
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
@@ -31,14 +34,14 @@ public:
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const override;
-    std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const override;
+    structures::IArray<IEntity const*>* get_entities() const override;
+    IEntity const* get_entity(std::string const &entity_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> get_driving_agents() const override;
-    std::shared_ptr<const IDrivingAgent> get_driving_agent(const std::string& driving_agent_name) const override;
+    structures::IArray<IDrivingAgent const*>* get_driving_agents() const override;
+    IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const override;
 
     bool has_map() const;
-    std::shared_ptr<const map::IMap<std::string>> get_map() const;
+    map::IMap<std::string> const* get_map() const;
 };
 
 }

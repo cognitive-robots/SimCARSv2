@@ -15,7 +15,7 @@ class ISimulator
 public:
     virtual ~ISimulator() = default;
 
-    virtual void simulate(std::shared_ptr<const agent::IState> current_state, std::shared_ptr<agent::IState> next_state, temporal::Duration time_step) const = 0;
+    virtual void simulate(agent::IState const *current_state, agent::IState *next_state, temporal::Duration time_step) const = 0;
 };
 
 }

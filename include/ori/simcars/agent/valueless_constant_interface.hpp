@@ -3,7 +3,6 @@
 #include <ori/simcars/structures/array_interface.hpp>
 
 #include <string>
-#include <memory>
 
 namespace ori
 {
@@ -17,7 +16,7 @@ class IValuelessConstant
 public:
     virtual ~IValuelessConstant() = default;
 
-    virtual std::shared_ptr<IValuelessConstant> valueless_shallow_copy() const = 0;
+    virtual IValuelessConstant* valueless_shallow_copy() const = 0;
 
     virtual std::string get_full_name() const = 0;
     virtual std::string get_entity_name() const = 0;

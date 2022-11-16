@@ -21,22 +21,22 @@ class DrivingSimulationScene : public virtual ADrivingScene, public virtual ISim
     temporal::Duration time_step;
 
     mutable temporal::Time furthest_simulation_time;
-    mutable std::shared_ptr<const IDrivingSceneState> furthest_simulation_state;
+    mutable IDrivingSceneState const *furthest_simulation_state;
 
-    std::shared_ptr<const IDrivingSimulator> simulator;
+    IDrivingSimulator const *simulator;
 
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IDrivingAgent>> driving_agent_dict;
+    structures::stl::STLDictionary<std::string, IDrivingAgent const*> driving_agent_dict;
 
 public:
-    static std::shared_ptr<const DrivingSimulationScene> construct_from(std::shared_ptr<const IDrivingScene> driving_scene,
-                                                                        std::shared_ptr<const IDrivingSimulator> driving_simulator,
-                                                                        temporal::Duration time_step,
-                                                                        temporal::Time simulation_start_time);
-    static std::shared_ptr<const DrivingSimulationScene> construct_from(std::shared_ptr<const IDrivingScene> driving_scene,
-                                                                        std::shared_ptr<const IDrivingSimulator> driving_simulator,
-                                                                        temporal::Duration simulation_time_step,
-                                                                        temporal::Time simulation_start_time,
-                                                                        temporal::Time simulation_end_time);
+    static DrivingSimulationScene const* construct_from(IDrivingScene const *driving_scene,
+                                                        IDrivingSimulator const *driving_simulator,
+                                                        temporal::Duration time_step,
+                                                        temporal::Time simulation_start_time);
+    static DrivingSimulationScene const* construct_from(IDrivingScene const *driving_scene,
+                                                        IDrivingSimulator const *driving_simulator,
+                                                        temporal::Duration simulation_time_step,
+                                                        temporal::Time simulation_start_time,
+                                                        temporal::Time simulation_end_time);
 
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
@@ -44,11 +44,11 @@ public:
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const override;
-    std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const override;
+    structures::IArray<IEntity const*>* get_entities() const override;
+    IEntity const* get_entity(std::string const &entity_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> get_driving_agents() const override;
-    std::shared_ptr<const IDrivingAgent> get_driving_agent(const std::string& driving_agent_name) const override;
+    structures::IArray<IDrivingAgent const*>* get_driving_agents() const override;
+    IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const override;
 
     temporal::Duration get_time_step() const override
     {

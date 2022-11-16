@@ -20,8 +20,8 @@ class AFileBasedScene : public virtual AScene, public virtual IFileBasedScene
 protected:
     AFileBasedScene() = default;
 
-    virtual void save_virt(std::ofstream& output_filestream) const = 0;
-    virtual void load_virt(std::ifstream& input_filestream) = 0;
+    virtual void save_virt(std::ofstream &output_filestream) const = 0;
+    virtual void load_virt(std::ifstream &input_filestream) = 0;
 
 public:
     ~AFileBasedScene() override
@@ -29,7 +29,7 @@ public:
         static_assert(std::is_base_of<AFileBasedScene, T_scene>::value, "T_map is not derived from AFileBasedScene");
     }
 
-    void save(const std::string& output_file_path_str) const override
+    void save(std::string const &output_file_path_str) const override
     {
         std::filesystem::path output_file_path(output_file_path_str);
 
@@ -43,7 +43,7 @@ public:
         this->save_virt(output_filestream);
     }
 
-    static std::shared_ptr<const T_scene> load(const std::string& input_file_path_str)
+    static T_scene const* load(std::string const &input_file_path_str)
     {
         std::filesystem::path input_file_path(input_file_path_str);
 
@@ -54,11 +54,11 @@ public:
 
         std::ifstream input_filestream(input_file_path, std::ios_base::binary);
 
-        std::shared_ptr<AFileBasedScene<T_scene>> scene(new T_scene());
+        AFileBasedScene<T_scene> *scene = new T_scene;
 
         scene->load_virt(input_filestream);
 
-        return std::dynamic_pointer_cast<const T_scene>(scene);
+        return dynamic_cast<T_scene const*>(scene);
     }
 };
 

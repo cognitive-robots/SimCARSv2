@@ -94,20 +94,19 @@ public:
         return updated_string_stream.str();
     }
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_valueless_events(
+    structures::IArray<IValuelessEvent const*>* get_valueless_events(
             temporal::Time time_window_start,
             temporal::Time time_window_end) const override
     {
-        const std::shared_ptr<structures::IArray<std::shared_ptr<const IEvent<T>>>> events = this->get_events(
-                    time_window_start,
-                    time_window_end);
-        const std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> valueless_events(
-                    new structures::stl::STLStackArray<std::shared_ptr<const IValuelessEvent>>(events->count()));
+        structures::IArray<IEvent<T> const*>* const events =
+                this->get_events(time_window_start, time_window_end);
+        structures::IArray<IValuelessEvent const*>* const valueless_events =
+                    new structures::stl::STLStackArray<IValuelessEvent const*>(events->count());
         cast_array(*events, *valueless_events);
         return valueless_events;
     }
 
-    std::shared_ptr<const IValuelessEvent> get_valueless_event(temporal::Time time) const override
+    IValuelessEvent const* get_valueless_event(temporal::Time time) const override
     {
         return this->get_event(time);
     }

@@ -10,7 +10,6 @@
 #include <ori/simcars/agent/entity_interface.hpp>
 
 #include <string>
-#include <memory>
 
 namespace ori
 {
@@ -30,18 +29,18 @@ public:
     virtual temporal::Time get_min_temporal_limit() const = 0;
     virtual temporal::Time get_max_temporal_limit() const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> get_entities() const = 0;
-    virtual std::shared_ptr<const IEntity> get_entity(const std::string& entity_name) const = 0;
+    virtual structures::IArray<IEntity const*>* get_entities() const = 0;
+    virtual IEntity const* get_entity(std::string const &entity_name) const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_constants() const = 0;
-    virtual std::shared_ptr<const IValuelessConstant> get_constant(const std::string& constant_name) const = 0;
+    virtual structures::IArray<IValuelessConstant const*>* get_constants() const = 0;
+    virtual IValuelessConstant const* get_constant(std::string const &constant_name) const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> get_variables() const = 0;
-    virtual std::shared_ptr<const IValuelessVariable> get_variable(const std::string& variable_name) const = 0;
+    virtual structures::IArray<IValuelessVariable const*>* get_variables() const = 0;
+    virtual IValuelessVariable const* get_variable(std::string const &variable_name) const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const = 0;
+    virtual structures::IArray<IValuelessEvent const*>* get_events() const = 0;
 
-    virtual std::shared_ptr<IState> get_state(temporal::Time time) const = 0;
+    virtual IState* get_state(temporal::Time time) const = 0;
 };
 
 }

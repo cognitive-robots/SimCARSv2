@@ -14,8 +14,8 @@ class IState
 public:
     virtual ~IState() = default;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_parameter_values() const = 0;
-    virtual std::shared_ptr<const IValuelessConstant> get_parameter_value(const std::string& parameter_name) const = 0;
+    virtual structures::IArray<IValuelessConstant const*>* get_parameter_values() const = 0;
+    virtual IValuelessConstant const* get_parameter_value(std::string const &parameter_name) const = 0;
 };
 
 }

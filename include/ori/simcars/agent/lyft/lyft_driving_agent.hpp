@@ -21,13 +21,13 @@ class LyftDrivingAgent : public virtual ADrivingAgent
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
 
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IValuelessConstant>> constant_dict;
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IValuelessVariable>> variable_dict;
+    structures::stl::STLDictionary<std::string, IValuelessConstant const*> constant_dict;
+    structures::stl::STLDictionary<std::string, IValuelessVariable const*> variable_dict;
 
     LyftDrivingAgent();
 
 public:
-    LyftDrivingAgent(const rapidjson::Value::ConstObject& json_agent_data);
+    LyftDrivingAgent(rapidjson::Value::ConstObject const &json_agent_data);
 
     std::string get_name() const override;
 
@@ -37,15 +37,15 @@ public:
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_constant_parameters() const override;
-    std::shared_ptr<const IValuelessConstant> get_constant_parameter(const std::string& constant_name) const override;
+    structures::IArray<IValuelessConstant const*>* get_constant_parameters() const override;
+    IValuelessConstant const* get_constant_parameter(std::string const &constant_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> get_variable_parameters() const override;
-    std::shared_ptr<const IValuelessVariable> get_variable_parameter(const std::string& variable_name) const override;
+    structures::IArray<IValuelessVariable const*>* get_variable_parameters() const override;
+    IValuelessVariable const* get_variable_parameter(std::string const &variable_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const override;
+    structures::IArray<IValuelessEvent const*>* get_events() const override;
 
-    std::shared_ptr<IDrivingAgent> driving_agent_deep_copy() const override;
+    IDrivingAgent* driving_agent_deep_copy() const override;
 };
 
 }

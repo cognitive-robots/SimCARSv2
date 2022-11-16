@@ -16,24 +16,24 @@ namespace agent
 
 class DrivingSimulationAgent : public virtual ADrivingAgent
 {
-    std::shared_ptr<const IDrivingAgent> driving_agent;
+    IDrivingAgent const *driving_agent;
 
     temporal::Time max_temporal_limit;
 
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const IValuelessVariable>> non_simulated_variable_dict;
-    structures::stl::STLDictionary<std::string, std::shared_ptr<const ISimulatedValuelessVariable>> simulated_variable_dict;
+    structures::stl::STLDictionary<std::string, IValuelessVariable const*> non_simulated_variable_dict;
+    structures::stl::STLDictionary<std::string, ISimulatedValuelessVariable const*> simulated_variable_dict;
 
-    std::shared_ptr<const DrivingSimulationScene> driving_simulation_scene;
+    DrivingSimulationScene const *driving_simulation_scene;
     temporal::Time latest_simulated_time;
 
     DrivingSimulationAgent();
 
 public:
-    DrivingSimulationAgent(std::shared_ptr<const IDrivingAgent> driving_agent,
-                           std::shared_ptr<const ISimulationScene> simulation_scene,
+    DrivingSimulationAgent(IDrivingAgent const *driving_agent,
+                           ISimulationScene const *simulation_scene,
                            temporal::Time simulation_start_time, bool allow_late_start = true);
-    DrivingSimulationAgent(std::shared_ptr<const IDrivingAgent> driving_agent,
-                           std::shared_ptr<const ISimulationScene> simulation_scene,
+    DrivingSimulationAgent(IDrivingAgent const *driving_agent,
+                           ISimulationScene const *simulation_scene,
                            temporal::Time simulation_start_time, temporal::Time simulation_end_time,
                            bool allow_late_start = true);
 
@@ -45,19 +45,19 @@ public:
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_constant_parameters() const override;
-    std::shared_ptr<const IValuelessConstant> get_constant_parameter(const std::string& constant_name) const override;
+    structures::IArray<IValuelessConstant const*>* get_constant_parameters() const override;
+    IValuelessConstant const* get_constant_parameter(std::string const &constant_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> get_variable_parameters() const override;
-    std::shared_ptr<const IValuelessVariable> get_variable_parameter(const std::string& variable_name) const override;
+    structures::IArray<IValuelessVariable const*>* get_variable_parameters() const override;
+    IValuelessVariable const* get_variable_parameter(std::string const &variable_name) const override;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const override;
+    structures::IArray<IValuelessEvent const*>* get_events() const override;
 
-    std::shared_ptr<IDrivingAgent> driving_agent_deep_copy() const override;
+    IDrivingAgent* driving_agent_deep_copy() const override;
 
-    std::shared_ptr<IDrivingAgentState> get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
+    IDrivingAgentState* get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
 
-    void propogate(temporal::Time time, std::shared_ptr<const IDrivingAgentState> state) const;
+    void propogate(temporal::Time time, IDrivingAgentState const *state) const;
 };
 
 }

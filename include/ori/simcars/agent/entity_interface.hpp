@@ -18,7 +18,7 @@ class IEntity
 public:
     virtual ~IEntity() = default;
 
-    virtual std::shared_ptr<IEntity> entity_deep_copy() const = 0;
+    virtual IEntity* entity_deep_copy() const = 0;
 
     virtual std::string get_name() const = 0;
 
@@ -28,15 +28,15 @@ public:
     virtual temporal::Time get_min_temporal_limit() const = 0;
     virtual temporal::Time get_max_temporal_limit() const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> get_constant_parameters() const = 0;
-    virtual std::shared_ptr<const IValuelessConstant> get_constant_parameter(const std::string& constant_name) const = 0;
+    virtual structures::IArray<IValuelessConstant const*>* get_constant_parameters() const = 0;
+    virtual IValuelessConstant const* get_constant_parameter(std::string const &constant_name) const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> get_variable_parameters() const = 0;
-    virtual std::shared_ptr<const IValuelessVariable> get_variable_parameter(const std::string& variable_name) const = 0;
+    virtual structures::IArray<IValuelessVariable const*>* get_variable_parameters() const = 0;
+    virtual IValuelessVariable const* get_variable_parameter(std::string const &variable_name) const = 0;
 
-    virtual std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> get_events() const = 0;
+    virtual structures::IArray<IValuelessEvent const*>* get_events() const = 0;
 
-    virtual std::shared_ptr<IState> get_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
+    virtual IState* get_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
 };
 
 }
