@@ -14,15 +14,6 @@ namespace agent
 template <typename T>
 class AEvent : public virtual IEvent<T>
 {
-protected:
-    bool is_equal(IValuelessEvent const *event) const override
-    {
-        AEvent<T> const *cast_event = dynamic_cast<AEvent<T> const*>(event);
-        return this->get_variable_name() == cast_event->get_variable_name() &&
-                this->get_value() == cast_event->get_value() &&
-                this->get_time() == cast_event->get_time();
-    }
-
 public:
     std::string get_value_as_string() const override
     {

@@ -1,6 +1,7 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/map/lane_interface.hpp>
+#include <ori/simcars/map/lane_array_interface.hpp>
 #include <ori/simcars/agent/defines.hpp>
 #include <ori/simcars/agent/variable_interface.hpp>
 #include <ori/simcars/agent/basic_constant.hpp>

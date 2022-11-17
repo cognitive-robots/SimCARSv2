@@ -2,6 +2,7 @@
 #include <ori/simcars/utils/exceptions.hpp>
 #include <ori/simcars/structures/stl/stl_concat_array.hpp>
 #include <ori/simcars/map/lane_interface.hpp>
+#include <ori/simcars/map/living_lane_stack_array.hpp>
 #include <ori/simcars/agent/defines.hpp>
 #include <ori/simcars/agent/basic_constant.hpp>
 #include <ori/simcars/agent/basic_event.hpp>
@@ -318,12 +319,12 @@ void DrivingGoalExtractionAgent::extract_lane_change_events(map::IMap<std::strin
 
             if (previous_lanes != nullptr)
             {
-                structures::IStackArray<map::ILane<std::string> const*> *continuing_lanes =
-                            new structures::stl::STLStackArray<map::ILane<std::string> const*>;
-                structures::IStackArray<map::ILane<std::string> const*> *left_lanes =
-                            new structures::stl::STLStackArray<map::ILane<std::string> const*>;
-                structures::IStackArray<map::ILane<std::string> const*> *right_lanes =
-                            new structures::stl::STLStackArray<map::ILane<std::string> const*>;
+                map::LivingLaneStackArray<std::string> *continuing_lanes =
+                            new map::LivingLaneStackArray<std::string>;
+                map::LivingLaneStackArray<std::string> *left_lanes =
+                            new map::LivingLaneStackArray<std::string>;
+                map::LivingLaneStackArray<std::string> *right_lanes =
+                            new map::LivingLaneStackArray<std::string>;
                 for (size_t j = 0; j < current_lanes->count(); ++j)
                 {
                     map::ILane<std::string> const *current_lane = (*current_lanes)[j];

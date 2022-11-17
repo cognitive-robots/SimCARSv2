@@ -88,7 +88,7 @@ public:
         structures::IArray<IEvent<T> const*> const *unfiltered_events =
                 time_event_dict.get_values();
         structures::IStackArray<IEvent<T> const*> *filtered_events =
-                new structures::stl::STLStackArray<IEvent<T> const*>());
+                new structures::stl::STLStackArray<IEvent<T> const*>;
 
         for (size_t i = 0; i < unfiltered_events->count(); ++i)
         {

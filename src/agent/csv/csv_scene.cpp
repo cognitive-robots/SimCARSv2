@@ -110,7 +110,7 @@ structures::IArray<IEntity const*>* CSVScene::get_entities() const
 {
     structures::stl::STLStackArray<IEntity const*> *entities =
             new structures::stl::STLStackArray<IEntity const*>(entity_dict.count());
-    entity_dict.get_values(entities)
+    entity_dict.get_values(entities);
     return entities;
 }
 

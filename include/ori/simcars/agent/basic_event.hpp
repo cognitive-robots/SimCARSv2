@@ -30,7 +30,7 @@ public:
 
     IEvent<T>* shallow_copy() const override
     {
-        return new BasicEvent<T>(variable_name, value, time));
+        return new BasicEvent<T>(variable_name, value, time);
     }
 
     std::string get_variable_name() const override
