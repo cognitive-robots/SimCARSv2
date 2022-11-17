@@ -14,22 +14,21 @@ namespace simcars
 namespace agent
 {
 
-std::shared_ptr<const DrivingGoalExtractionScene> DrivingGoalExtractionScene::construct_from(std::shared_ptr<const IDrivingScene> driving_scene)
+DrivingGoalExtractionScene const* DrivingGoalExtractionScene::construct_from(IDrivingScene const *driving_scene)
 {
-    std::shared_ptr<DrivingGoalExtractionScene> new_driving_scene(new DrivingGoalExtractionScene());
+    DrivingGoalExtractionScene *new_driving_scene = new DrivingGoalExtractionScene;
 
     new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
     new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
     new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
     new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> driving_agents =
+    structures::IArray<IDrivingAgent const*> *driving_agents =
             driving_scene->get_driving_agents();
 
     for(size_t i = 0; i < driving_agents->count(); ++i)
     {
-        std::shared_ptr<IDrivingAgent> driving_goal_extraction_agent =
-                std::shared_ptr<IDrivingAgent>(new DrivingGoalExtractionAgent((*driving_agents)[i]));
+        IDrivingAgent *driving_goal_extraction_agent = new DrivingGoalExtractionAgent((*driving_agents)[i]);
 
         new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(), driving_goal_extraction_agent);
     }
@@ -37,10 +36,10 @@ std::shared_ptr<const DrivingGoalExtractionScene> DrivingGoalExtractionScene::co
     return new_driving_scene;
 }
 
-std::shared_ptr<const DrivingGoalExtractionScene> DrivingGoalExtractionScene::construct_from(std::shared_ptr<const IDrivingScene> driving_scene,
-                                                                           std::shared_ptr<const map::IMap<std::string>> map)
+DrivingGoalExtractionScene const* DrivingGoalExtractionScene::construct_from(IDrivingScene const *driving_scene,
+                                                                             map::IMap<std::string> const *map)
 {
-    std::shared_ptr<DrivingGoalExtractionScene> new_driving_scene(new DrivingGoalExtractionScene());
+    DrivingGoalExtractionScene *new_driving_scene = new DrivingGoalExtractionScene;
 
     new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
     new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
@@ -49,13 +48,12 @@ std::shared_ptr<const DrivingGoalExtractionScene> DrivingGoalExtractionScene::co
 
     new_driving_scene->map = map;
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> driving_agents =
+    structures::IArray<IDrivingAgent const*> *driving_agents =
             driving_scene->get_driving_agents();
 
     for(size_t i = 0; i < driving_agents->count(); ++i)
     {
-        std::shared_ptr<IDrivingAgent> driving_goal_extraction_agent =
-                std::shared_ptr<IDrivingAgent>(new DrivingGoalExtractionAgent((*driving_agents)[i], map));
+        IDrivingAgent *driving_goal_extraction_agent = new DrivingGoalExtractionAgent((*driving_agents)[i], map);
 
         new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(), driving_goal_extraction_agent);
     }
@@ -83,21 +81,21 @@ temporal::Time DrivingGoalExtractionScene::get_max_temporal_limit() const
     return max_temporal_limit;
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> DrivingGoalExtractionScene::get_entities() const
+structures::IArray<IEntity const*>* DrivingGoalExtractionScene::get_entities() const
 {
-    const std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> driving_agents = this->get_driving_agents();
-    const std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities(
-                new structures::stl::STLStackArray<std::shared_ptr<const IEntity>>(driving_agents->count()));
+    structures::IArray<IDrivingAgent const*>* const driving_agents = this->get_driving_agents();
+    structures::IArray<IEntity const*>* const entities =
+                new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
     cast_array(*driving_agents, *entities);
     return entities;
 }
 
-std::shared_ptr<const IEntity> DrivingGoalExtractionScene::get_entity(const std::string& entity_name) const
+IEntity const* DrivingGoalExtractionScene::get_entity(const std::string& entity_name) const
 {
     return this->get_driving_agent(entity_name);
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> DrivingGoalExtractionScene::get_driving_agents() const
+structures::IArray<IDrivingAgent const*>* DrivingGoalExtractionScene::get_driving_agents() const
 {
     structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
             new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.count());
@@ -105,7 +103,7 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> Drivin
     return driving_agents;
 }
 
-std::shared_ptr<const IDrivingAgent> DrivingGoalExtractionScene::get_driving_agent(const std::string& driving_agent_name) const
+IDrivingAgent const* DrivingGoalExtractionScene::get_driving_agent(const std::string& driving_agent_name) const
 {
     return driving_agent_dict[driving_agent_name];
 }
@@ -115,7 +113,7 @@ bool DrivingGoalExtractionScene::has_map() const
     return map != nullptr;
 }
 
-std::shared_ptr<const map::IMap<std::string>> DrivingGoalExtractionScene::get_map() const
+map::IMap<std::string> const* DrivingGoalExtractionScene::get_map() const
 {
     return map;
 }

@@ -22,17 +22,17 @@ DrivingGoalExtractionAgent::DrivingGoalExtractionAgent() {}
 
 void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
 {
-    std::shared_ptr<const IVariable<FP_DATA_TYPE>> aligned_linear_velocity_variable =
+    IVariable<FP_DATA_TYPE> const *aligned_linear_velocity_variable =
             this->get_aligned_linear_velocity_variable();
-    std::shared_ptr<const IVariable<FP_DATA_TYPE>> aligned_linear_acceleration_variable =
+    IVariable<FP_DATA_TYPE> const *aligned_linear_acceleration_variable =
             this->get_aligned_linear_acceleration_variable();
 
-    std::shared_ptr<IVariable<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_variable(
+    IVariable<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_variable =
                 new BasicVariable<FP_DATA_TYPE>(
-                    this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL_VALUE));
-    std::shared_ptr<IVariable<temporal::Duration>> aligned_linear_velocity_goal_duration_variable(
+                    this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL_VALUE);
+    IVariable<temporal::Duration> *aligned_linear_velocity_goal_duration_variable =
                 new BasicVariable<temporal::Duration>(
-                    this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL_DURATION));
+                    this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL_DURATION);
 
     temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_ALIGNED_LINEAR_VELOCITY_CHANGE_DURATION_THRESHOLD));
 
@@ -59,16 +59,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                              && std::abs(aligned_linear_velocity_variable->get_value(current_time) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
                                 || action_start_time == this->get_min_temporal_limit())
                         {
-                            std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time),
-                                                                                                                                   action_start_time));
+                                                                                                                                   action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
-                                std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                       current_time - current_time_2,
-                                                                                                                                                      current_time_2));
+                                                                                                                                                      current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                             }
                         }
@@ -81,16 +81,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                             || (current_time + time_step > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
-                        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                aligned_linear_velocity_variable->get_value(current_time - time_step),
-                                                                                                                               action_start_time));
+                                                                                                                               action_start_time);
                         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                   (current_time - time_step) - current_time_2,
-                                                                                                                                                  current_time_2));
+                                                                                                                                                  current_time_2);
                             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                         }
                     }
@@ -105,16 +105,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                             || (current_time + time_step > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
-                        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                aligned_linear_velocity_variable->get_value(current_time),
-                                                                                                                               action_start_time));
+                                                                                                                               action_start_time);
                         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                   current_time - current_time_2,
-                                                                                                                                                  current_time_2));
+                                                                                                                                                  current_time_2);
                             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                         }
                     }
@@ -129,16 +129,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                             || (current_time + time_step > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
-                        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                aligned_linear_velocity_variable->get_value(current_time - time_step),
-                                                                                                                               action_start_time));
+                                                                                                                               action_start_time);
                         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                   (current_time - time_step) - current_time_2,
-                                                                                                                                                  current_time_2));
+                                                                                                                                                  current_time_2);
                             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                         }
                     }
@@ -156,16 +156,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                              && std::abs(aligned_linear_velocity_variable->get_value(current_time) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
                                 || action_start_time == this->get_min_temporal_limit())
                         {
-                            std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time),
-                                                                                                                                   action_start_time));
+                                                                                                                                   action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
-                                std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                       current_time - current_time_2,
-                                                                                                                                                      current_time_2));
+                                                                                                                                                      current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                             }
                         }
@@ -178,16 +178,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                             || (current_time + time_step > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
-                        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                aligned_linear_velocity_variable->get_value(current_time),
-                                                                                                                               action_start_time));
+                                                                                                                               action_start_time);
                         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                   current_time - current_time_2,
-                                                                                                                                                  current_time_2));
+                                                                                                                                                  current_time_2);
                             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                         }
                     }
@@ -199,16 +199,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                 {
                     if (action_start_time == this->get_min_temporal_limit())
                     {
-                        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                aligned_linear_velocity_variable->get_value(current_time - time_step),
-                                                                                                                               action_start_time));
+                                                                                                                               action_start_time);
                         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                   (current_time - time_step) - current_time_2,
-                                                                                                                                                  current_time_2));
+                                                                                                                                                  current_time_2);
                             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                         }
                     }
@@ -220,16 +220,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
                 {
                     if (action_start_time == this->get_min_temporal_limit())
                     {
-                        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                aligned_linear_velocity_variable->get_value(current_time - time_step),
-                                                                                                                               action_start_time));
+                                                                                                                               action_start_time);
                         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                   (current_time - time_step) - current_time_2,
-                                                                                                                                                  current_time_2));
+                                                                                                                                                  current_time_2);
                             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                         }
                     }
@@ -243,16 +243,16 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
 
                     if (current_time + time_step > this->get_max_temporal_limit() && action_start_time == this->get_min_temporal_limit())
                     {
-                        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                                aligned_linear_velocity_variable->get_value(current_time),
-                                                                                                                               action_start_time));
+                                                                                                                               action_start_time);
                         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                                                   current_time - current_time_2,
-                                                                                                                                                  current_time_2));
+                                                                                                                                                  current_time_2);
                             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
                         }
                     }
@@ -268,14 +268,14 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
     if (aligned_linear_velocity_goal_value_variable->get_events()->count() == 0 ||
             aligned_linear_velocity_goal_value_variable->get_min_temporal_limit() > this->get_min_temporal_limit())
     {
-        std::shared_ptr<IEvent<FP_DATA_TYPE>> aligned_linear_velocity_goal_value_event(new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+        IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
                                                                                                                aligned_linear_velocity_variable->get_value(this->get_min_temporal_limit()),
-                                                                                                               this->get_min_temporal_limit()));
+                                                                                                               this->get_min_temporal_limit());
         aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
-        std::shared_ptr<IEvent<temporal::Duration>> aligned_linear_velocity_goal_duration_event(new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+        IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
                                                                                                                               temporal::Duration(0),
-                                                                                                                              this->get_min_temporal_limit()));
+                                                                                                                              this->get_min_temporal_limit());
         aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
     }
 
@@ -283,31 +283,31 @@ void DrivingGoalExtractionAgent::extract_aligned_linear_velocity_change_events()
     this->variable_dict.update(aligned_linear_velocity_goal_duration_variable->get_full_name(), aligned_linear_velocity_goal_duration_variable);
 }
 
-void DrivingGoalExtractionAgent::extract_lane_change_events(std::shared_ptr<const map::IMap<std::string> > map)
+void DrivingGoalExtractionAgent::extract_lane_change_events(map::IMap<std::string> const *map)
 {
-    std::shared_ptr<const IVariable<geometry::Vec>> position_variable = this->get_position_variable();
+    IVariable<geometry::Vec> const *position_variable = this->get_position_variable();
 
     temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_LANE_CHANGE_DURATION_THRESHOLD));
 
-    std::shared_ptr<IVariable<int32_t>> lane_goal_value_variable(
+    IVariable<int32_t> *lane_goal_value_variable =
                 new BasicVariable<int32_t>(
-                    this->get_name(), "lane", IValuelessVariable::Type::GOAL_VALUE));
-    std::shared_ptr<IVariable<temporal::Duration>> lane_goal_duration_variable(
+                    this->get_name(), "lane", IValuelessVariable::Type::GOAL_VALUE);
+    IVariable<temporal::Duration> *lane_goal_duration_variable =
                 new BasicVariable<temporal::Duration>(
-                    this->get_name(), "lane", IValuelessVariable::Type::GOAL_DURATION));
+                    this->get_name(), "lane", IValuelessVariable::Type::GOAL_DURATION);
 
     temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
     temporal::Time current_time;
     temporal::Time action_start_time;
     temporal::Time lane_change_time = temporal::Time::max();
     int32_t lane_change_offset = 0;
-    std::shared_ptr<const map::ILaneArray<std::string>> previous_lanes = nullptr;
+    map::ILaneArray<std::string> const *previous_lanes = nullptr;
     for (current_time = this->get_min_temporal_limit(); current_time <= this->get_max_temporal_limit(); current_time += time_step)
     {
         try
         {
             geometry::Vec current_position = position_variable->get_value(current_time);
-            std::shared_ptr<const map::ILaneArray<std::string>> current_lanes =
+            map::ILaneArray<std::string> const *current_lanes =
                     map->get_encapsulating_lanes(current_position);
 
             if (current_lanes->count() == 0)
@@ -318,18 +318,18 @@ void DrivingGoalExtractionAgent::extract_lane_change_events(std::shared_ptr<cons
 
             if (previous_lanes != nullptr)
             {
-                std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>> continuing_lanes(
-                            new structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>());
-                std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>> left_lanes(
-                            new structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>());
-                std::shared_ptr<structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>> right_lanes(
-                            new structures::stl::STLStackArray<std::shared_ptr<const map::ILane<std::string>>>());
+                structures::IStackArray<map::ILane<std::string> const*> *continuing_lanes =
+                            new structures::stl::STLStackArray<map::ILane<std::string> const*>;
+                structures::IStackArray<map::ILane<std::string> const*> *left_lanes =
+                            new structures::stl::STLStackArray<map::ILane<std::string> const*>;
+                structures::IStackArray<map::ILane<std::string> const*> *right_lanes =
+                            new structures::stl::STLStackArray<map::ILane<std::string> const*>;
                 for (size_t j = 0; j < current_lanes->count(); ++j)
                 {
-                    std::shared_ptr<const map::ILane<std::string>> current_lane = (*current_lanes)[j];
+                    map::ILane<std::string> const *current_lane = (*current_lanes)[j];
                     for (size_t k = 0; k < previous_lanes->count(); ++k)
                     {
-                        std::shared_ptr<const map::ILane<std::string>> previous_lane = (*previous_lanes)[k];
+                        map::ILane<std::string> const *previous_lane = (*previous_lanes)[k];
                         if (current_lane == previous_lane || current_lane->get_aft_lanes()->contains(previous_lane))
                         {
                             continuing_lanes->push_back(current_lane);
@@ -384,16 +384,16 @@ void DrivingGoalExtractionAgent::extract_lane_change_events(std::shared_ptr<cons
                 {
                     if (lane_change_offset != 0)
                     {
-                        std::shared_ptr<IEvent<int32_t>> lane_goal_value_event(new BasicEvent<int32_t>(lane_goal_value_variable->get_full_name(),
+                        IEvent<int32_t> *lane_goal_value_event = new BasicEvent<int32_t>(lane_goal_value_variable->get_full_name(),
                                                                                                   lane_change_offset,
-                                                                                                  action_start_time));
+                                                                                                  action_start_time);
                         lane_goal_value_variable->add_event(lane_goal_value_event);
 
                         for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                         {
-                            std::shared_ptr<IEvent<temporal::Duration>> lane_goal_duration_event(new BasicEvent<temporal::Duration>(lane_goal_duration_variable->get_full_name(),
+                            IEvent<temporal::Duration> *lane_goal_duration_event = new BasicEvent<temporal::Duration>(lane_goal_duration_variable->get_full_name(),
                                                                                                                                current_time - current_time_2,
-                                                                                                                               current_time_2));
+                                                                                                                               current_time_2);
                             lane_goal_duration_variable->add_event(lane_goal_duration_event);
                         }
                     }
@@ -425,10 +425,10 @@ void DrivingGoalExtractionAgent::extract_lane_change_events(std::shared_ptr<cons
     this->variable_dict.update(lane_goal_duration_variable->get_full_name(), lane_goal_duration_variable);
 }
 
-DrivingGoalExtractionAgent::DrivingGoalExtractionAgent(std::shared_ptr<const IDrivingAgent> driving_agent)
+DrivingGoalExtractionAgent::DrivingGoalExtractionAgent(IDrivingAgent const *driving_agent)
     : driving_agent(driving_agent)
 {
-    std::shared_ptr<const structures::IArray<std::shared_ptr<const IValuelessVariable>>> variables =
+    structures::IArray<IValuelessVariable const*> const *variables =
             driving_agent->get_variable_parameters();
     for(size_t i = 0; i < variables->count(); ++i)
     {
@@ -438,8 +438,8 @@ DrivingGoalExtractionAgent::DrivingGoalExtractionAgent(std::shared_ptr<const IDr
     this->extract_aligned_linear_velocity_change_events();
 }
 
-DrivingGoalExtractionAgent::DrivingGoalExtractionAgent(std::shared_ptr<const IDrivingAgent> driving_agent,
-                                                       std::shared_ptr<const map::IMap<std::string>> map)
+DrivingGoalExtractionAgent::DrivingGoalExtractionAgent(IDrivingAgent const *driving_agent,
+                                                       map::IMap<std::string> const *map)
     : DrivingGoalExtractionAgent(driving_agent)
 {
     this->extract_lane_change_events(map);
@@ -470,33 +470,32 @@ temporal::Time DrivingGoalExtractionAgent::get_max_temporal_limit() const
     return this->driving_agent->get_max_temporal_limit();
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> DrivingGoalExtractionAgent::get_constant_parameters() const
+structures::IArray<IValuelessConstant const*>* DrivingGoalExtractionAgent::get_constant_parameters() const
 {
     return this->driving_agent->get_constant_parameters();
 }
 
-std::shared_ptr<const IValuelessConstant> DrivingGoalExtractionAgent::get_constant_parameter(const std::string& constant_name) const
+IValuelessConstant const* DrivingGoalExtractionAgent::get_constant_parameter(std::string const &constant_name) const
 {
     return this->driving_agent->get_constant_parameter(constant_name);
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> DrivingGoalExtractionAgent::get_variable_parameters() const
+structures::IArray<IValuelessVariable const*>* DrivingGoalExtractionAgent::get_variable_parameters() const
 {
-    return std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>>(
-            new structures::stl::STLStackArray<std::shared_ptr<const IValuelessVariable>>(variable_dict.get_values()));
+    return new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.get_values());
 }
 
-std::shared_ptr<const IValuelessVariable> DrivingGoalExtractionAgent::get_variable_parameter(const std::string& variable_name) const
+IValuelessVariable const* DrivingGoalExtractionAgent::get_variable_parameter(std::string const &variable_name) const
 {
     return variable_dict[variable_name];
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> DrivingGoalExtractionAgent::get_events() const
+structures::IArray<IValuelessEvent const*>* DrivingGoalExtractionAgent::get_events() const
 {
-    std::shared_ptr<const structures::IArray<std::string>> variable_names = variable_dict.get_keys();
+    structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
 
-    std::shared_ptr<structures::stl::STLConcatArray<std::shared_ptr<const IValuelessEvent>>> events(
-                new structures::stl::STLConcatArray<std::shared_ptr<const IValuelessEvent>>(variable_names->count()));
+    structures::stl::STLConcatArray<IValuelessEvent const*> *events =
+                new structures::stl::STLConcatArray<IValuelessEvent const*>(variable_names->count());
 
     size_t i;
     for(i = 0; i < variable_names->count(); ++i)
@@ -507,13 +506,13 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> Driv
     return events;
 }
 
-std::shared_ptr<IDrivingAgent> DrivingGoalExtractionAgent::driving_agent_deep_copy() const
+IDrivingAgent* DrivingGoalExtractionAgent::driving_agent_deep_copy() const
 {
-    std::shared_ptr<DrivingGoalExtractionAgent> driving_agent(new DrivingGoalExtractionAgent());
+    DrivingGoalExtractionAgent *driving_agent = new DrivingGoalExtractionAgent;
 
     driving_agent->driving_agent = this->driving_agent;
 
-    std::shared_ptr<const structures::IArray<std::string>> variable_names = this->variable_dict.get_keys();
+    structures::IArray<std::string> const *variable_names = this->variable_dict.get_keys();
     for(size_t i = 0; i < variable_names->count(); ++i)
     {
         driving_agent->variable_dict.update((*variable_names)[i], variable_dict[(*variable_names)[i]]->valueless_deep_copy());
@@ -522,12 +521,13 @@ std::shared_ptr<IDrivingAgent> DrivingGoalExtractionAgent::driving_agent_deep_co
     return driving_agent;
 }
 
-std::shared_ptr<IDrivingAgentState> DrivingGoalExtractionAgent::get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const
+IDrivingAgentState* DrivingGoalExtractionAgent::get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const
 {
-    std::shared_ptr<IDrivingAgentState> driving_agent_state =
+    IDrivingAgentState *driving_agent_state =
             driving_agent->get_driving_agent_state(time, throw_on_out_of_range);
 
-    std::shared_ptr<GoalDrivingAgentState> goal_driving_agent_state(new GoalDrivingAgentState(driving_agent_state));
+    GoalDrivingAgentState *goal_driving_agent_state =
+            new GoalDrivingAgentState(driving_agent_state);
 
     try
     {
@@ -536,23 +536,21 @@ std::shared_ptr<IDrivingAgentState> DrivingGoalExtractionAgent::get_driving_agen
             //std::cerr << "DrivingGoalExtractionAgent: " << this->get_variable_parameter(this->get_name() + ".aligned_linear_velocity.goal_value")->get_min_temporal_limit().time_since_epoch().count() << std::endl;
         }
         goal_driving_agent_state->set_aligned_linear_velocity_goal_value_variable(
-                    std::shared_ptr<const IConstant<FP_DATA_TYPE>>(
                         new BasicConstant(
                             this->get_name(),
                             "aligned_linear_velocity.goal_value",
-                            std::dynamic_pointer_cast<const IVariable<FP_DATA_TYPE>>(
+                            dynamic_cast<IVariable<FP_DATA_TYPE> const*>(
                                 this->get_variable_parameter(
-                                    this->get_name() + ".aligned_linear_velocity.goal_value"))->get_value(time))));
+                                    this->get_name() + ".aligned_linear_velocity.goal_value"))->get_value(time)));
         goal_driving_agent_state->set_aligned_linear_velocity_goal_duration_variable(
-                    std::shared_ptr<const IConstant<temporal::Duration>>(
                         new BasicConstant(
                             this->get_name(),
                             "aligned_linear_velocity.goal_duration",
-                            std::dynamic_pointer_cast<const IVariable<temporal::Duration>>(
+                            dynamic_cast<IVariable<temporal::Duration> const*>(
                                 this->get_variable_parameter(
-                                    this->get_name() + ".aligned_linear_velocity.goal_duration"))->get_value(time))));
+                                    this->get_name() + ".aligned_linear_velocity.goal_duration"))->get_value(time)));
     }
-    catch (std::out_of_range e)
+    catch (std::out_of_range const &e)
     {
         //std::cerr << "At error time was: " << this->get_variable_parameter(this->get_name() + ".aligned_linear_velocity.goal_value")->get_min_temporal_limit().time_since_epoch().count() << std::endl;
         if (throw_on_out_of_range)

@@ -15,17 +15,16 @@ namespace agent
 namespace lyft
 {
 
-std::shared_ptr<const LyftScene> LyftScene::construct_from(std::shared_ptr<const IDrivingScene> driving_scene)
+LyftScene const* LyftScene::construct_from(IDrivingScene const *driving_scene)
 {
-    std::shared_ptr<LyftScene> new_driving_scene(new LyftScene());
+    LyftScene *new_driving_scene = new LyftScene();
 
     new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
     new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
     new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
     new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> driving_agents =
-            driving_scene->get_driving_agents();
+    structures::IArray<IDrivingAgent const*> *driving_agents = driving_scene->get_driving_agents();
 
     size_t i;
     for(i = 0; i < driving_agents->count(); ++i)
@@ -41,7 +40,7 @@ void LyftScene::save_virt(std::ofstream &output_filestream) const
     throw utils::NotImplementedException();
 }
 
-void LyftScene::load_virt(std::ifstream& input_filestream)
+void LyftScene::load_virt(std::ifstream &input_filestream)
 {
     lz4_stream::istream input_lz4_stream(input_filestream);
     rapidjson::BasicIStreamWrapper input_lz4_json_stream(input_lz4_stream);
@@ -57,11 +56,11 @@ void LyftScene::load_virt(std::ifstream& input_filestream)
     FP_DATA_TYPE min_position_y = std::numeric_limits<FP_DATA_TYPE>::max();
     FP_DATA_TYPE max_position_y = std::numeric_limits<FP_DATA_TYPE>::min();
 
-    for (const rapidjson::Value& json_document_element : json_document.GetArray())
+    for (rapidjson::Value const &json_document_element : json_document.GetArray())
     {
-        const rapidjson::Value::ConstObject& json_agent_data = json_document_element.GetObject();
+        rapidjson::Value::ConstObject const &json_agent_data = json_document_element.GetObject();
 
-        std::shared_ptr<const LyftDrivingAgent> driving_agent(new LyftDrivingAgent(json_agent_data));
+        LyftDrivingAgent const *driving_agent = new LyftDrivingAgent(json_agent_data);
 
         driving_agent_dict.update(driving_agent->get_name(), driving_agent);
 
@@ -101,21 +100,21 @@ temporal::Time LyftScene::get_max_temporal_limit() const
     return this->max_temporal_limit;
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> LyftScene::get_entities() const
+structures::IArray<IEntity const*>* LyftScene::get_entities() const
 {
-    const std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> driving_agents = this->get_driving_agents();
-    const std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities(
-                new structures::stl::STLStackArray<std::shared_ptr<const IEntity>>(driving_agents->count()));
+    structures::IArray<IDrivingAgent const*>* const driving_agents = this->get_driving_agents();
+    structures::IArray<IEntity const*>* const entities =
+            new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
     cast_array(*driving_agents, *entities);
     return entities;
 }
 
-std::shared_ptr<const IEntity> LyftScene::get_entity(const std::string& entity_name) const
+IEntity const* LyftScene::get_entity(std::string const &entity_name) const
 {
     return this->get_driving_agent(entity_name);
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> LyftScene::get_driving_agents() const
+structures::IArray<IDrivingAgent const*>* LyftScene::get_driving_agents() const
 {
     structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
             new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.count());
@@ -123,7 +122,7 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IDrivingAgent>>> LyftSc
     return driving_agents;
 }
 
-std::shared_ptr<const IDrivingAgent> LyftScene::get_driving_agent(const std::string& driving_agent_name) const
+IDrivingAgent const* LyftScene::get_driving_agent(std::string const &driving_agent_name) const
 {
     return driving_agent_dict[driving_agent_name];
 }

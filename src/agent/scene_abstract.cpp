@@ -9,12 +9,12 @@ namespace simcars
 namespace agent
 {
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> AScene::get_constants() const
+structures::IArray<IValuelessConstant const*>* AScene::get_constants() const
 {
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = this->get_entities();
+    structures::IArray<IEntity const*> *entities = this->get_entities();
 
-    std::shared_ptr<structures::stl::STLConcatArray<std::shared_ptr<const IValuelessConstant>>> constants(
-                new structures::stl::STLConcatArray<std::shared_ptr<const IValuelessConstant>>(entities->count()));
+    structures::stl::STLConcatArray<IValuelessConstant const*> *constants =
+            new structures::stl::STLConcatArray<IValuelessConstant const*>(entities->count());
 
     size_t i;
     for(i = 0; i < entities->count(); ++i)
@@ -25,17 +25,17 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessConstant>>> A
     return constants;
 }
 
-std::shared_ptr<const IValuelessConstant> AScene::get_constant(const std::string& constant_name) const
+IValuelessConstant const* AScene::get_constant(std::string const &constant_name) const
 {
     return this->get_entity(constant_name.substr(0, constant_name.find(".")))->get_constant_parameter(constant_name);
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> AScene::get_variables() const
+structures::IArray<IValuelessVariable const*>* AScene::get_variables() const
 {
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = this->get_entities();
+    structures::IArray<IEntity const*> *entities = this->get_entities();
 
-    std::shared_ptr<structures::stl::STLConcatArray<std::shared_ptr<const IValuelessVariable>>> variables(
-                new structures::stl::STLConcatArray<std::shared_ptr<const IValuelessVariable>>(entities->count()));
+    structures::stl::STLConcatArray<IValuelessVariable const*> *variables =
+            new structures::stl::STLConcatArray<IValuelessVariable const*>(entities->count());
 
     size_t i;
     for(i = 0; i < entities->count(); ++i)
@@ -46,17 +46,17 @@ std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessVariable>>> A
     return variables;
 }
 
-std::shared_ptr<const IValuelessVariable> AScene::get_variable(const std::string& variable_name) const
+IValuelessVariable const* AScene::get_variable(std::string const &variable_name) const
 {
     return this->get_entity(variable_name.substr(0, variable_name.find(".")))->get_variable_parameter(variable_name);
 }
 
-std::shared_ptr<structures::IArray<std::shared_ptr<const IValuelessEvent>>> AScene::get_events() const
+structures::IArray<IValuelessEvent const*>* AScene::get_events() const
 {
-    std::shared_ptr<structures::IArray<std::shared_ptr<const IEntity>>> entities = this->get_entities();
+    structures::IArray<IEntity const*> *entities = this->get_entities();
 
-    std::shared_ptr<structures::stl::STLConcatArray<std::shared_ptr<const IValuelessEvent>>> events(
-                new structures::stl::STLConcatArray<std::shared_ptr<const IValuelessEvent>>(entities->count()));
+    structures::stl::STLConcatArray<IValuelessEvent const*> *events =
+            new structures::stl::STLConcatArray<IValuelessEvent const*>(entities->count());
 
     size_t i;
     for(i = 0; i < entities->count(); ++i)
