@@ -1,4 +1,5 @@
 
+#include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/agent/lyft/lyft_scene.hpp>
 
 #include <iostream>
@@ -6,7 +7,7 @@
 
 using namespace ori::simcars;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
@@ -14,19 +15,25 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
+
     std::cout << "Beginning scene load" << std::endl;
 
-    std::shared_ptr<const agent::IScene> scene;
+    agent::IScene const *scene;
 
     try
     {
         scene = agent::lyft::LyftScene::load(argv[1]);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during scene load:" << std::endl << e.what() << std::endl;
         return -1;
     }
 
     std::cout << "Finished scene load" << std::endl;
+
+    delete scene;
+
+    geometry::TrigBuff::destroy_instance();
 }

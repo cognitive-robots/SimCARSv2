@@ -32,6 +32,8 @@ IDrivingSceneState* ADrivingScene::get_driving_scene_state(temporal::Time time) 
         }
     }
 
+    delete driving_agents;
+
     return driving_scene_state;
 }
 

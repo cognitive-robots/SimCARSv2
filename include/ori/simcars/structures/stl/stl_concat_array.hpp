@@ -21,9 +21,17 @@ protected:
     std::vector<IArray<T>*> data;
 
 public:
-    STLConcatArray(size_t size = 0) : data(size) {}
+    STLConcatArray(size_t size = 0) : data(size, nullptr) {}
     STLConcatArray(std::initializer_list<IArray<T> const*> init_list) : data(init_list) {}
     STLConcatArray(STLConcatArray<T> const &stl_concat_array) : data(stl_concat_array.data) {}
+
+    ~STLConcatArray()
+    {
+        for (IArray<T> *array : data)
+        {
+            delete array;
+        }
+    }
 
     size_t count() const override
     {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ori/simcars/agent/constant_interface.hpp>
+#include <ori/simcars/agent/valueless_constant_abstract.hpp>
 
 #include <sstream>
 
@@ -12,14 +13,9 @@ namespace agent
 {
 
 template <typename T>
-class AConstant : public virtual IConstant<T>
+class AConstant : public virtual IConstant<T>, public virtual AValuelessConstant
 {
 public:
-    std::string get_full_name() const override
-    {
-        return this->get_entity_name() + "." + this->get_parameter_name();
-    }
-
     std::string get_value_as_string() const override
     {
         std::stringstream string_stream;

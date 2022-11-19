@@ -52,7 +52,6 @@ public:
                       size_t max_cache_size = 10) :
         SimulatedVariable(original_variable, simulation_scene, simulation_start_time, original_variable->get_max_temporal_limit(),
                           max_cache_size) {}
-
     SimulatedVariable(IVariable<T> const *original_variable,
                       ISimulationScene const *simulation_scene,
                       temporal::Time simulation_start_time, temporal::Time simulation_end_time,
@@ -74,6 +73,16 @@ public:
         if (simulation_start_time > simulation_end_time)
         {
             throw std::invalid_argument("Simulation start time is after simulation end time");
+        }
+    }
+
+    ~SimulatedVariable()
+    {
+        structures::IArray<IEvent<T> const*> const *events = time_event_dict.get_values();
+
+        for (size_t i = 0; i < events->count(); ++i)
+        {
+            delete (*events)[i];
         }
     }
 
@@ -207,6 +216,11 @@ public:
         }
         else
         {
+            if (time_event_dict.contains(event->get_time()))
+            {
+                delete time_event_dict[event->get_time()];
+            }
+
             time_event_dict.update(event->get_time(), event);
 
             return true;

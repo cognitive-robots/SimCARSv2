@@ -10,7 +10,7 @@
 
 using namespace ori::simcars;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc < 3)
     {
@@ -18,17 +18,17 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
+    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
     std::cout << "Beginning map load" << std::endl;
 
-    std::shared_ptr<const map::IMap<std::string>> map;
+    map::IMap<std::string> const *map;
 
     try
     {
         map = map::lyft::LyftMap::load(argv[1]);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during map load:" << std::endl << e.what() << std::endl;
         return -1;
@@ -38,13 +38,13 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    std::shared_ptr<const agent::IDrivingScene> scene;
+    agent::IDrivingScene const *scene;
 
     try
     {
         scene = agent::lyft::LyftScene::load(argv[2]);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during scene load:" << std::endl << e.what() << std::endl;
         return -1;
@@ -57,13 +57,13 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning action extraction" << std::endl;
 
-    std::shared_ptr<const agent::IDrivingScene> scene_with_actions;
+    agent::IDrivingScene const *scene_with_actions;
 
     try
     {
         scene_with_actions = agent::DrivingGoalExtractionScene::construct_from(scene, map);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during action extraction:" << std::endl << e.what() << std::endl;
         return -1;
@@ -74,18 +74,26 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning scene save" << std::endl;
 
-    std::shared_ptr<const agent::IFileBasedScene> csv_scene_with_actions;
+    agent::IFileBasedScene const *csv_scene_with_actions;
 
     try
     {
         csv_scene_with_actions = agent::csv::CSVScene::construct_from(scene_with_actions);
         csv_scene_with_actions->save(argv[3]);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during scene save:" << std::endl << e.what() << std::endl;
         return -1;
     }
 
     std::cout << "Finished scene save" << std::endl;
+
+    delete csv_scene_with_actions;
+    delete scene_with_actions;
+    delete scene;
+
+    delete map;
+
+    geometry::TrigBuff::destroy_instance();
 }

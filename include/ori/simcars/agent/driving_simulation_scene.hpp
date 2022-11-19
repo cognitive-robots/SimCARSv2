@@ -28,6 +28,8 @@ class DrivingSimulationScene : public virtual ADrivingScene, public virtual ISim
     structures::stl::STLDictionary<std::string, IDrivingAgent const*> driving_agent_dict;
 
 public:
+    ~DrivingSimulationScene();
+
     static DrivingSimulationScene const* construct_from(IDrivingScene const *driving_scene,
                                                         IDrivingSimulator const *driving_simulator,
                                                         temporal::Duration time_step,

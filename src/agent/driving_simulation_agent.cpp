@@ -126,6 +126,16 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agen
     }
 }
 
+DrivingSimulationAgent::~DrivingSimulationAgent()
+{
+    structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables = simulated_variable_dict.get_values();
+
+    for (size_t i = 0; i < simulated_variables->count(); ++i)
+    {
+        delete (*simulated_variables)[i];
+    }
+}
+
 std::string DrivingSimulationAgent::get_name() const
 {
     return this->driving_agent->get_name();

@@ -4,6 +4,7 @@ project(simcars VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -167,6 +168,8 @@ target_compile_options(simcars_map PRIVATE -fPIC)
 set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_agent STATIC
+  src/agent/valueless_constant_abstract.cpp
+  src/agent/valueless_variable_abstract.cpp
   src/agent/driving_agent_state_abstract.cpp
   src/agent/driving_agent_abstract.cpp
   src/agent/scene_abstract.cpp
@@ -206,6 +209,8 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/simulation_scene_interface.hpp
   include/ori/simcars/agent/driving_agent_controller_interface.hpp
   include/ori/simcars/agent/driving_simulator_interface.hpp
+  include/ori/simcars/agent/valueless_constant_abstract.hpp
+  include/ori/simcars/agent/valueless_variable_abstract.hpp
   include/ori/simcars/agent/constant_abstract.hpp
   include/ori/simcars/agent/event_abstract.hpp
   include/ori/simcars/agent/variable_abstract.hpp

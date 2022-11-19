@@ -24,6 +24,8 @@ protected:
     DrivingGoalExtractionScene() : map(nullptr) {}
 
 public:
+    ~DrivingGoalExtractionScene();
+
     static DrivingGoalExtractionScene const* construct_from(IDrivingScene const *driving_scene);
     static DrivingGoalExtractionScene const* construct_from(IDrivingScene const *driving_scene,
                                                             map::IMap<std::string> const *map);

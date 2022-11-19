@@ -2,8 +2,6 @@
 
 #include <ori/simcars/agent/event_interface.hpp>
 
-#include <sstream>
-
 namespace ori
 {
 namespace simcars

@@ -37,6 +37,8 @@ public:
                            temporal::Time simulation_start_time, temporal::Time simulation_end_time,
                            bool allow_late_start = true);
 
+    ~DrivingSimulationAgent();
+
     std::string get_name() const override;
 
     geometry::Vec get_min_spatial_limits() const override;

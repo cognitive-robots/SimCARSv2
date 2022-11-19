@@ -26,6 +26,8 @@ public:
     DrivingGoalExtractionAgent(IDrivingAgent const *driving_agent);
     DrivingGoalExtractionAgent(IDrivingAgent const *driving_agent, map::IMap<std::string> const *map);
 
+    ~DrivingGoalExtractionAgent();
+
     std::string get_name() const override;
 
     geometry::Vec get_min_spatial_limits() const override;

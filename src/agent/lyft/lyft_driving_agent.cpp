@@ -159,6 +159,25 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     this->max_spatial_limits = geometry::Vec(max_position_x, max_position_y);
 }
 
+LyftDrivingAgent::~LyftDrivingAgent()
+{
+    size_t i;
+
+    structures::IArray<IValuelessConstant const*> const *constants = constant_dict.get_values();
+
+    for (i = 0; i < constants->count(); ++i)
+    {
+        delete (*constants)[i];
+    }
+
+    structures::IArray<IValuelessVariable const*> const *variables = variable_dict.get_values();
+
+    for (i = 0; i < variables->count(); ++i)
+    {
+        delete (*variables)[i];
+    }
+}
+
 std::string LyftDrivingAgent::get_name() const
 {
     return this->name;
@@ -186,7 +205,10 @@ temporal::Time LyftDrivingAgent::get_max_temporal_limit() const
 
 structures::IArray<IValuelessConstant const*>* LyftDrivingAgent::get_constant_parameters() const
 {
-    return new structures::stl::STLStackArray<IValuelessConstant const*>(constant_dict.get_values());
+    structures::stl::STLStackArray<IValuelessConstant const*> *constants =
+            new structures::stl::STLStackArray<IValuelessConstant const*>(constant_dict.get_values());
+    constant_dict.get_values(constants);
+    return constants;
 }
 
 IValuelessConstant const* LyftDrivingAgent::get_constant_parameter(std::string const &constant_name) const
@@ -196,7 +218,10 @@ IValuelessConstant const* LyftDrivingAgent::get_constant_parameter(std::string c
 
 structures::IArray<IValuelessVariable const*>* LyftDrivingAgent::get_variable_parameters() const
 {
-    return new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.get_values());
+    structures::stl::STLStackArray<IValuelessVariable const*> *variables =
+            new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.count());
+    variable_dict.get_values(variables);
+    return variables;
 }
 
 IValuelessVariable const* LyftDrivingAgent::get_variable_parameter(std::string const &variable_name) const

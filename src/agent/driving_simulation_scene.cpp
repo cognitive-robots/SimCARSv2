@@ -13,6 +13,16 @@ namespace simcars
 namespace agent
 {
 
+DrivingSimulationScene::~DrivingSimulationScene()
+{
+    structures::IArray<IDrivingAgent const*> const *driving_agents = driving_agent_dict.get_values();
+
+    for (size_t i = 0; i < driving_agents->count(); ++i)
+    {
+        delete (*driving_agents)[i];
+    }
+}
+
 DrivingSimulationScene const* DrivingSimulationScene::construct_from(
         IDrivingScene const *driving_scene,
         IDrivingSimulator const *driving_simulator,
@@ -82,6 +92,8 @@ DrivingSimulationScene const* DrivingSimulationScene::construct_from(
         }
     }
 
+    delete driving_agents;
+
     return new_driving_scene;
 }
 
@@ -113,6 +125,7 @@ structures::IArray<IEntity const*>* DrivingSimulationScene::get_entities() const
     structures::IArray<IEntity const*>* const entities =
             new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
     cast_array(*driving_agents, *entities);
+    delete driving_agents;
     return entities;
 }
 
@@ -123,7 +136,10 @@ IEntity const* DrivingSimulationScene::get_entity(std::string const &entity_name
 
 structures::IArray<IDrivingAgent const*>* DrivingSimulationScene::get_driving_agents() const
 {
-    return new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.get_values());
+    structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
+            new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.get_values());
+    driving_agent_dict.get_values(driving_agents);
+    return driving_agents;
 }
 
 IDrivingAgent const* DrivingSimulationScene::get_driving_agent(std::string const &driving_agent_name) const

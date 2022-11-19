@@ -27,6 +27,16 @@ public:
              temporal::Duration time_diff_threshold = temporal::Duration::max() / 2, size_t max_cache_size = 10) : entity_name(entity_name), parameter_name(parameter_name), type(type),
         time_event_dict(time_diff_threshold, max_cache_size) {}
 
+    ~BasicVariable()
+    {
+        structures::IArray<IEvent<T> const*> const *events = time_event_dict.get_values();
+
+        for (size_t i = 0; i < events->count(); ++i)
+        {
+            delete (*events)[i];
+        }
+    }
+
     IValuelessVariable* valueless_deep_copy() const override
     {
         return deep_copy();
@@ -117,6 +127,15 @@ public:
 
     bool add_event(IEvent<T> const *event) override
     {
+        if (time_event_dict.contains(event->get_time()))
+        {
+            IEvent<T> const *other_event = time_event_dict[event->get_time()];
+            if (event->get_time() == other_event->get_time())
+            {
+                delete time_event_dict[event->get_time()];
+            }
+        }
+
         time_event_dict.update(event->get_time(), event);
 
         return true;

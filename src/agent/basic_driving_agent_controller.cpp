@@ -80,10 +80,12 @@ void BasicDrivingAgentController::modify_driving_agent_state(agent::IDrivingAgen
     geometry::Vec position = original_state->get_position_variable()->get_value();
     FP_DATA_TYPE rotation = original_state->get_rotation_variable()->get_value();
 
+    map::ILaneArray<std::string> const *lanes;
+
     try
     {
         // TODO: Accomodate branching lanes
-        map::ILaneArray<std::string> const *lanes = map->get_encapsulating_lanes(position);
+        lanes = map->get_encapsulating_lanes(position);
 
         if (lanes->count() > 0)
         {
@@ -266,6 +268,8 @@ void BasicDrivingAgentController::modify_driving_agent_state(agent::IDrivingAgen
     {
         modified_state->set_steer_variable(original_state->get_steer_variable());
     }
+
+    delete lanes;
 }
 
 }

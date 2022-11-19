@@ -22,6 +22,8 @@ structures::IArray<IValuelessConstant const*>* AScene::get_constants() const
         constants->get_array(i) = (*entities)[i]->get_constant_parameters();
     }
 
+    delete entities;
+
     return constants;
 }
 
@@ -43,6 +45,8 @@ structures::IArray<IValuelessVariable const*>* AScene::get_variables() const
         variables->get_array(i) = (*entities)[i]->get_variable_parameters();
     }
 
+    delete entities;
+
     return variables;
 }
 
@@ -63,6 +67,8 @@ structures::IArray<IValuelessEvent const*>* AScene::get_events() const
     {
         events->get_array(i) = (*entities)[i]->get_events();
     }
+
+    delete entities;
 
     return events;
 }

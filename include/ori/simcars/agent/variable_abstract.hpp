@@ -2,6 +2,7 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/agent/variable_interface.hpp>
+#include <ori/simcars/agent/valueless_variable_abstract.hpp>
 
 #include <sstream>
 
@@ -13,41 +14,9 @@ namespace agent
 {
 
 template <typename T>
-class AVariable : public virtual IVariable<T>
+class AVariable : public virtual IVariable<T>, public virtual AValuelessVariable
 {
 public:
-    std::string get_full_name() const override
-    {
-        return this->get_entity_name() + "." + this->get_parameter_name() + "." + this->get_type_name();
-    }
-
-    std::string get_type_name() const override
-    {
-        switch (this->get_type())
-        {
-            case IValuelessVariable::Type::BASE:
-                return "base";
-
-            case IValuelessVariable::Type::INDIRECT_ACTUATION:
-                return "indirect_actuation";
-
-            case IValuelessVariable::Type::DIRECT_ACTUATION:
-                return "direct_actuation";
-
-            case IValuelessVariable::Type::GOAL_VALUE:
-                return "goal_value";
-
-            case IValuelessVariable::Type::GOAL_DURATION:
-                return "goal_duration";
-
-            case IValuelessVariable::Type::EXTERNAL:
-                return "external";
-
-            default:
-                throw std::runtime_error("Type indicated by value: '" + std::to_string((uint8_t) this->get_type()) + "' is not supported");
-        };
-    }
-
     std::string get_value_as_string(temporal::Time time) const override
     {
         std::stringstream string_stream;
@@ -103,9 +72,9 @@ public:
         structures::IArray<IValuelessEvent const*>* const valueless_events =
                     new structures::stl::STLStackArray<IValuelessEvent const*>(events->count());
         cast_array(*events, *valueless_events);
+        delete events;
         return valueless_events;
     }
-
     IValuelessEvent const* get_valueless_event(temporal::Time time) const override
     {
         return this->get_event(time);

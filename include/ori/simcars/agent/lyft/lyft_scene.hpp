@@ -26,6 +26,8 @@ protected:
     void load_virt(std::ifstream &input_filestream) override;
 
 public:
+    ~LyftScene();
+
     static LyftScene const* construct_from(IDrivingScene const *driving_scene);
 
     geometry::Vec get_min_spatial_limits() const override;

@@ -14,6 +14,16 @@ namespace simcars
 namespace agent
 {
 
+DrivingGoalExtractionScene::~DrivingGoalExtractionScene()
+{
+    structures::IArray<IDrivingAgent const*> const *driving_agents = driving_agent_dict.get_values();
+
+    for (size_t i = 0; i < driving_agents->count(); ++i)
+    {
+        delete (*driving_agents)[i];
+    }
+}
+
 DrivingGoalExtractionScene const* DrivingGoalExtractionScene::construct_from(IDrivingScene const *driving_scene)
 {
     DrivingGoalExtractionScene *new_driving_scene = new DrivingGoalExtractionScene;
@@ -32,6 +42,8 @@ DrivingGoalExtractionScene const* DrivingGoalExtractionScene::construct_from(IDr
 
         new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(), driving_goal_extraction_agent);
     }
+
+    delete driving_agents;
 
     return new_driving_scene;
 }
@@ -57,6 +69,8 @@ DrivingGoalExtractionScene const* DrivingGoalExtractionScene::construct_from(IDr
 
         new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(), driving_goal_extraction_agent);
     }
+
+    delete driving_agents;
 
     return new_driving_scene;
 }
@@ -87,6 +101,7 @@ structures::IArray<IEntity const*>* DrivingGoalExtractionScene::get_entities() c
     structures::IArray<IEntity const*>* const entities =
                 new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
     cast_array(*driving_agents, *entities);
+    delete driving_agents;
     return entities;
 }
 

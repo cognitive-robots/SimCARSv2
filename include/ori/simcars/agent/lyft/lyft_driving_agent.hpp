@@ -29,6 +29,8 @@ class LyftDrivingAgent : public virtual ADrivingAgent
 public:
     LyftDrivingAgent(rapidjson::Value::ConstObject const &json_agent_data);
 
+    ~LyftDrivingAgent();
+
     std::string get_name() const override;
 
     geometry::Vec get_min_spatial_limits() const override;

@@ -34,6 +34,8 @@ CSVScene const* CSVScene::construct_from(IScene const *scene)
         new_scene->entity_dict.update((*entities)[i]->get_name(), (*entities)[i]);
     }
 
+    delete entities;
+
     return new_scene;
 }
 
@@ -79,6 +81,9 @@ void CSVScene::save_virt(std::ofstream &output_filestream) const
         }
         output_filestream << std::endl;
     }
+
+    delete constants;
+    delete variables;
 }
 
 void CSVScene::load_virt(std::ifstream &input_filestream)
