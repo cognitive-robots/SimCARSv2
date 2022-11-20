@@ -4,7 +4,6 @@
 #include <ori/simcars/visualisation/utils.hpp>
 #include <ori/simcars/visualisation/qscene_widget.hpp>
 
-
 #include <iostream>
 
 namespace ori
@@ -21,6 +20,16 @@ QSceneWidget::QSceneWidget(agent::IScene const *scene, QWidget *parent, QPoint c
       realtime_factor(realtime_factor), pixels_per_metre(pixels_per_metre), current_time(scene->get_min_temporal_limit()),
       last_time(temporal::Time::min()), last_realtime(temporal::Time::min()), update_required(true),
       trig_buff(geometry::TrigBuff::get_instance()) {}
+
+QSceneWidget::~QSceneWidget()
+{
+    delete focal_entities;
+
+    for (size_t i = 0; i < render_stack.count(); ++i)
+    {
+        delete render_stack[i];
+    }
+}
 
 void QSceneWidget::on_init()
 {
@@ -43,6 +52,11 @@ void QSceneWidget::on_update()
 
         if (update_required)
         {
+            for (size_t i = 0; i < render_stack.count(); ++i)
+            {
+                delete render_stack[i];
+            }
+
             render_stack.clear();
 
             populate_render_stack();
@@ -88,11 +102,6 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
         agent::IConstant<FP_DATA_TYPE> const *bb_width_constant =
                 dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_width_valueless_constant);
 
-        FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
-        FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
-        FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
-        sf::RectangleShape *rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
-
         agent::IValuelessVariable const *position_valueless_variable =
                 vehicle->get_variable_parameter(vehicle->get_name() + ".position.base");
         agent::IValuelessVariable const *rotation_valueless_variable =
@@ -104,9 +113,18 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
                 dynamic_cast<agent::IVariable<FP_DATA_TYPE> const*>(rotation_valueless_variable);
 
         temporal::Time current_time = this->get_time();
+
+        sf::RectangleShape *rectangle = nullptr;
+        sf::CircleShape *circle = nullptr;
+        sf::Text *text = nullptr;
         try
         {
             sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position_variable->get_value(current_time), false, true);
+
+            FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
+            FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
+            FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
+            rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
             sf::Vector2f agent_rectangle_position = agent_base_shape_position
                     - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation_variable->get_value(current_time))
                                   * geometry::Vec(agent_rectangle_length, agent_rectangle_width));
@@ -116,7 +134,7 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
             rectangle->setOutlineThickness(agent_rectangle_min_side * 0.1f);
 
             FP_DATA_TYPE agent_circle_radius = 0.25f * agent_rectangle_min_side;
-            sf::CircleShape *circle = new sf::CircleShape(agent_circle_radius);
+            circle = new sf::CircleShape(agent_circle_radius);
             sf::Vector2f agent_circle_position = agent_base_shape_position - sf::Vector2f(agent_circle_radius, agent_circle_radius);
             circle->setPosition(agent_circle_position);
             circle->setOutlineThickness(agent_circle_radius * 0.4f);
@@ -130,7 +148,7 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
             }
 
             FP_DATA_TYPE agent_text_size = 0.4f * agent_rectangle_min_side;
-            sf::Text *text = new sf::Text(std::to_string(id_constant->get_value()), text_font, agent_text_size);
+            text = new sf::Text(std::to_string(id_constant->get_value()), text_font, agent_text_size);
             sf::FloatRect text_bounds = text->getGlobalBounds();
             sf::Vector2f agent_text_position = agent_base_shape_position
                     - 0.5f * sf::Vector2f(text_bounds.width, agent_text_size);
@@ -144,6 +162,9 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
         catch (std::out_of_range)
         {
             //std::cerr << "Position / Rotation not available for this time" << std::endl;
+            delete rectangle;
+            delete circle;
+            delete text;
         }
     }
     catch (std::out_of_range)
@@ -200,6 +221,8 @@ void QSceneWidget::add_scene_to_render_stack()
         }
     }
 
+    delete entities;
+
     focal_position /= focal_agent_count;
 }
 
@@ -236,12 +259,17 @@ void QSceneWidget::set_focal_entities(structures::IArray<std::string> const *foc
 {
     std::lock_guard<std::recursive_mutex> const lock(mutex);
 
-    this->focal_entities = focal_entities;
+    if (this->focal_entities != focal_entities)
+    {
+        delete this->focal_entities;
 
-    focused = focal_entities->count() > 0;
+        this->focal_entities = focal_entities;
 
-    // TODO: Possibly add a check to see if an update is actually required?
-    update_required = true;
+        focused = focal_entities->count() > 0;
+
+        // TODO: Possibly add a check to see if an update is actually required?
+        update_required = true;
+    }
 }
 
 void QSceneWidget::set_time(temporal::Time time)

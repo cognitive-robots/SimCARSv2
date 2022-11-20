@@ -53,6 +53,8 @@ public:
     QSceneWidget(agent::IScene const *scene, QWidget *parent, QPoint const &position, QSize const &size,
                  FP_DATA_TYPE frame_rate = 30.0f, FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 10.0f);
 
+    ~QSceneWidget();
+
     FP_DATA_TYPE get_pixels_per_metre() const;
     geometry::Vec const& get_focal_position() const;
     structures::IArray<std::string> const* get_focal_entities() const;

@@ -279,8 +279,8 @@ PUBLIC
   simcars_temporal
   simcars_map
   simcars_agent
-PRIVATE
   Qt5::Widgets
+PRIVATE
   sfml-graphics
 )
 add_dependencies(simcars_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
@@ -307,11 +307,11 @@ add_executable(qscene_widget_test src/qscene_widget_test/qscene_widget_test.cpp)
 target_link_libraries(qscene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 add_dependencies(qscene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 
-add_executable(qmap_scene_widget_test src/qmap_scene_widget_test/qmap_scene_widget_test.cpp)
-target_link_libraries(qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
-add_dependencies(qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+#add_executable(qmap_scene_widget_test src/qmap_scene_widget_test/qmap_scene_widget_test.cpp)
+#target_link_libraries(qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+#add_dependencies(qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 
-add_executable(simcars_demo src/simcars_demo/simcars_demo.cpp)
-target_link_libraries(simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
-add_dependencies(simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+#add_executable(simcars_demo src/simcars_demo/simcars_demo.cpp)
+#target_link_libraries(simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+#add_dependencies(simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 
