@@ -6,8 +6,6 @@
 #include <ori/simcars/visualisation/utils.hpp>
 #include <ori/simcars/visualisation/qscene_widget.hpp>
 
-#include <memory>
-
 namespace ori
 {
 namespace simcars
@@ -18,7 +16,7 @@ namespace visualisation
 template <typename T_id>
 class QMapSceneWidget : public QSceneWidget
 {
-    std::shared_ptr<const map::IMap<T_id>> map;
+    map::IMap<T_id> const *map;
 
     FP_DATA_TYPE single_point_map_object_size;
 
@@ -29,13 +27,13 @@ protected:
         this->add_scene_to_render_stack();
     }
 
-    virtual void add_lane_to_render_stack(std::shared_ptr<const map::ILane<T_id>> lane)
+    virtual void add_lane_to_render_stack(map::ILane<T_id> const *lane)
     {
-        std::shared_ptr<const structures::IArray<geometry::Tri>> tris = lane->get_tris();
+        structures::IArray<geometry::Tri> const *tris = lane->get_tris();
         size_t i, j;
         for (i = 0; i < tris->count(); ++i)
         {
-            std::shared_ptr<sf::ConvexShape> polygon(new sf::ConvexShape());
+            sf::ConvexShape *polygon = new sf::ConvexShape();
             polygon->setPointCount(3);
             for (j = 0; j < 3; ++j)
             {
@@ -96,21 +94,21 @@ protected:
             render_stack.push_back(polygon);
         }
     }
-    virtual void add_traffic_light_to_render_stack(std::shared_ptr<const map::ITrafficLight<T_id>> traffic_light)
+    virtual void add_traffic_light_to_render_stack(map::ITrafficLight<T_id> const *traffic_light)
     {
-        std::shared_ptr<sf::CircleShape> circle(new sf::CircleShape(get_pixels_per_metre() * single_point_map_object_size));
-        std::shared_ptr<const map::ITrafficLightStateHolder::State> traffic_light_state = traffic_light->get_state(this->get_time());
+        sf::CircleShape *circle = new sf::CircleShape(get_pixels_per_metre() * single_point_map_object_size);
+        map::ITrafficLightStateHolder::State const *traffic_light_state = traffic_light->get_state(this->get_time());
         circle->setPosition(to_sfml_vec(get_pixels_per_metre() * traffic_light->get_position(), false, true));
         circle->setFillColor(to_sfml_colour(traffic_light_state->active_face));
         render_stack.push_back(circle);
     }
     virtual void add_map_to_render_stack()
     {
-        const geometry::Vec& point = this->get_focal_position() / this->get_pixels_per_metre();
+        geometry::Vec const &point = this->get_focal_position() / this->get_pixels_per_metre();
         FP_DATA_TYPE distance = std::max(this->width() / this->get_pixels_per_metre(),
                                          this->height() / this->get_pixels_per_metre());
 
-        std::shared_ptr<const map::ILaneArray<T_id>> lanes_in_focus = map->get_lanes_in_range(point, distance);
+        map::ILaneArray<T_id> const *lanes_in_focus = map->get_lanes_in_range(point, distance);
 
         size_t i;
         for (i = 0; i < lanes_in_focus->count(); ++i)
@@ -118,7 +116,7 @@ protected:
             add_lane_to_render_stack((*lanes_in_focus)[i]);
         }
 
-        std::shared_ptr<const map::ITrafficLightArray<T_id>> traffic_lights_in_focus =
+        map::ITrafficLightArray<T_id> const *traffic_lights_in_focus =
                 map->get_traffic_lights_in_range(point, distance);
 
         for (i = 0; i < traffic_lights_in_focus->count(); ++i)
@@ -128,8 +126,8 @@ protected:
     }
 
 public:
-    QMapSceneWidget(std::shared_ptr<const map::IMap<T_id>> map, std::shared_ptr<const agent::IScene> scene, QWidget* parent,
-                    const QPoint& position, const QSize& size, FP_DATA_TYPE single_point_map_object_size = 1.0f, FP_DATA_TYPE frame_rate = 30.0f,
+    QMapSceneWidget(map::IMap<T_id> const *map, agent::IScene const *scene, QWidget *parent,
+                    QPoint const &position, QSize const &size, FP_DATA_TYPE single_point_map_object_size = 1.0f, FP_DATA_TYPE frame_rate = 30.0f,
                     FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 10.0f)
         : QSceneWidget(scene, parent, position, size, frame_rate, realtime_factor, pixels_per_metre), map(map),
           single_point_map_object_size(single_point_map_object_size) {}

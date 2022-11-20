@@ -23,15 +23,15 @@ class AQSFMLCanvas : public QWidget, public sf::RenderWindow
 
     QPaintEngine* paintEngine() const override;
 
-    void showEvent(QShowEvent* event) override;
-    void paintEvent(QPaintEvent* event) override;
+    void showEvent(QShowEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 protected:
     virtual void on_init() = 0;
     virtual void on_update() = 0;
 
 public :
-    AQSFMLCanvas(QWidget* parent, const QPoint& position, const QSize& size, int render_interval = 0);
+    AQSFMLCanvas(QWidget *parent, QPoint const &position, QSize const &size, int render_interval = 0);
 };
 
 }
