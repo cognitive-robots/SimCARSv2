@@ -8,7 +8,7 @@ namespace simcars
 namespace visualisation
 {
 
-sf::Vector2f to_sfml_vec(const geometry::Vec& vec, bool flip_x, bool flip_y)
+sf::Vector2f to_sfml_vec(geometry::Vec const &vec, bool flip_x, bool flip_y)
 {
     FP_DATA_TYPE x;
     FP_DATA_TYPE y;

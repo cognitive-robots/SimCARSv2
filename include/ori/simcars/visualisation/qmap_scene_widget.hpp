@@ -33,7 +33,7 @@ protected:
         size_t i, j;
         for (i = 0; i < tris->count(); ++i)
         {
-            sf::ConvexShape *polygon = new sf::ConvexShape();
+            sf::ConvexShape *polygon = new sf::ConvexShape;
             polygon->setPointCount(3);
             for (j = 0; j < 3; ++j)
             {

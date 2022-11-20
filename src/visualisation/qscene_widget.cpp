@@ -14,8 +14,8 @@ namespace simcars
 namespace visualisation
 {
 
-QSceneWidget::QSceneWidget(std::shared_ptr<const agent::IScene> scene, QWidget* parent, const QPoint& position,
-                           const QSize& size, FP_DATA_TYPE frame_rate, FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre)
+QSceneWidget::QSceneWidget(agent::IScene const *scene, QWidget *parent, QPoint const &position,
+                           QSize const &size, FP_DATA_TYPE frame_rate, FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre)
     : AQSFMLCanvas(parent, position, size, int(1000.0f / frame_rate)), text_enabled(true), scene(scene), focused(false),
       focal_position(geometry::Vec::Zero()), focal_entities(new structures::stl::STLStackArray<std::string>()),
       realtime_factor(realtime_factor), pixels_per_metre(pixels_per_metre), current_time(scene->get_min_temporal_limit()),
@@ -37,7 +37,7 @@ void QSceneWidget::on_update()
 {
     if (mutex.try_lock())
     {
-        const std::lock_guard<std::recursive_mutex> lock(mutex, std::adopt_lock);
+        std::lock_guard<std::recursive_mutex> const lock(mutex, std::adopt_lock);
 
         tick_forwards();
 
@@ -62,47 +62,46 @@ void QSceneWidget::on_update()
     }
 }
 
-void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEntity> vehicle)
+void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
 {
     try
     {
-        std::shared_ptr<const agent::IValuelessConstant> ego_valueless_constant =
+        agent::IValuelessConstant const *ego_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".ego");
-        std::shared_ptr<const agent::IValuelessConstant> id_valueless_constant =
+        agent::IValuelessConstant const *id_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".id");
-        std::shared_ptr<const agent::IValuelessConstant> driving_agent_class_valueless_constant =
+        agent::IValuelessConstant const *driving_agent_class_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".driving_agent_class");
-        std::shared_ptr<const agent::IValuelessConstant> bb_length_valueless_constant =
+        agent::IValuelessConstant const *bb_length_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".bb_length");
-        std::shared_ptr<const agent::IValuelessConstant> bb_width_valueless_constant =
+        agent::IValuelessConstant const *bb_width_valueless_constant =
                 vehicle->get_constant_parameter(vehicle->get_name() + ".bb_width");
 
-        std::shared_ptr<const agent::IConstant<bool>> ego_constant =
-                std::dynamic_pointer_cast<const agent::IConstant<bool>>(ego_valueless_constant);
-        std::shared_ptr<const agent::IConstant<uint32_t>> id_constant =
-                std::dynamic_pointer_cast<const agent::IConstant<uint32_t>>(id_valueless_constant);
-        std::shared_ptr<const agent::IConstant<agent::DrivingAgentClass>> driving_agent_class_constant =
-                std::dynamic_pointer_cast<const agent::IConstant<agent::DrivingAgentClass>>(driving_agent_class_valueless_constant);
-        std::shared_ptr<const agent::IConstant<FP_DATA_TYPE>> bb_length_constant =
-                std::dynamic_pointer_cast<const agent::IConstant<FP_DATA_TYPE>>(bb_length_valueless_constant);
-        std::shared_ptr<const agent::IConstant<FP_DATA_TYPE>> bb_width_constant =
-                std::dynamic_pointer_cast<const agent::IConstant<FP_DATA_TYPE>>(bb_width_valueless_constant);
+        agent::IConstant<bool> const *ego_constant =
+                dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
+        agent::IConstant<uint32_t> const *id_constant =
+                dynamic_cast<agent::IConstant<uint32_t> const*>(id_valueless_constant);
+        agent::IConstant<agent::DrivingAgentClass> const *driving_agent_class_constant =
+                dynamic_cast<agent::IConstant<agent::DrivingAgentClass> const*>(driving_agent_class_valueless_constant);
+        agent::IConstant<FP_DATA_TYPE> const *bb_length_constant =
+                dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_length_valueless_constant);
+        agent::IConstant<FP_DATA_TYPE> const *bb_width_constant =
+                dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_width_valueless_constant);
 
         FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
         FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
         FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
-        std::shared_ptr<sf::RectangleShape> rectangle(
-                    new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width)));
+        sf::RectangleShape *rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
 
-        std::shared_ptr<const agent::IValuelessVariable> position_valueless_variable =
+        agent::IValuelessVariable const *position_valueless_variable =
                 vehicle->get_variable_parameter(vehicle->get_name() + ".position.base");
-        std::shared_ptr<const agent::IValuelessVariable> rotation_valueless_variable =
+        agent::IValuelessVariable const *rotation_valueless_variable =
                 vehicle->get_variable_parameter(vehicle->get_name() + ".rotation.base");
 
-        std::shared_ptr<const agent::IVariable<geometry::Vec>> position_variable =
-                std::dynamic_pointer_cast<const agent::IVariable<geometry::Vec>>(position_valueless_variable);
-        std::shared_ptr<const agent::IVariable<FP_DATA_TYPE>> rotation_variable =
-                std::dynamic_pointer_cast<const agent::IVariable<FP_DATA_TYPE>>(rotation_valueless_variable);
+        agent::IVariable<geometry::Vec> const *position_variable =
+                dynamic_cast<agent::IVariable<geometry::Vec> const*>(position_valueless_variable);
+        agent::IVariable<FP_DATA_TYPE> const *rotation_variable =
+                dynamic_cast<agent::IVariable<FP_DATA_TYPE> const*>(rotation_valueless_variable);
 
         temporal::Time current_time = this->get_time();
         try
@@ -112,12 +111,12 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
                     - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation_variable->get_value(current_time))
                                   * geometry::Vec(agent_rectangle_length, agent_rectangle_width));
             rectangle->setPosition(agent_rectangle_position);
-            rectangle->setRotation(-180 * rotation_variable->get_value(current_time) / M_PI);
+            rectangle->setRotation(-180.0f * rotation_variable->get_value(current_time) / M_PI);
             rectangle->setFillColor(to_sfml_colour(driving_agent_class_constant->get_value()));
             rectangle->setOutlineThickness(agent_rectangle_min_side * 0.1f);
 
             FP_DATA_TYPE agent_circle_radius = 0.25f * agent_rectangle_min_side;
-            std::shared_ptr<sf::CircleShape> circle(new sf::CircleShape(agent_circle_radius));
+            sf::CircleShape *circle = new sf::CircleShape(agent_circle_radius);
             sf::Vector2f agent_circle_position = agent_base_shape_position - sf::Vector2f(agent_circle_radius, agent_circle_radius);
             circle->setPosition(agent_circle_position);
             circle->setOutlineThickness(agent_circle_radius * 0.4f);
@@ -131,7 +130,7 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
             }
 
             FP_DATA_TYPE agent_text_size = 0.4f * agent_rectangle_min_side;
-            std::shared_ptr<sf::Text> text(new sf::Text(std::to_string(id_constant->get_value()), text_font, agent_text_size));
+            sf::Text *text = new sf::Text(std::to_string(id_constant->get_value()), text_font, agent_text_size);
             sf::FloatRect text_bounds = text->getGlobalBounds();
             sf::Vector2f agent_text_position = agent_base_shape_position
                     - 0.5f * sf::Vector2f(text_bounds.width, agent_text_size);
@@ -155,7 +154,7 @@ void QSceneWidget::add_vehicle_to_render_stack(std::shared_ptr<const agent::IEnt
 
 void QSceneWidget::add_scene_to_render_stack()
 {
-    std::shared_ptr<structures::IArray<std::shared_ptr<const agent::IEntity>>> entities = scene->get_entities();
+    structures::IArray<agent::IEntity const*> *entities = scene->get_entities();
 
     focal_position = geometry::Vec::Zero();
     size_t focal_agent_count = 0;
@@ -163,7 +162,7 @@ void QSceneWidget::add_scene_to_render_stack()
     size_t i;
     for (i = 0; i < entities->count(); ++i)
     {
-        std::shared_ptr<const agent::IEntity> entity = (*entities)[i];
+        agent::IEntity const *entity = (*entities)[i];
         if (entity->get_name().find("vehicle") != std::string::npos)
         {
             add_vehicle_to_render_stack(entity);
@@ -172,11 +171,11 @@ void QSceneWidget::add_scene_to_render_stack()
             {
                 try
                 {
-                    std::shared_ptr<const agent::IValuelessVariable> position_valueless_variable =
+                    agent::IValuelessVariable const *position_valueless_variable =
                             entity->get_variable_parameter(entity->get_name() + ".position.base");
 
-                    std::shared_ptr<const agent::IVariable<geometry::Vec>> position_variable =
-                            std::dynamic_pointer_cast<const agent::IVariable<geometry::Vec>>(position_valueless_variable);
+                    agent::IVariable<geometry::Vec> const *position_variable =
+                            dynamic_cast<agent::IVariable<geometry::Vec> const*>(position_valueless_variable);
 
                     // TODO: Replace this with something more efficient
                     try
@@ -214,28 +213,28 @@ FP_DATA_TYPE QSceneWidget::get_pixels_per_metre() const
     return pixels_per_metre;
 }
 
-const geometry::Vec& QSceneWidget::get_focal_position() const
+geometry::Vec const& QSceneWidget::get_focal_position() const
 {
     return focal_position;
 }
 
-std::shared_ptr<const structures::IArray<std::string>> QSceneWidget::get_focal_entities() const
+structures::IArray<std::string> const* QSceneWidget::get_focal_entities() const
 {
-    const std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
 
     return focal_entities;
 }
 
 temporal::Time QSceneWidget::get_time() const
 {
-    const std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
 
     return current_time;
 }
 
-void QSceneWidget::set_focal_entities(std::shared_ptr<const structures::IArray<std::string>> focal_entities)
+void QSceneWidget::set_focal_entities(structures::IArray<std::string> const *focal_entities)
 {
-    const std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
 
     this->focal_entities = focal_entities;
 
@@ -247,7 +246,7 @@ void QSceneWidget::set_focal_entities(std::shared_ptr<const structures::IArray<s
 
 void QSceneWidget::set_time(temporal::Time time)
 {
-    const std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
 
     if (time < scene->get_min_temporal_limit())
     {
@@ -267,7 +266,7 @@ void QSceneWidget::set_time(temporal::Time time)
 
 void QSceneWidget::tick_forwards()
 {
-    const std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
 
     temporal::Time current_realtime = std::chrono::time_point_cast<temporal::Duration>(std::chrono::steady_clock::now());
 
@@ -297,7 +296,7 @@ void QSceneWidget::tick_forwards()
 
 void QSceneWidget::tick_backwards()
 {
-    const std::lock_guard<std::recursive_mutex> lock(mutex);
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
 
     temporal::Time current_realtime = std::chrono::time_point_cast<temporal::Duration>(std::chrono::steady_clock::now());
 

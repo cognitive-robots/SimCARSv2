@@ -19,7 +19,7 @@ namespace simcars
 namespace visualisation
 {
 
-AQSFMLCanvas::AQSFMLCanvas(QWidget* parent, const QPoint& position, const QSize& size, int render_interval)
+AQSFMLCanvas::AQSFMLCanvas(QWidget *parent, QPoint const &position, QSize const &size, int render_interval)
     : QWidget(parent), render_timer(this), initialised(false)
 {
     // Setup some states to allow direct rendering into the widget
@@ -43,7 +43,7 @@ QPaintEngine* AQSFMLCanvas::paintEngine() const
     return 0;
 }
 
-void AQSFMLCanvas::showEvent(QShowEvent* event)
+void AQSFMLCanvas::showEvent(QShowEvent *event)
 {
     if (!initialised)
     {
@@ -67,7 +67,7 @@ void AQSFMLCanvas::showEvent(QShowEvent* event)
     }
 }
 
-void AQSFMLCanvas::paintEvent(QPaintEvent* event)
+void AQSFMLCanvas::paintEvent(QPaintEvent *event)
 {
     // Let the derived class do its specific stuff
     on_update();
