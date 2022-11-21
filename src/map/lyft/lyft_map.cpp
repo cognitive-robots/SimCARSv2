@@ -367,6 +367,8 @@ ILaneArray<std::string> const* LyftMap::get_lanes_in_range(geometry::Vec point, 
 
     lanes.get_array(lane_array);
 
+    delete map_grid_rects;
+
     return lane_array;
 }
 
@@ -411,6 +413,8 @@ ITrafficLightArray<std::string> const* LyftMap::get_traffic_lights_in_range(geom
     LivingTrafficLightStackArray<std::string> *traffic_light_array = new LivingTrafficLightStackArray<std::string>;
 
     traffic_lights.get_array(traffic_light_array);
+
+    delete map_grid_rects;
 
     return traffic_light_array;
 }

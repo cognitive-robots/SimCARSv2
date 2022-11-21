@@ -18,6 +18,11 @@ namespace agent
 
 BasicDrivingSimulator::BasicDrivingSimulator(IDrivingAgentController const *controller) : controller(controller) {}
 
+BasicDrivingSimulator::~BasicDrivingSimulator()
+{
+    delete controller;
+}
+
 void BasicDrivingSimulator::simulate(IState const *current_state, IState *next_state, temporal::Duration time_step) const
 {
     this->simulate_driving_scene(
@@ -56,6 +61,8 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
         (*new_driving_agent_states)[i] = new_driving_agent_state;
     }
+
+    delete current_driving_agent_states;
 
     /*
     for (i = 0; i < new_driving_agent_states->count(); ++i)
@@ -147,6 +154,8 @@ void BasicDrivingSimulator::simulate_driving_scene(
         IDrivingAgentState *new_driving_agent_state = (*new_driving_agent_states)[i];
         next_state->set_driving_agent_state(new_driving_agent_state);
     }
+
+    delete new_driving_agent_states;
 }
 
 void BasicDrivingSimulator::simulate_driving_agent(

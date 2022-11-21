@@ -13,11 +13,10 @@
 
 #include <iostream>
 #include <exception>
-#include <memory>
 
 using namespace ori::simcars;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     if (argc < 3)
     {
@@ -25,19 +24,19 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    std::shared_ptr<const geometry::TrigBuff> trig_buff = geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
+    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
     QApplication app(argc, argv);
 
     std::cout << "Beginning map load" << std::endl;
 
-    std::shared_ptr<const map::IMap<std::string>> map;
+    map::IMap<std::string> const *map;
 
     try
     {
         map = map::lyft::LyftMap::load(argv[1]);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during map load:" << std::endl << e.what() << std::endl;
         return -1;
@@ -47,13 +46,13 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    std::shared_ptr<const agent::IDrivingScene> scene;
+    agent::IDrivingScene const *scene;
 
     try
     {
         scene = agent::lyft::LyftScene::load(argv[2]);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during scene load:" << std::endl << e.what() << std::endl;
         return -1;
@@ -63,13 +62,13 @@ int main(int argc, char* argv[])
 
     std::cout << "Beginning action extraction" << std::endl;
 
-    std::shared_ptr<const agent::IDrivingScene> scene_with_actions;
+    agent::IDrivingScene const *scene_with_actions;
 
     try
     {
         scene_with_actions = agent::DrivingGoalExtractionScene::construct_from(scene, map);
     }
-    catch (const std::exception& e)
+    catch (std::exception const &e)
     {
         std::cerr << "Exception occured during action extraction:" << std::endl << e.what() << std::endl;
         return -1;
@@ -77,86 +76,97 @@ int main(int argc, char* argv[])
 
     std::cout << "Finished action extraction" << std::endl;
 
-    std::shared_ptr<const structures::IArray<std::shared_ptr<const agent::IEntity>>> entities = scene->get_entities();
+    structures::IStackArray<std::string> *focal_entities =
+            new structures::stl::STLStackArray<std::string>();
 
-    if (entities->count() == 0)
+    structures::IArray<agent::IEntity const*> *entities =
+            scene->get_entities();
+
+    for (size_t i = 0; i < entities->count(); ++i)
     {
-        std::cerr << "No agents were present in the scene" << std::endl;
-        return -1;
-    }
-
-    bool ego_focal_agents = false;
-    std::shared_ptr<structures::IArray<std::string>> focal_agent_ids(new structures::stl::STLStackArray<std::string>(1));
-
-    size_t i;
-
-    for (i = 0; i < entities->count(); ++i)
-    {
-        std::shared_ptr<const agent::IDrivingAgent> driving_agent =
-                std::dynamic_pointer_cast<const agent::IDrivingAgent>((*entities)[i]);
-
-        if (driving_agent->get_ego_constant()->get_value())
+        agent::IEntity const *entity = (*entities)[i];
+        try
         {
-            ego_focal_agents = true;
-            (*focal_agent_ids)[0] = driving_agent->get_name();
-            break;
+            agent::IValuelessConstant const *ego_valueless_constant =
+                    entity->get_constant_parameter(entity->get_name() + ".ego");
+
+            agent::IConstant<bool> const *ego_constant =
+                    dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
+
+            if (ego_constant->get_value())
+            {
+                focal_entities->push_back(entity->get_name());
+            }
+        }
+        catch (std::out_of_range)
+        {
+            // Entity does not have an ego parameter
         }
     }
 
-    if (!ego_focal_agents)
-    {
-        std::shared_ptr<const agent::IDrivingAgent> driving_agent =
-                std::dynamic_pointer_cast<const agent::IDrivingAgent>((*entities)[0]);
-        (*focal_agent_ids)[0] = driving_agent->get_name();
-    }
+    delete entities;
 
     temporal::Time scene_half_way_timestamp = scene->get_min_temporal_limit() +
             (scene->get_max_temporal_limit() - scene->get_min_temporal_limit()) / 2;
 
     temporal::Duration time_step(100);
 
-    std::shared_ptr<agent::IDrivingAgentController> driving_agent_controller(
-                new agent::BasicDrivingAgentController(map, time_step, 10));
+    agent::IDrivingAgentController *driving_agent_controller =
+                new agent::BasicDrivingAgentController(map, time_step, 10);
 
-    std::shared_ptr<agent::IDrivingSimulator> driving_simulator(
-                new agent::BasicDrivingSimulator(driving_agent_controller));
+    agent::IDrivingSimulator *driving_simulator =
+                new agent::BasicDrivingSimulator(driving_agent_controller);
 
-    std::shared_ptr<const agent::IDrivingScene> simulated_scene =
+    agent::IDrivingScene const *simulated_scene =
             agent::DrivingSimulationScene::construct_from(
                 scene_with_actions, driving_simulator, time_step, scene_half_way_timestamp);
 
-    std::shared_ptr<QFrame> frame(new QFrame());
+    QFrame *frame = new QFrame();
     frame->setWindowTitle("SIMCARS Demo");
     frame->setFixedSize(1600, 800);
     frame->show();
 
-    /*
-    std::shared_ptr<visualisation::QMapSceneWidget<std::string>> map_scene_widget(
+    visualisation::QMapSceneWidget<std::string> *map_scene_widget =
                 new visualisation::QMapSceneWidget<std::string>(
                     map,
                     scene,
-                    frame.get(),
+                    frame,
                     QPoint(20, 20),
                     QSize(760, 760),
                     1.0f,
                     10.0f,
-                    1.0f));
-    map_scene_widget->set_focal_entities(focal_agent_ids);
+                    1.0f);
+    map_scene_widget->set_focal_entities(focal_entities);
     map_scene_widget->show();
-    */
 
-    std::shared_ptr<visualisation::QMapSceneWidget<std::string>> map_simulated_scene_widget(
+    visualisation::QMapSceneWidget<std::string> *map_simulated_scene_widget =
                 new visualisation::QMapSceneWidget<std::string>(
                     map,
                     simulated_scene,
-                    frame.get(),
+                    frame,
                     QPoint(820, 20),
                     QSize(760, 760),
                     1.0f,
                     30.0f,
-                    1.0f));
-    map_simulated_scene_widget->set_focal_entities(focal_agent_ids);
+                    1.0f);
+    map_simulated_scene_widget->set_focal_entities(
+                new structures::stl::STLStackArray(focal_entities));
     map_simulated_scene_widget->show();
 
-    return app.exec();
+    int result = app.exec();
+
+    delete map_simulated_scene_widget;
+    delete map_scene_widget;
+
+    delete frame;
+
+    delete simulated_scene;
+    delete scene_with_actions;
+    delete scene;
+
+    delete map;
+
+    geometry::TrigBuff::destroy_instance();
+
+    return result;
 }

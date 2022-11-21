@@ -45,7 +45,9 @@ protected:
     }
 
 public:
-    ALivingLane(T_id const &id, IMap<T_id> const *map) : ALane<T_id>(id, map) {}
+    ALivingLane(T_id const &id, IMap<T_id> const *map) :
+        ALane<T_id>(id, map), left_adjacent_lane(nullptr), right_adjacent_lane(nullptr),
+        straight_fore_lane(nullptr), fore_lanes(nullptr), aft_lanes(nullptr), traffic_lights(nullptr) {}
     ~ALivingLane() override
     {
         delete fore_lanes;

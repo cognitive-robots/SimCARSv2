@@ -589,6 +589,8 @@ IDrivingAgentState* DrivingGoalExtractionAgent::get_driving_agent_state(temporal
     GoalDrivingAgentState *goal_driving_agent_state =
             new GoalDrivingAgentState(driving_agent_state);
 
+    delete driving_agent_state;
+
     try
     {
         goal_driving_agent_state->set_aligned_linear_velocity_goal_value_variable(
@@ -608,9 +610,9 @@ IDrivingAgentState* DrivingGoalExtractionAgent::get_driving_agent_state(temporal
     }
     catch (std::out_of_range const &e)
     {
-        //std::cerr << "At error time was: " << this->get_variable_parameter(this->get_name() + ".aligned_linear_velocity.goal_value")->get_min_temporal_limit().time_since_epoch().count() << std::endl;
         if (throw_on_out_of_range)
         {
+            delete goal_driving_agent_state;
             throw e;
         }
     }

@@ -52,7 +52,7 @@ ITrafficLightStateHolder::State const* LyftTrafficLight::get_state(temporal::Tim
     }
     else
     {
-        return new ITrafficLightStateHolder::State();
+        return nullptr;
     }
 }
 

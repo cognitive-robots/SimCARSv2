@@ -124,6 +124,7 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agen
             this->non_simulated_variable_dict.update((*variables)[i]->get_full_name(), (*variables)[i]);
         }
     }
+    delete variables;
 }
 
 DrivingSimulationAgent::~DrivingSimulationAgent()
@@ -183,7 +184,7 @@ structures::IArray<IValuelessVariable const*>* DrivingSimulationAgent::get_varia
                     non_simulated_variable_dict.get_values());
 
     structures::IArray<IValuelessVariable const*> *simulated_variables =
-                new structures::stl::STLStackArray<IValuelessVariable const*>();
+                new structures::stl::STLStackArray<IValuelessVariable const*>(simulated_variable_dict.count());
     cast_array<ISimulatedValuelessVariable const*, IValuelessVariable const*>(
                 *(simulated_variable_dict.get_values()), *simulated_variables);
     variables->get_array(1) = simulated_variables;
@@ -262,10 +263,6 @@ IDrivingAgentState* DrivingSimulationAgent::get_driving_agent_state(temporal::Ti
 
     try
     {
-        if (driving_agent_state->get_id_constant()->get_value() == 1310)
-        {
-            //std::cerr << "DrivingSimulationAgent: " << this->get_position_variable()->get_min_temporal_limit().time_since_epoch().count() << std::endl;
-        }
         driving_agent_state->set_position_variable(
                         new BasicConstant(
                             this->get_name(),
@@ -316,6 +313,7 @@ IDrivingAgentState* DrivingSimulationAgent::get_driving_agent_state(temporal::Ti
     {
         if (throw_on_out_of_range)
         {
+            delete driving_agent_state;
             throw e;
         }
     }

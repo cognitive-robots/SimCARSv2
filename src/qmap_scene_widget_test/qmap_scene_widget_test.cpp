@@ -9,7 +9,6 @@
 
 #include <iostream>
 #include <exception>
-#include <memory>
 
 using namespace ori::simcars;
 
@@ -85,6 +84,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    delete entities;
+
     QFrame *frame = new QFrame();
     frame->setWindowTitle("QMapSceneWidget Test");
     frame->setFixedSize(1000, 1000);
@@ -96,9 +97,23 @@ int main(int argc, char *argv[])
                 scene,
                 frame,
                 QPoint(20, 20),
-                QSize(960, 960));
+                QSize(960, 960),
+                1.0f,
+                10.0f);
     map_scene_widget->set_focal_entities(focal_entities);
     map_scene_widget->show();
 
-    return app.exec();
+    int result = app.exec();
+
+    delete map_scene_widget;
+
+    delete frame;
+
+    delete scene;
+
+    delete map;
+
+    geometry::TrigBuff::destroy_instance();
+
+    return result;
 }

@@ -76,7 +76,9 @@ int main(int argc, char *argv[])
                 scene,
                 frame,
                 QPoint(20, 20),
-                QSize(760, 760));
+                QSize(760, 760),
+                1.0f,
+                10.0f);
     scene_widget->set_focal_entities(focal_entities);
     scene_widget->show();
 

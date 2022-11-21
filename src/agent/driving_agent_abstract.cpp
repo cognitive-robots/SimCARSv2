@@ -24,20 +24,16 @@ IState* ADrivingAgent::get_state(temporal::Time time, bool throw_on_out_of_range
 
 IDrivingAgentState* ADrivingAgent::get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const
 {
-    IDrivingAgentState *driving_agent_state(new BasicDrivingAgentState(this->get_name()));
+    IDrivingAgentState *driving_agent_state = new BasicDrivingAgentState(this->get_name());
 
-    driving_agent_state->set_id_constant(this->get_id_constant());
-    driving_agent_state->set_ego_constant(this->get_ego_constant());
-    driving_agent_state->set_bb_length_constant(this->get_bb_length_constant());
-    driving_agent_state->set_bb_width_constant(this->get_bb_width_constant());
-    driving_agent_state->set_driving_agent_class_constant(this->get_driving_agent_class_constant());
+    driving_agent_state->set_id_constant(this->get_id_constant()->shallow_copy());
+    driving_agent_state->set_ego_constant(this->get_ego_constant()->shallow_copy());
+    driving_agent_state->set_bb_length_constant(this->get_bb_length_constant()->shallow_copy());
+    driving_agent_state->set_bb_width_constant(this->get_bb_width_constant()->shallow_copy());
+    driving_agent_state->set_driving_agent_class_constant(this->get_driving_agent_class_constant()->shallow_copy());
 
     try
     {
-        //if (driving_agent_state->get_id_constant()->get_value() == 1310)
-        //{
-            //std::cerr << "ADrivingAgent: " << this->get_position_variable()->get_min_temporal_limit().time_since_epoch().count() << std::endl;
-        //}
         driving_agent_state->set_position_variable(
                         new BasicConstant(
                             this->get_name(),
@@ -88,6 +84,7 @@ IDrivingAgentState* ADrivingAgent::get_driving_agent_state(temporal::Time time, 
     {
         if (throw_on_out_of_range)
         {
+            delete driving_agent_state;
             throw e;
         }
     }

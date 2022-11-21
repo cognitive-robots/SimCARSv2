@@ -99,7 +99,14 @@ protected:
         sf::CircleShape *circle = new sf::CircleShape(get_pixels_per_metre() * single_point_map_object_size);
         map::ITrafficLightStateHolder::State const *traffic_light_state = traffic_light->get_state(this->get_time());
         circle->setPosition(to_sfml_vec(get_pixels_per_metre() * traffic_light->get_position(), false, true));
-        circle->setFillColor(to_sfml_colour(traffic_light_state->active_face));
+        if (traffic_light_state != nullptr)
+        {
+            circle->setFillColor(to_sfml_colour(traffic_light_state->active_face));
+        }
+        else
+        {
+            circle->setFillColor(sf::Color(127, 127, 127));
+        }
         render_stack.push_back(circle);
     }
     virtual void add_map_to_render_stack()
@@ -116,6 +123,8 @@ protected:
             add_lane_to_render_stack((*lanes_in_focus)[i]);
         }
 
+        delete lanes_in_focus;
+
         map::ITrafficLightArray<T_id> const *traffic_lights_in_focus =
                 map->get_traffic_lights_in_range(point, distance);
 
@@ -123,6 +132,8 @@ protected:
         {
             add_traffic_light_to_render_stack((*traffic_lights_in_focus)[i]);
         }
+
+        delete traffic_lights_in_focus;
     }
 
 public:

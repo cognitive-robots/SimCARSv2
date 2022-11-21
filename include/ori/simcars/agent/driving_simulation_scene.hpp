@@ -21,11 +21,11 @@ class DrivingSimulationScene : public virtual ADrivingScene, public virtual ISim
     temporal::Duration time_step;
 
     mutable temporal::Time furthest_simulation_time;
-    mutable IDrivingSceneState const *furthest_simulation_state;
 
     IDrivingSimulator const *simulator;
 
-    structures::stl::STLDictionary<std::string, IDrivingAgent const*> driving_agent_dict;
+    structures::stl::STLDictionary<std::string, DrivingSimulationAgent const*> simulated_driving_agent_dict;
+    structures::stl::STLDictionary<std::string, IDrivingAgent const*> non_simulated_driving_agent_dict;
 
 public:
     ~DrivingSimulationScene();

@@ -64,7 +64,7 @@ void BasicDrivingAgentController::modify_driving_agent_state(agent::IDrivingAgen
     {
         std::cerr << "Could not actuate aligned linear acceleration variable" << std::endl;
         modified_state->set_aligned_linear_acceleration_variable(
-                    original_state->get_aligned_linear_acceleration_variable());
+                    original_state->get_aligned_linear_acceleration_variable()->shallow_copy());
     }
 
     FP_DATA_TYPE aligned_linear_acceleration = original_state->get_aligned_linear_acceleration_variable()->get_value();
@@ -256,17 +256,17 @@ void BasicDrivingAgentController::modify_driving_agent_state(agent::IDrivingAgen
         else
         {
             // Driving agent not on lane
-            modified_state->set_steer_variable(original_state->get_steer_variable());
+            modified_state->set_steer_variable(original_state->get_steer_variable()->shallow_copy());
         }
     }
     catch (std::out_of_range)
     {
         std::cerr << "Could not actuate steer variable" << std::endl;
-        modified_state->set_steer_variable(original_state->get_steer_variable());
+        modified_state->set_steer_variable(original_state->get_steer_variable()->shallow_copy());
     }
     catch (std::runtime_error)
     {
-        modified_state->set_steer_variable(original_state->get_steer_variable());
+        modified_state->set_steer_variable(original_state->get_steer_variable()->shallow_copy());
     }
 
     delete lanes;
