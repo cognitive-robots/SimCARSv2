@@ -20,37 +20,6 @@ namespace map
 namespace lyft
 {
 
-LyftMap::~LyftMap()
-{
-    size_t i;
-
-    structures::IArray<LyftLane*> const *lane_array =
-            id_to_lane_dict->get_values();
-    for (i = 0; i < lane_array->count(); ++i)
-    {
-        delete (*lane_array)[i];
-    }
-    delete id_to_lane_dict;
-
-    structures::IArray<LyftTrafficLight*> const *traffic_light_array =
-            id_to_traffic_light_dict->get_values();
-    for (i = 0; i < traffic_light_array->count(); ++i)
-    {
-        delete (*traffic_light_array)[i];
-    }
-    delete id_to_traffic_light_dict;
-
-    structures::IArray<IMapObject<std::string> const*> const *ghost_array =
-            stray_ghosts->get_array();
-    for (i = 0; i < ghost_array->count(); ++i)
-    {
-        delete (*ghost_array)[i];
-    }
-    delete stray_ghosts;
-
-    delete map_grid_dict;
-}
-
 void LyftMap::save_virt(std::ofstream &output_filestream) const
 {
     throw utils::NotImplementedException();
@@ -311,6 +280,37 @@ void LyftMap::load_virt(std::ifstream &input_filestream)
     delete id_to_timestamp_to_state_dict;
 }
 
+LyftMap::~LyftMap()
+{
+    size_t i;
+
+    structures::IArray<LyftLane*> const *lane_array =
+            id_to_lane_dict->get_values();
+    for (i = 0; i < lane_array->count(); ++i)
+    {
+        delete (*lane_array)[i];
+    }
+    delete id_to_lane_dict;
+
+    structures::IArray<LyftTrafficLight*> const *traffic_light_array =
+            id_to_traffic_light_dict->get_values();
+    for (i = 0; i < traffic_light_array->count(); ++i)
+    {
+        delete (*traffic_light_array)[i];
+    }
+    delete id_to_traffic_light_dict;
+
+    structures::IArray<IMapObject<std::string> const*> const *ghost_array =
+            stray_ghosts->get_array();
+    for (i = 0; i < ghost_array->count(); ++i)
+    {
+        delete (*ghost_array)[i];
+    }
+    delete stray_ghosts;
+
+    delete map_grid_dict;
+}
+
 ILane<std::string> const* LyftMap::get_lane(std::string id) const
 {
     try
@@ -429,15 +429,19 @@ void LyftMap::unregister_stray_ghost(IMapObject<std::string> const *ghost) const
     stray_ghosts->erase(ghost);
 }
 
-LyftMap* LyftMap::copy() const
+LyftMap* LyftMap::shallow_copy() const
 {
-    LyftMap *map_copy = new LyftMap();
+    LyftMap *map_copy = new LyftMap;
+
     map_copy->id_to_lane_dict =
                 new structures::stl::STLDictionary<std::string, LyftLane*>(
                     this->id_to_lane_dict);
     map_copy->id_to_traffic_light_dict =
                 new structures::stl::STLDictionary<std::string, LyftTrafficLight*>(
                     this->id_to_traffic_light_dict);
+
+    map_copy->stray_ghosts = new structures::stl::STLSet<IMapObject<std::string> const*>(this->stray_ghosts);
+
     map_copy->map_grid_dict = new geometry::GridDictionary<MapGridRect<std::string>>(
                                       *this->map_grid_dict);
     return map_copy;

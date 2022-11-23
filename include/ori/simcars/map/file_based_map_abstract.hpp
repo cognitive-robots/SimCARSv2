@@ -44,7 +44,7 @@ public:
         this->save_virt(output_filestream);
     }
 
-    virtual T_map* copy() const = 0;
+    virtual T_map* shallow_copy() const = 0;
 
     static T_map const* load(std::string const &input_file_path_str)
     {

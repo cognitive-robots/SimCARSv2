@@ -17,6 +17,7 @@ find_package(SFML REQUIRED COMPONENTS graphics)
 
 add_subdirectory(extern/magic_enum)
 add_subdirectory(extern/lz4_stream)
+add_subdirectory(extern/rapidcsv)
 
 add_library(simcars_utils STATIC
   src/utils/sanity_check.cpp
@@ -116,6 +117,8 @@ add_library(simcars_map STATIC
   src/map/lyft/lyft_map.cpp
   src/map/lyft/lyft_lane.cpp
   src/map/lyft/lyft_traffic_light.cpp
+  src/map/highd/highd_lane.cpp
+  src/map/highd/highd_map.cpp
   include/ori/simcars/map/soul_interface.hpp
   include/ori/simcars/map/soul_abstract.hpp
   include/ori/simcars/map/declarations.hpp
@@ -146,6 +149,9 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/lyft/lyft_map.hpp
   include/ori/simcars/map/lyft/lyft_lane.hpp
   include/ori/simcars/map/lyft/lyft_traffic_light.hpp
+  include/ori/simcars/map/highd/highd_declarations.hpp
+  include/ori/simcars/map/highd/highd_map.hpp
+  include/ori/simcars/map/highd/highd_lane.hpp
 )
 target_include_directories(simcars_map
 PUBLIC
@@ -162,6 +168,7 @@ PUBLIC
   simcars_temporal
 PRIVATE
   lz4_stream
+  rapidcsv
 )
 add_dependencies(simcars_map simcars_utils simcars_structures simcars_geometry simcars_temporal)
 target_compile_options(simcars_map PRIVATE -fPIC)
@@ -287,9 +294,11 @@ add_dependencies(simcars_visualisation simcars_utils simcars_structures simcars_
 target_compile_options(simcars_visualisation PRIVATE -fPIC)
 set_target_properties(simcars_visualisation PROPERTIES VERSION ${PROJECT_VERSION})
 
+
 add_executable(trig_buff_test src/trig_buff_test/trig_buff_test.cpp)
 target_link_libraries(trig_buff_test simcars_utils simcars_structures simcars_geometry)
 add_dependencies(trig_buff_test simcars_utils simcars_structures simcars_geometry)
+
 
 add_executable(lyft_map_test src/lyft_map_test/lyft_map_test.cpp)
 target_link_libraries(lyft_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
@@ -302,6 +311,13 @@ add_dependencies(lyft_scene_test simcars_utils simcars_structures simcars_geomet
 add_executable(lyft_scene_action_extraction src/lyft_scene_action_extraction/lyft_scene_action_extraction.cpp)
 target_link_libraries(lyft_scene_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 add_dependencies(lyft_scene_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+
+
+
+add_executable(highd_map_test src/highd_map_test/highd_map_test.cpp)
+target_link_libraries(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
+add_dependencies(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
+
 
 add_executable(qscene_widget_test src/qscene_widget_test/qscene_widget_test.cpp)
 target_link_libraries(qscene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)

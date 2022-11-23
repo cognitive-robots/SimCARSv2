@@ -16,7 +16,8 @@ namespace map
 namespace lyft
 {
 
-LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjson::Value::ConstObject const &json_lane_data) : ALivingLane(id, map)
+LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjson::Value::ConstObject const &json_lane_data) :
+    ALivingLane(id, map)
 {
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 

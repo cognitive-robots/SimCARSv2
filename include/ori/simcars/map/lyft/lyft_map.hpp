@@ -49,7 +49,7 @@ public:
     void register_stray_ghost(IMapObject<std::string> const *ghost) const override;
     void unregister_stray_ghost(IMapObject<std::string> const *ghost) const override;
 
-    LyftMap* copy() const override;
+    LyftMap* shallow_copy() const override;
 };
 
 }
