@@ -1,11 +1,12 @@
 
+#include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
-#include <ori/simcars/map/lyft/lyft_map.hpp>
+#include <ori/simcars/map/highd/highd_map.hpp>
 #include <ori/simcars/agent/driving_goal_extraction_scene.hpp>
 #include <ori/simcars/agent/basic_driving_agent_controller.hpp>
 #include <ori/simcars/agent/basic_driving_simulator.hpp>
 #include <ori/simcars/agent/driving_simulation_scene.hpp>
-#include <ori/simcars/agent/lyft/lyft_scene.hpp>
+#include <ori/simcars/agent/highd/highd_scene.hpp>
 #include <ori/simcars/visualisation/qmap_scene_widget.hpp>
 
 #include <QApplication>
@@ -18,9 +19,9 @@ using namespace ori::simcars;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        std::cerr << "Usage: ./lyft_simcars_demo map_file_path scene_file_path" << std::endl;
+        std::cerr << "Usage: ./highd_simcars_demo recording_meta_file_path tracks_meta_file_path tracks_file_path" << std::endl;
         return -1;
     }
 
@@ -30,11 +31,11 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning map load" << std::endl;
 
-    map::IMap<std::string> const *map;
+    map::IMap<uint8_t> const *map;
 
     try
     {
-        map = map::lyft::LyftMap::load(argv[1]);
+        map = map::highd::HighDMap::load(argv[1]);
     }
     catch (std::exception const &e)
     {
@@ -46,11 +47,24 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
+    structures::ISet<std::string> *agent_names = new structures::stl::STLSet<std::string>(
+                {
+                    "non_ego_vehicle_1",
+                    "non_ego_vehicle_2",
+                    "non_ego_vehicle_3",
+                    "non_ego_vehicle_4",
+                    "non_ego_vehicle_5",
+                    "non_ego_vehicle_6",
+                    "non_ego_vehicle_7",
+                    "non_ego_vehicle_8",
+                    "non_ego_vehicle_9"
+                });
+
     agent::IDrivingScene const *scene;
 
     try
     {
-        scene = agent::lyft::LyftScene::load(argv[2]);
+        scene = agent::highd::HighDScene::load(argv[2], argv[3], agent_names);
     }
     catch (std::exception const &e)
     {
@@ -59,6 +73,8 @@ int main(int argc, char *argv[])
     }
 
     std::cout << "Finished scene load" << std::endl;
+
+    delete agent_names;
 
     std::cout << "Beginning action extraction" << std::endl;
 
@@ -109,7 +125,7 @@ int main(int argc, char *argv[])
     temporal::Time scene_half_way_timestamp = scene->get_min_temporal_limit() +
             (scene->get_max_temporal_limit() - scene->get_min_temporal_limit()) / 2;
 
-    temporal::Duration time_step(100);
+    temporal::Duration time_step(40);
 
     agent::IDrivingAgentController *driving_agent_controller =
                 new agent::BasicDrivingAgentController(map, time_step, 10);
@@ -126,8 +142,8 @@ int main(int argc, char *argv[])
     frame->setFixedSize(1600, 800);
     frame->show();
 
-    visualisation::QMapSceneWidget<std::string> *map_scene_widget =
-                new visualisation::QMapSceneWidget<std::string>(
+    visualisation::QMapSceneWidget<uint8_t> *map_scene_widget =
+                new visualisation::QMapSceneWidget<uint8_t>(
                     map,
                     scene,
                     frame,
@@ -139,8 +155,8 @@ int main(int argc, char *argv[])
     map_scene_widget->set_focal_entities(focal_entities);
     map_scene_widget->show();
 
-    visualisation::QMapSceneWidget<std::string> *map_simulated_scene_widget =
-                new visualisation::QMapSceneWidget<std::string>(
+    visualisation::QMapSceneWidget<uint8_t> *map_simulated_scene_widget =
+                new visualisation::QMapSceneWidget<uint8_t>(
                     map,
                     simulated_scene,
                     frame,

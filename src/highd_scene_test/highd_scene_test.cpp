@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished scene load" << std::endl;
 
-    delete scene;
-
     delete agent_names;
+
+    delete scene;
 
     geometry::TrigBuff::destroy_instance();
 }

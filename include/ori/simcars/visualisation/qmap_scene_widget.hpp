@@ -2,7 +2,9 @@
 
 #include <ori/simcars/map/map_interface.hpp>
 #include <ori/simcars/map/lane_interface.hpp>
+#include <ori/simcars/map/lane_array_interface.hpp>
 #include <ori/simcars/map/traffic_light_interface.hpp>
+#include <ori/simcars/map/traffic_light_array_interface.hpp>
 #include <ori/simcars/visualisation/utils.hpp>
 #include <ori/simcars/visualisation/qscene_widget.hpp>
 

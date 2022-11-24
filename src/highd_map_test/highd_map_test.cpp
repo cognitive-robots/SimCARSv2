@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        std::cerr << "Usage: ./highd_map_test map_file_path" << std::endl;
+        std::cerr << "Usage: ./highd_map_test recording_meta_file_path" << std::endl;
         return -1;
     }
 
