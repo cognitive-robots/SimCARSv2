@@ -192,6 +192,8 @@ add_library(simcars_agent STATIC
   src/agent/basic_driving_agent_controller.cpp
   src/agent/lyft/lyft_driving_agent.cpp
   src/agent/lyft/lyft_scene.cpp
+  src/agent/highd/highd_driving_agent.cpp
+  src/agent/highd/highd_scene.cpp
   src/agent/csv/csv_scene.cpp
   include/ori/simcars/agent/defines.hpp
   include/ori/simcars/agent/declarations.hpp
@@ -211,6 +213,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/driving_scene_state_interface.hpp
   include/ori/simcars/agent/driving_scene_interface.hpp
   include/ori/simcars/agent/file_based_scene_interface.hpp
+  include/ori/simcars/agent/two_file_based_scene_interface.hpp
   include/ori/simcars/agent/controller_interface.hpp
   include/ori/simcars/agent/simulator_interface.hpp
   include/ori/simcars/agent/simulation_scene_interface.hpp
@@ -226,6 +229,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/scene_abstract.hpp
   include/ori/simcars/agent/driving_scene_abstract.hpp
   include/ori/simcars/agent/file_based_scene_abstract.hpp
+  include/ori/simcars/agent/two_file_based_scene_abstract.hpp
   include/ori/simcars/agent/basic_constant.hpp
   include/ori/simcars/agent/basic_event.hpp
   include/ori/simcars/agent/basic_variable.hpp
@@ -241,6 +245,8 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/basic_driving_agent_controller.hpp
   include/ori/simcars/agent/lyft/lyft_driving_agent.hpp
   include/ori/simcars/agent/lyft/lyft_scene.hpp
+  include/ori/simcars/agent/highd/highd_driving_agent.hpp
+  include/ori/simcars/agent/highd/highd_scene.hpp
   include/ori/simcars/agent/csv/csv_scene.hpp
 )
 target_include_directories(simcars_agent
@@ -257,6 +263,7 @@ PUBLIC
   simcars_temporal
   simcars_map
   magic_enum::magic_enum
+  rapidcsv
 PRIVATE
   lz4_stream
 )
@@ -313,10 +320,13 @@ target_link_libraries(lyft_scene_action_extraction simcars_utils simcars_structu
 add_dependencies(lyft_scene_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 
 
-
 add_executable(highd_map_test src/highd_map_test/highd_map_test.cpp)
 target_link_libraries(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
+
+add_executable(highd_scene_test src/highd_scene_test/highd_scene_test.cpp)
+target_link_libraries(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+add_dependencies(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 
 
 add_executable(qscene_widget_test src/qscene_widget_test/qscene_widget_test.cpp)

@@ -1,10 +1,6 @@
 
 #include <ori/simcars/utils/exceptions.hpp>
-#include <ori/simcars/agent/lyft/lyft_scene.hpp>
-
-#include <lz4_stream.h>
-#include <rapidjson/document.h>
-#include <rapidjson/istreamwrapper.h>
+#include <ori/simcars/agent/highd/highd_scene.hpp>
 
 namespace ori
 {
@@ -12,10 +8,10 @@ namespace simcars
 {
 namespace agent
 {
-namespace lyft
+namespace highd
 {
 
-LyftScene::~LyftScene()
+HighDScene::~HighDScene()
 {
     structures::IArray<IDrivingAgent const*> const *driving_agents = driving_agent_dict.get_values();
 
@@ -25,9 +21,9 @@ LyftScene::~LyftScene()
     }
 }
 
-LyftScene const* LyftScene::construct_from(IDrivingScene const *driving_scene)
+HighDScene const* HighDScene::construct_from(IDrivingScene const *driving_scene)
 {
-    LyftScene *new_driving_scene = new LyftScene();
+    HighDScene *new_driving_scene = new HighDScene();
 
     new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
     new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
@@ -47,18 +43,16 @@ LyftScene const* LyftScene::construct_from(IDrivingScene const *driving_scene)
     return new_driving_scene;
 }
 
-void LyftScene::save_virt(std::ofstream &output_filestream) const
+void HighDScene::save_virt(std::ofstream &output_filestream_1, std::ofstream &output_filestream_2) const
 {
     throw utils::NotImplementedException();
 }
 
-void LyftScene::load_virt(std::ifstream &input_filestream, structures::ISet<std::string>* agent_names)
+void HighDScene::load_virt(std::ifstream &input_filestream_1, std::ifstream &input_filestream_2,
+                           structures::ISet<std::string>* agent_names)
 {
-    lz4_stream::istream input_lz4_stream(input_filestream);
-    rapidjson::BasicIStreamWrapper input_lz4_json_stream(input_lz4_stream);
-
-    rapidjson::Document json_document;
-    json_document.ParseStream(input_lz4_json_stream);
+    rapidcsv::Document tracks_meta_csv_document(input_filestream_1);
+    rapidcsv::Document tracks_csv_document(input_filestream_2);
 
     this->min_temporal_limit = temporal::Time::max();
     this->max_temporal_limit = temporal::Time::min();
@@ -68,12 +62,10 @@ void LyftScene::load_virt(std::ifstream &input_filestream, structures::ISet<std:
     FP_DATA_TYPE min_position_y = std::numeric_limits<FP_DATA_TYPE>::max();
     FP_DATA_TYPE max_position_y = std::numeric_limits<FP_DATA_TYPE>::min();
 
-    for (rapidjson::Value const &json_document_element : json_document.GetArray())
+    for (size_t i = 0; i < tracks_meta_csv_document.GetRowCount(); ++i)
     {
-        rapidjson::Value::ConstObject const &json_agent_data = json_document_element.GetObject();
-
-        uint32_t const id = json_agent_data["id"].GetInt();
-        bool const ego = json_agent_data["ego"].GetBool();
+        uint32_t const id = tracks_meta_csv_document.GetCell<uint32_t>("id", i);
+        bool const ego = false;
 
         std::string agent_name = (ego ? "ego_vehicle_" : "non_ego_vehicle_") + std::to_string(id);
 
@@ -82,7 +74,7 @@ void LyftScene::load_virt(std::ifstream &input_filestream, structures::ISet<std:
             continue;
         }
 
-        LyftDrivingAgent const *driving_agent = new LyftDrivingAgent(json_agent_data);
+        HighDDrivingAgent const *driving_agent = new HighDDrivingAgent(i, tracks_meta_csv_document, tracks_csv_document);
 
         driving_agent_dict.update(driving_agent->get_name(), driving_agent);
 
@@ -102,27 +94,27 @@ void LyftScene::load_virt(std::ifstream &input_filestream, structures::ISet<std:
     this->max_spatial_limits = geometry::Vec(max_position_x, max_position_y);
 }
 
-geometry::Vec LyftScene::get_min_spatial_limits() const
+geometry::Vec HighDScene::get_min_spatial_limits() const
 {
     return this->min_spatial_limits;
 }
 
-geometry::Vec LyftScene::get_max_spatial_limits() const
+geometry::Vec HighDScene::get_max_spatial_limits() const
 {
     return this->max_spatial_limits;
 }
 
-temporal::Time LyftScene::get_min_temporal_limit() const
+temporal::Time HighDScene::get_min_temporal_limit() const
 {
     return this->min_temporal_limit;
 }
 
-temporal::Time LyftScene::get_max_temporal_limit() const
+temporal::Time HighDScene::get_max_temporal_limit() const
 {
     return this->max_temporal_limit;
 }
 
-structures::IArray<IEntity const*>* LyftScene::get_entities() const
+structures::IArray<IEntity const*>* HighDScene::get_entities() const
 {
     structures::IArray<IDrivingAgent const*>* const driving_agents = this->get_driving_agents();
     structures::IArray<IEntity const*>* const entities =
@@ -132,12 +124,12 @@ structures::IArray<IEntity const*>* LyftScene::get_entities() const
     return entities;
 }
 
-IEntity const* LyftScene::get_entity(std::string const &entity_name) const
+IEntity const* HighDScene::get_entity(std::string const &entity_name) const
 {
     return this->get_driving_agent(entity_name);
 }
 
-structures::IArray<IDrivingAgent const*>* LyftScene::get_driving_agents() const
+structures::IArray<IDrivingAgent const*>* HighDScene::get_driving_agents() const
 {
     structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
             new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.count());
@@ -145,7 +137,7 @@ structures::IArray<IDrivingAgent const*>* LyftScene::get_driving_agents() const
     return driving_agents;
 }
 
-IDrivingAgent const* LyftScene::get_driving_agent(std::string const &driving_agent_name) const
+IDrivingAgent const* HighDScene::get_driving_agent(std::string const &driving_agent_name) const
 {
     return driving_agent_dict[driving_agent_name];
 }

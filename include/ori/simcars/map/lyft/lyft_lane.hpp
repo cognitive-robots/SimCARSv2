@@ -2,8 +2,6 @@
 
 #include <ori/simcars/structures/stack_array_interface.hpp>
 #include <ori/simcars/map/living_lane_abstract.hpp>
-#include <ori/simcars/map/lyft/lyft_declarations.hpp>
-#include <ori/simcars/map/lyft/lyft_map.hpp>
 
 #include <rapidjson/document.h>
 

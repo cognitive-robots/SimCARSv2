@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ori/simcars/utils/exceptions.hpp>
+#include <ori/simcars/structures/set_interface.hpp>
 #include <ori/simcars/agent/file_based_scene_interface.hpp>
 #include <ori/simcars/agent/scene_abstract.hpp>
 
@@ -21,7 +22,7 @@ protected:
     AFileBasedScene() = default;
 
     virtual void save_virt(std::ofstream &output_filestream) const = 0;
-    virtual void load_virt(std::ifstream &input_filestream) = 0;
+    virtual void load_virt(std::ifstream &input_filestream, structures::ISet<std::string>* agent_names) = 0;
 
 public:
     ~AFileBasedScene() override
@@ -43,7 +44,7 @@ public:
         this->save_virt(output_filestream);
     }
 
-    static T_scene const* load(std::string const &input_file_path_str)
+    static T_scene const* load(std::string const &input_file_path_str, structures::ISet<std::string>* agent_names = nullptr)
     {
         std::filesystem::path input_file_path(input_file_path_str);
 
@@ -56,7 +57,7 @@ public:
 
         AFileBasedScene<T_scene> *scene = new T_scene;
 
-        scene->load_virt(input_filestream);
+        scene->load_virt(input_filestream, agent_names);
 
         return dynamic_cast<T_scene const*>(scene);
     }

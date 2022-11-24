@@ -86,7 +86,7 @@ void CSVScene::save_virt(std::ofstream &output_filestream) const
     delete variables;
 }
 
-void CSVScene::load_virt(std::ifstream &input_filestream)
+void CSVScene::load_virt(std::ifstream &input_filestream, structures::ISet<std::string>* agent_names)
 {
     throw utils::NotImplementedException();
 }

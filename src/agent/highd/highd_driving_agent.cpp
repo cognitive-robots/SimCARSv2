@@ -1,12 +1,10 @@
 
 #include <ori/simcars/structures/stl/stl_concat_array.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
+#include <ori/simcars/agent/highd/highd_driving_agent.hpp>
 #include <ori/simcars/agent/basic_constant.hpp>
 #include <ori/simcars/agent/basic_event.hpp>
 #include <ori/simcars/agent/basic_variable.hpp>
-#include <ori/simcars/agent/lyft/lyft_driving_agent.hpp>
-
-#include <magic_enum.hpp>
 
 namespace ori
 {
@@ -14,23 +12,29 @@ namespace simcars
 {
 namespace agent
 {
-namespace lyft
+namespace highd
 {
 
-LyftDrivingAgent::LyftDrivingAgent() {}
+HighDDrivingAgent::HighDDrivingAgent() {}
 
-LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_agent_data)
+HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Document &tracks_meta_csv_document,
+                                     const rapidcsv::Document &tracks_csv_document)
 {
-    this->min_temporal_limit = temporal::Time::max();
-    this->max_temporal_limit = temporal::Time::min();
+    size_t const start_frame = tracks_meta_csv_document.GetCell<size_t>("initialFrame", tracks_meta_row) - 1;
+    size_t const end_frame = tracks_meta_csv_document.GetCell<size_t>("finalFrame", tracks_meta_row) - 1;
+
+    // WARNING: This doesn't actually set the min and max temporal limits to the real world time points, based upon ticks since
+    // epoch, in theory this is possible, but unnecessary at this stage
+    this->min_temporal_limit = temporal::Time(temporal::Duration(start_frame * 40));
+    this->max_temporal_limit = temporal::Time(temporal::Duration(end_frame * 40));
 
     FP_DATA_TYPE min_position_x = std::numeric_limits<FP_DATA_TYPE>::max();
     FP_DATA_TYPE max_position_x = std::numeric_limits<FP_DATA_TYPE>::min();
     FP_DATA_TYPE min_position_y = std::numeric_limits<FP_DATA_TYPE>::max();
     FP_DATA_TYPE max_position_y = std::numeric_limits<FP_DATA_TYPE>::min();
 
-    uint32_t const id = json_agent_data["id"].GetInt();
-    bool const ego = json_agent_data["ego"].GetBool();
+    uint32_t const id = tracks_meta_csv_document.GetCell<uint32_t>("id", tracks_meta_row);
+    bool const ego = false;
 
     this->name = (ego ? "ego_vehicle_" : "non_ego_vehicle_") + std::to_string(id);
 
@@ -40,9 +44,8 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     IConstant<bool>* const ego_constant = new BasicConstant<bool>(this->name, "ego", ego);
     this->constant_dict.update(ego_constant->get_full_name(), ego_constant);
 
-    rapidjson::Value::ConstArray const &bounding_box_data = json_agent_data["bounding_box"].GetArray();
-    FP_DATA_TYPE const bb_length = bounding_box_data[0].GetDouble();
-    FP_DATA_TYPE const bb_width = bounding_box_data[1].GetDouble();
+    FP_DATA_TYPE const bb_length = tracks_meta_csv_document.GetCell<FP_DATA_TYPE>("width", tracks_meta_row);
+    FP_DATA_TYPE const bb_width = tracks_meta_csv_document.GetCell<FP_DATA_TYPE>("height", tracks_meta_row);
 
     IConstant<FP_DATA_TYPE>* const bb_length_constant = new BasicConstant<FP_DATA_TYPE>(this->name, "bb_length", bb_length);
     this->constant_dict.update(bb_length_constant->get_full_name(), bb_length_constant);
@@ -50,15 +53,15 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     IConstant<FP_DATA_TYPE>* const bb_width_constant = new BasicConstant<FP_DATA_TYPE>(this->name, "bb_width", bb_width);
     this->constant_dict.update(bb_width_constant->get_full_name(), bb_width_constant);
 
-    std::string class_label = json_agent_data["class_label"].GetString();
-    size_t const first_underscore = class_label.find('_');
-    size_t const second_underscore = class_label.find('_', first_underscore + 1);
-    class_label = class_label.substr(second_underscore + 1);
-    auto temp_class_value = magic_enum::enum_cast<DrivingAgentClass>(class_label);
+    std::string class_label = tracks_meta_csv_document.GetCell<std::string>("class", tracks_meta_row);
     DrivingAgentClass class_value;
-    if (temp_class_value.has_value())
+    if (class_label == "Car")
     {
-        class_value = temp_class_value.value();
+        class_value = DrivingAgentClass::CAR;
+    }
+    else if (class_label == "Truck")
+    {
+        class_value = DrivingAgentClass::TRUCK;
     }
     else
     {
@@ -68,8 +71,6 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     IConstant<DrivingAgentClass>* const driving_agent_class_constant = new BasicConstant<DrivingAgentClass>(this->name, "driving_agent_class", class_value);
     this->constant_dict.update(driving_agent_class_constant->get_full_name(), driving_agent_class_constant);
 
-    rapidjson::Value::ConstArray const &state_data = json_agent_data["states"].GetArray();
-    size_t const state_data_size = state_data.Capacity();
 
     IVariable<geometry::Vec>* const position_variable = new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, temporal::Duration(100));
     this->variable_dict.update(position_variable->get_full_name(), position_variable);
@@ -98,19 +99,31 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
     this->variable_dict.update(angular_velocity_variable->get_full_name(), angular_velocity_variable);
 
+
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
     size_t i;
-    for (i = 0; i < state_data_size; ++i)
-    {
-        rapidjson::Value::ConstObject const &state_data_entry = state_data[i].GetObject();
-        temporal::Time const timestamp(temporal::Duration(state_data_entry["timestamp"].GetInt64()));
-        this->min_temporal_limit = std::min(timestamp, this->min_temporal_limit);
-        this->max_temporal_limit = std::max(timestamp, this->max_temporal_limit);
 
-        rapidjson::Value::ConstArray const &position_data = state_data_entry["position"].GetArray();
-        FP_DATA_TYPE const position_x = position_data[0].GetDouble();
-        FP_DATA_TYPE const position_y = position_data[1].GetDouble();
+    for (i = 0; i < tracks_csv_document.GetRowCount(); ++i)
+    {
+        if (tracks_csv_document.GetCell<uint32_t>("id", i) == id)
+        {
+            break;
+        }
+    }
+    if (i == tracks_csv_document.GetRowCount())
+    {
+        throw std::runtime_error("Could not find agent id specified in tracks meta file in tracks file");
+    }
+
+    size_t const tracks_start_row = i;
+    size_t const tracks_end_row = tracks_start_row + (end_frame - start_frame);
+    for (i = tracks_start_row; i <= tracks_end_row; ++i)
+    {
+        temporal::Time timestamp(temporal::Duration((i - tracks_start_row) * 40));
+
+        FP_DATA_TYPE const position_x = tracks_csv_document.GetCell<FP_DATA_TYPE>("x", i);
+        FP_DATA_TYPE const position_y = tracks_csv_document.GetCell<FP_DATA_TYPE>("y", i);
         min_position_x = std::min(position_x, min_position_x);
         max_position_x = std::max(position_x, max_position_x);
         min_position_y = std::min(position_y, min_position_y);
@@ -119,17 +132,32 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
         IEvent<geometry::Vec>* const position_event = new BasicEvent<geometry::Vec>(position_variable->get_full_name(), position, timestamp);
         position_variable->add_event(position_event);
 
-        rapidjson::Value::ConstArray const &linear_velocity_data = state_data_entry["linear_velocity"].GetArray();
-        geometry::Vec const linear_velocity(linear_velocity_data[0].GetDouble(), linear_velocity_data[1].GetDouble());
+        geometry::Vec const linear_velocity(tracks_csv_document.GetCell<FP_DATA_TYPE>("xVelocity", i),
+                                            tracks_csv_document.GetCell<FP_DATA_TYPE>("yVelocity", i));
         IEvent<geometry::Vec>* const linear_velocity_event = new BasicEvent<geometry::Vec>(linear_velocity_variable->get_full_name(), linear_velocity, timestamp);
         linear_velocity_variable->add_event(linear_velocity_event);
 
-        rapidjson::Value::ConstArray const &linear_acceleration_data = state_data_entry["linear_acceleration"].GetArray();
-        geometry::Vec const linear_acceleration(linear_acceleration_data[0].GetDouble(), linear_acceleration_data[1].GetDouble());
+        geometry::Vec const linear_acceleration(tracks_csv_document.GetCell<FP_DATA_TYPE>("xAcceleration", i),
+                                                tracks_csv_document.GetCell<FP_DATA_TYPE>("yAcceleration", i));
         IEvent<geometry::Vec>* const linear_acceleration_event = new BasicEvent<geometry::Vec>(linear_acceleration_variable->get_full_name(), linear_acceleration, timestamp);
         linear_acceleration_variable->add_event(linear_acceleration_event);
 
-        FP_DATA_TYPE const rotation(state_data_entry["rotation"].GetDouble());
+        // WARNING: This makes a rather big assumption that the vehicles are always driving parallel to the lanes, mainly
+        // because the dataset doesn't actually provide any orientation information
+        FP_DATA_TYPE rotation;
+        uint32_t driving_direction = tracks_meta_csv_document.GetCell<uint32_t>("drivingDirection", tracks_meta_row);
+        if (driving_direction == 1)
+        {
+            rotation = -M_PI;
+        }
+        else if (driving_direction == 2)
+        {
+            rotation = 0.0f;
+        }
+        else
+        {
+            throw std::runtime_error("Unrecognised driving direction");
+        }
         IEvent<FP_DATA_TYPE>* const rotation_event = new BasicEvent<FP_DATA_TYPE>(rotation_variable->get_full_name(), rotation, timestamp);
         rotation_variable->add_event(rotation_event);
 
@@ -145,7 +173,8 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
         IEvent<geometry::Vec>* const external_linear_acceleration_event = new BasicEvent<geometry::Vec>(external_linear_acceleration_variable->get_full_name(), external_linear_acceleration, timestamp);
         external_linear_acceleration_variable->add_event(external_linear_acceleration_event);
 
-        FP_DATA_TYPE const angular_velocity(state_data_entry["angular_velocity"].GetDouble());
+        // WARNING: Again, assuming no angular velocity due to lack of orientation information
+        FP_DATA_TYPE const angular_velocity = 0.0f;
         IEvent<FP_DATA_TYPE>* const angular_velocity_event = new BasicEvent<FP_DATA_TYPE>(angular_velocity_variable->get_full_name(), angular_velocity, timestamp);
         angular_velocity_variable->add_event(angular_velocity_event);
 
@@ -158,7 +187,7 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     this->max_spatial_limits = geometry::Vec(max_position_x, max_position_y);
 }
 
-LyftDrivingAgent::~LyftDrivingAgent()
+HighDDrivingAgent::~HighDDrivingAgent()
 {
     size_t i;
 
@@ -177,32 +206,32 @@ LyftDrivingAgent::~LyftDrivingAgent()
     }
 }
 
-std::string LyftDrivingAgent::get_name() const
+std::string HighDDrivingAgent::get_name() const
 {
     return this->name;
 }
 
-geometry::Vec LyftDrivingAgent::get_min_spatial_limits() const
+geometry::Vec HighDDrivingAgent::get_min_spatial_limits() const
 {
     return this->min_spatial_limits;
 }
 
-geometry::Vec LyftDrivingAgent::get_max_spatial_limits() const
+geometry::Vec HighDDrivingAgent::get_max_spatial_limits() const
 {
     return this->max_spatial_limits;
 }
 
-temporal::Time LyftDrivingAgent::get_min_temporal_limit() const
+temporal::Time HighDDrivingAgent::get_min_temporal_limit() const
 {
     return this->min_temporal_limit;
 }
 
-temporal::Time LyftDrivingAgent::get_max_temporal_limit() const
+temporal::Time HighDDrivingAgent::get_max_temporal_limit() const
 {
     return this->max_temporal_limit;
 }
 
-structures::IArray<IValuelessConstant const*>* LyftDrivingAgent::get_constant_parameters() const
+structures::IArray<IValuelessConstant const*>* HighDDrivingAgent::get_constant_parameters() const
 {
     structures::stl::STLStackArray<IValuelessConstant const*> *constants =
             new structures::stl::STLStackArray<IValuelessConstant const*>(constant_dict.get_values());
@@ -210,12 +239,12 @@ structures::IArray<IValuelessConstant const*>* LyftDrivingAgent::get_constant_pa
     return constants;
 }
 
-IValuelessConstant const* LyftDrivingAgent::get_constant_parameter(std::string const &constant_name) const
+IValuelessConstant const* HighDDrivingAgent::get_constant_parameter(std::string const &constant_name) const
 {
     return constant_dict[constant_name];
 }
 
-structures::IArray<IValuelessVariable const*>* LyftDrivingAgent::get_variable_parameters() const
+structures::IArray<IValuelessVariable const*>* HighDDrivingAgent::get_variable_parameters() const
 {
     structures::stl::STLStackArray<IValuelessVariable const*> *variables =
             new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.count());
@@ -223,12 +252,12 @@ structures::IArray<IValuelessVariable const*>* LyftDrivingAgent::get_variable_pa
     return variables;
 }
 
-IValuelessVariable const* LyftDrivingAgent::get_variable_parameter(std::string const &variable_name) const
+IValuelessVariable const* HighDDrivingAgent::get_variable_parameter(std::string const &variable_name) const
 {
     return variable_dict[variable_name];
 }
 
-structures::IArray<IValuelessEvent const*>* LyftDrivingAgent::get_events() const
+structures::IArray<IValuelessEvent const*>* HighDDrivingAgent::get_events() const
 {
     structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
 
@@ -244,9 +273,9 @@ structures::IArray<IValuelessEvent const*>* LyftDrivingAgent::get_events() const
     return events;
 }
 
-IDrivingAgent* LyftDrivingAgent::driving_agent_deep_copy() const
+IDrivingAgent* HighDDrivingAgent::driving_agent_deep_copy() const
 {
-    LyftDrivingAgent *driving_agent = new LyftDrivingAgent();
+    HighDDrivingAgent *driving_agent = new HighDDrivingAgent();
 
     driving_agent->min_spatial_limits = this->get_min_spatial_limits();
     driving_agent->max_spatial_limits = this->get_max_spatial_limits();

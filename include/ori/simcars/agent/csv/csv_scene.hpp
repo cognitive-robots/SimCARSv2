@@ -21,7 +21,7 @@ class CSVScene : public virtual AFileBasedScene<CSVScene>
 
 protected:
     void save_virt(std::ofstream &output_filestream) const override;
-    void load_virt(std::ifstream &input_filestream) override;
+    void load_virt(std::ifstream &input_filestream, structures::ISet<std::string>* agent_names) override;
 
 public:
     static CSVScene const* construct_from(IScene const *scene);

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
-#include <ori/simcars/agent/file_based_scene_abstract.hpp>
+#include <ori/simcars/agent/two_file_based_scene_abstract.hpp>
 #include <ori/simcars/agent/driving_scene_abstract.hpp>
-#include <ori/simcars/agent/lyft/lyft_driving_agent.hpp>
+#include <ori/simcars/agent/highd/highd_driving_agent.hpp>
 
 namespace ori
 {
@@ -11,10 +11,10 @@ namespace simcars
 {
 namespace agent
 {
-namespace lyft
+namespace highd
 {
 
-class LyftScene : public virtual AFileBasedScene<LyftScene>, public virtual ADrivingScene
+class HighDScene : public virtual ATwoFileBasedScene<HighDScene>, public virtual ADrivingScene
 {
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
@@ -22,13 +22,14 @@ class LyftScene : public virtual AFileBasedScene<LyftScene>, public virtual ADri
     structures::stl::STLDictionary<std::string, IDrivingAgent const*> driving_agent_dict;
 
 protected:
-    void save_virt(std::ofstream &output_filestream) const override;
-    void load_virt(std::ifstream &input_filestream, structures::ISet<std::string>* agent_names) override;
+    void save_virt(std::ofstream &output_filestream_1, std::ofstream &output_filestream_2) const override;
+    void load_virt(std::ifstream &input_filestream_1, std::ifstream &input_filestream_2,
+                   structures::ISet<std::string>* agent_names) override;
 
 public:
-    ~LyftScene();
+    ~HighDScene();
 
-    static LyftScene const* construct_from(IDrivingScene const *driving_scene);
+    static HighDScene const* construct_from(IDrivingScene const *driving_scene);
 
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
