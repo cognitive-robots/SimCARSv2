@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        scene_with_actions = agent::DrivingGoalExtractionScene::construct_from(scene, map);
+        scene_with_actions = agent::DrivingGoalExtractionScene<std::string>::construct_from(scene, map);
     }
     catch (std::exception const &e)
     {
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     temporal::Duration time_step(100);
 
     agent::IDrivingAgentController *driving_agent_controller =
-                new agent::BasicDrivingAgentController(map, time_step, 10);
+                new agent::BasicDrivingAgentController<std::string>(map, time_step, 10);
 
     agent::IDrivingSimulator *driving_simulator =
                 new agent::BasicDrivingSimulator(driving_agent_controller);

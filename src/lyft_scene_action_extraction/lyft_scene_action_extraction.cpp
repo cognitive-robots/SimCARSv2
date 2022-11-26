@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        scene_with_actions = agent::DrivingGoalExtractionScene::construct_from(scene, map);
+        scene_with_actions = agent::DrivingGoalExtractionScene<std::string>::construct_from(scene, map);
     }
     catch (std::exception const &e)
     {

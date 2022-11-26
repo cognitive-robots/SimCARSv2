@@ -184,12 +184,9 @@ add_library(simcars_agent STATIC
   src/agent/basic_driving_agent_state.cpp
   src/agent/basic_driving_scene_state.cpp
   src/agent/goal_driving_agent_state.cpp
-  src/agent/driving_goal_extraction_agent.cpp
-  src/agent/driving_goal_extraction_scene.cpp
   src/agent/basic_driving_simulator.cpp
   src/agent/driving_simulation_agent.cpp
   src/agent/driving_simulation_scene.cpp
-  src/agent/basic_driving_agent_controller.cpp
   src/agent/lyft/lyft_driving_agent.cpp
   src/agent/lyft/lyft_scene.cpp
   src/agent/highd/highd_driving_agent.cpp
