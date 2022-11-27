@@ -20,33 +20,33 @@ HighDLane::HighDLane(uint8_t id, IMap<uint8_t> const *map, FP_DATA_TYPE upper_bo
     if (driving_left)
     {
         left_boundary = geometry::Vecs::Zero(2, 2);
-        left_boundary(0, 0) = 200.0f;
-        left_boundary(0, 1) = lower_bound;
-        left_boundary(0, 1) = -100.0f;
+        left_boundary(0, 0) = 460.0f;
+        left_boundary(1, 0) = lower_bound;
+        left_boundary(0, 1) = -40.0f;
         left_boundary(1, 1) = lower_bound;
 
         right_boundary = geometry::Vecs::Zero(2, 2);
-        right_boundary(0, 0) = 200.0f;
-        right_boundary(0, 1) = upper_bound;
-        right_boundary(0, 1) = -100.0f;
+        right_boundary(0, 0) = 460.0f;
+        right_boundary(1, 0) = upper_bound;
+        right_boundary(0, 1) = -40.0f;
         right_boundary(1, 1) = upper_bound;
     }
     else
     {
         left_boundary = geometry::Vecs::Zero(2, 2);
-        left_boundary(0, 0) = -100.0f;
-        left_boundary(0, 1) = upper_bound;
-        left_boundary(0, 1) = 200.0f;
+        left_boundary(0, 0) = -40.0f;
+        left_boundary(1, 0) = upper_bound;
+        left_boundary(0, 1) = 460.0f;
         left_boundary(1, 1) = upper_bound;
 
         right_boundary = geometry::Vecs::Zero(2, 2);
-        right_boundary(0, 0) = -100.0f;
-        right_boundary(0, 1) = lower_bound;
-        right_boundary(0, 1) = 200.0f;
+        right_boundary(0, 0) = -40.0f;
+        right_boundary(1, 0) = lower_bound;
+        right_boundary(0, 1) = 460.0f;
         right_boundary(1, 1) = lower_bound;
     }
 
-    centroid(0) = 50.0f;
+    centroid(0) = 210.0f;
     centroid(1) = (upper_bound + lower_bound) / 2.0f;
 
     tris = new structures::stl::STLStackArray<geometry::Tri>(2);
@@ -55,7 +55,7 @@ HighDLane::HighDLane(uint8_t id, IMap<uint8_t> const *map, FP_DATA_TYPE upper_bo
     geometry::Tri tri_2(right_boundary.col(0), right_boundary.col(1), left_boundary.col(1));
     tris->push_back(tri_2);
 
-    bounding_box = geometry::Rect(-100.0f, lower_bound, 200.0f, upper_bound);
+    bounding_box = geometry::Rect(-40.0f, upper_bound, 460.0f, lower_bound);
 
     if (left_adjacent_lane_id != 0)
     {

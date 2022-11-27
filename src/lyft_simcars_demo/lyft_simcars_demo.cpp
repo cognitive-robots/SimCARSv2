@@ -134,8 +134,9 @@ int main(int argc, char *argv[])
                     QPoint(20, 20),
                     QSize(760, 760),
                     1.0f,
-                    10.0f,
+                    30.0f,
                     1.0f);
+    map_scene_widget->set_focus_mode(visualisation::QSceneWidget::FocusMode::FOCAL_AGENTS);
     map_scene_widget->set_focal_entities(focal_entities);
     map_scene_widget->show();
 
@@ -149,6 +150,7 @@ int main(int argc, char *argv[])
                     1.0f,
                     30.0f,
                     1.0f);
+    map_simulated_scene_widget->set_focus_mode(visualisation::QSceneWidget::FocusMode::FOCAL_AGENTS);
     map_simulated_scene_widget->set_focal_entities(
                 new structures::stl::STLStackArray(focal_entities));
     map_simulated_scene_widget->show();

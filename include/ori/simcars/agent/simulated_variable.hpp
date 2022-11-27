@@ -34,12 +34,12 @@ class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulated
         temporal::Time simulation_target_time = std::min(time, simulation_end_time);
         if (time_event_dict.count() == 0)
         {
-            if (simulation_target_time > simulation_start_time)
+            if (simulation_target_time >= simulation_start_time + simulation_scene->get_time_step())
             {
                 simulation_scene->simulate_and_propogate(simulation_target_time);
             }
         }
-        else if (time_event_dict.get_latest_timestamp() < simulation_target_time)
+        else if (time_event_dict.get_latest_timestamp() + simulation_scene->get_time_step() <= simulation_target_time)
         {
             simulation_scene->simulate_and_propogate(simulation_target_time);
         }

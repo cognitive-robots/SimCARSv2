@@ -8,6 +8,7 @@
 #include <ori/simcars/agent/basic_driving_simulator.hpp>
 
 #include <iostream>
+#include <cassert>
 
 namespace ori
 {
@@ -215,6 +216,7 @@ void BasicDrivingSimulator::simulate_driving_agent(
     FP_DATA_TYPE mean_angular_velocity = (angular_velocity + new_angular_velocity) / 2.0f;
 
     FP_DATA_TYPE new_rotation = rotation + mean_angular_velocity * time_step.count();
+    assert(!std::isnan(new_rotation));
 
     IConstant<FP_DATA_TYPE> *new_rotation_variable =
                 new BasicConstant<FP_DATA_TYPE>(next_state->get_driving_agent_name(), "rotation.base", new_rotation);
@@ -250,6 +252,8 @@ void BasicDrivingSimulator::simulate_driving_agent(
     geometry::Vec mean_linear_velocity = (linear_velocity + new_linear_velocity) / 2.0f;
 
     geometry::Vec new_position = position + mean_linear_velocity * time_step.count();
+    assert(!std::isnan(new_position.x()));
+    assert(!std::isnan(new_position.y()));
 
     IConstant<geometry::Vec> *new_position_variable =
                 new BasicConstant<geometry::Vec>(next_state->get_driving_agent_name(), "position.base", new_position);

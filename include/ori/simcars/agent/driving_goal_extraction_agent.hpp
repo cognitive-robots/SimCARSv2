@@ -343,10 +343,11 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     for (size_t j = 0; j < current_lanes->count(); ++j)
                     {
                         map::ILane<T_map_id> const *current_lane = (*current_lanes)[j];
+                        map::ILaneArray<T_map_id> const *current_lane_aft_lanes = current_lane->get_aft_lanes();
                         for (size_t k = 0; k < previous_lanes->count(); ++k)
                         {
                             map::ILane<T_map_id> const *previous_lane = (*previous_lanes)[k];
-                            if (current_lane == previous_lane || current_lane->get_aft_lanes()->contains(previous_lane))
+                            if (current_lane == previous_lane || (current_lane_aft_lanes != nullptr && current_lane_aft_lanes->contains(previous_lane)))
                             {
                                 continuing_lanes->push_back(current_lane);
                             }

@@ -6,6 +6,8 @@
 #include <ori/simcars/agent/basic_event.hpp>
 #include <ori/simcars/agent/basic_variable.hpp>
 
+#include <cassert>
+
 namespace ori
 {
 namespace simcars
@@ -122,8 +124,8 @@ HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Doc
     {
         temporal::Time timestamp(temporal::Duration((i - tracks_start_row) * 40));
 
-        FP_DATA_TYPE const position_x = tracks_csv_document.GetCell<FP_DATA_TYPE>("x", i);
-        FP_DATA_TYPE const position_y = tracks_csv_document.GetCell<FP_DATA_TYPE>("y", i);
+        FP_DATA_TYPE const position_x = tracks_csv_document.GetCell<FP_DATA_TYPE>("x", i) + bb_length / 2.0f;
+        FP_DATA_TYPE const position_y = tracks_csv_document.GetCell<FP_DATA_TYPE>("y", i) + bb_width / 2.0f;
         min_position_x = std::min(position_x, min_position_x);
         max_position_x = std::max(position_x, max_position_x);
         min_position_y = std::min(position_y, min_position_y);
@@ -132,13 +134,13 @@ HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Doc
         IEvent<geometry::Vec>* const position_event = new BasicEvent<geometry::Vec>(position_variable->get_full_name(), position, timestamp);
         position_variable->add_event(position_event);
 
-        geometry::Vec const linear_velocity(tracks_csv_document.GetCell<FP_DATA_TYPE>("xVelocity", i),
-                                            tracks_csv_document.GetCell<FP_DATA_TYPE>("yVelocity", i));
+        geometry::Vec const linear_velocity = geometry::Vec(tracks_csv_document.GetCell<FP_DATA_TYPE>("xVelocity", i),
+                                                            tracks_csv_document.GetCell<FP_DATA_TYPE>("yVelocity", i)) * 1e-3f;
         IEvent<geometry::Vec>* const linear_velocity_event = new BasicEvent<geometry::Vec>(linear_velocity_variable->get_full_name(), linear_velocity, timestamp);
         linear_velocity_variable->add_event(linear_velocity_event);
 
-        geometry::Vec const linear_acceleration(tracks_csv_document.GetCell<FP_DATA_TYPE>("xAcceleration", i),
-                                                tracks_csv_document.GetCell<FP_DATA_TYPE>("yAcceleration", i));
+        geometry::Vec const linear_acceleration = geometry::Vec(tracks_csv_document.GetCell<FP_DATA_TYPE>("xAcceleration", i),
+                                                                tracks_csv_document.GetCell<FP_DATA_TYPE>("yAcceleration", i)) * 1e-6f;
         IEvent<geometry::Vec>* const linear_acceleration_event = new BasicEvent<geometry::Vec>(linear_acceleration_variable->get_full_name(), linear_acceleration, timestamp);
         linear_acceleration_variable->add_event(linear_acceleration_event);
 
@@ -164,6 +166,7 @@ HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Doc
         FP_DATA_TYPE const aligned_linear_velocity = (trig_buff->get_rot_mat(-rotation) * linear_velocity).x();
         IEvent<FP_DATA_TYPE>* const aligned_linear_velocity_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity, timestamp);
         aligned_linear_velocity_variable->add_event(aligned_linear_velocity_event);
+        assert(aligned_linear_velocity >= 0.0f);
 
         FP_DATA_TYPE const aligned_linear_acceleration = (trig_buff->get_rot_mat(-rotation) * linear_acceleration).x();
         IEvent<FP_DATA_TYPE>* const aligned_linear_acceleration_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration, timestamp);

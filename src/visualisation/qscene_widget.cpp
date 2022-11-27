@@ -14,12 +14,16 @@ namespace visualisation
 {
 
 QSceneWidget::QSceneWidget(agent::IScene const *scene, QWidget *parent, QPoint const &position,
-                           QSize const &size, FP_DATA_TYPE frame_rate, FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre)
-    : AQSFMLCanvas(parent, position, size, int(1000.0f / frame_rate)), text_enabled(true), scene(scene), focused(false),
-      focal_position(geometry::Vec::Zero()), focal_entities(new structures::stl::STLStackArray<std::string>()),
-      realtime_factor(realtime_factor), pixels_per_metre(pixels_per_metre), current_time(scene->get_min_temporal_limit()),
+                           QSize const &size, FP_DATA_TYPE frame_rate, FP_DATA_TYPE realtime_factor,
+                           FP_DATA_TYPE pixels_per_metre, bool flip_y)
+    : AQSFMLCanvas(parent, position, size, int(1000.0f / frame_rate)), text_enabled(true), scene(scene),
+      focus_mode(FocusMode::FIXED), focal_position(geometry::Vec::Zero()),
+      focal_entities(new structures::stl::STLStackArray<std::string>()), realtime_factor(realtime_factor),
+      pixels_per_metre(pixels_per_metre), flip_y(flip_y), current_time(scene->get_min_temporal_limit()),
       last_time(temporal::Time::min()), last_realtime(temporal::Time::min()), update_required(true),
-      trig_buff(geometry::TrigBuff::get_instance()) {}
+      trig_buff(geometry::TrigBuff::get_instance())
+{
+}
 
 QSceneWidget::~QSceneWidget()
 {
@@ -61,7 +65,8 @@ void QSceneWidget::on_update()
 
             populate_render_stack();
 
-            sf::View view(to_sfml_vec(focal_position, false, true), sf::Vector2f(this->width(), this->height()));
+            sf::View view(to_sfml_vec(get_pixels_per_metre() * focal_position, false, this->get_flip_y()),
+                          sf::Vector2f(this->width(), this->height()));
             setView(view);
 
             update_required = false;
@@ -119,7 +124,7 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
         sf::Text *text = nullptr;
         try
         {
-            sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position_variable->get_value(current_time), false, true);
+            sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position_variable->get_value(current_time), false, this->get_flip_y());
 
             FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
             FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
@@ -177,7 +182,10 @@ void QSceneWidget::add_scene_to_render_stack()
 {
     structures::IArray<agent::IEntity const*> *entities = scene->get_entities();
 
-    focal_position = geometry::Vec::Zero();
+    if (focus_mode == FocusMode::ALL_AGENTS || focus_mode == FocusMode::FOCAL_AGENTS)
+    {
+        focal_position = geometry::Vec::Zero();
+    }
     size_t focal_agent_count = 0;
 
     size_t i;
@@ -188,7 +196,9 @@ void QSceneWidget::add_scene_to_render_stack()
         {
             add_vehicle_to_render_stack(entity);
 
-            if (!focused || focal_entities->contains(entity->get_name()))
+            if (focus_mode == FocusMode::ALL_AGENTS ||
+                    (focus_mode == FocusMode::FOCAL_AGENTS &&
+                     focal_entities->contains(entity->get_name())))
             {
                 try
                 {
@@ -202,7 +212,7 @@ void QSceneWidget::add_scene_to_render_stack()
                     try
                     {
                         geometry::Vec position = position_variable->get_value(this->get_time());
-                        focal_position += get_pixels_per_metre() * position;
+                        focal_position += position;
                         ++focal_agent_count;
                     }
                     catch (std::out_of_range)
@@ -212,7 +222,7 @@ void QSceneWidget::add_scene_to_render_stack()
                 }
                 catch (std::out_of_range)
                 {
-                    if (focused)
+                    if (focus_mode == FocusMode::FOCAL_AGENTS)
                     {
                         std::cerr << "Focal entity '" << entity->get_name() << "' does not have a position parameter" << std::endl;
                     }
@@ -223,7 +233,10 @@ void QSceneWidget::add_scene_to_render_stack()
 
     delete entities;
 
-    focal_position /= focal_agent_count;
+    if (focus_mode == FocusMode::ALL_AGENTS || focus_mode == FocusMode::FOCAL_AGENTS)
+    {
+        focal_position /= focal_agent_count;
+    }
 }
 
 void QSceneWidget::populate_render_stack()
@@ -234,6 +247,16 @@ void QSceneWidget::populate_render_stack()
 FP_DATA_TYPE QSceneWidget::get_pixels_per_metre() const
 {
     return pixels_per_metre;
+}
+
+bool QSceneWidget::get_flip_y() const
+{
+    return flip_y;
+}
+
+QSceneWidget::FocusMode QSceneWidget::get_focus_mode() const
+{
+    return focus_mode;
 }
 
 geometry::Vec const& QSceneWidget::get_focal_position() const
@@ -255,6 +278,40 @@ temporal::Time QSceneWidget::get_time() const
     return current_time;
 }
 
+void QSceneWidget::set_pixels_per_metre(FP_DATA_TYPE pixels_per_metre)
+{
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
+
+    this->pixels_per_metre = pixels_per_metre;
+
+    // TODO: Possibly add a check to see if an update is actually required?
+    update_required = true;
+}
+
+void QSceneWidget::set_focus_mode(FocusMode focus_mode)
+{
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
+
+    this->focus_mode = focus_mode;
+
+    // TODO: Possibly add a check to see if an update is actually required?
+    update_required = true;
+}
+
+void QSceneWidget::set_focal_position(geometry::Vec const &focal_position)
+{
+    std::lock_guard<std::recursive_mutex> const lock(mutex);
+
+    this->focal_position = focal_position;
+
+    // TODO: Possibly add a check to see if an update is actually required?
+    if (focus_mode == FocusMode::FIXED)
+    {
+        update_required = true;
+    }
+
+}
+
 void QSceneWidget::set_focal_entities(structures::IArray<std::string> const *focal_entities)
 {
     std::lock_guard<std::recursive_mutex> const lock(mutex);
@@ -262,13 +319,13 @@ void QSceneWidget::set_focal_entities(structures::IArray<std::string> const *foc
     if (this->focal_entities != focal_entities)
     {
         delete this->focal_entities;
-
         this->focal_entities = focal_entities;
 
-        focused = focal_entities->count() > 0;
-
         // TODO: Possibly add a check to see if an update is actually required?
-        update_required = true;
+        if (focus_mode == FocusMode::FOCAL_AGENTS)
+        {
+            update_required = true;
+        }
     }
 }
 

@@ -15,6 +15,8 @@
 #include <iostream>
 #include <exception>
 
+#define NUMBER_OF_AGENTS 30
+
 using namespace ori::simcars;
 
 int main(int argc, char *argv[])
@@ -47,18 +49,12 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    structures::ISet<std::string> *agent_names = new structures::stl::STLSet<std::string>(
-                {
-                    "non_ego_vehicle_1",
-                    "non_ego_vehicle_2",
-                    "non_ego_vehicle_3",
-                    "non_ego_vehicle_4",
-                    "non_ego_vehicle_5",
-                    "non_ego_vehicle_6",
-                    "non_ego_vehicle_7",
-                    "non_ego_vehicle_8",
-                    "non_ego_vehicle_9"
-                });
+    structures::ISet<std::string> *agent_names = new structures::stl::STLSet<std::string>;
+
+    for (size_t i = 1; i <= NUMBER_OF_AGENTS; ++i)
+    {
+        agent_names->insert("non_ego_vehicle_" + std::to_string(i));
+    }
 
     agent::IDrivingScene const *scene;
 
@@ -92,36 +88,6 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished action extraction" << std::endl;
 
-    structures::IStackArray<std::string> *focal_entities =
-            new structures::stl::STLStackArray<std::string>();
-
-    structures::IArray<agent::IEntity const*> *entities =
-            scene->get_entities();
-
-    for (size_t i = 0; i < entities->count(); ++i)
-    {
-        agent::IEntity const *entity = (*entities)[i];
-        try
-        {
-            agent::IValuelessConstant const *ego_valueless_constant =
-                    entity->get_constant_parameter(entity->get_name() + ".ego");
-
-            agent::IConstant<bool> const *ego_constant =
-                    dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
-
-            if (ego_constant->get_value())
-            {
-                focal_entities->push_back(entity->get_name());
-            }
-        }
-        catch (std::out_of_range)
-        {
-            // Entity does not have an ego parameter
-        }
-    }
-
-    delete entities;
-
     temporal::Time scene_half_way_timestamp = scene->get_min_temporal_limit() +
             (scene->get_max_temporal_limit() - scene->get_min_temporal_limit()) / 2;
 
@@ -142,6 +108,8 @@ int main(int argc, char *argv[])
     frame->setFixedSize(1600, 800);
     frame->show();
 
+    geometry::Vec focal_position(210.0f, 19.0f);
+
     visualisation::QMapSceneWidget<uint8_t> *map_scene_widget =
                 new visualisation::QMapSceneWidget<uint8_t>(
                     map,
@@ -150,9 +118,11 @@ int main(int argc, char *argv[])
                     QPoint(20, 20),
                     QSize(760, 760),
                     1.0f,
-                    10.0f,
-                    1.0f);
-    map_scene_widget->set_focal_entities(focal_entities);
+                    30.0f,
+                    1.0f,
+                    2.0f,
+                    false);
+    map_scene_widget->set_focal_position(focal_position);
     map_scene_widget->show();
 
     visualisation::QMapSceneWidget<uint8_t> *map_simulated_scene_widget =
@@ -164,9 +134,10 @@ int main(int argc, char *argv[])
                     QSize(760, 760),
                     1.0f,
                     30.0f,
-                    1.0f);
-    map_simulated_scene_widget->set_focal_entities(
-                new structures::stl::STLStackArray(focal_entities));
+                    1.0f,
+                    2.0f,
+                    false);
+    map_simulated_scene_widget->set_focal_position(focal_position);
     map_simulated_scene_widget->show();
 
     int result = app.exec();

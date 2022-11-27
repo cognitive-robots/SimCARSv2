@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/map/map_interface.hpp>
 #include <ori/simcars/map/lane_interface.hpp>
 #include <ori/simcars/map/lane_array_interface.hpp>
@@ -7,6 +8,8 @@
 #include <ori/simcars/map/traffic_light_array_interface.hpp>
 #include <ori/simcars/visualisation/utils.hpp>
 #include <ori/simcars/visualisation/qscene_widget.hpp>
+
+#include <random>
 
 namespace ori
 {
@@ -19,6 +22,12 @@ template <typename T_id>
 class QMapSceneWidget : public QSceneWidget
 {
     map::IMap<T_id> const *map;
+
+    std::random_device random_device;
+    std::mt19937 randomness_generator;
+    std::uniform_real_distribution<float> hue_generator;
+
+    structures::stl::STLDictionary<T_id, sf::Color> id_to_colour_dict;
 
     FP_DATA_TYPE single_point_map_object_size;
 
@@ -39,59 +48,70 @@ protected:
             polygon->setPointCount(3);
             for (j = 0; j < 3; ++j)
             {
-                polygon->setPoint(j, to_sfml_vec(get_pixels_per_metre() * (*tris)[i][j], false, true));
+                polygon->setPoint(j, to_sfml_vec(get_pixels_per_metre() * (*tris)[i][j], false, this->get_flip_y()));
             }
 
             T_id id = lane->get_id();
-            size_t id_hash = std::hash<T_id>()(id);
 
-            float h = id_hash % 360;
-            float s = 0.5f;
-            float v = 1.0f;
+            sf::Color lane_colour;
+            if (id_to_colour_dict.contains(id))
+            {
+                lane_colour = id_to_colour_dict[id];
+            }
+            else
+            {
+                float h = hue_generator(randomness_generator);
+                float s = 0.5f;
+                float v = 1.0f;
 
-            float c = v * s;
-            float x = c * (1.0f - std::fabs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
-            float m = v - c;
+                float c = v * s;
+                float x = c * (1.0f - std::fabs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
+                float m = v - c;
 
-            uint8_t r, g, b;
-            if (0.0f <= h && h < 60.0f)
-            {
-                r = 255 * (c + m);
-                g = 255 * (x + m);
-                b = 255 * m;
-            }
-            else if (60.0f <= h && h < 120.0f)
-            {
-                r = 255 * (x + m);
-                g = 255 * (c + m);
-                b = 255 * m;
-            }
-            else if (120.0f <= h && h < 180.0f)
-            {
-                r = 255 * m;
-                g = 255 * (c + m);
-                b = 255 * (x + m);
-            }
-            else if (180.0f <= h && h < 240.0f)
-            {
-                r = 255 * m;
-                g = 255 * (x + m);
-                b = 255 * (c + m);
-            }
-            else if (240.0f <= h && h < 300.0f)
-            {
-                r = 255 * (x + m);
-                g = 255 * m;
-                b = 255 * (c + m);
-            }
-            else if (300.0f <= h && h < 360.0f)
-            {
-                r = 255 * (c + m);
-                g = 255 * m;
-                b = 255 * (x + m);
+                uint8_t r, g, b;
+                if (0.0f <= h && h < 60.0f)
+                {
+                    r = 255 * (c + m);
+                    g = 255 * (x + m);
+                    b = 255 * m;
+                }
+                else if (60.0f <= h && h < 120.0f)
+                {
+                    r = 255 * (x + m);
+                    g = 255 * (c + m);
+                    b = 255 * m;
+                }
+                else if (120.0f <= h && h < 180.0f)
+                {
+                    r = 255 * m;
+                    g = 255 * (c + m);
+                    b = 255 * (x + m);
+                }
+                else if (180.0f <= h && h < 240.0f)
+                {
+                    r = 255 * m;
+                    g = 255 * (x + m);
+                    b = 255 * (c + m);
+                }
+                else if (240.0f <= h && h < 300.0f)
+                {
+                    r = 255 * (x + m);
+                    g = 255 * m;
+                    b = 255 * (c + m);
+                }
+                else if (300.0f <= h && h < 360.0f)
+                {
+                    r = 255 * (c + m);
+                    g = 255 * m;
+                    b = 255 * (x + m);
+                }
+
+                lane_colour = sf::Color(r, g, b, 128);
+
+                id_to_colour_dict.update(id, lane_colour);
             }
 
-            polygon->setFillColor(sf::Color(r, g, b, 128));
+            polygon->setFillColor(lane_colour);
 
             render_stack.push_back(polygon);
         }
@@ -100,7 +120,7 @@ protected:
     {
         sf::CircleShape *circle = new sf::CircleShape(get_pixels_per_metre() * single_point_map_object_size);
         map::ITrafficLightStateHolder::State const *traffic_light_state = traffic_light->get_state(this->get_time());
-        circle->setPosition(to_sfml_vec(get_pixels_per_metre() * traffic_light->get_position(), false, true));
+        circle->setPosition(to_sfml_vec(get_pixels_per_metre() * traffic_light->get_position(), false, this->get_flip_y()));
         if (traffic_light_state != nullptr)
         {
             circle->setFillColor(to_sfml_colour(traffic_light_state->active_face));
@@ -113,7 +133,7 @@ protected:
     }
     virtual void add_map_to_render_stack()
     {
-        geometry::Vec const &point = this->get_focal_position() / this->get_pixels_per_metre();
+        geometry::Vec const &point = this->get_focal_position();
         FP_DATA_TYPE distance = std::max(this->width() / this->get_pixels_per_metre(),
                                          this->height() / this->get_pixels_per_metre());
 
@@ -141,8 +161,9 @@ protected:
 public:
     QMapSceneWidget(map::IMap<T_id> const *map, agent::IScene const *scene, QWidget *parent,
                     QPoint const &position, QSize const &size, FP_DATA_TYPE single_point_map_object_size = 1.0f, FP_DATA_TYPE frame_rate = 30.0f,
-                    FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 10.0f)
-        : QSceneWidget(scene, parent, position, size, frame_rate, realtime_factor, pixels_per_metre), map(map),
+                    FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 10.0f, bool flip_y = true)
+        : QSceneWidget(scene, parent, position, size, frame_rate, realtime_factor, pixels_per_metre, flip_y), map(map),
+          randomness_generator(random_device()), hue_generator(0.0f, 360.0f),
           single_point_map_object_size(single_point_map_object_size) {}
 };
 

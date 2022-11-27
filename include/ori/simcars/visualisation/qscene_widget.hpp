@@ -17,6 +17,15 @@ namespace visualisation
 
 class QSceneWidget : public AQSFMLCanvas
 {
+public:
+    enum class FocusMode
+    {
+        FIXED = 0,
+        ALL_AGENTS = 1,
+        FOCAL_AGENTS = 2
+    };
+
+private:
     bool text_enabled;
     sf::Font text_font;
 
@@ -25,7 +34,9 @@ class QSceneWidget : public AQSFMLCanvas
     FP_DATA_TYPE realtime_factor;
     FP_DATA_TYPE pixels_per_metre;
 
-    bool focused;
+    bool flip_y;
+
+    FocusMode focus_mode;
     geometry::Vec focal_position;
     structures::IArray<std::string> const *focal_entities;
 
@@ -51,15 +62,21 @@ protected:
 
 public:
     QSceneWidget(agent::IScene const *scene, QWidget *parent, QPoint const &position, QSize const &size,
-                 FP_DATA_TYPE frame_rate = 30.0f, FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 10.0f);
+                 FP_DATA_TYPE frame_rate = 30.0f, FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 10.0f,
+                 bool flip_y = true);
 
     ~QSceneWidget();
 
     FP_DATA_TYPE get_pixels_per_metre() const;
+    bool get_flip_y() const;
+    FocusMode get_focus_mode() const;
     geometry::Vec const& get_focal_position() const;
     structures::IArray<std::string> const* get_focal_entities() const;
     temporal::Time get_time() const;
 
+    void set_pixels_per_metre(FP_DATA_TYPE pixels_per_metre);
+    void set_focus_mode(FocusMode focus_mode);
+    void set_focal_position(geometry::Vec const &focal_position);
     void set_focal_entities(structures::IArray<std::string> const *focal_entities);
     void set_time(temporal::Time time);
 

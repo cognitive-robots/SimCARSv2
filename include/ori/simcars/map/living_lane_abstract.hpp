@@ -101,7 +101,7 @@ public:
         if (straight_fore_lane == nullptr)
         {
             ILaneArray<T_id> const *fore_lanes = this->get_fore_lanes();
-            if (fore_lanes->count() > 0)
+            if (fore_lanes != nullptr && fore_lanes->count() > 0)
             {
                 ILane<T_id> const *min_abs_steer_fore_lane = (*fore_lanes)[0];
                 for (size_t i = 1; i < fore_lanes->count(); ++i)
@@ -126,6 +126,10 @@ public:
     }
     ILaneArray<T_id> const* get_fore_lanes() const override
     {
+        if (fore_lanes == nullptr)
+        {
+            return nullptr;
+        }
         try
         {
             return fore_lanes->get_self();
@@ -138,6 +142,10 @@ public:
     }
     ILaneArray<T_id> const* get_aft_lanes() const override
     {
+        if (aft_lanes == nullptr)
+        {
+            return nullptr;
+        }
         try
         {
             return aft_lanes->get_self();
@@ -150,6 +158,10 @@ public:
     }
     ITrafficLightArray<T_id> const* get_traffic_lights() const override
     {
+        if (traffic_lights == nullptr)
+        {
+            return nullptr;
+        }
         try
         {
             return traffic_lights->get_self();

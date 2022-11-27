@@ -13,6 +13,7 @@
 #include <ori/simcars/agent/basic_driving_agent_controller.hpp>
 
 #include <iostream>
+#include <cassert>
 
 namespace ori
 {
@@ -71,6 +72,7 @@ public:
             new_aligned_linear_acceleration = aligned_linear_velocity_error / std::max(aligned_linear_velocity_goal_duration.count(), time_step.count());
             new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
             new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
+            assert(!std::isnan(new_aligned_linear_acceleration));
 
             IConstant<FP_DATA_TYPE> const *new_aligned_linear_acceleration_variable =
                         new BasicConstant(
@@ -177,7 +179,7 @@ public:
                             if (distance_remaining < 0)
                             {
                                 end_direction = on_boundary.normalized();
-                                end_point = left_boundary.col(i);
+                                end_point = left_boundary.col(i + 1);
                                 break;
                             }
                         }
@@ -194,7 +196,7 @@ public:
                         else
                         {
                             size_t last_index = left_boundary.cols() - 1;
-                            end_direction = left_boundary.col(last_index) - left_boundary.col(last_index - 1);
+                            end_direction = (left_boundary.col(last_index) - left_boundary.col(last_index - 1)).normalized();
                             end_point = left_boundary.col(last_index - 1);
                             break;
                         }
@@ -235,7 +237,10 @@ public:
 
                 geometry::Vec midpoint_direction = (lane_midpoint - position).normalized();
 
-                FP_DATA_TYPE lane_midpoint_angle_mag = std::acos(start_direction.dot(midpoint_direction));
+                FP_DATA_TYPE lane_midpoint_dot_prod = start_direction.dot(midpoint_direction);
+                lane_midpoint_dot_prod = std::min(lane_midpoint_dot_prod, 1.0f);
+                lane_midpoint_dot_prod = std::max(lane_midpoint_dot_prod, -1.0f);
+                FP_DATA_TYPE lane_midpoint_angle_mag = std::acos(lane_midpoint_dot_prod);
                 FP_DATA_TYPE lane_midpoint_angle;
                 if (midpoint_direction.dot(trig_buff->get_rot_mat(lane_midpoint_angle_mag) * start_direction) >=
                         midpoint_direction.dot(trig_buff->get_rot_mat(-lane_midpoint_angle_mag) * start_direction))
@@ -264,6 +269,7 @@ public:
 
 
                 FP_DATA_TYPE new_steer = (lane_midpoint_steer + lane_orientation_steer) / 2.0f;
+                assert(!std::isnan(new_steer));
 
                 IConstant<FP_DATA_TYPE> const *new_steer_variable =
                             new BasicConstant(
