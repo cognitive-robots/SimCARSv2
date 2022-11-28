@@ -55,7 +55,7 @@ void HighDMap::load_virt(std::ifstream &input_filestream)
         uint8_t const lane_id = i + 1;
 
         uint8_t left_adjacent_lane_id;
-        if (lane_id != upper_lane_markings.count() - 2)
+        if (i != upper_lane_markings.count() - 2)
         {
             left_adjacent_lane_id = lane_id + 1;
         }
@@ -65,7 +65,7 @@ void HighDMap::load_virt(std::ifstream &input_filestream)
         }
 
         uint8_t right_adjacent_lane_id;
-        if (lane_id != 1)
+        if (i != 0)
         {
             right_adjacent_lane_id = lane_id - 1;
         }
@@ -84,7 +84,7 @@ void HighDMap::load_virt(std::ifstream &input_filestream)
         uint8_t const lane_id = i + upper_lane_markings.count();
 
         uint8_t left_adjacent_lane_id;
-        if (lane_id != 1)
+        if (i != 0)
         {
             left_adjacent_lane_id = lane_id - 1;
         }
@@ -94,7 +94,7 @@ void HighDMap::load_virt(std::ifstream &input_filestream)
         }
 
         uint8_t right_adjacent_lane_id;
-        if (lane_id != upper_lane_markings.count() - 2)
+        if (i != lower_lane_markings.count() - 2)
         {
             right_adjacent_lane_id = lane_id + 1;
         }

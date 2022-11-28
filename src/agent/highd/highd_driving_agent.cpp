@@ -122,7 +122,8 @@ HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Doc
     size_t const tracks_end_row = tracks_start_row + (end_frame - start_frame);
     for (i = tracks_start_row; i <= tracks_end_row; ++i)
     {
-        temporal::Time timestamp(temporal::Duration((i - tracks_start_row) * 40));
+        temporal::Time timestamp = this->min_temporal_limit + temporal::Duration((i - tracks_start_row) * 40);
+        assert(timestamp <= this->max_temporal_limit);
 
         FP_DATA_TYPE const position_x = tracks_csv_document.GetCell<FP_DATA_TYPE>("x", i) + bb_length / 2.0f;
         FP_DATA_TYPE const position_y = tracks_csv_document.GetCell<FP_DATA_TYPE>("y", i) + bb_width / 2.0f;

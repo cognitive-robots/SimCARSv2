@@ -95,25 +95,21 @@ public:
 
     Time get_earliest_timestamp() const
     {
-        structures::IArray<Time> const &timestamps = *(this->get_keys());
-
-        if (timestamps.count() == 0)
+        if (this->data.size() == 0)
         {
             throw std::out_of_range("Temporal dictionary is empty");
         }
 
-        return timestamps[0];
+        return this->data.begin()->first;
     }
     Time get_latest_timestamp() const
     {
-        structures::IArray<Time> const &timestamps = *(this->get_keys());
-
-        if (timestamps.count() == 0)
+        if (this->data.size() == 0)
         {
             throw std::out_of_range("Temporal dictionary is empty");
         }
 
-        return timestamps[timestamps.count() - 1];
+        return this->data.end()->first;
     }
     Duration get_time_diff_threshold() const
     {
