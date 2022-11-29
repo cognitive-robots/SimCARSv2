@@ -109,7 +109,7 @@ public:
             throw std::out_of_range("Temporal dictionary is empty");
         }
 
-        return this->data.end()->first;
+        return this->data.rbegin()->first;
     }
     Duration get_time_diff_threshold() const
     {
