@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
+    geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
     std::cout << "Beginning map load" << std::endl;
 
@@ -110,8 +110,7 @@ int main(int argc, char *argv[])
             agent::IDrivingAgent const *driving_agent = (*driving_agents)[i];
             agent::IVariable<geometry::Vec> const *position_variable =
                     driving_agent->get_position_variable();
-            geometry::Vec final_position = position_variable->get_value(
-                        simulated_scene->get_max_temporal_limit());
+            position_variable->get_value(simulated_scene->get_max_temporal_limit());
         }
         catch (std::out_of_range)
         {

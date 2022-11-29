@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
+    geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
     QApplication app(argc, argv);
 
