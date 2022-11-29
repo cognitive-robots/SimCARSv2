@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished action extraction (" << time_elapsed.count() << " us)" << std::endl;
 
-    temporal::Time scene_half_way_timestamp = scene->get_min_temporal_limit() +
-            (scene->get_max_temporal_limit() - scene->get_min_temporal_limit()) / 2;
+    temporal::Time simulation_start_time = scene->get_min_temporal_limit() +
+            temporal::Duration(1000);
 
     temporal::Duration time_step(40);
 
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 
     agent::IDrivingScene const *simulated_scene =
             agent::DrivingSimulationScene::construct_from(
-                scene_with_actions, driving_simulator, time_step, scene_half_way_timestamp);
+                scene_with_actions, driving_simulator, time_step, simulation_start_time);
 
     std::cout << "Beginning simulation" << std::endl;
 
