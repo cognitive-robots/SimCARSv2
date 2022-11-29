@@ -14,6 +14,7 @@
 #define NUMBER_OF_AGENTS 100
 
 using namespace ori::simcars;
+using namespace std::chrono;
 
 int main(int argc, char *argv[])
 {
@@ -25,7 +26,12 @@ int main(int argc, char *argv[])
 
     geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
+    time_point<high_resolution_clock> start_time;
+    microseconds time_elapsed;
+
     std::cout << "Beginning map load" << std::endl;
+
+    start_time = high_resolution_clock::now();
 
     map::IMap<uint8_t> const *map;
 
@@ -39,9 +45,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    std::cout << "Finished map load" << std::endl;
+    time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
+
+    std::cout << "Finished map load (" << time_elapsed.count() << " us)" << std::endl;
 
     std::cout << "Beginning scene load" << std::endl;
+
+    start_time = high_resolution_clock::now();
 
     structures::ISet<std::string> *agent_names = new structures::stl::STLSet<std::string>;
 
@@ -63,11 +73,15 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    std::cout << "Finished scene load" << std::endl;
+    time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
+
+    std::cout << "Finished scene load (" << time_elapsed.count() << " us)" << std::endl;
 
     delete agent_names;
 
     std::cout << "Beginning action extraction" << std::endl;
+
+    start_time = high_resolution_clock::now();
 
     agent::IDrivingScene const *scene_with_actions;
 
@@ -81,7 +95,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    std::cout << "Finished action extraction" << std::endl;
+    time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
+
+    std::cout << "Finished action extraction (" << time_elapsed.count() << " us)" << std::endl;
 
     temporal::Time scene_half_way_timestamp = scene->get_min_temporal_limit() +
             (scene->get_max_temporal_limit() - scene->get_min_temporal_limit()) / 2;
@@ -99,6 +115,8 @@ int main(int argc, char *argv[])
                 scene_with_actions, driving_simulator, time_step, scene_half_way_timestamp);
 
     std::cout << "Beginning simulation" << std::endl;
+
+    start_time = high_resolution_clock::now();
 
     structures::IArray<agent::IDrivingAgent const*> *driving_agents =
             simulated_scene->get_driving_agents();
@@ -120,7 +138,9 @@ int main(int argc, char *argv[])
 
     delete driving_agents;
 
-    std::cout << "Finished simulation" << std::endl;
+    time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
+
+    std::cout << "Finished simulation (" << time_elapsed.count() << " us)" << std::endl;
 
     delete simulated_scene;
     delete scene_with_actions;
