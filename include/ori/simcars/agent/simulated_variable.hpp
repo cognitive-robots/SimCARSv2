@@ -24,7 +24,7 @@ class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulated
     IVariable<T> const *original_variable;
     ISimulationScene const *simulation_scene;
 
-    temporal::Time simulation_start_time;
+    mutable temporal::Time simulation_start_time;
     temporal::Time simulation_end_time;
 
     mutable temporal::PrecedenceTemporalDictionary<IEvent<T> const*> time_event_dict;
@@ -49,15 +49,21 @@ public:
     SimulatedVariable(IVariable<T> const *original_variable,
                       ISimulationScene const *simulation_scene,
                       temporal::Time simulation_start_time,
+                      bool start_simulated,
                       size_t max_cache_size = 10) :
-        SimulatedVariable(original_variable, simulation_scene, simulation_start_time, original_variable->get_max_temporal_limit(),
+        SimulatedVariable(original_variable, simulation_scene,
+                          simulation_start_time,
+                          original_variable->get_max_temporal_limit(),
+                          start_simulated,
                           max_cache_size) {}
     SimulatedVariable(IVariable<T> const *original_variable,
                       ISimulationScene const *simulation_scene,
-                      temporal::Time simulation_start_time, temporal::Time simulation_end_time,
+                      temporal::Time simulation_start_time,
+                      temporal::Time simulation_end_time,
+                      bool start_simulated,
                       size_t max_cache_size = 10) :
         original_variable(original_variable), simulation_scene(simulation_scene),
-        simulation_start_time(simulation_start_time), simulation_end_time(simulation_end_time),
+        simulation_end_time(simulation_end_time),
         time_event_dict(max_cache_size)
     {
         if (simulation_start_time < original_variable->get_min_temporal_limit())
@@ -73,6 +79,15 @@ public:
         if (simulation_start_time > simulation_end_time)
         {
             throw std::invalid_argument("Simulation start time is after simulation end time");
+        }
+
+        if (start_simulated)
+        {
+            this->simulation_start_time = simulation_start_time;
+        }
+        else
+        {
+            this->simulation_start_time = simulation_end_time;
         }
     }
 
@@ -273,6 +288,14 @@ public:
             }
 
             return true;
+        }
+    }
+
+    void begin_simulation(temporal::Time simulation_start_time) const override
+    {
+        if (this->simulation_start_time != this->simulation_end_time)
+        {
+            this->simulation_start_time = simulation_start_time;
         }
     }
 };

@@ -10,8 +10,10 @@
 
 #include <iostream>
 #include <exception>
+#include <random>
 
 #define NUMBER_OF_AGENTS 100
+#define NUMBER_OF_SIMULATED_AGENTS 2
 
 using namespace ori::simcars;
 using namespace std::chrono;
@@ -23,6 +25,36 @@ int main(int argc, char *argv[])
         std::cerr << "Usage: ./highd_simcars_demo recording_meta_file_path tracks_meta_file_path tracks_file_path" << std::endl;
         return -1;
     }
+
+
+    structures::ISet<std::string> *agent_names = new structures::stl::STLSet<std::string>;
+
+    size_t i;
+    for (i = 1; i <= NUMBER_OF_AGENTS; ++i)
+    {
+        agent_names->insert("non_ego_vehicle_" + std::to_string(i));
+    }
+
+    std::random_device random_device;
+    std::mt19937 randomness_generator(random_device());
+    std::uniform_int_distribution<size_t> agent_selector(1, NUMBER_OF_AGENTS);
+
+    structures::ISet<std::string> *simulated_agent_names = new structures::stl::STLSet<std::string>;
+
+    for (i = 0; i < NUMBER_OF_SIMULATED_AGENTS; ++i)
+    {
+        size_t agent_id = agent_selector(randomness_generator);
+        std::string agent_name = "non_ego_vehicle_" + std::to_string(agent_id);
+        if (!simulated_agent_names->contains(agent_name))
+        {
+            simulated_agent_names->insert(agent_name);
+        }
+        else
+        {
+            --i;
+        }
+    }
+
 
     geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
@@ -52,14 +84,6 @@ int main(int argc, char *argv[])
     std::cout << "Beginning scene load" << std::endl;
 
     start_time = high_resolution_clock::now();
-
-    structures::ISet<std::string> *agent_names = new structures::stl::STLSet<std::string>;
-
-    size_t i;
-    for (i = 1; i <= NUMBER_OF_AGENTS; ++i)
-    {
-        agent_names->insert("non_ego_vehicle_" + std::to_string(i));
-    }
 
     agent::IDrivingScene const *scene;
 
@@ -112,7 +136,10 @@ int main(int argc, char *argv[])
 
     agent::IDrivingScene const *simulated_scene =
             agent::DrivingSimulationScene::construct_from(
-                scene_with_actions, driving_simulator, time_step, simulation_start_time);
+                scene_with_actions, driving_simulator, time_step,
+                simulation_start_time, simulated_agent_names);
+
+    delete simulated_agent_names;
 
     std::cout << "Beginning simulation" << std::endl;
 

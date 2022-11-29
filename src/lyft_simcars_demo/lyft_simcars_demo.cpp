@@ -76,8 +76,11 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished action extraction" << std::endl;
 
+    // NOTE: Kinda redundant, maybe we should only use one type of container
     structures::IStackArray<std::string> *focal_entities =
             new structures::stl::STLStackArray<std::string>();
+    structures::ISet<std::string> *agent_names =
+            new structures::stl::STLSet<std::string>;
 
     structures::IArray<agent::IEntity const*> *entities =
             scene->get_entities();
@@ -96,6 +99,7 @@ int main(int argc, char *argv[])
             if (ego_constant->get_value())
             {
                 focal_entities->push_back(entity->get_name());
+                agent_names->insert(entity->get_name());
             }
         }
         catch (std::out_of_range)
@@ -119,7 +123,10 @@ int main(int argc, char *argv[])
 
     agent::IDrivingScene const *simulated_scene =
             agent::DrivingSimulationScene::construct_from(
-                scene_with_actions, driving_simulator, time_step, scene_half_way_timestamp);
+                scene_with_actions, driving_simulator, time_step,
+                scene_half_way_timestamp, agent_names);
+
+    delete agent_names;
 
     QFrame *frame = new QFrame();
     frame->setWindowTitle("SIMCARS Demo");

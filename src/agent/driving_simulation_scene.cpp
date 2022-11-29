@@ -31,14 +31,16 @@ DrivingSimulationScene const* DrivingSimulationScene::construct_from(
         IDrivingScene const *driving_scene,
         IDrivingSimulator const *driving_simulator,
         temporal::Duration simulation_time_step,
-        temporal::Time simulation_start_time)
+        temporal::Time simulation_start_time,
+        structures::ISet<std::string> *starting_agent_names)
 {
     return DrivingSimulationScene::construct_from(
                 driving_scene,
                 driving_simulator,
                 simulation_time_step,
                 simulation_start_time,
-                driving_scene->get_max_temporal_limit());
+                driving_scene->get_max_temporal_limit(),
+                starting_agent_names);
 }
 
 DrivingSimulationScene const* DrivingSimulationScene::construct_from(
@@ -46,7 +48,8 @@ DrivingSimulationScene const* DrivingSimulationScene::construct_from(
         IDrivingSimulator const *driving_simulator,
         temporal::Duration simulation_time_step,
         temporal::Time simulation_start_time,
-        temporal::Time simulation_end_time)
+        temporal::Time simulation_end_time,
+        structures::ISet<std::string> *starting_agent_names)
 {
     if (simulation_start_time < driving_scene->get_min_temporal_limit())
     {
@@ -78,6 +81,9 @@ DrivingSimulationScene const* DrivingSimulationScene::construct_from(
 
     for (size_t i = 0; i < driving_agents->count(); ++i)
     {
+        bool starting_agent = starting_agent_names == nullptr ||
+                starting_agent_names->contains((*driving_agents)[i]->get_name());
+
         try
         {
             DrivingSimulationAgent *driving_simulation_agent =
@@ -85,7 +91,8 @@ DrivingSimulationScene const* DrivingSimulationScene::construct_from(
                             (*driving_agents)[i],
                             new_driving_scene,
                             simulation_start_time,
-                            simulation_end_time);
+                            simulation_end_time,
+                            starting_agent);
 
             new_driving_scene->simulated_driving_agent_dict.update(
                         driving_simulation_agent->get_name(), driving_simulation_agent);

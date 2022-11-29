@@ -31,10 +31,14 @@ class DrivingSimulationAgent : public virtual ADrivingAgent
 public:
     DrivingSimulationAgent(IDrivingAgent const *driving_agent,
                            ISimulationScene const *simulation_scene,
-                           temporal::Time simulation_start_time, bool allow_late_start = true);
+                           temporal::Time simulation_start_time,
+                           bool start_simulated,
+                           bool allow_late_start = true);
     DrivingSimulationAgent(IDrivingAgent const *driving_agent,
                            ISimulationScene const *simulation_scene,
-                           temporal::Time simulation_start_time, temporal::Time simulation_end_time,
+                           temporal::Time simulation_start_time,
+                           temporal::Time simulation_end_time,
+                           bool start_simulated,
                            bool allow_late_start = true);
 
     ~DrivingSimulationAgent();
@@ -60,6 +64,8 @@ public:
     IDrivingAgentState* get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
 
     void propogate(temporal::Time time, IDrivingAgentState const *state) const;
+
+    void begin_simulation(temporal::Time simulation_start_time) const;
 };
 
 }

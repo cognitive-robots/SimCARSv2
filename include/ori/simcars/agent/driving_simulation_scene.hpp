@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ori/simcars/structures/set_interface.hpp>
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/agent/declarations.hpp>
 #include <ori/simcars/agent/simulation_scene_interface.hpp>
@@ -33,12 +34,14 @@ public:
     static DrivingSimulationScene const* construct_from(IDrivingScene const *driving_scene,
                                                         IDrivingSimulator const *driving_simulator,
                                                         temporal::Duration time_step,
-                                                        temporal::Time simulation_start_time);
+                                                        temporal::Time simulation_start_time,
+                                                        structures::ISet<std::string> *starting_agent_names = nullptr);
     static DrivingSimulationScene const* construct_from(IDrivingScene const *driving_scene,
                                                         IDrivingSimulator const *driving_simulator,
                                                         temporal::Duration simulation_time_step,
                                                         temporal::Time simulation_start_time,
-                                                        temporal::Time simulation_end_time);
+                                                        temporal::Time simulation_end_time,
+                                                        structures::ISet<std::string> *starting_agent_names = nullptr);
 
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
