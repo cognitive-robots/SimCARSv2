@@ -3,7 +3,6 @@
 #include <ori/simcars/utils/exceptions.hpp>
 #include <ori/simcars/structures/set_interface.hpp>
 #include <ori/simcars/agent/file_based_scene_interface.hpp>
-#include <ori/simcars/agent/scene_abstract.hpp>
 
 #include <fstream>
 #include <filesystem>
@@ -16,7 +15,7 @@ namespace agent
 {
 
 template <class T_scene>
-class AFileBasedScene : public virtual AScene, public virtual IFileBasedScene
+class AFileBasedScene : public virtual IFileBasedScene
 {
 protected:
     AFileBasedScene() = default;

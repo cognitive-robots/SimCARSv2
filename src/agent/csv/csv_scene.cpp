@@ -41,49 +41,56 @@ CSVScene const* CSVScene::construct_from(IScene const *scene)
 
 void CSVScene::save_virt(std::ofstream &output_filestream) const
 {
-    structures::IArray<IValuelessConstant const*> *constants = this->get_constants();
-    structures::IArray<IValuelessVariable const*> *variables = this->get_variables();
+    structures::IArray<IEntity const*> *entities = this->get_entities();
 
-    size_t i;
-    for (i = 0; i < variables->count(); ++i)
+    for (size_t i = 0; i < entities->count(); ++i)
     {
-        std::string variable_name = (*variables)[i]->get_full_name();
-        output_filestream << variable_name << ";";
-    }
-    for (i = 0; i < constants->count(); ++i)
-    {
-        std::string constant_name = (*constants)[i]->get_full_name();
-        output_filestream << constant_name << ";";
-    }
-    output_filestream << std::endl;
+        structures::IArray<IValuelessConstant const*> *constants = (*entities)[i]->get_constant_parameters();
+        structures::IArray<IValuelessVariable const*> *variables = (*entities)[i]->get_variable_parameters();
 
-    temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
-    temporal::Time current_time;
-    for (current_time = min_temporal_limit; current_time <= max_temporal_limit; current_time += time_step)
-    {
-        for (i = 0; i < variables->count(); ++i)
+        size_t j;
+        for (j = 0; j < variables->count(); ++j)
         {
-            try
-            {
-                std::string value_as_string = (*variables)[i]->get_value_as_string(current_time);
-                output_filestream << value_as_string << ";";
-            }
-            catch (std::out_of_range)
-            {
-                // Not the best solution, since it's not impossible a variable could take the value "NA"
-                output_filestream << "NA;";
-            }
+            std::string variable_name = (*variables)[j]->get_full_name();
+            output_filestream << variable_name << ";";
         }
-        for (i = 0; i < constants->count(); ++i)
+        for (j = 0; j < constants->count(); ++j)
         {
-            std::string value_as_string = (*constants)[i]->get_value_as_string();
-            output_filestream << value_as_string << ";";
+            std::string constant_name = (*constants)[j]->get_full_name();
+            output_filestream << constant_name << ";";
         }
         output_filestream << std::endl;
+
+        temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
+        temporal::Time current_time;
+        for (current_time = min_temporal_limit; current_time <= max_temporal_limit; current_time += time_step)
+        {
+            for (j = 0; j < variables->count(); ++j)
+            {
+                try
+                {
+                    std::string value_as_string = (*variables)[j]->get_value_as_string(current_time);
+                    output_filestream << value_as_string << ";";
+                }
+                catch (std::out_of_range)
+                {
+                    // Not the best solution, since it's not impossible a variable could take the value "NA"
+                    output_filestream << "NA;";
+                }
+            }
+            for (j = 0; j < constants->count(); ++j)
+            {
+                std::string value_as_string = (*constants)[j]->get_value_as_string();
+                output_filestream << value_as_string << ";";
+            }
+            output_filestream << std::endl;
+        }
+
+        delete constants;
+        delete variables;
     }
 
-    delete constants;
-    delete variables;
+    delete entities;
 }
 
 void CSVScene::load_virt(std::ifstream &input_filestream, structures::ISet<std::string>* agent_names)

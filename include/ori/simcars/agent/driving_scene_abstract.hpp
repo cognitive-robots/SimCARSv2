@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ori/simcars/agent/driving_scene_interface.hpp>
-#include <ori/simcars/agent/scene_abstract.hpp>
 
 namespace ori
 {
@@ -10,7 +9,7 @@ namespace simcars
 namespace agent
 {
 
-class ADrivingScene : public virtual AScene, public virtual IDrivingScene
+class ADrivingScene : public virtual IDrivingScene
 {
 public:
     IState* get_state(temporal::Time time) const override;

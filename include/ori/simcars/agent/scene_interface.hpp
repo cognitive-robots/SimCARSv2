@@ -32,14 +32,6 @@ public:
     virtual structures::IArray<IEntity const*>* get_entities() const = 0;
     virtual IEntity const* get_entity(std::string const &entity_name) const = 0;
 
-    virtual structures::IArray<IValuelessConstant const*>* get_constants() const = 0;
-    virtual IValuelessConstant const* get_constant(std::string const &constant_name) const = 0;
-
-    virtual structures::IArray<IValuelessVariable const*>* get_variables() const = 0;
-    virtual IValuelessVariable const* get_variable(std::string const &variable_name) const = 0;
-
-    virtual structures::IArray<IValuelessEvent const*>* get_events() const = 0;
-
     virtual IState* get_state(temporal::Time time) const = 0;
 };
 
