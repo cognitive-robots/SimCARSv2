@@ -10,7 +10,12 @@ namespace agent
 
 std::string AValuelessVariable::get_full_name() const
 {
-    return this->get_entity_name() + "." + this->get_parameter_name() + "." + this->get_type_name();
+    return this->get_entity_name() + "." + this->get_parameter_name();
+}
+
+std::string AValuelessVariable::get_parameter_name() const
+{
+    return this->get_variable_name() + "." + this->get_type_name();
 }
 
 std::string AValuelessVariable::get_type_name() const

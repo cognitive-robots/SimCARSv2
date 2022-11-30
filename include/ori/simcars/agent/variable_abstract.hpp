@@ -75,9 +75,9 @@ public:
         delete events;
         return valueless_events;
     }
-    IValuelessEvent const* get_valueless_event(temporal::Time time) const override
+    IValuelessEvent const* get_valueless_event(temporal::Time time, bool exact) const override
     {
-        return this->get_event(time);
+        return this->get_event(time, exact);
     }
 };
 

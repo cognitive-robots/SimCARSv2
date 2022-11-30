@@ -16,6 +16,11 @@ template <typename T>
 class AConstant : public virtual IConstant<T>, public virtual AValuelessConstant
 {
 public:
+    IValuelessConstant* valueless_constant_shallow_copy() const override
+    {
+        return this->constant_shallow_copy();
+    }
+
     std::string get_value_as_string() const override
     {
         std::stringstream string_stream;

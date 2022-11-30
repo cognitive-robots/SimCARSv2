@@ -34,6 +34,7 @@ public:
     virtual std::string get_full_name() const = 0;
     virtual std::string get_entity_name() const = 0;
     virtual std::string get_parameter_name() const = 0;
+    virtual std::string get_variable_name() const = 0;
     virtual std::string get_type_name() const = 0;
 
     virtual Type get_type() const = 0;
@@ -46,7 +47,7 @@ public:
     virtual structures::IArray<IValuelessEvent const*>* get_valueless_events(
             temporal::Time time_window_start = temporal::Time::min(),
             temporal::Time time_window_end = temporal::Time::max()) const = 0;
-    virtual IValuelessEvent const* get_valueless_event(temporal::Time time) const = 0;
+    virtual IValuelessEvent const* get_valueless_event(temporal::Time time, bool exact = false) const = 0;
 };
 
 }

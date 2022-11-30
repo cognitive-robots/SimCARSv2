@@ -68,14 +68,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                  && std::abs(aligned_linear_velocity_variable->get_value(current_time) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
                                     || action_start_time == this->get_min_temporal_limit())
                             {
-                                IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                                IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                                              aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                                        aligned_linear_velocity_variable->get_value(current_time),
                                                                                                                                        action_start_time);
                                 aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                                 for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                                 {
-                                    IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                    IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                                                 aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                                           current_time - current_time_2,
                                                                                                                                                           current_time_2);
                                     aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -90,14 +92,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 || (current_time + time_step > this->get_max_temporal_limit()
                                     && action_start_time == this->get_min_temporal_limit()))
                         {
-                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                                          aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time - time_step),
                                                                                                                                    action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                             {
-                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                                             aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                                       (current_time - time_step) - current_time_2,
                                                                                                                                                       current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -114,14 +118,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 || (current_time + time_step > this->get_max_temporal_limit()
                                     && action_start_time == this->get_min_temporal_limit()))
                         {
-                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                                          aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time),
                                                                                                                                    action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
-                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                                             aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                                       current_time - current_time_2,
                                                                                                                                                       current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -138,14 +144,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 || (current_time + time_step > this->get_max_temporal_limit()
                                     && action_start_time == this->get_min_temporal_limit()))
                         {
-                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                                          aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time - time_step),
                                                                                                                                    action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                             {
-                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                                             aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                                       (current_time - time_step) - current_time_2,
                                                                                                                                                       current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -166,7 +174,8 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                     || action_start_time == this->get_min_temporal_limit())
                             {
                                 IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event =
-                                        new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                                        new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                     aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                      aligned_linear_velocity_variable->get_value(current_time),
                                                                      action_start_time);
                                 aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
@@ -174,7 +183,8 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                                 {
                                     IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event =
-                                            new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                            new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                               aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                current_time - current_time_2,
                                                                                current_time_2);
                                     aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -190,7 +200,8 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                     && action_start_time == this->get_min_temporal_limit()))
                         {
                             IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event =
-                                    new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                                    new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                 aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                  aligned_linear_velocity_variable->get_value(current_time),
                                                                  action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
@@ -198,7 +209,8 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
                                 IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event =
-                                        new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                        new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                           aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                            current_time - current_time_2,
                                                                            current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -212,14 +224,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     {
                         if (action_start_time == this->get_min_temporal_limit())
                         {
-                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                                          aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time - time_step),
                                                                                                                                    action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                             {
-                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                                             aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                                       (current_time - time_step) - current_time_2,
                                                                                                                                                       current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -233,14 +247,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     {
                         if (action_start_time == this->get_min_temporal_limit())
                         {
-                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                                          aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time - time_step),
                                                                                                                                    action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                             {
-                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                                             aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                                       (current_time - time_step) - current_time_2,
                                                                                                                                                       current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -256,14 +272,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 
                         if (current_time + time_step > this->get_max_temporal_limit() && action_start_time == this->get_min_temporal_limit())
                         {
-                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+                            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                                          aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                                    aligned_linear_velocity_variable->get_value(current_time),
                                                                                                                                    action_start_time);
                             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
-                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                                             aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                                       current_time - current_time_2,
                                                                                                                                                       current_time_2);
                                 aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -282,12 +300,14 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         if (events->count() == 0 ||
                 aligned_linear_velocity_goal_value_variable->get_min_temporal_limit() > this->get_min_temporal_limit())
         {
-            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_full_name(),
+            IEvent<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_goal_value_variable->get_entity_name(),
+                                                                                                          aligned_linear_velocity_goal_value_variable->get_parameter_name(),
                                                                                                                    aligned_linear_velocity_variable->get_value(this->get_min_temporal_limit()),
                                                                                                                    this->get_min_temporal_limit());
             aligned_linear_velocity_goal_value_variable->add_event(aligned_linear_velocity_goal_value_event);
 
-            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_full_name(),
+            IEvent<temporal::Duration> *aligned_linear_velocity_goal_duration_event = new BasicEvent<temporal::Duration>(aligned_linear_velocity_goal_duration_variable->get_entity_name(),
+                                                                                                                         aligned_linear_velocity_goal_duration_variable->get_parameter_name(),
                                                                                                                                   temporal::Duration(0),
                                                                                                                                   this->get_min_temporal_limit());
             aligned_linear_velocity_goal_duration_variable->add_event(aligned_linear_velocity_goal_duration_event);
@@ -410,14 +430,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     {
                         if (lane_change_offset != 0)
                         {
-                            IEvent<int32_t> *lane_goal_value_event = new BasicEvent<int32_t>(lane_goal_value_variable->get_full_name(),
+                            IEvent<int32_t> *lane_goal_value_event = new BasicEvent<int32_t>(lane_goal_value_variable->get_entity_name(),
+                                                                                             lane_goal_value_variable->get_parameter_name(),
                                                                                                       lane_change_offset,
                                                                                                       action_start_time);
                             lane_goal_value_variable->add_event(lane_goal_value_event);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
-                                IEvent<temporal::Duration> *lane_goal_duration_event = new BasicEvent<temporal::Duration>(lane_goal_duration_variable->get_full_name(),
+                                IEvent<temporal::Duration> *lane_goal_duration_event = new BasicEvent<temporal::Duration>(lane_goal_duration_variable->get_entity_name(),
+                                                                                                                          lane_goal_duration_variable->get_parameter_name(),
                                                                                                                                    current_time - current_time_2,
                                                                                                                                    current_time_2);
                                 lane_goal_duration_variable->add_event(lane_goal_duration_event);
@@ -590,26 +612,20 @@ public:
                 driving_agent->get_driving_agent_state(time, throw_on_out_of_range);
 
         GoalDrivingAgentState *goal_driving_agent_state =
-                new GoalDrivingAgentState(driving_agent_state);
+                new GoalDrivingAgentState(driving_agent_state, false);
 
         delete driving_agent_state;
 
         try
         {
             goal_driving_agent_state->set_aligned_linear_velocity_goal_value_variable(
-                            new BasicConstant(
-                                this->get_name(),
-                                "aligned_linear_velocity.goal_value",
-                                dynamic_cast<IVariable<FP_DATA_TYPE> const*>(
-                                    this->get_variable_parameter(
-                                        this->get_name() + ".aligned_linear_velocity.goal_value"))->get_value(time)));
+                        dynamic_cast<IVariable<FP_DATA_TYPE> const*>(
+                            this->get_variable_parameter(
+                                this->get_name() + ".aligned_linear_velocity.goal_value"))->get_event(time));
             goal_driving_agent_state->set_aligned_linear_velocity_goal_duration_variable(
-                            new BasicConstant(
-                                this->get_name(),
-                                "aligned_linear_velocity.goal_duration",
-                                dynamic_cast<IVariable<temporal::Duration> const*>(
-                                    this->get_variable_parameter(
-                                        this->get_name() + ".aligned_linear_velocity.goal_duration"))->get_value(time)));
+                        dynamic_cast<IVariable<temporal::Duration> const*>(
+                            this->get_variable_parameter(
+                                this->get_name() + ".aligned_linear_velocity.goal_duration"))->get_event(time));
         }
         catch (std::out_of_range const &e)
         {

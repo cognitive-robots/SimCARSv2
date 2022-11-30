@@ -270,50 +270,23 @@ IDrivingAgentState* DrivingSimulationAgent::get_driving_agent_state(temporal::Ti
     try
     {
         driving_agent_state->set_position_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "position.base",
-                            this->get_position_variable()->get_value(time)));
+                    this->get_position_variable()->get_event(time));
         driving_agent_state->set_linear_velocity_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "linear_velocity.base",
-                            this->get_linear_velocity_variable()->get_value(time)));
+                    this->get_linear_velocity_variable()->get_event(time));
         driving_agent_state->set_aligned_linear_velocity_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "aligned_linear_velocity.base",
-                            this->get_aligned_linear_velocity_variable()->get_value(time)));
+                    this->get_aligned_linear_velocity_variable()->get_event(time));
         driving_agent_state->set_linear_acceleration_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "linear_acceleration.base",
-                            this->get_linear_acceleration_variable()->get_value(time)));
+                    this->get_linear_acceleration_variable()->get_event(time));
         driving_agent_state->set_aligned_linear_acceleration_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "aligned_linear_acceleration.indirect_actuation",
-                            this->get_aligned_linear_acceleration_variable()->get_value(time)));
+                    this->get_aligned_linear_acceleration_variable()->get_event(time));
         driving_agent_state->set_external_linear_acceleration_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "linear_acceleration.external",
-                            this->get_external_linear_acceleration_variable()->get_value(time)));
+                    this->get_external_linear_acceleration_variable()->get_event(time));
         driving_agent_state->set_rotation_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "rotation.base",
-                            this->get_rotation_variable()->get_value(time)));
+                    this->get_rotation_variable()->get_event(time));
         driving_agent_state->set_steer_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "steer.indirect_actuation",
-                            this->get_steer_variable()->get_value(time)));
+                    this->get_steer_variable()->get_event(time));
         driving_agent_state->set_angular_velocity_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "angular_velocity.base",
-                            this->get_angular_velocity_variable()->get_value(time)));
+                    this->get_angular_velocity_variable()->get_event(time));
     }
     catch (std::out_of_range const &e)
     {

@@ -13,13 +13,14 @@ namespace agent
 class BasicDrivingAgentState : public virtual ADrivingAgentState
 {
     std::string driving_agent_name;
+    bool delete_dicts;
 
 protected:
     structures::stl::STLDictionary<std::string, IValuelessConstant const*> parameter_dict;
 
 public:
-    BasicDrivingAgentState(std::string const &driving_agent_name);
-    BasicDrivingAgentState(IDrivingAgentState const *driving_agent_state);
+    BasicDrivingAgentState(std::string const &driving_agent_name, bool delete_dicts = true);
+    BasicDrivingAgentState(IDrivingAgentState const *driving_agent_state, bool copy_parameters = true);
 
     ~BasicDrivingAgentState();
 

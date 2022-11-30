@@ -9,17 +9,27 @@ namespace simcars
 namespace agent
 {
 
-BasicDrivingAgentState::BasicDrivingAgentState(std::string const &driving_agent_name) : driving_agent_name(driving_agent_name) {}
+BasicDrivingAgentState::BasicDrivingAgentState(std::string const &driving_agent_name, bool delete_dicts) : driving_agent_name(driving_agent_name), delete_dicts(delete_dicts) {}
 
-BasicDrivingAgentState::BasicDrivingAgentState(IDrivingAgentState const *driving_agent_state) :
-    driving_agent_name(driving_agent_state->get_driving_agent_name())
+BasicDrivingAgentState::BasicDrivingAgentState(IDrivingAgentState const *driving_agent_state, bool copy_parameters) :
+    driving_agent_name(driving_agent_state->get_driving_agent_name()), delete_dicts(copy_parameters)
 {
     structures::IArray<IValuelessConstant const*> *parameter_values =
             driving_agent_state->get_parameter_values();
 
-    for (size_t i = 0; i < parameter_values->count(); ++i)
+    if (copy_parameters)
     {
-        parameter_dict.update((*parameter_values)[i]->get_full_name(), (*parameter_values)[i]->valueless_shallow_copy());
+        for (size_t i = 0; i < parameter_values->count(); ++i)
+        {
+            parameter_dict.update((*parameter_values)[i]->get_full_name(), (*parameter_values)[i]->valueless_constant_shallow_copy());
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < parameter_values->count(); ++i)
+        {
+            parameter_dict.update((*parameter_values)[i]->get_full_name(), (*parameter_values)[i]);
+        }
     }
 
     delete parameter_values;
@@ -27,11 +37,14 @@ BasicDrivingAgentState::BasicDrivingAgentState(IDrivingAgentState const *driving
 
 BasicDrivingAgentState::~BasicDrivingAgentState()
 {
-    structures::IArray<IValuelessConstant const*> const *parameters = parameter_dict.get_values();
-
-    for (size_t i = 0; i < parameters->count(); ++i)
+    if (delete_dicts)
     {
-        delete (*parameters)[i];
+        structures::IArray<IValuelessConstant const*> const *parameters = parameter_dict.get_values();
+
+        for (size_t i = 0; i < parameters->count(); ++i)
+        {
+            delete (*parameters)[i];
+        }
     }
 }
 
@@ -59,7 +72,7 @@ void BasicDrivingAgentState::set_parameter_values(structures::IArray<IValuelessC
 void BasicDrivingAgentState::set_parameter_value(IValuelessConstant const *parameter_value)
 {
     std::string const &parameter_name = parameter_value->get_full_name();
-    if (parameter_dict.contains(parameter_name))
+    if (delete_dicts && parameter_dict.contains(parameter_name))
     {
         delete parameter_dict[parameter_name];
     }

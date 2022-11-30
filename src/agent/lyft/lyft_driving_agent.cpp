@@ -116,41 +116,41 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
         min_position_y = std::min(position_y, min_position_y);
         max_position_y = std::max(position_y, max_position_y);
         geometry::Vec const position(position_x, position_y);
-        IEvent<geometry::Vec>* const position_event = new BasicEvent<geometry::Vec>(position_variable->get_full_name(), position, timestamp);
+        IEvent<geometry::Vec>* const position_event = new BasicEvent<geometry::Vec>(position_variable->get_entity_name(), position_variable->get_parameter_name(), position, timestamp);
         position_variable->add_event(position_event);
 
         rapidjson::Value::ConstArray const &linear_velocity_data = state_data_entry["linear_velocity"].GetArray();
         geometry::Vec const linear_velocity(linear_velocity_data[0].GetDouble(), linear_velocity_data[1].GetDouble());
-        IEvent<geometry::Vec>* const linear_velocity_event = new BasicEvent<geometry::Vec>(linear_velocity_variable->get_full_name(), linear_velocity, timestamp);
+        IEvent<geometry::Vec>* const linear_velocity_event = new BasicEvent<geometry::Vec>(linear_velocity_variable->get_entity_name(), linear_velocity_variable->get_parameter_name(), linear_velocity, timestamp);
         linear_velocity_variable->add_event(linear_velocity_event);
 
         rapidjson::Value::ConstArray const &linear_acceleration_data = state_data_entry["linear_acceleration"].GetArray();
         geometry::Vec const linear_acceleration(linear_acceleration_data[0].GetDouble(), linear_acceleration_data[1].GetDouble());
-        IEvent<geometry::Vec>* const linear_acceleration_event = new BasicEvent<geometry::Vec>(linear_acceleration_variable->get_full_name(), linear_acceleration, timestamp);
+        IEvent<geometry::Vec>* const linear_acceleration_event = new BasicEvent<geometry::Vec>(linear_acceleration_variable->get_entity_name(), linear_acceleration_variable->get_parameter_name(), linear_acceleration, timestamp);
         linear_acceleration_variable->add_event(linear_acceleration_event);
 
         FP_DATA_TYPE const rotation(state_data_entry["rotation"].GetDouble());
-        IEvent<FP_DATA_TYPE>* const rotation_event = new BasicEvent<FP_DATA_TYPE>(rotation_variable->get_full_name(), rotation, timestamp);
+        IEvent<FP_DATA_TYPE>* const rotation_event = new BasicEvent<FP_DATA_TYPE>(rotation_variable->get_entity_name(), rotation_variable->get_parameter_name(), rotation, timestamp);
         rotation_variable->add_event(rotation_event);
 
         FP_DATA_TYPE const aligned_linear_velocity = (trig_buff->get_rot_mat(-rotation) * linear_velocity).x();
-        IEvent<FP_DATA_TYPE>* const aligned_linear_velocity_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity, timestamp);
+        IEvent<FP_DATA_TYPE>* const aligned_linear_velocity_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_variable->get_entity_name(), aligned_linear_velocity_variable->get_parameter_name(),aligned_linear_velocity, timestamp);
         aligned_linear_velocity_variable->add_event(aligned_linear_velocity_event);
 
         FP_DATA_TYPE const aligned_linear_acceleration = (trig_buff->get_rot_mat(-rotation) * linear_acceleration).x();
-        IEvent<FP_DATA_TYPE>* const aligned_linear_acceleration_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration, timestamp);
+        IEvent<FP_DATA_TYPE>* const aligned_linear_acceleration_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_entity_name(), aligned_linear_acceleration_variable->get_parameter_name(), aligned_linear_acceleration, timestamp);
         aligned_linear_acceleration_variable->add_event(aligned_linear_acceleration_event);
 
         geometry::Vec const external_linear_acceleration = linear_acceleration - (trig_buff->get_rot_mat(rotation) * geometry::Vec(aligned_linear_acceleration, 0));
-        IEvent<geometry::Vec>* const external_linear_acceleration_event = new BasicEvent<geometry::Vec>(external_linear_acceleration_variable->get_full_name(), external_linear_acceleration, timestamp);
+        IEvent<geometry::Vec>* const external_linear_acceleration_event = new BasicEvent<geometry::Vec>(external_linear_acceleration_variable->get_entity_name(), external_linear_acceleration_variable->get_parameter_name(), external_linear_acceleration, timestamp);
         external_linear_acceleration_variable->add_event(external_linear_acceleration_event);
 
         FP_DATA_TYPE const angular_velocity(state_data_entry["angular_velocity"].GetDouble());
-        IEvent<FP_DATA_TYPE>* const angular_velocity_event = new BasicEvent<FP_DATA_TYPE>(angular_velocity_variable->get_full_name(), angular_velocity, timestamp);
+        IEvent<FP_DATA_TYPE>* const angular_velocity_event = new BasicEvent<FP_DATA_TYPE>(angular_velocity_variable->get_entity_name(), angular_velocity_variable->get_parameter_name(), angular_velocity, timestamp);
         angular_velocity_variable->add_event(angular_velocity_event);
 
         FP_DATA_TYPE const steer = angular_velocity / aligned_linear_velocity;
-        IEvent<FP_DATA_TYPE>* const steer_event = new BasicEvent<FP_DATA_TYPE>(steer_variable->get_full_name(), steer, timestamp);
+        IEvent<FP_DATA_TYPE>* const steer_event = new BasicEvent<FP_DATA_TYPE>(steer_variable->get_entity_name(), steer_variable->get_parameter_name(), steer, timestamp);
         steer_variable->add_event(steer_event);
     }
 
@@ -258,7 +258,7 @@ IDrivingAgent* LyftDrivingAgent::driving_agent_deep_copy() const
     structures::IArray<std::string> const *constant_names = constant_dict.get_keys();
     for(i = 0; i < constant_names->count(); ++i)
     {
-        driving_agent->constant_dict.update((*constant_names)[i], constant_dict[(*constant_names)[i]]->valueless_shallow_copy());
+        driving_agent->constant_dict.update((*constant_names)[i], constant_dict[(*constant_names)[i]]->valueless_constant_shallow_copy());
     }
 
     structures::IArray<std::string> const *variable_names = variable_dict.get_keys();

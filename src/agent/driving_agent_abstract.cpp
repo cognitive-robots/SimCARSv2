@@ -24,61 +24,34 @@ IState* ADrivingAgent::get_state(temporal::Time time, bool throw_on_out_of_range
 
 IDrivingAgentState* ADrivingAgent::get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const
 {
-    IDrivingAgentState *driving_agent_state = new BasicDrivingAgentState(this->get_name());
+    IDrivingAgentState *driving_agent_state = new BasicDrivingAgentState(this->get_name(), false);
 
-    driving_agent_state->set_id_constant(this->get_id_constant()->shallow_copy());
-    driving_agent_state->set_ego_constant(this->get_ego_constant()->shallow_copy());
-    driving_agent_state->set_bb_length_constant(this->get_bb_length_constant()->shallow_copy());
-    driving_agent_state->set_bb_width_constant(this->get_bb_width_constant()->shallow_copy());
-    driving_agent_state->set_driving_agent_class_constant(this->get_driving_agent_class_constant()->shallow_copy());
+    driving_agent_state->set_id_constant(this->get_id_constant());
+    driving_agent_state->set_ego_constant(this->get_ego_constant());
+    driving_agent_state->set_bb_length_constant(this->get_bb_length_constant());
+    driving_agent_state->set_bb_width_constant(this->get_bb_width_constant());
+    driving_agent_state->set_driving_agent_class_constant(this->get_driving_agent_class_constant());
 
     try
     {
         driving_agent_state->set_position_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "position.base",
-                            this->get_position_variable()->get_value(time)));
+                    this->get_position_variable()->get_event(time));
         driving_agent_state->set_linear_velocity_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "linear_velocity.base",
-                            this->get_linear_velocity_variable()->get_value(time)));
+                    this->get_linear_velocity_variable()->get_event(time));
         driving_agent_state->set_aligned_linear_velocity_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "aligned_linear_velocity.base",
-                            this->get_aligned_linear_velocity_variable()->get_value(time)));
+                    this->get_aligned_linear_velocity_variable()->get_event(time));
         driving_agent_state->set_linear_acceleration_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "linear_acceleration.base",
-                            this->get_linear_acceleration_variable()->get_value(time)));
+                    this->get_linear_acceleration_variable()->get_event(time));
         driving_agent_state->set_aligned_linear_acceleration_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "aligned_linear_acceleration.indirect_actuation",
-                            this->get_aligned_linear_acceleration_variable()->get_value(time)));
+                    this->get_aligned_linear_acceleration_variable()->get_event(time));
         driving_agent_state->set_external_linear_acceleration_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "linear_acceleration.external",
-                            this->get_external_linear_acceleration_variable()->get_value(time)));
+                    this->get_external_linear_acceleration_variable()->get_event(time));
         driving_agent_state->set_rotation_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "rotation.base",
-                            this->get_rotation_variable()->get_value(time)));
+                    this->get_rotation_variable()->get_event(time));
         driving_agent_state->set_steer_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "steer.indirect_actuation",
-                            this->get_steer_variable()->get_value(time)));
+                    this->get_steer_variable()->get_event(time));
         driving_agent_state->set_angular_velocity_variable(
-                        new BasicConstant(
-                            this->get_name(),
-                            "angular_velocity.base",
-                            this->get_angular_velocity_variable()->get_value(time)));
+                    this->get_angular_velocity_variable()->get_event(time));
     }
     catch (std::out_of_range const &e)
     {

@@ -16,7 +16,7 @@ class IValuelessConstant
 public:
     virtual ~IValuelessConstant() = default;
 
-    virtual IValuelessConstant* valueless_shallow_copy() const = 0;
+    virtual IValuelessConstant* valueless_constant_shallow_copy() const = 0;
 
     virtual std::string get_full_name() const = 0;
     virtual std::string get_entity_name() const = 0;

@@ -120,7 +120,7 @@ public:
         structures::IArray<temporal::Time> const *times = time_event_dict.get_keys();
         for(i = 0; i < times->count(); ++i)
         {
-            variable->time_event_dict.update((*times)[i], time_event_dict[(*times)[i]]->shallow_copy());
+            variable->time_event_dict.update((*times)[i], time_event_dict[(*times)[i]]->event_shallow_copy());
         }
 
         return variable;
@@ -136,9 +136,9 @@ public:
         return original_variable->get_entity_name();
     }
 
-    std::string get_parameter_name() const override
+    std::string get_variable_name() const override
     {
-        return original_variable->get_parameter_name();
+        return original_variable->get_variable_name();
     }
 
     IValuelessVariable::Type get_type() const override
@@ -200,18 +200,18 @@ public:
         return events;
     }
 
-    IEvent<T> const* get_event(temporal::Time time) const override
+    IEvent<T> const* get_event(temporal::Time time, bool exact) const override
     {
         simulation_check(time);
 
         if (time < simulation_start_time + simulation_scene->get_time_step())
         {
-            return original_variable->get_event(time);
+            return original_variable->get_event(time, exact);
         }
         else
         {
             IEvent<T> const *prospective_event = time_event_dict[time];
-            if (prospective_event->get_time() == time)
+            if (!exact || prospective_event->get_time() == time)
             {
                 return prospective_event;
             }

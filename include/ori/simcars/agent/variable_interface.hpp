@@ -21,7 +21,7 @@ public:
     virtual structures::IArray<IEvent<T> const*>* get_events(
             temporal::Time time_window_start = temporal::Time::min(),
             temporal::Time time_window_end = temporal::Time::max()) const = 0;
-    virtual IEvent<T> const* get_event(temporal::Time time) const = 0;
+    virtual IEvent<T> const* get_event(temporal::Time time, bool exact = false) const = 0;
     virtual bool add_event(IEvent<T> const *event) = 0;
     virtual bool remove_event(IEvent<T> const *event) = 0;
 };

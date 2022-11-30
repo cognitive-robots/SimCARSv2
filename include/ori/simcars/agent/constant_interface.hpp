@@ -13,7 +13,7 @@ template <typename T>
 class IConstant : public virtual IValuelessConstant
 {
 public:
-    virtual IConstant<T>* shallow_copy() const = 0;
+    virtual IConstant<T>* constant_shallow_copy() const = 0;
 
     virtual T get_value() const = 0;
 };

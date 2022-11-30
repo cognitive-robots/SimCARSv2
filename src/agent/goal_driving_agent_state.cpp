@@ -8,11 +8,11 @@ namespace simcars
 namespace agent
 {
 
-GoalDrivingAgentState::GoalDrivingAgentState(std::string const &driving_agent_name) :
-    BasicDrivingAgentState(driving_agent_name) {}
+GoalDrivingAgentState::GoalDrivingAgentState(std::string const &driving_agent_name, bool delete_dicts) :
+    BasicDrivingAgentState(driving_agent_name, delete_dicts) {}
 
-GoalDrivingAgentState::GoalDrivingAgentState(IDrivingAgentState const *driving_agent_state) :
-    BasicDrivingAgentState(driving_agent_state) {}
+GoalDrivingAgentState::GoalDrivingAgentState(IDrivingAgentState const *driving_agent_state, bool copy_parameters) :
+    BasicDrivingAgentState(driving_agent_state, copy_parameters) {}
 
 IConstant<FP_DATA_TYPE> const* GoalDrivingAgentState::get_aligned_linear_velocity_goal_value_variable() const
 {
