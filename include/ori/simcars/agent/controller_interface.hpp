@@ -2,7 +2,7 @@
 
 #include <ori/simcars/structures/array_interface.hpp>
 #include <ori/simcars/temporal/typedefs.hpp>
-#include <ori/simcars/agent/state_interface.hpp>
+#include <ori/simcars/agent/entity_state_interface.hpp>
 
 namespace ori
 {
@@ -16,7 +16,7 @@ class IController
 public:
     virtual ~IController() = default;
 
-    virtual void modify_state(agent::IState const *original_state, agent::IState *modified_state) const = 0;
+    virtual void modify_state(agent::IEntityState const *original_state, agent::IEntityState *modified_state) const = 0;
 };
 
 }

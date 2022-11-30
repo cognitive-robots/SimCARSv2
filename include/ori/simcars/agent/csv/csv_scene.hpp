@@ -35,7 +35,7 @@ public:
     structures::IArray<IEntity const*>* get_entities() const override;
     IEntity const* get_entity(std::string const &entity_name) const override;
 
-    IState* get_state(temporal::Time time) const override;
+    ISceneState* get_state(temporal::Time time) const override;
 };
 
 }

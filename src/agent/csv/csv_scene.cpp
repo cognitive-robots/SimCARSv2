@@ -131,7 +131,7 @@ IEntity const* CSVScene::get_entity(std::string const &entity_name) const
     return entity_dict[entity_name];
 }
 
-IState* CSVScene::get_state(temporal::Time time) const
+ISceneState* CSVScene::get_state(temporal::Time time) const
 {
     throw utils::NotImplementedException();
 }

@@ -4,7 +4,7 @@
 #include <ori/simcars/temporal/precedence_temporal_dictionary.hpp>
 #include <ori/simcars/agent/simulated_valueless_variable_interface.hpp>
 #include <ori/simcars/agent/constant_interface.hpp>
-#include <ori/simcars/agent/state_interface.hpp>
+#include <ori/simcars/agent/entity_state_interface.hpp>
 #include <ori/simcars/agent/simulation_scene_interface.hpp>
 #include <ori/simcars/agent/variable_abstract.hpp>
 #include <ori/simcars/agent/basic_event.hpp>
@@ -262,7 +262,7 @@ public:
         }
     }
 
-    bool simulation_update(temporal::Time time, IState const *state) const override
+    bool simulation_update(temporal::Time time, IEntityState const *state) const override
     {
         if (time <= simulation_start_time
                 || time > simulation_end_time)

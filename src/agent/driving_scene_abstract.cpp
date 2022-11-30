@@ -9,7 +9,7 @@ namespace simcars
 namespace agent
 {
 
-IState* ADrivingScene::get_state(temporal::Time time) const
+ISceneState* ADrivingScene::get_state(temporal::Time time) const
 {
     return this->get_driving_scene_state(time);
 }

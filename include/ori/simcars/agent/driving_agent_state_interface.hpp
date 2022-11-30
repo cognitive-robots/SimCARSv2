@@ -2,7 +2,7 @@
 
 #include <ori/simcars/geometry/typedefs.hpp>
 #include <ori/simcars/agent/constant_interface.hpp>
-#include <ori/simcars/agent/state_interface.hpp>
+#include <ori/simcars/agent/entity_state_interface.hpp>
 #include <ori/simcars/agent/driving_enums.hpp>
 
 namespace ori
@@ -12,7 +12,7 @@ namespace simcars
 namespace agent
 {
 
-class IDrivingAgentState : public virtual IState
+class IDrivingAgentState : public virtual IEntityState
 {
 public:
     virtual std::string get_driving_agent_name() const = 0;

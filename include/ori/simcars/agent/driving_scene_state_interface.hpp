@@ -2,7 +2,7 @@
 
 #include <ori/simcars/geometry/typedefs.hpp>
 #include <ori/simcars/agent/constant_interface.hpp>
-#include <ori/simcars/agent/state_interface.hpp>
+#include <ori/simcars/agent/scene_state_interface.hpp>
 #include <ori/simcars/agent/driving_enums.hpp>
 #include <ori/simcars/agent/driving_agent_state_interface.hpp>
 
@@ -13,7 +13,7 @@ namespace simcars
 namespace agent
 {
 
-class IDrivingSceneState : public virtual IState
+class IDrivingSceneState : public virtual ISceneState
 {
 public:
     virtual structures::IArray<IDrivingAgentState const*>* get_driving_agent_states() const = 0;

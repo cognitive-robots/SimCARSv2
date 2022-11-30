@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/temporal/typedefs.hpp>
-#include <ori/simcars/agent/state_interface.hpp>
+#include <ori/simcars/agent/scene_state_interface.hpp>
 
 namespace ori
 {
@@ -15,7 +15,7 @@ class ISimulator
 public:
     virtual ~ISimulator() = default;
 
-    virtual void simulate(agent::IState const *current_state, agent::IState *next_state, temporal::Duration time_step) const = 0;
+    virtual void simulate(agent::ISceneState const *current_state, agent::ISceneState *next_state, temporal::Duration time_step) const = 0;
 };
 
 }

@@ -177,9 +177,10 @@ set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 add_library(simcars_agent STATIC
   src/agent/valueless_constant_abstract.cpp
   src/agent/valueless_variable_abstract.cpp
-  src/agent/driving_agent_state_abstract.cpp
   src/agent/driving_agent_abstract.cpp
+  src/agent/driving_agent_state_abstract.cpp
   src/agent/driving_scene_abstract.cpp
+  src/agent/driving_scene_state_abstract.cpp
   src/agent/basic_driving_agent_state.cpp
   src/agent/basic_driving_scene_state.cpp
   src/agent/goal_driving_agent_state.cpp
@@ -200,14 +201,15 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/constant_interface.hpp
   include/ori/simcars/agent/event_interface.hpp
   include/ori/simcars/agent/variable_interface.hpp
-  include/ori/simcars/agent/state_interface.hpp
   include/ori/simcars/agent/entity_interface.hpp
+  include/ori/simcars/agent/entity_state_interface.hpp
   include/ori/simcars/agent/driving_enums.hpp
-  include/ori/simcars/agent/driving_agent_state_interface.hpp
   include/ori/simcars/agent/driving_agent_interface.hpp
+  include/ori/simcars/agent/driving_agent_state_interface.hpp
   include/ori/simcars/agent/scene_interface.hpp
-  include/ori/simcars/agent/driving_scene_state_interface.hpp
+  include/ori/simcars/agent/scene_state_interface.hpp
   include/ori/simcars/agent/driving_scene_interface.hpp
+  include/ori/simcars/agent/driving_scene_state_interface.hpp
   include/ori/simcars/agent/file_based_scene_interface.hpp
   include/ori/simcars/agent/two_file_based_scene_interface.hpp
   include/ori/simcars/agent/controller_interface.hpp
@@ -220,9 +222,10 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/constant_abstract.hpp
   include/ori/simcars/agent/event_abstract.hpp
   include/ori/simcars/agent/variable_abstract.hpp
-  include/ori/simcars/agent/driving_agent_state_abstract.hpp
   include/ori/simcars/agent/driving_agent_abstract.hpp
+  include/ori/simcars/agent/driving_agent_state_abstract.hpp
   include/ori/simcars/agent/driving_scene_abstract.hpp
+  include/ori/simcars/agent/driving_scene_state_abstract.hpp
   include/ori/simcars/agent/file_based_scene_abstract.hpp
   include/ori/simcars/agent/two_file_based_scene_abstract.hpp
   include/ori/simcars/agent/basic_constant.hpp

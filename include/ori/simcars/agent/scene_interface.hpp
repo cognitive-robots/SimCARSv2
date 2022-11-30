@@ -6,7 +6,7 @@
 #include <ori/simcars/agent/valueless_constant_interface.hpp>
 #include <ori/simcars/agent/valueless_event_interface.hpp>
 #include <ori/simcars/agent/valueless_variable_interface.hpp>
-#include <ori/simcars/agent/state_interface.hpp>
+#include <ori/simcars/agent/scene_state_interface.hpp>
 #include <ori/simcars/agent/entity_interface.hpp>
 
 #include <string>
@@ -32,7 +32,7 @@ public:
     virtual structures::IArray<IEntity const*>* get_entities() const = 0;
     virtual IEntity const* get_entity(std::string const &entity_name) const = 0;
 
-    virtual IState* get_state(temporal::Time time) const = 0;
+    virtual ISceneState* get_state(temporal::Time time) const = 0;
 };
 
 }

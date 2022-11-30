@@ -24,7 +24,7 @@ BasicDrivingSimulator::~BasicDrivingSimulator()
     delete controller;
 }
 
-void BasicDrivingSimulator::simulate(IState const *current_state, IState *next_state, temporal::Duration time_step) const
+void BasicDrivingSimulator::simulate(ISceneState const *current_state, ISceneState *next_state, temporal::Duration time_step) const
 {
     this->simulate_driving_scene(
                 dynamic_cast<IDrivingSceneState const*>(current_state),

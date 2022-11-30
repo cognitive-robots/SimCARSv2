@@ -20,7 +20,7 @@ public:
 
     ~BasicDrivingSimulator();
 
-    void simulate(agent::IState const *current_state, agent::IState *next_state, temporal::Duration time_step) const override;
+    void simulate(agent::ISceneState const *current_state, agent::ISceneState *next_state, temporal::Duration time_step) const override;
 
     void simulate_driving_scene(agent::IDrivingSceneState const *current_state, agent::IDrivingSceneState *next_state, temporal::Duration time_step) const override;
     void simulate_driving_agent(agent::IDrivingAgentState const *current_state, agent::IDrivingAgentState *next_state, temporal::Duration time_step) const override;

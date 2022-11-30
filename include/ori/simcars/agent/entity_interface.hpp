@@ -4,7 +4,7 @@
 #include <ori/simcars/geometry/typedefs.hpp>
 #include <ori/simcars/agent/valueless_constant_interface.hpp>
 #include <ori/simcars/agent/valueless_variable_interface.hpp>
-#include <ori/simcars/agent/state_interface.hpp>
+#include <ori/simcars/agent/entity_state_interface.hpp>
 
 namespace ori
 {
@@ -36,7 +36,7 @@ public:
 
     virtual structures::IArray<IValuelessEvent const*>* get_events() const = 0;
 
-    virtual IState* get_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
+    virtual IEntityState* get_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
 };
 
 }

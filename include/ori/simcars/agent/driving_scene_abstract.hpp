@@ -12,7 +12,7 @@ namespace agent
 class ADrivingScene : public virtual IDrivingScene
 {
 public:
-    IState* get_state(temporal::Time time) const override;
+    ISceneState* get_state(temporal::Time time) const override;
 
     IDrivingSceneState* get_driving_scene_state(temporal::Time time) const override;
 };

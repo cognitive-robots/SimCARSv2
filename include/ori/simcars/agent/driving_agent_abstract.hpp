@@ -14,7 +14,7 @@ class ADrivingAgent : public virtual IDrivingAgent
 public:
     IEntity* entity_deep_copy() const override;
 
-    IState* get_state(temporal::Time time, bool throw_on_out_of_range) const override;
+    IEntityState* get_state(temporal::Time time, bool throw_on_out_of_range) const override;
 
     IDrivingAgentState* get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
 

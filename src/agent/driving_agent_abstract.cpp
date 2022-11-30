@@ -17,7 +17,7 @@ IEntity* ADrivingAgent::entity_deep_copy() const
     return this->driving_agent_deep_copy();
 }
 
-IState* ADrivingAgent::get_state(temporal::Time time, bool throw_on_out_of_range) const
+IEntityState* ADrivingAgent::get_state(temporal::Time time, bool throw_on_out_of_range) const
 {
     return this->get_driving_agent_state(time, throw_on_out_of_range);
 }

@@ -39,7 +39,7 @@ public:
     {
     }
 
-    void modify_state(agent::IState const *original_state, agent::IState *modified_state) const override
+    void modify_state(agent::IEntityState const *original_state, agent::IEntityState *modified_state) const override
     {
         this->modify_driving_agent_state(
                     dynamic_cast<IDrivingAgentState const*>(original_state),
