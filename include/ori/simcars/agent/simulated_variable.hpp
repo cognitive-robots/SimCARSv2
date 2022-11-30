@@ -293,7 +293,7 @@ public:
 
     void begin_simulation(temporal::Time simulation_start_time) const override
     {
-        if (this->simulation_start_time != this->simulation_end_time)
+        if (this->simulation_start_time == this->simulation_end_time)
         {
             this->simulation_start_time = simulation_start_time;
         }

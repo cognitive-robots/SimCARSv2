@@ -18,7 +18,8 @@ class DrivingSimulationAgent : public virtual ADrivingAgent
 {
     IDrivingAgent const *driving_agent;
 
-    temporal::Time max_temporal_limit;
+    mutable temporal::Time simulation_start_time;
+    temporal::Time simulation_end_time;
 
     structures::stl::STLDictionary<std::string, IValuelessVariable const*> non_simulated_variable_dict;
     structures::stl::STLDictionary<std::string, ISimulatedValuelessVariable const*> simulated_variable_dict;

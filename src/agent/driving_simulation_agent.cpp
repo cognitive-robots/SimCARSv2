@@ -55,7 +55,16 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agen
         throw std::invalid_argument("Simulation start time is after simulation end time");
     }
 
-    this->max_temporal_limit = simulation_end_time;
+    if (start_simulated)
+    {
+        this->simulation_start_time = simulation_start_time;
+    }
+    else
+    {
+        this->simulation_start_time = simulation_end_time;
+    }
+
+    this->simulation_end_time = simulation_end_time;
 
 
     IVariable<geometry::Vec> const *position_variable = driving_agent->get_position_variable();
@@ -167,7 +176,7 @@ temporal::Time DrivingSimulationAgent::get_min_temporal_limit() const
 
 temporal::Time DrivingSimulationAgent::get_max_temporal_limit() const
 {
-    return this->max_temporal_limit;
+    return this->simulation_end_time;
 }
 
 structures::IArray<IValuelessConstant const*>* DrivingSimulationAgent::get_constant_parameters() const
@@ -243,7 +252,8 @@ IDrivingAgent* DrivingSimulationAgent::driving_agent_deep_copy() const
     DrivingSimulationAgent *driving_agent = new DrivingSimulationAgent();
 
     driving_agent->driving_agent = this->driving_agent;
-    driving_agent->max_temporal_limit = this->max_temporal_limit;
+    driving_agent->simulation_start_time = this->simulation_start_time;
+    driving_agent->simulation_end_time = this->simulation_end_time;
 
     size_t i;
 
@@ -302,21 +312,30 @@ IDrivingAgentState* DrivingSimulationAgent::get_driving_agent_state(temporal::Ti
 
 void DrivingSimulationAgent::propogate(temporal::Time time, IDrivingAgentState const *state) const
 {
-    structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables =
-            simulated_variable_dict.get_values();
-    for(size_t i = 0; i < simulated_variables->count(); ++i)
+    if (time > simulation_start_time
+            && time <= simulation_end_time)
     {
-        (*simulated_variables)[i]->simulation_update(time, state);
+        structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables =
+                simulated_variable_dict.get_values();
+        for(size_t i = 0; i < simulated_variables->count(); ++i)
+        {
+            (*simulated_variables)[i]->simulation_update(time, state);
+        }
     }
 }
 
 void DrivingSimulationAgent::begin_simulation(temporal::Time simulation_start_time) const
 {
-    structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables =
-            simulated_variable_dict.get_values();
-    for(size_t i = 0; i < simulated_variables->count(); ++i)
+    if (this->simulation_start_time == this->simulation_end_time)
     {
-        (*simulated_variables)[i]->begin_simulation(simulation_start_time);
+        this->simulation_start_time = simulation_start_time;
+
+        structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables =
+                simulated_variable_dict.get_values();
+        for(size_t i = 0; i < simulated_variables->count(); ++i)
+        {
+            (*simulated_variables)[i]->begin_simulation(simulation_start_time);
+        }
     }
 }
 

@@ -25,11 +25,11 @@ public:
     structures::IArray<IValuelessConstant const*>* get_parameter_values() const override;
     IValuelessConstant const* get_parameter_value(std::string const &parameter_name) const override;
 
-    void set_parameter_values(structures::IArray<IValuelessConstant const*> const *parameter_values) override;
-    void set_parameter_value(IValuelessConstant const *parameter_value) override;
-
     structures::IArray<IDrivingAgentState const*>* get_driving_agent_states() const override;
     IDrivingAgentState const* get_driving_agent_state(std::string const &driving_agent_name) const override;
+
+    void set_parameter_values(structures::IArray<IValuelessConstant const*> const *parameter_values) override;
+    void set_parameter_value(IValuelessConstant const *parameter_value) override;
 
     void set_driving_agent_states(structures::IArray<IDrivingAgentState const*> *driving_agent_states) override;
     void set_driving_agent_state(IDrivingAgentState const *driving_agent_state) override;
