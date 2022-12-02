@@ -17,7 +17,7 @@ namespace lyft
 
 LyftScene::~LyftScene()
 {
-    structures::IArray<IDrivingAgent const*> const *driving_agents = driving_agent_dict.get_values();
+    structures::IArray<IDrivingAgent*> const *driving_agents = driving_agent_dict.get_values();
 
     for (size_t i = 0; i < driving_agents->count(); ++i)
     {
@@ -25,7 +25,7 @@ LyftScene::~LyftScene()
     }
 }
 
-LyftScene const* LyftScene::construct_from(IDrivingScene const *driving_scene)
+LyftScene* LyftScene::construct_from(IDrivingScene *driving_scene)
 {
     LyftScene *new_driving_scene = new LyftScene();
 
@@ -34,7 +34,7 @@ LyftScene const* LyftScene::construct_from(IDrivingScene const *driving_scene)
     new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
     new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
-    structures::IArray<IDrivingAgent const*> *driving_agents = driving_scene->get_driving_agents();
+    structures::IArray<IDrivingAgent*> *driving_agents = driving_scene->get_mutable_driving_agents();
 
     size_t i;
     for(i = 0; i < driving_agents->count(); ++i)
@@ -82,7 +82,7 @@ void LyftScene::load_virt(std::ifstream &input_filestream, structures::ISet<std:
             continue;
         }
 
-        LyftDrivingAgent const *driving_agent = new LyftDrivingAgent(json_agent_data);
+        LyftDrivingAgent *driving_agent = new LyftDrivingAgent(json_agent_data);
 
         driving_agent_dict.update(driving_agent->get_name(), driving_agent);
 
@@ -122,30 +122,28 @@ temporal::Time LyftScene::get_max_temporal_limit() const
     return this->max_temporal_limit;
 }
 
-structures::IArray<IEntity const*>* LyftScene::get_entities() const
-{
-    structures::IArray<IDrivingAgent const*>* const driving_agents = this->get_driving_agents();
-    structures::IArray<IEntity const*>* const entities =
-            new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
-    cast_array(*driving_agents, *entities);
-    delete driving_agents;
-    return entities;
-}
-
-IEntity const* LyftScene::get_entity(std::string const &entity_name) const
-{
-    return this->get_driving_agent(entity_name);
-}
-
 structures::IArray<IDrivingAgent const*>* LyftScene::get_driving_agents() const
 {
     structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
             new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.count());
-    driving_agent_dict.get_values(driving_agents);
+    cast_array(*driving_agent_dict.get_values(), *driving_agents);
     return driving_agents;
 }
 
 IDrivingAgent const* LyftScene::get_driving_agent(std::string const &driving_agent_name) const
+{
+    return driving_agent_dict[driving_agent_name];
+}
+
+structures::IArray<IDrivingAgent*>* LyftScene::get_mutable_driving_agents()
+{
+    structures::stl::STLStackArray<IDrivingAgent*> *driving_agents =
+            new structures::stl::STLStackArray<IDrivingAgent*>(driving_agent_dict.count());
+    driving_agent_dict.get_values(driving_agents);
+    return driving_agents;
+}
+
+IDrivingAgent* LyftScene::get_mutable_driving_agent(std::string const &driving_agent_name)
 {
     return driving_agent_dict[driving_agent_name];
 }

@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
         agent_names->insert("non_ego_vehicle_" + std::to_string(i));
     }
 
-    agent::IDrivingScene const *scene;
+    agent::IDrivingScene *scene;
 
     try
     {
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning action extraction" << std::endl;
 
-    agent::IDrivingScene const *scene_with_actions;
+    agent::IDrivingScene *scene_with_actions;
 
     try
     {
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     agent::IDrivingSimulator *driving_simulator =
                 new agent::BasicDrivingSimulator(driving_agent_controller);
 
-    agent::IDrivingScene const *simulated_scene =
+    agent::IDrivingScene *simulated_scene =
             agent::DrivingSimulationScene::construct_from(
                 scene_with_actions, driving_simulator, time_step, scene_half_way_timestamp);
 

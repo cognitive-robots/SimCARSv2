@@ -16,7 +16,7 @@ class IController
 public:
     virtual ~IController() = default;
 
-    virtual void modify_state(agent::IEntityState const *original_state, agent::IEntityState *modified_state) const = 0;
+    virtual void modify_state(agent::IReadOnlyEntityState const *original_state, agent::IEntityState *modified_state) const = 0;
 };
 
 }

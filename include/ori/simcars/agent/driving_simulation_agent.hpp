@@ -16,13 +16,13 @@ namespace agent
 
 class DrivingSimulationAgent : public virtual ADrivingAgent
 {
-    IDrivingAgent const *driving_agent;
+    IDrivingAgent *driving_agent;
 
     mutable temporal::Time simulation_start_time;
     temporal::Time simulation_end_time;
 
-    structures::stl::STLDictionary<std::string, IValuelessVariable const*> non_simulated_variable_dict;
-    structures::stl::STLDictionary<std::string, ISimulatedValuelessVariable const*> simulated_variable_dict;
+    structures::stl::STLDictionary<std::string, IValuelessVariable*> non_simulated_variable_dict;
+    structures::stl::STLDictionary<std::string, ISimulatedValuelessVariable*> simulated_variable_dict;
 
     DrivingSimulationScene const *driving_simulation_scene;
     temporal::Time latest_simulated_time;
@@ -30,13 +30,13 @@ class DrivingSimulationAgent : public virtual ADrivingAgent
     DrivingSimulationAgent();
 
 public:
-    DrivingSimulationAgent(IDrivingAgent const *driving_agent,
-                           ISimulationScene const *simulation_scene,
+    DrivingSimulationAgent(IDrivingAgent *driving_agent,
+                           ISimulationScene *simulation_scene,
                            temporal::Time simulation_start_time,
                            bool start_simulated,
                            bool allow_late_start = true);
-    DrivingSimulationAgent(IDrivingAgent const *driving_agent,
-                           ISimulationScene const *simulation_scene,
+    DrivingSimulationAgent(IDrivingAgent *driving_agent,
+                           ISimulationScene *simulation_scene,
                            temporal::Time simulation_start_time,
                            temporal::Time simulation_end_time,
                            bool start_simulated,
@@ -52,6 +52,8 @@ public:
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;
 
+    bool is_state_available(temporal::Time) const override;
+
     structures::IArray<IValuelessConstant const*>* get_constant_parameters() const override;
     IValuelessConstant const* get_constant_parameter(std::string const &constant_name) const override;
 
@@ -62,11 +64,18 @@ public:
 
     IDrivingAgent* driving_agent_deep_copy() const override;
 
-    IDrivingAgentState* get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const override;
-
     void propogate(temporal::Time time, IDrivingAgentState const *state) const;
 
     void begin_simulation(temporal::Time simulation_start_time) const;
+
+
+    structures::IArray<IValuelessConstant*>* get_mutable_constant_parameters() override;
+    IValuelessConstant* get_mutable_constant_parameter(std::string const &constant_name) override;
+
+    structures::IArray<IValuelessVariable*>* get_mutable_variable_parameters() override;
+    IValuelessVariable* get_mutable_variable_parameter(std::string const &variable_name) override;
+
+    structures::IArray<IValuelessEvent*>* get_mutable_events() override;
 };
 
 }

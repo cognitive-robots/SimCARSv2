@@ -18,7 +18,7 @@ class DrivingGoalExtractionScene : public virtual ADrivingScene
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
 
-    structures::stl::STLDictionary<std::string, IDrivingAgent const*> driving_agent_dict;
+    structures::stl::STLDictionary<std::string, IDrivingAgent*> driving_agent_dict;
 
     map::IMap<T_map_id> const *map;
 
@@ -28,7 +28,7 @@ protected:
 public:
     ~DrivingGoalExtractionScene()
     {
-        structures::IArray<IDrivingAgent const*> const *driving_agents = driving_agent_dict.get_values();
+        structures::IArray<IDrivingAgent*> const *driving_agents = driving_agent_dict.get_values();
 
         for (size_t i = 0; i < driving_agents->count(); ++i)
         {
@@ -36,7 +36,7 @@ public:
         }
     }
 
-    static DrivingGoalExtractionScene const* construct_from(IDrivingScene const *driving_scene)
+    static DrivingGoalExtractionScene* construct_from(IDrivingScene *driving_scene)
     {
         DrivingGoalExtractionScene *new_driving_scene = new DrivingGoalExtractionScene;
 
@@ -45,8 +45,8 @@ public:
         new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
         new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
-        structures::IArray<IDrivingAgent const*> *driving_agents =
-                driving_scene->get_driving_agents();
+        structures::IArray<IDrivingAgent*> *driving_agents =
+                driving_scene->get_mutable_driving_agents();
 
         for(size_t i = 0; i < driving_agents->count(); ++i)
         {
@@ -59,7 +59,7 @@ public:
 
         return new_driving_scene;
     }
-    static DrivingGoalExtractionScene const* construct_from(IDrivingScene const *driving_scene,
+    static DrivingGoalExtractionScene* construct_from(IDrivingScene *driving_scene,
                                                             map::IMap<T_map_id> const *map)
     {
         DrivingGoalExtractionScene *new_driving_scene = new DrivingGoalExtractionScene;
@@ -71,8 +71,8 @@ public:
 
         new_driving_scene->map = map;
 
-        structures::IArray<IDrivingAgent const*> *driving_agents =
-                driving_scene->get_driving_agents();
+        structures::IArray<IDrivingAgent*> *driving_agents =
+                driving_scene->get_mutable_driving_agents();
 
         for(size_t i = 0; i < driving_agents->count(); ++i)
         {
@@ -104,25 +104,11 @@ public:
         return max_temporal_limit;
     }
 
-    structures::IArray<IEntity const*>* get_entities() const override
-    {
-        structures::IArray<IDrivingAgent const*>* const driving_agents = this->get_driving_agents();
-        structures::IArray<IEntity const*>* const entities =
-                    new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
-        cast_array(*driving_agents, *entities);
-        delete driving_agents;
-        return entities;
-    }
-    IEntity const* get_entity(std::string const &entity_name) const override
-    {
-        return this->get_driving_agent(entity_name);
-    }
-
-    structures::IArray<IDrivingAgent const*>* get_driving_agents() const override
+    structures::IArray<IDrivingAgent const*>* get_driving_agents() const
     {
         structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
                 new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.count());
-        driving_agent_dict.get_values(driving_agents);
+        cast_array(*driving_agent_dict.get_values(), *driving_agents);
         return driving_agents;
     }
     IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const override
@@ -137,6 +123,18 @@ public:
     map::IMap<T_map_id> const* get_map() const
     {
         return map;
+    }
+
+    structures::IArray<IDrivingAgent*>* get_mutable_driving_agents() override
+    {
+        structures::stl::STLStackArray<IDrivingAgent*> *driving_agents =
+                new structures::stl::STLStackArray<IDrivingAgent*>(driving_agent_dict.count());
+        driving_agent_dict.get_values(driving_agents);
+        return driving_agents;
+    }
+    IDrivingAgent* get_mutable_driving_agent(std::string const &driving_agent_name) override
+    {
+        return driving_agent_dict[driving_agent_name];
     }
 };
 

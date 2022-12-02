@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    agent::IScene const *scene;
+    agent::IScene *scene;
 
     try
     {

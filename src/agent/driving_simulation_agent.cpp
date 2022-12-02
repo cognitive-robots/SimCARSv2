@@ -15,8 +15,8 @@ namespace agent
 
 DrivingSimulationAgent::DrivingSimulationAgent() {}
 
-DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agent,
-                                               ISimulationScene const *simulation_scene,
+DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent *driving_agent,
+                                               ISimulationScene *simulation_scene,
                                                temporal::Time simulation_start_time,
                                                bool start_simulated,
                                                bool allow_late_start) :
@@ -25,8 +25,8 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agen
                            allow_late_start)
 {}
 
-DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agent,
-                                               ISimulationScene const *simulation_scene,
+DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent *driving_agent,
+                                               ISimulationScene *simulation_scene,
                                                temporal::Time simulation_start_time,
                                                temporal::Time simulation_end_time,
                                                bool start_simulated,
@@ -67,71 +67,71 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agen
     this->simulation_end_time = simulation_end_time;
 
 
-    IVariable<geometry::Vec> const *position_variable = driving_agent->get_position_variable();
-    SimulatedVariable<geometry::Vec> const *simulated_position_variable =
+    IVariable<geometry::Vec> *position_variable = driving_agent->get_mutable_position_variable();
+    SimulatedVariable<geometry::Vec> *simulated_position_variable =
                 new SimulatedVariable(position_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_position_variable->get_full_name(), simulated_position_variable);
 
-    IVariable<geometry::Vec> const *linear_velocity_variable =
-            driving_agent->get_linear_velocity_variable();
-    SimulatedVariable<geometry::Vec> const *simulated_linear_velocity_variable =
+    IVariable<geometry::Vec> *linear_velocity_variable =
+            driving_agent->get_mutable_linear_velocity_variable();
+    SimulatedVariable<geometry::Vec> *simulated_linear_velocity_variable =
                 new SimulatedVariable(linear_velocity_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_linear_velocity_variable->get_full_name(), simulated_linear_velocity_variable);
 
-    IVariable<FP_DATA_TYPE> const *aligned_linear_velocity_variable =
-            driving_agent->get_aligned_linear_velocity_variable();
-    SimulatedVariable<FP_DATA_TYPE> const *simulated_aligned_linear_velocity_variable =
+    IVariable<FP_DATA_TYPE> *aligned_linear_velocity_variable =
+            driving_agent->get_mutable_aligned_linear_velocity_variable();
+    SimulatedVariable<FP_DATA_TYPE> *simulated_aligned_linear_velocity_variable =
                 new SimulatedVariable(aligned_linear_velocity_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_aligned_linear_velocity_variable->get_full_name(), simulated_aligned_linear_velocity_variable);
 
-    IVariable<geometry::Vec> const *linear_acceleration_variable =
-            driving_agent->get_linear_acceleration_variable();
-    SimulatedVariable<geometry::Vec> const *simulated_linear_acceleration_variable =
+    IVariable<geometry::Vec> *linear_acceleration_variable =
+            driving_agent->get_mutable_linear_acceleration_variable();
+    SimulatedVariable<geometry::Vec> *simulated_linear_acceleration_variable =
                 new SimulatedVariable(linear_acceleration_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_linear_acceleration_variable->get_full_name(), simulated_linear_acceleration_variable);
 
-    IVariable<FP_DATA_TYPE> const *aligned_linear_acceleration_variable =
-            driving_agent->get_aligned_linear_acceleration_variable();
-    SimulatedVariable<FP_DATA_TYPE> const *simulated_aligned_linear_acceleration_variable =
+    IVariable<FP_DATA_TYPE> *aligned_linear_acceleration_variable =
+            driving_agent->get_mutable_aligned_linear_acceleration_variable();
+    SimulatedVariable<FP_DATA_TYPE> *simulated_aligned_linear_acceleration_variable =
                 new SimulatedVariable(aligned_linear_acceleration_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_aligned_linear_acceleration_variable->get_full_name(), simulated_aligned_linear_acceleration_variable);
 
-    IVariable<geometry::Vec> const *external_linear_acceleration_variable =
-            driving_agent->get_external_linear_acceleration_variable();
-    SimulatedVariable<geometry::Vec> const *simulated_external_linear_acceleration_variable =
+    IVariable<geometry::Vec> *external_linear_acceleration_variable =
+            driving_agent->get_mutable_external_linear_acceleration_variable();
+    SimulatedVariable<geometry::Vec> *simulated_external_linear_acceleration_variable =
                 new SimulatedVariable(external_linear_acceleration_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_external_linear_acceleration_variable->get_full_name(), simulated_external_linear_acceleration_variable);
 
-    IVariable<FP_DATA_TYPE> const *rotation_variable =
-            driving_agent->get_rotation_variable();
-    SimulatedVariable<FP_DATA_TYPE> const *simulated_rotation_variable =
+    IVariable<FP_DATA_TYPE> *rotation_variable =
+            driving_agent->get_mutable_rotation_variable();
+    SimulatedVariable<FP_DATA_TYPE> *simulated_rotation_variable =
                 new SimulatedVariable(rotation_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_rotation_variable->get_full_name(), simulated_rotation_variable);
 
-    IVariable<FP_DATA_TYPE> const *steer_variable =
-            driving_agent->get_steer_variable();
-    SimulatedVariable<FP_DATA_TYPE> const *simulated_steer_variable =
+    IVariable<FP_DATA_TYPE> *steer_variable =
+            driving_agent->get_mutable_steer_variable();
+    SimulatedVariable<FP_DATA_TYPE> *simulated_steer_variable =
                 new SimulatedVariable(steer_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_steer_variable->get_full_name(), simulated_steer_variable);
 
-    IVariable<FP_DATA_TYPE> const *angular_velocity_variable =
-            driving_agent->get_angular_velocity_variable();
-    SimulatedVariable<FP_DATA_TYPE> const *simulated_angular_velocity_variable =
+    IVariable<FP_DATA_TYPE> *angular_velocity_variable =
+            driving_agent->get_mutable_angular_velocity_variable();
+    SimulatedVariable<FP_DATA_TYPE> *simulated_angular_velocity_variable =
                 new SimulatedVariable(angular_velocity_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated);
     this->simulated_variable_dict.update(simulated_angular_velocity_variable->get_full_name(), simulated_angular_velocity_variable);
 
 
-    structures::IArray<IValuelessVariable const*> const *variables =
-            driving_agent->get_variable_parameters();
+    structures::IArray<IValuelessVariable*> const *variables =
+            driving_agent->get_mutable_variable_parameters();
     for (size_t i = 0; i < variables->count(); ++i)
     {
         if (!this->simulated_variable_dict.contains((*variables)[i]->get_full_name()))
@@ -144,7 +144,7 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent const *driving_agen
 
 DrivingSimulationAgent::~DrivingSimulationAgent()
 {
-    structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables = simulated_variable_dict.get_values();
+    structures::IArray<ISimulatedValuelessVariable*> const *simulated_variables = simulated_variable_dict.get_values();
 
     for (size_t i = 0; i < simulated_variables->count(); ++i)
     {
@@ -179,6 +179,14 @@ temporal::Time DrivingSimulationAgent::get_max_temporal_limit() const
     return this->simulation_end_time;
 }
 
+bool DrivingSimulationAgent::is_state_available(temporal::Time time) const
+{
+    return driving_agent->is_state_available(time) ||
+            (time > simulation_start_time &&
+             time <= simulation_end_time &&
+             driving_agent->is_state_available(simulation_start_time));
+}
+
 structures::IArray<IValuelessConstant const*>* DrivingSimulationAgent::get_constant_parameters() const
 {
     return this->driving_agent->get_constant_parameters();
@@ -194,13 +202,14 @@ structures::IArray<IValuelessVariable const*>* DrivingSimulationAgent::get_varia
     structures::stl::STLConcatArray<IValuelessVariable const*> *variables =
                 new structures::stl::STLConcatArray<IValuelessVariable const*>(2);
 
-    variables->get_array(0) =
-                new structures::stl::STLStackArray<IValuelessVariable const*>(
-                    non_simulated_variable_dict.get_values());
+    structures::IArray<IValuelessVariable const*> *non_simulated_variables =
+                new structures::stl::STLStackArray<IValuelessVariable const*>(non_simulated_variable_dict.count());
+    cast_array(*non_simulated_variable_dict.get_values(), *non_simulated_variables);
+    variables->get_array(0) = non_simulated_variables;
 
     structures::IArray<IValuelessVariable const*> *simulated_variables =
                 new structures::stl::STLStackArray<IValuelessVariable const*>(simulated_variable_dict.count());
-    cast_array<ISimulatedValuelessVariable const*, IValuelessVariable const*>(
+    cast_array<ISimulatedValuelessVariable*, IValuelessVariable const*>(
                 *(simulated_variable_dict.get_values()), *simulated_variables);
     variables->get_array(1) = simulated_variables;
 
@@ -272,50 +281,12 @@ IDrivingAgent* DrivingSimulationAgent::driving_agent_deep_copy() const
     return driving_agent;
 }
 
-IDrivingAgentState* DrivingSimulationAgent::get_driving_agent_state(temporal::Time time, bool throw_on_out_of_range) const
-{
-    IDrivingAgentState *driving_agent_state =
-            driving_agent->get_driving_agent_state(time, false);
-
-    try
-    {
-        driving_agent_state->set_position_variable(
-                    this->get_position_variable()->get_event(time));
-        driving_agent_state->set_linear_velocity_variable(
-                    this->get_linear_velocity_variable()->get_event(time));
-        driving_agent_state->set_aligned_linear_velocity_variable(
-                    this->get_aligned_linear_velocity_variable()->get_event(time));
-        driving_agent_state->set_linear_acceleration_variable(
-                    this->get_linear_acceleration_variable()->get_event(time));
-        driving_agent_state->set_aligned_linear_acceleration_variable(
-                    this->get_aligned_linear_acceleration_variable()->get_event(time));
-        driving_agent_state->set_external_linear_acceleration_variable(
-                    this->get_external_linear_acceleration_variable()->get_event(time));
-        driving_agent_state->set_rotation_variable(
-                    this->get_rotation_variable()->get_event(time));
-        driving_agent_state->set_steer_variable(
-                    this->get_steer_variable()->get_event(time));
-        driving_agent_state->set_angular_velocity_variable(
-                    this->get_angular_velocity_variable()->get_event(time));
-    }
-    catch (std::out_of_range const &e)
-    {
-        if (throw_on_out_of_range)
-        {
-            delete driving_agent_state;
-            throw e;
-        }
-    }
-
-    return driving_agent_state;
-}
-
 void DrivingSimulationAgent::propogate(temporal::Time time, IDrivingAgentState const *state) const
 {
     if (time > simulation_start_time
             && time <= simulation_end_time)
     {
-        structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables =
+        structures::IArray<ISimulatedValuelessVariable*> const *simulated_variables =
                 simulated_variable_dict.get_values();
         for(size_t i = 0; i < simulated_variables->count(); ++i)
         {
@@ -330,13 +301,77 @@ void DrivingSimulationAgent::begin_simulation(temporal::Time simulation_start_ti
     {
         this->simulation_start_time = simulation_start_time;
 
-        structures::IArray<ISimulatedValuelessVariable const*> const *simulated_variables =
+        structures::IArray<ISimulatedValuelessVariable*> const *simulated_variables =
                 simulated_variable_dict.get_values();
         for(size_t i = 0; i < simulated_variables->count(); ++i)
         {
             (*simulated_variables)[i]->begin_simulation(simulation_start_time);
         }
     }
+}
+
+structures::IArray<IValuelessConstant*>* DrivingSimulationAgent::get_mutable_constant_parameters()
+{
+    return driving_agent->get_mutable_constant_parameters();
+}
+
+IValuelessConstant* DrivingSimulationAgent::get_mutable_constant_parameter(std::string const &constant_name)
+{
+    return driving_agent->get_mutable_constant_parameter(constant_name);
+}
+
+structures::IArray<IValuelessVariable*>* DrivingSimulationAgent::get_mutable_variable_parameters()
+{
+    structures::stl::STLConcatArray<IValuelessVariable*> *variables =
+                new structures::stl::STLConcatArray<IValuelessVariable*>(2);
+
+    variables->get_array(0) =
+                new structures::stl::STLStackArray<IValuelessVariable*>(
+                    non_simulated_variable_dict.get_values());
+
+    structures::IArray<IValuelessVariable*> *simulated_variables =
+                new structures::stl::STLStackArray<IValuelessVariable*>(simulated_variable_dict.count());
+    cast_array<ISimulatedValuelessVariable*, IValuelessVariable*>(
+                *(simulated_variable_dict.get_values()), *simulated_variables);
+    variables->get_array(1) = simulated_variables;
+
+    return variables;
+}
+
+IValuelessVariable* DrivingSimulationAgent::get_mutable_variable_parameter(std::string const &variable_name)
+{
+    if (non_simulated_variable_dict.contains(variable_name))
+    {
+        return non_simulated_variable_dict[variable_name];
+    }
+    else
+    {
+        return simulated_variable_dict[variable_name];
+    }
+}
+
+structures::IArray<IValuelessEvent*>* DrivingSimulationAgent::get_mutable_events()
+{
+    structures::IArray<std::string> const *non_simulated_variable_names = non_simulated_variable_dict.get_keys();
+    structures::IArray<std::string> const *simulated_variable_names = simulated_variable_dict.get_keys();
+
+    structures::stl::STLConcatArray<IValuelessEvent*> *events =
+                new structures::stl::STLConcatArray<IValuelessEvent*>(
+                    non_simulated_variable_names->count() + simulated_variable_names->count());
+
+    size_t i;
+
+    for(i = 0; i < non_simulated_variable_names->count(); ++i)
+    {
+        events->get_array(i) = non_simulated_variable_dict[(*non_simulated_variable_names)[i]]->get_mutable_valueless_events();
+    }
+
+    for(i = 0; i < simulated_variable_names->count(); ++i)
+    {
+        events->get_array(non_simulated_variable_names->count() + i) = simulated_variable_dict[(*simulated_variable_names)[i]]->get_mutable_valueless_events();
+    }
+
+    return events;
 }
 
 }

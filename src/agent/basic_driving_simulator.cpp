@@ -24,7 +24,7 @@ BasicDrivingSimulator::~BasicDrivingSimulator()
     delete controller;
 }
 
-void BasicDrivingSimulator::simulate(ISceneState const *current_state, ISceneState *next_state, temporal::Duration time_step) const
+void BasicDrivingSimulator::simulate(IReadOnlySceneState const *current_state, ISceneState *next_state, temporal::Duration time_step) const
 {
     this->simulate_driving_scene(
                 dynamic_cast<IDrivingSceneState const*>(current_state),
@@ -33,77 +33,91 @@ void BasicDrivingSimulator::simulate(ISceneState const *current_state, ISceneSta
 }
 
 void BasicDrivingSimulator::simulate_driving_scene(
-        IDrivingSceneState const *current_state,
+        IReadOnlyDrivingSceneState const *current_state,
         IDrivingSceneState *next_state,
         temporal::Duration time_step) const
 {
-    structures::IArray<IDrivingAgentState const*> *current_driving_agent_states =
+    structures::IArray<IReadOnlyDrivingAgentState const*> *current_driving_agent_states =
             current_state->get_driving_agent_states();
 
-    structures::IArray<IDrivingAgentState*> *new_driving_agent_states =
-            new structures::stl::STLStackArray<IDrivingAgentState*>(current_driving_agent_states->count());
+    structures::IArray<IDrivingAgentState*> *next_driving_agent_states =
+            next_state->get_mutable_driving_agent_states();
 
-    size_t i;
+    size_t i, j;
     for (i = 0; i < current_driving_agent_states->count(); ++i)
     {
-        IDrivingAgentState const *current_driving_agent_state = (*current_driving_agent_states)[i];
-        IDrivingAgentState *new_driving_agent_state =
-                    new BasicDrivingAgentState(current_driving_agent_state);
+        IReadOnlyDrivingAgentState const *current_driving_agent_state = (*current_driving_agent_states)[i];
 
-        IConstant<geometry::Vec> *external_linear_acceleration_variable =
-                    new BasicConstant<geometry::Vec>(
-                        new_driving_agent_state->get_driving_agent_name(),
-                        "linear_acceleration.external",
-                        geometry::Vec::Zero());
-        new_driving_agent_state->set_external_linear_acceleration_variable(external_linear_acceleration_variable);
+        for (j = 0; j < next_driving_agent_states->count(); ++j)
+        {
+            IDrivingAgentState *next_driving_agent_state = (*next_driving_agent_states)[j];
 
-        controller->modify_driving_agent_state(current_driving_agent_state, new_driving_agent_state);
-        simulate_driving_agent(current_driving_agent_state, new_driving_agent_state, time_step);
+            if (current_driving_agent_state->get_name() == next_driving_agent_state->get_name())
+            {
+                if (next_driving_agent_state->is_populated())
+                {
+                    break;
+                }
 
-        (*new_driving_agent_states)[i] = new_driving_agent_state;
+                IConstant<geometry::Vec> *external_linear_acceleration_variable =
+                            new BasicConstant<geometry::Vec>(
+                                next_driving_agent_state->get_name(),
+                                "linear_acceleration.external",
+                                geometry::Vec::Zero());
+                next_driving_agent_state->set_external_linear_acceleration_variable(external_linear_acceleration_variable);
+
+                controller->modify_driving_agent_state(current_driving_agent_state, next_driving_agent_state);
+                simulate_driving_agent(current_driving_agent_state, next_driving_agent_state, time_step);
+
+                break;
+            }
+
+        }
+
+        delete current_driving_agent_state;
     }
 
     delete current_driving_agent_states;
 
-    /*
-    for (i = 0; i < new_driving_agent_states->count(); ++i)
+    for (i = 0; i < next_driving_agent_states->count(); ++i)
     {
-        IDrivingAgentState *new_driving_agent_state_1 = (*new_driving_agent_states)[i];
+        IDrivingAgentState *next_driving_agent_state_1 = (*next_driving_agent_states)[i];
+        /*
 
-        geometry::Vec position_1 = new_driving_agent_state_1->get_position_variable()->get_value();
-        FP_DATA_TYPE length_1 = new_driving_agent_state_1->get_bb_length_constant()->get_value();
-        FP_DATA_TYPE width_1 = new_driving_agent_state_1->get_bb_width_constant()->get_value();
-        FP_DATA_TYPE rotation_1 = new_driving_agent_state_1->get_rotation_variable()->get_value();
+        geometry::Vec position_1 = next_driving_agent_state_1->get_position_variable()->get_value();
+        FP_DATA_TYPE length_1 = next_driving_agent_state_1->get_bb_length_constant()->get_value();
+        FP_DATA_TYPE width_1 = next_driving_agent_state_1->get_bb_width_constant()->get_value();
+        FP_DATA_TYPE rotation_1 = next_driving_agent_state_1->get_rotation_variable()->get_value();
 
         geometry::ORect bounding_box_1(position_1, length_1, width_1, rotation_1);
 
-        for (size_t j = i + 1; j < new_driving_agent_states->count(); ++j)
+        for (size_t j = i + 1; j < next_driving_agent_states->count(); ++j)
         {
-            IDrivingAgentState *new_driving_agent_state_2 = (*new_driving_agent_states)[j];
+            IDrivingAgentState *next_driving_agent_state_2 = (*next_driving_agent_states)[j];
 
-            geometry::Vec position_2 = new_driving_agent_state_2->get_position_variable()->get_value();
-            FP_DATA_TYPE length_2 = new_driving_agent_state_2->get_bb_length_constant()->get_value();
-            FP_DATA_TYPE width_2 = new_driving_agent_state_2->get_bb_width_constant()->get_value();
-            FP_DATA_TYPE rotation_2 = new_driving_agent_state_2->get_rotation_variable()->get_value();
+            geometry::Vec position_2 = next_driving_agent_state_2->get_position_variable()->get_value();
+            FP_DATA_TYPE length_2 = next_driving_agent_state_2->get_bb_length_constant()->get_value();
+            FP_DATA_TYPE width_2 = next_driving_agent_state_2->get_bb_width_constant()->get_value();
+            FP_DATA_TYPE rotation_2 = next_driving_agent_state_2->get_rotation_variable()->get_value();
 
             geometry::ORect bounding_box_2(position_2, length_2, width_2, rotation_2);
 
             if (bounding_box_1.check_collision(bounding_box_2))
             {
                 IDrivingAgentState const *current_driving_agent_state_1 =
-                        current_state->get_driving_agent_state(new_driving_agent_state_1->get_driving_agent_name());
+                        current_state->get_driving_agent_state(next_driving_agent_state_1->get_driving_agent_name());
                 IDrivingAgentState const *current_driving_agent_state_2 =
-                        current_state->get_driving_agent_state(new_driving_agent_state_2->get_driving_agent_name());
+                        current_state->get_driving_agent_state(next_driving_agent_state_2->get_driving_agent_name());
 
                 geometry::Vec direction = (position_2 - position_1).normalized();
 
-                geometry::Vec acceleration_1 = new_driving_agent_state_1->get_linear_acceleration_variable()->get_value();
-                geometry::Vec velocity_1 = new_driving_agent_state_1->get_linear_velocity_variable()->get_value();
+                geometry::Vec acceleration_1 = next_driving_agent_state_1->get_linear_acceleration_variable()->get_value();
+                geometry::Vec velocity_1 = next_driving_agent_state_1->get_linear_velocity_variable()->get_value();
                 FP_DATA_TYPE mass_1 = length_1 * width_1;
                 FP_DATA_TYPE collision_velocity_1 = velocity_1.dot(direction);
 
-                geometry::Vec acceleration_2 = new_driving_agent_state_2->get_linear_acceleration_variable()->get_value();
-                geometry::Vec velocity_2 = new_driving_agent_state_2->get_linear_velocity_variable()->get_value();
+                geometry::Vec acceleration_2 = next_driving_agent_state_2->get_linear_acceleration_variable()->get_value();
+                geometry::Vec velocity_2 = next_driving_agent_state_2->get_linear_velocity_variable()->get_value();
                 FP_DATA_TYPE mass_2 = length_2 * width_2;
                 FP_DATA_TYPE collision_velocity_2 = velocity_2.dot(direction);
 
@@ -132,35 +146,31 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
                 IConstant<geometry::Vec> *external_linear_acceleration_variable_1(
                             new BasicConstant<geometry::Vec>(
-                                new_driving_agent_state_1->get_driving_agent_name(),
+                                next_driving_agent_state_1->get_driving_agent_name(),
                                 "linear_acceleration.external",
                                 external_acceleration_1));
-                new_driving_agent_state_1->set_external_linear_acceleration_variable(external_linear_acceleration_variable_1);
-                simulate_driving_agent(current_driving_agent_state_1, new_driving_agent_state_1, time_step);
+                next_driving_agent_state_1->set_external_linear_acceleration_variable(external_linear_acceleration_variable_1);
+                simulate_driving_agent(current_driving_agent_state_1, next_driving_agent_state_1, time_step);
 
                 IConstant<geometry::Vec> *external_linear_acceleration_variable_2(
                             new BasicConstant<geometry::Vec>(
-                                new_driving_agent_state_2->get_driving_agent_name(),
+                                next_driving_agent_state_2->get_driving_agent_name(),
                                 "linear_acceleration.external",
                                 external_acceleration_2));
-                new_driving_agent_state_2->set_external_linear_acceleration_variable(external_linear_acceleration_variable_2);
-                simulate_driving_agent(current_driving_agent_state_2, new_driving_agent_state_2, time_step);
+                next_driving_agent_state_2->set_external_linear_acceleration_variable(external_linear_acceleration_variable_2);
+                simulate_driving_agent(current_driving_agent_state_2, next_driving_agent_state_2, time_step);
             }
         }
-    }
-    */
+        */
 
-    for (i = 0; i < new_driving_agent_states->count(); ++i)
-    {
-        IDrivingAgentState *new_driving_agent_state = (*new_driving_agent_states)[i];
-        next_state->set_driving_agent_state(new_driving_agent_state);
+        delete next_driving_agent_state_1;
     }
 
-    delete new_driving_agent_states;
+    delete next_driving_agent_states;
 }
 
 void BasicDrivingSimulator::simulate_driving_agent(
-        IDrivingAgentState const *current_state,
+        IReadOnlyDrivingAgentState const *current_state,
         IDrivingAgentState *next_state,
         temporal::Duration time_step) const
 {
@@ -210,7 +220,7 @@ void BasicDrivingSimulator::simulate_driving_agent(
     FP_DATA_TYPE new_angular_velocity = new_steer * estimated_mean_aligned_linear_velocity;
 
     IConstant<FP_DATA_TYPE> *new_angular_velocity_variable =
-                new BasicConstant<FP_DATA_TYPE>(next_state->get_driving_agent_name(), "angular_velocity.base", new_angular_velocity);
+                new BasicConstant<FP_DATA_TYPE>(next_state->get_name(), "angular_velocity.base", new_angular_velocity);
     next_state->set_angular_velocity_variable(new_angular_velocity_variable);
 
     FP_DATA_TYPE mean_angular_velocity = (angular_velocity + new_angular_velocity) / 2.0f;
@@ -219,7 +229,7 @@ void BasicDrivingSimulator::simulate_driving_agent(
     assert(!std::isnan(new_rotation));
 
     IConstant<FP_DATA_TYPE> *new_rotation_variable =
-                new BasicConstant<FP_DATA_TYPE>(next_state->get_driving_agent_name(), "rotation.base", new_rotation);
+                new BasicConstant<FP_DATA_TYPE>(next_state->get_name(), "rotation.base", new_rotation);
     next_state->set_rotation_variable(new_rotation_variable);
 
 
@@ -230,7 +240,7 @@ void BasicDrivingSimulator::simulate_driving_agent(
 
     IConstant<geometry::Vec> *new_linear_acceleration_variable =
                 new BasicConstant<geometry::Vec>(
-                    next_state->get_driving_agent_name(), "linear_acceleration.base", new_linear_acceleration);
+                    next_state->get_name(), "linear_acceleration.base", new_linear_acceleration);
     next_state->set_linear_acceleration_variable(new_linear_acceleration_variable);
 
     geometry::Vec mean_linear_acceleration = (linear_acceleration + new_linear_acceleration) / 2.0f;
@@ -238,7 +248,7 @@ void BasicDrivingSimulator::simulate_driving_agent(
     geometry::Vec new_linear_velocity = linear_velocity + mean_linear_acceleration * time_step.count();
 
     IConstant<geometry::Vec> *new_linear_velocity_variable =
-                new BasicConstant<geometry::Vec>(next_state->get_driving_agent_name(), "linear_velocity.base", new_linear_velocity);
+                new BasicConstant<geometry::Vec>(next_state->get_name(), "linear_velocity.base", new_linear_velocity);
     next_state->set_linear_velocity_variable(new_linear_velocity_variable);
 
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
@@ -246,7 +256,7 @@ void BasicDrivingSimulator::simulate_driving_agent(
 
     IConstant<FP_DATA_TYPE> *new_aligned_linear_velocity_variable =
                 new BasicConstant<FP_DATA_TYPE>(
-                    next_state->get_driving_agent_name(), "aligned_linear_velocity.base", new_aligned_linear_velocity);
+                    next_state->get_name(), "aligned_linear_velocity.base", new_aligned_linear_velocity);
     next_state->set_aligned_linear_velocity_variable(new_aligned_linear_velocity_variable);
 
     geometry::Vec mean_linear_velocity = (linear_velocity + new_linear_velocity) / 2.0f;
@@ -256,7 +266,7 @@ void BasicDrivingSimulator::simulate_driving_agent(
     assert(!std::isnan(new_position.y()));
 
     IConstant<geometry::Vec> *new_position_variable =
-                new BasicConstant<geometry::Vec>(next_state->get_driving_agent_name(), "position.base", new_position);
+                new BasicConstant<geometry::Vec>(next_state->get_name(), "position.base", new_position);
     next_state->set_position_variable(new_position_variable);
 }
 

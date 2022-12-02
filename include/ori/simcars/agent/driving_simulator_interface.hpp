@@ -14,8 +14,8 @@ namespace agent
 class IDrivingSimulator : public virtual ISimulator
 {
 public:
-    virtual void simulate_driving_scene(agent::IDrivingSceneState const *current_state, agent::IDrivingSceneState *next_state, temporal::Duration time_step) const = 0;
-    virtual void simulate_driving_agent(agent::IDrivingAgentState const *current_state, agent::IDrivingAgentState *next_state, temporal::Duration time_step) const = 0;
+    virtual void simulate_driving_scene(agent::IReadOnlyDrivingSceneState const *current_state, agent::IDrivingSceneState *next_state, temporal::Duration time_step) const = 0;
+    virtual void simulate_driving_agent(agent::IReadOnlyDrivingAgentState const *current_state, agent::IDrivingAgentState *next_state, temporal::Duration time_step) const = 0;
 };
 
 }

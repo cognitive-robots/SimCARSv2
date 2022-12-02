@@ -14,7 +14,7 @@ class ISimulationScene : public virtual IScene
 public:
     virtual inline temporal::Duration get_time_step() const = 0;
 
-    virtual void simulate_and_propogate(temporal::Time time) const = 0;
+    virtual void simulate(temporal::Time time) = 0;
 };
 
 }

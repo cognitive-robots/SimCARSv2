@@ -13,7 +13,7 @@ namespace highd
 
 HighDScene::~HighDScene()
 {
-    structures::IArray<IDrivingAgent const*> const *driving_agents = driving_agent_dict.get_values();
+    structures::IArray<IDrivingAgent*> const *driving_agents = driving_agent_dict.get_values();
 
     for (size_t i = 0; i < driving_agents->count(); ++i)
     {
@@ -21,7 +21,7 @@ HighDScene::~HighDScene()
     }
 }
 
-HighDScene const* HighDScene::construct_from(IDrivingScene const *driving_scene)
+HighDScene* HighDScene::construct_from(IDrivingScene *driving_scene)
 {
     HighDScene *new_driving_scene = new HighDScene();
 
@@ -30,7 +30,7 @@ HighDScene const* HighDScene::construct_from(IDrivingScene const *driving_scene)
     new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
     new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
-    structures::IArray<IDrivingAgent const*> *driving_agents = driving_scene->get_driving_agents();
+    structures::IArray<IDrivingAgent*> *driving_agents = driving_scene->get_mutable_driving_agents();
 
     size_t i;
     for(i = 0; i < driving_agents->count(); ++i)
@@ -74,7 +74,7 @@ void HighDScene::load_virt(std::ifstream &input_filestream_1, std::ifstream &inp
             continue;
         }
 
-        HighDDrivingAgent const *driving_agent = new HighDDrivingAgent(i, tracks_meta_csv_document, tracks_csv_document);
+        HighDDrivingAgent *driving_agent = new HighDDrivingAgent(i, tracks_meta_csv_document, tracks_csv_document);
 
         driving_agent_dict.update(driving_agent->get_name(), driving_agent);
 
@@ -114,30 +114,28 @@ temporal::Time HighDScene::get_max_temporal_limit() const
     return this->max_temporal_limit;
 }
 
-structures::IArray<IEntity const*>* HighDScene::get_entities() const
-{
-    structures::IArray<IDrivingAgent const*>* const driving_agents = this->get_driving_agents();
-    structures::IArray<IEntity const*>* const entities =
-            new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
-    cast_array(*driving_agents, *entities);
-    delete driving_agents;
-    return entities;
-}
-
-IEntity const* HighDScene::get_entity(std::string const &entity_name) const
-{
-    return this->get_driving_agent(entity_name);
-}
-
 structures::IArray<IDrivingAgent const*>* HighDScene::get_driving_agents() const
 {
     structures::stl::STLStackArray<IDrivingAgent const*> *driving_agents =
             new structures::stl::STLStackArray<IDrivingAgent const*>(driving_agent_dict.count());
-    driving_agent_dict.get_values(driving_agents);
+    cast_array(*driving_agent_dict.get_values(), *driving_agents);
     return driving_agents;
 }
 
 IDrivingAgent const* HighDScene::get_driving_agent(std::string const &driving_agent_name) const
+{
+    return driving_agent_dict[driving_agent_name];
+}
+
+structures::IArray<IDrivingAgent*>* HighDScene::get_mutable_driving_agents()
+{
+    structures::stl::STLStackArray<IDrivingAgent*> *driving_agents =
+            new structures::stl::STLStackArray<IDrivingAgent*>(driving_agent_dict.count());
+    driving_agent_dict.get_values(driving_agents);
+    return driving_agents;
+}
+
+IDrivingAgent* HighDScene::get_mutable_driving_agent(std::string const &driving_agent_name)
 {
     return driving_agent_dict[driving_agent_name];
 }

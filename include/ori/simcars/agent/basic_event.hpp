@@ -16,8 +16,9 @@ class BasicEvent : public virtual AEvent<T>
 {
     std::string const entity_name;
     std::string const parameter_name;
-    T const value;
-    temporal::Time const time;
+
+    T value;
+    temporal::Time time;
 
 public:
     BasicEvent(std::string const &entity_name,
@@ -40,7 +41,7 @@ public:
         return new BasicEvent<T>(entity_name, parameter_name, value, time);
     }
 
-    T get_value() const override
+    T const& get_value() const override
     {
         return value;
     }
@@ -58,6 +59,11 @@ public:
     temporal::Time get_time() const override
     {
         return time;
+    }
+
+    void set_value(T const &value) override
+    {
+        this->value = value;
     }
 };
 

@@ -79,6 +79,23 @@ public:
     {
         return this->get_event(time, exact);
     }
+
+    structures::IArray<IValuelessEvent*>* get_mutable_valueless_events(
+            temporal::Time time_window_start,
+            temporal::Time time_window_end) override
+    {
+        structures::IArray<IEvent<T>*>* const events =
+                this->get_mutable_events(time_window_start, time_window_end);
+        structures::IArray<IValuelessEvent*>* const valueless_events =
+                    new structures::stl::STLStackArray<IValuelessEvent*>(events->count());
+        cast_array(*events, *valueless_events);
+        delete events;
+        return valueless_events;
+    }
+    IValuelessEvent* get_mutable_valueless_event(temporal::Time time, bool exact) override
+    {
+        return this->get_mutable_event(time, exact);
+    }
 };
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ori/simcars/agent/valueless_constant_interface.hpp>
+#include <ori/simcars/agent/read_only_entity_state_interface.hpp>
 
 namespace ori
 {
@@ -9,16 +9,11 @@ namespace simcars
 namespace agent
 {
 
-class IEntityState
+class IEntityState : public virtual IReadOnlyEntityState
 {
 public:
-    virtual ~IEntityState() = default;
-
-    virtual structures::IArray<IValuelessConstant const*>* get_parameter_values() const = 0;
-    virtual IValuelessConstant const* get_parameter_value(std::string const &parameter_name) const = 0;
-
-    virtual void set_parameter_values(structures::IArray<IValuelessConstant const*> const *parameter_values) = 0;
-    virtual void set_parameter_value(IValuelessConstant const *parameter_value) = 0;
+    virtual structures::IArray<IValuelessConstant*>* get_mutable_parameter_values() = 0;
+    virtual IValuelessConstant* get_mutable_parameter_value(std::string const &parameter_name) = 0;
 };
 
 }

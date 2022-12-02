@@ -12,9 +12,20 @@ namespace agent
 class ADrivingScene : public virtual IDrivingScene
 {
 public:
-    ISceneState* get_state(temporal::Time time) const override;
+    structures::IArray<IEntity const*>* get_entities() const override;
+    IEntity const* get_entity(std::string const &entity_name) const override;
 
-    IDrivingSceneState* get_driving_scene_state(temporal::Time time) const override;
+    IReadOnlySceneState const* get_state(temporal::Time time) const override;
+
+    IReadOnlyDrivingSceneState const* get_driving_scene_state(temporal::Time time) const override;
+
+
+    structures::IArray<IEntity*>* get_mutable_entities() override;
+    IEntity* get_mutable_entity(std::string const &entity_name) override;
+
+    ISceneState* get_mutable_state(temporal::Time time) override;
+
+    IDrivingSceneState* get_mutable_driving_scene_state(temporal::Time time) override;
 };
 
 }

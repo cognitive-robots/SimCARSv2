@@ -13,7 +13,7 @@ namespace agent
 class IDrivingAgentController : public virtual IController
 {
 public:
-    virtual void modify_driving_agent_state(agent::IDrivingAgentState const *original_state, agent::IDrivingAgentState *modified_state) const = 0;
+    virtual void modify_driving_agent_state(agent::IReadOnlyDrivingAgentState const *original_state, agent::IDrivingAgentState *modified_state) const = 0;
 };
 
 }

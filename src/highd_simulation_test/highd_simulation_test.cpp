@@ -12,8 +12,8 @@
 #include <exception>
 #include <random>
 
-#define NUMBER_OF_AGENTS 100
-#define NUMBER_OF_SIMULATED_AGENTS 2
+#define NUMBER_OF_AGENTS 10
+#define NUMBER_OF_SIMULATED_AGENTS 10
 
 using namespace ori::simcars;
 using namespace std::chrono;
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 
     start_time = high_resolution_clock::now();
 
-    agent::IDrivingScene const *scene;
+    agent::IDrivingScene *scene;
 
     try
     {
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
     start_time = high_resolution_clock::now();
 
-    agent::IDrivingScene const *scene_with_actions;
+    agent::IDrivingScene *scene_with_actions;
 
     try
     {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
     agent::IDrivingSimulator *driving_simulator =
                 new agent::BasicDrivingSimulator(driving_agent_controller);
 
-    agent::IDrivingScene const *simulated_scene =
+    agent::IDrivingScene *simulated_scene =
             agent::DrivingSimulationScene::construct_from(
                 scene_with_actions, driving_simulator, time_step,
                 simulation_start_time, simulated_agent_names);

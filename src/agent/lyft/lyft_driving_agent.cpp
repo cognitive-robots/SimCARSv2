@@ -116,42 +116,33 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
         min_position_y = std::min(position_y, min_position_y);
         max_position_y = std::max(position_y, max_position_y);
         geometry::Vec const position(position_x, position_y);
-        IEvent<geometry::Vec>* const position_event = new BasicEvent<geometry::Vec>(position_variable->get_entity_name(), position_variable->get_parameter_name(), position, timestamp);
-        position_variable->add_event(position_event);
+        position_variable->set_value(timestamp, position);
 
         rapidjson::Value::ConstArray const &linear_velocity_data = state_data_entry["linear_velocity"].GetArray();
         geometry::Vec const linear_velocity(linear_velocity_data[0].GetDouble(), linear_velocity_data[1].GetDouble());
-        IEvent<geometry::Vec>* const linear_velocity_event = new BasicEvent<geometry::Vec>(linear_velocity_variable->get_entity_name(), linear_velocity_variable->get_parameter_name(), linear_velocity, timestamp);
-        linear_velocity_variable->add_event(linear_velocity_event);
+        linear_velocity_variable->set_value(timestamp, linear_velocity);
 
         rapidjson::Value::ConstArray const &linear_acceleration_data = state_data_entry["linear_acceleration"].GetArray();
         geometry::Vec const linear_acceleration(linear_acceleration_data[0].GetDouble(), linear_acceleration_data[1].GetDouble());
-        IEvent<geometry::Vec>* const linear_acceleration_event = new BasicEvent<geometry::Vec>(linear_acceleration_variable->get_entity_name(), linear_acceleration_variable->get_parameter_name(), linear_acceleration, timestamp);
-        linear_acceleration_variable->add_event(linear_acceleration_event);
+        linear_acceleration_variable->set_value(timestamp, linear_acceleration);
 
         FP_DATA_TYPE const rotation(state_data_entry["rotation"].GetDouble());
-        IEvent<FP_DATA_TYPE>* const rotation_event = new BasicEvent<FP_DATA_TYPE>(rotation_variable->get_entity_name(), rotation_variable->get_parameter_name(), rotation, timestamp);
-        rotation_variable->add_event(rotation_event);
+        rotation_variable->set_value(timestamp, rotation);
 
         FP_DATA_TYPE const aligned_linear_velocity = (trig_buff->get_rot_mat(-rotation) * linear_velocity).x();
-        IEvent<FP_DATA_TYPE>* const aligned_linear_velocity_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_velocity_variable->get_entity_name(), aligned_linear_velocity_variable->get_parameter_name(),aligned_linear_velocity, timestamp);
-        aligned_linear_velocity_variable->add_event(aligned_linear_velocity_event);
+        aligned_linear_velocity_variable->set_value(timestamp, aligned_linear_velocity);
 
         FP_DATA_TYPE const aligned_linear_acceleration = (trig_buff->get_rot_mat(-rotation) * linear_acceleration).x();
-        IEvent<FP_DATA_TYPE>* const aligned_linear_acceleration_event = new BasicEvent<FP_DATA_TYPE>(aligned_linear_acceleration_variable->get_entity_name(), aligned_linear_acceleration_variable->get_parameter_name(), aligned_linear_acceleration, timestamp);
-        aligned_linear_acceleration_variable->add_event(aligned_linear_acceleration_event);
+        aligned_linear_acceleration_variable->set_value(timestamp, aligned_linear_acceleration);
 
         geometry::Vec const external_linear_acceleration = linear_acceleration - (trig_buff->get_rot_mat(rotation) * geometry::Vec(aligned_linear_acceleration, 0));
-        IEvent<geometry::Vec>* const external_linear_acceleration_event = new BasicEvent<geometry::Vec>(external_linear_acceleration_variable->get_entity_name(), external_linear_acceleration_variable->get_parameter_name(), external_linear_acceleration, timestamp);
-        external_linear_acceleration_variable->add_event(external_linear_acceleration_event);
+        external_linear_acceleration_variable->set_value(timestamp, external_linear_acceleration);
 
-        FP_DATA_TYPE const angular_velocity(state_data_entry["angular_velocity"].GetDouble());
-        IEvent<FP_DATA_TYPE>* const angular_velocity_event = new BasicEvent<FP_DATA_TYPE>(angular_velocity_variable->get_entity_name(), angular_velocity_variable->get_parameter_name(), angular_velocity, timestamp);
-        angular_velocity_variable->add_event(angular_velocity_event);
+        FP_DATA_TYPE const angular_velocity = state_data_entry["angular_velocity"].GetDouble();
+        angular_velocity_variable->set_value(timestamp, angular_velocity);
 
         FP_DATA_TYPE const steer = angular_velocity / aligned_linear_velocity;
-        IEvent<FP_DATA_TYPE>* const steer_event = new BasicEvent<FP_DATA_TYPE>(steer_variable->get_entity_name(), steer_variable->get_parameter_name(), steer, timestamp);
-        steer_variable->add_event(steer_event);
+        steer_variable->set_value(timestamp, steer);
     }
 
     this->min_spatial_limits = geometry::Vec(min_position_x, min_position_y);
@@ -162,14 +153,14 @@ LyftDrivingAgent::~LyftDrivingAgent()
 {
     size_t i;
 
-    structures::IArray<IValuelessConstant const*> const *constants = constant_dict.get_values();
+    structures::IArray<IValuelessConstant*> const *constants = constant_dict.get_values();
 
     for (i = 0; i < constants->count(); ++i)
     {
         delete (*constants)[i];
     }
 
-    structures::IArray<IValuelessVariable const*> const *variables = variable_dict.get_values();
+    structures::IArray<IValuelessVariable*> const *variables = variable_dict.get_values();
 
     for (i = 0; i < variables->count(); ++i)
     {
@@ -205,8 +196,8 @@ temporal::Time LyftDrivingAgent::get_max_temporal_limit() const
 structures::IArray<IValuelessConstant const*>* LyftDrivingAgent::get_constant_parameters() const
 {
     structures::stl::STLStackArray<IValuelessConstant const*> *constants =
-            new structures::stl::STLStackArray<IValuelessConstant const*>(constant_dict.get_values());
-    constant_dict.get_values(constants);
+            new structures::stl::STLStackArray<IValuelessConstant const*>(constant_dict.count());
+    cast_array(*constant_dict.get_values(), *constants);
     return constants;
 }
 
@@ -219,7 +210,7 @@ structures::IArray<IValuelessVariable const*>* LyftDrivingAgent::get_variable_pa
 {
     structures::stl::STLStackArray<IValuelessVariable const*> *variables =
             new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.count());
-    variable_dict.get_values(variables);
+    cast_array(*variable_dict.get_values(), *variables);
     return variables;
 }
 
@@ -268,6 +259,48 @@ IDrivingAgent* LyftDrivingAgent::driving_agent_deep_copy() const
     }
 
     return driving_agent;
+}
+
+structures::IArray<IValuelessConstant*>* LyftDrivingAgent::get_mutable_constant_parameters()
+{
+    structures::stl::STLStackArray<IValuelessConstant*> *constants =
+            new structures::stl::STLStackArray<IValuelessConstant*>(constant_dict.get_values());
+    constant_dict.get_values(constants);
+    return constants;
+}
+
+IValuelessConstant* LyftDrivingAgent::get_mutable_constant_parameter(std::string const &constant_name)
+{
+    return constant_dict[constant_name];
+}
+
+structures::IArray<IValuelessVariable*>* LyftDrivingAgent::get_mutable_variable_parameters()
+{
+    structures::stl::STLStackArray<IValuelessVariable*> *variables =
+            new structures::stl::STLStackArray<IValuelessVariable*>(variable_dict.count());
+    variable_dict.get_values(variables);
+    return variables;
+}
+
+IValuelessVariable* LyftDrivingAgent::get_mutable_variable_parameter(std::string const &variable_name)
+{
+    return variable_dict[variable_name];
+}
+
+structures::IArray<IValuelessEvent*>* LyftDrivingAgent::get_mutable_events()
+{
+    structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
+
+    structures::stl::STLConcatArray<IValuelessEvent*> *events =
+            new structures::stl::STLConcatArray<IValuelessEvent*>(variable_names->count());
+
+    size_t i;
+    for(i = 0; i < variable_names->count(); ++i)
+    {
+        events->get_array(i) = variable_dict[(*variable_names)[i]]->get_mutable_valueless_events();
+    }
+
+    return events;
 }
 
 }

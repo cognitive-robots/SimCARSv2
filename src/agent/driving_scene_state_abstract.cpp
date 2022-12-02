@@ -9,32 +9,20 @@ namespace simcars
 namespace agent
 {
 
-structures::IArray<IEntityState const*>* ADrivingSceneState::get_entity_states() const
+structures::IArray<IEntityState*>* ADrivingSceneState::get_mutable_entity_states()
 {
-    structures::IArray<IDrivingAgentState const*> *driving_agents =
-            this->get_driving_agent_states();
-    structures::IArray<IEntityState const*> *entities =
-            new structures::stl::STLStackArray<IEntityState const*>(driving_agents->count());
-    cast_array<IDrivingAgentState const*, IEntityState const*>(*driving_agents, *entities);
+    structures::IArray<IDrivingAgentState*> *driving_agents =
+            this->get_mutable_driving_agent_states();
+    structures::IArray<IEntityState*> *entities =
+            new structures::stl::STLStackArray<IEntityState*>(driving_agents->count());
+    cast_array<IDrivingAgentState*, IEntityState*>(*driving_agents, *entities);
+    delete driving_agents;
     return entities;
 }
 
-IEntityState const* ADrivingSceneState::get_entity_state(std::string const &entity_name) const
+IEntityState* ADrivingSceneState::get_mutable_entity_state(std::string const &entity_name)
 {
-    return this->get_driving_agent_state(entity_name);
-}
-
-void ADrivingSceneState::set_entity_states(structures::IArray<IEntityState const*> const *entities)
-{
-    for (size_t i = 0; i < entities->count(); ++i)
-    {
-        this->set_entity_state((*entities)[i]);
-    }
-}
-
-void ADrivingSceneState::set_entity_state(IEntityState const *entity)
-{
-    this->set_driving_agent_state(dynamic_cast<IDrivingAgentState const*>(entity));
+    return this->get_mutable_driving_agent_state(entity_name);
 }
 
 }

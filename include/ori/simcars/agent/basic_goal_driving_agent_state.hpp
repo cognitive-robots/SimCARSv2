@@ -10,19 +10,19 @@ namespace simcars
 namespace agent
 {
 
-class GoalDrivingAgentState : public virtual BasicDrivingAgentState
+class BasicGoalDrivingAgentState : public virtual BasicDrivingAgentState
 {
 public:
-    GoalDrivingAgentState(std::string const &driving_agent_name, bool delete_dicts = true);
-    GoalDrivingAgentState(IDrivingAgentState const *driving_agent_state, bool copy_parameters = true);
+    BasicGoalDrivingAgentState(std::string const &name, bool delete_dicts = true);
+    BasicGoalDrivingAgentState(IDrivingAgentState *driving_agent_state, bool copy_parameters = true);
 
     virtual IConstant<FP_DATA_TYPE> const* get_aligned_linear_velocity_goal_value_variable() const;
     virtual IConstant<temporal::Duration> const* get_aligned_linear_velocity_goal_duration_variable() const;
 
     virtual void set_aligned_linear_velocity_goal_value_variable(
-            IConstant<FP_DATA_TYPE> const* aligned_linear_velocity_goal_value_variable);
+            IConstant<FP_DATA_TYPE>* aligned_linear_velocity_goal_value_variable);
     virtual void set_aligned_linear_velocity_goal_duration_variable(
-            IConstant<temporal::Duration> const* aligned_linear_velocity_goal_duration_variable);
+            IConstant<temporal::Duration>* aligned_linear_velocity_goal_duration_variable);
 };
 
 }

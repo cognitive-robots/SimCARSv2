@@ -17,7 +17,7 @@ namespace agent
 namespace csv
 {
 
-CSVScene const* CSVScene::construct_from(IScene const *scene)
+CSVScene* CSVScene::construct_from(IScene *scene)
 {
     CSVScene *new_scene = new CSVScene();
 
@@ -26,7 +26,7 @@ CSVScene const* CSVScene::construct_from(IScene const *scene)
     new_scene->min_temporal_limit = scene->get_min_temporal_limit();
     new_scene->max_temporal_limit = scene->get_max_temporal_limit();
 
-    structures::IArray<IEntity const*> *entities = scene->get_entities();
+    structures::IArray<IEntity*> *entities = scene->get_mutable_entities();
 
     size_t i;
     for(i = 0; i < entities->count(); ++i)
@@ -122,7 +122,7 @@ structures::IArray<IEntity const*>* CSVScene::get_entities() const
 {
     structures::stl::STLStackArray<IEntity const*> *entities =
             new structures::stl::STLStackArray<IEntity const*>(entity_dict.count());
-    entity_dict.get_values(entities);
+    cast_array(*entity_dict.get_values(), *entities);
     return entities;
 }
 
@@ -131,7 +131,25 @@ IEntity const* CSVScene::get_entity(std::string const &entity_name) const
     return entity_dict[entity_name];
 }
 
-ISceneState* CSVScene::get_state(temporal::Time time) const
+ISceneState const* CSVScene::get_state(temporal::Time time) const
+{
+    throw utils::NotImplementedException();
+}
+
+structures::IArray<IEntity*>* CSVScene::get_mutable_entities()
+{
+    structures::stl::STLStackArray<IEntity*> *entities =
+            new structures::stl::STLStackArray<IEntity*>(entity_dict.count());
+    entity_dict.get_values(entities);
+    return entities;
+}
+
+IEntity* CSVScene::get_mutable_entity(std::string const &entity_name)
+{
+    return entity_dict[entity_name];
+}
+
+ISceneState* CSVScene::get_mutable_state(temporal::Time time)
 {
     throw utils::NotImplementedException();
 }

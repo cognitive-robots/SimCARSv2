@@ -39,14 +39,14 @@ public:
     {
     }
 
-    void modify_state(agent::IEntityState const *original_state, agent::IEntityState *modified_state) const override
+    void modify_state(agent::IReadOnlyEntityState const *original_state, agent::IEntityState *modified_state) const override
     {
         this->modify_driving_agent_state(
                     dynamic_cast<IDrivingAgentState const*>(original_state),
                     dynamic_cast<IDrivingAgentState*>(modified_state));
     }
 
-    void modify_driving_agent_state(agent::IDrivingAgentState const *original_state,
+    void modify_driving_agent_state(agent::IReadOnlyDrivingAgentState const *original_state,
                                     agent::IDrivingAgentState *modified_state) const override
     {
         FP_DATA_TYPE aligned_linear_velocity = original_state->get_aligned_linear_velocity_variable()->get_value();
@@ -56,9 +56,9 @@ public:
         try
         {
             IValuelessConstant const *aligned_linear_velocity_goal_value_valueless_variable =
-                    original_state->get_parameter_value(original_state->get_driving_agent_name() + ".aligned_linear_velocity.goal_value");
+                    original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_value");
             IValuelessConstant const *aligned_linear_velocity_goal_duration_valueless_variable =
-                    original_state->get_parameter_value(original_state->get_driving_agent_name() + ".aligned_linear_velocity.goal_duration");
+                    original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_duration");
 
             IConstant<FP_DATA_TYPE> const *aligned_linear_velocity_goal_value_variable =
                     dynamic_cast<IConstant<FP_DATA_TYPE> const*>(aligned_linear_velocity_goal_value_valueless_variable);
@@ -74,9 +74,9 @@ public:
             new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
             assert(!std::isnan(new_aligned_linear_acceleration));
 
-            IConstant<FP_DATA_TYPE> const *new_aligned_linear_acceleration_variable =
+            IConstant<FP_DATA_TYPE> *new_aligned_linear_acceleration_variable =
                         new BasicConstant(
-                            modified_state->get_driving_agent_name(),
+                            modified_state->get_name(),
                             "aligned_linear_acceleration.indirect_actuation",
                             new_aligned_linear_acceleration);
             modified_state->set_aligned_linear_acceleration_variable(new_aligned_linear_acceleration_variable);
@@ -271,9 +271,9 @@ public:
                 FP_DATA_TYPE new_steer = (lane_midpoint_steer + lane_orientation_steer) / 2.0f;
                 assert(!std::isnan(new_steer));
 
-                IConstant<FP_DATA_TYPE> const *new_steer_variable =
+                IConstant<FP_DATA_TYPE> *new_steer_variable =
                             new BasicConstant(
-                                modified_state->get_driving_agent_name(),
+                                modified_state->get_name(),
                                 "steer.indirect_actuation",
                                 new_steer);
                 modified_state->set_steer_variable(new_steer_variable);

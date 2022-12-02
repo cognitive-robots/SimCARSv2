@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    agent::IDrivingScene const *scene;
+    agent::IDrivingScene *scene;
 
     try
     {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning action extraction" << std::endl;
 
-    agent::IDrivingScene const *scene_with_actions;
+    agent::IDrivingScene *scene_with_actions;
 
     try
     {
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     agent::IDrivingSimulator *driving_simulator =
                 new agent::BasicDrivingSimulator(driving_agent_controller);
 
-    agent::IDrivingScene const *simulated_scene =
+    agent::IDrivingScene *simulated_scene =
             agent::DrivingSimulationScene::construct_from(
                 scene_with_actions, driving_simulator, time_step,
                 scene_half_way_timestamp, agent_names);
@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
     frame->setFixedSize(1600, 800);
     frame->show();
 
+    /*
     visualisation::QMapSceneWidget<std::string> *map_scene_widget =
                 new visualisation::QMapSceneWidget<std::string>(
                     map,
@@ -146,6 +147,7 @@ int main(int argc, char *argv[])
     map_scene_widget->set_focus_mode(visualisation::QSceneWidget::FocusMode::FOCAL_AGENTS);
     map_scene_widget->set_focal_entities(focal_entities);
     map_scene_widget->show();
+    */
 
     visualisation::QMapSceneWidget<std::string> *map_simulated_scene_widget =
                 new visualisation::QMapSceneWidget<std::string>(
@@ -165,7 +167,7 @@ int main(int argc, char *argv[])
     int result = app.exec();
 
     delete map_simulated_scene_widget;
-    delete map_scene_widget;
+    //delete map_scene_widget;
 
     delete frame;
 

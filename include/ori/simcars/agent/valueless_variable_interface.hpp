@@ -44,10 +44,17 @@ public:
     virtual temporal::Time get_min_temporal_limit() const = 0;
     virtual temporal::Time get_max_temporal_limit() const = 0;
 
+    virtual bool has_event(temporal::Time time) const = 0;
+
     virtual structures::IArray<IValuelessEvent const*>* get_valueless_events(
             temporal::Time time_window_start = temporal::Time::min(),
             temporal::Time time_window_end = temporal::Time::max()) const = 0;
     virtual IValuelessEvent const* get_valueless_event(temporal::Time time, bool exact = false) const = 0;
+
+    virtual structures::IArray<IValuelessEvent*>* get_mutable_valueless_events(
+            temporal::Time time_window_start = temporal::Time::min(),
+            temporal::Time time_window_end = temporal::Time::max()) = 0;
+    virtual IValuelessEvent* get_mutable_valueless_event(temporal::Time time, bool exact = false) = 0;
 };
 
 }

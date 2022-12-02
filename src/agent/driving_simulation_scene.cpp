@@ -2,7 +2,7 @@
 #include <ori/simcars/utils/exceptions.hpp>
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/structures/stl/stl_concat_array.hpp>
-#include <ori/simcars/agent/basic_driving_scene_state.hpp>
+#include <ori/simcars/agent/view_driving_scene_state.hpp>
 #include <ori/simcars/agent/driving_simulation_scene.hpp>
 
 #include <iostream>
@@ -16,7 +16,7 @@ namespace agent
 
 DrivingSimulationScene::~DrivingSimulationScene()
 {
-    structures::IArray<DrivingSimulationAgent const*> const *simulated_driving_agents =
+    structures::IArray<DrivingSimulationAgent*> const *simulated_driving_agents =
             simulated_driving_agent_dict.get_values();
 
     for (size_t i = 0; i < simulated_driving_agents->count(); ++i)
@@ -27,8 +27,8 @@ DrivingSimulationScene::~DrivingSimulationScene()
     delete simulator;
 }
 
-DrivingSimulationScene const* DrivingSimulationScene::construct_from(
-        IDrivingScene const *driving_scene,
+DrivingSimulationScene* DrivingSimulationScene::construct_from(
+        IDrivingScene *driving_scene,
         IDrivingSimulator const *driving_simulator,
         temporal::Duration simulation_time_step,
         temporal::Time simulation_start_time,
@@ -43,8 +43,8 @@ DrivingSimulationScene const* DrivingSimulationScene::construct_from(
                 starting_agent_names);
 }
 
-DrivingSimulationScene const* DrivingSimulationScene::construct_from(
-        IDrivingScene const *driving_scene,
+DrivingSimulationScene* DrivingSimulationScene::construct_from(
+        IDrivingScene *driving_scene,
         IDrivingSimulator const *driving_simulator,
         temporal::Duration simulation_time_step,
         temporal::Time simulation_start_time,
@@ -76,8 +76,8 @@ DrivingSimulationScene const* DrivingSimulationScene::construct_from(
     new_driving_scene->time_step = simulation_time_step;
     new_driving_scene->simulator = driving_simulator;
 
-    structures::IArray<IDrivingAgent const*> *driving_agents =
-            driving_scene->get_driving_agents();
+    structures::IArray<IDrivingAgent*> *driving_agents =
+            driving_scene->get_mutable_driving_agents();
 
     for (size_t i = 0; i < driving_agents->count(); ++i)
     {
@@ -131,33 +131,19 @@ temporal::Time DrivingSimulationScene::get_max_temporal_limit() const
     return max_temporal_limit;
 }
 
-structures::IArray<IEntity const*>* DrivingSimulationScene::get_entities() const
-{
-    structures::IArray<IDrivingAgent const*>* const driving_agents = this->get_driving_agents();
-    structures::IArray<IEntity const*>* const entities =
-            new structures::stl::STLStackArray<IEntity const*>(driving_agents->count());
-    cast_array(*driving_agents, *entities);
-    delete driving_agents;
-    return entities;
-}
-
-IEntity const* DrivingSimulationScene::get_entity(std::string const &entity_name) const
-{
-    return this->get_driving_agent(entity_name);
-}
-
 structures::IArray<IDrivingAgent const*>* DrivingSimulationScene::get_driving_agents() const
 {
     structures::stl::STLConcatArray<IDrivingAgent const*> *driving_agents =
             new structures::stl::STLConcatArray<IDrivingAgent const*>(2);
 
-    driving_agents->get_array(0) =
-            new structures::stl::STLStackArray<IDrivingAgent const*>(
-                non_simulated_driving_agent_dict.get_values());
+    structures::IArray<IDrivingAgent const*> *non_simulated_driving_agents =
+            new structures::stl::STLStackArray<IDrivingAgent const*>(non_simulated_driving_agent_dict.count());
+    cast_array(*non_simulated_driving_agent_dict.get_values(), *non_simulated_driving_agents);
+    driving_agents->get_array(0) = non_simulated_driving_agents;
 
     structures::IArray<IDrivingAgent const*> *simulated_driving_agents =
             new structures::stl::STLStackArray<IDrivingAgent const*>(simulated_driving_agent_dict.count());
-    cast_array<DrivingSimulationAgent const*, IDrivingAgent const*>(
+    cast_array<DrivingSimulationAgent*, IDrivingAgent const*>(
                 *(simulated_driving_agent_dict.get_values()), *simulated_driving_agents);
     driving_agents->get_array(1) = simulated_driving_agents;
 
@@ -176,37 +162,54 @@ IDrivingAgent const* DrivingSimulationScene::get_driving_agent(std::string const
     }
 }
 
-void DrivingSimulationScene::simulate_and_propogate(temporal::Time time) const
+temporal::Duration DrivingSimulationScene::get_time_step() const
 {
-    IDrivingSceneState *new_state = new BasicDrivingSceneState;
+    return time_step;
+}
+
+void DrivingSimulationScene::simulate(temporal::Time time)
+{
+    ViewDrivingSceneState furthest_simulation_state(this, furthest_simulation_time);
+    ViewDrivingSceneState new_state(this, furthest_simulation_time + time_step);
     while (furthest_simulation_time < std::min(time, max_temporal_limit))
     {
-        IDrivingSceneState *furthest_simulation_state = this->get_driving_scene_state(furthest_simulation_time);
-
-        simulator->simulate_driving_scene(furthest_simulation_state, new_state, time_step);
+        simulator->simulate_driving_scene(&furthest_simulation_state, &new_state, time_step);
 
         furthest_simulation_time += time_step;
 
-        structures::IArray<DrivingSimulationAgent const*> const *simulated_driving_agents =
-                simulated_driving_agent_dict.get_values();
-        for(size_t i = 0; i < simulated_driving_agents->count(); ++i)
-        {
-            DrivingSimulationAgent const *simulated_driving_agent = (*simulated_driving_agents)[i];
-            try
-            {
-                simulated_driving_agent->propogate(
-                            furthest_simulation_time,
-                            new_state->get_driving_agent_state(simulated_driving_agent->get_name()));
-            }
-            catch (std::out_of_range)
-            {
-                // Agent not available at the current time
-            }
-        }
-
-        delete furthest_simulation_state;
+        furthest_simulation_state.set_time(furthest_simulation_time);
+        new_state.set_time(furthest_simulation_time + time_step);
     }
-    delete new_state;
+}
+
+structures::IArray<IDrivingAgent*>* DrivingSimulationScene::get_mutable_driving_agents()
+{
+    structures::stl::STLConcatArray<IDrivingAgent*> *driving_agents =
+            new structures::stl::STLConcatArray<IDrivingAgent*>(2);
+
+    driving_agents->get_array(0) =
+            new structures::stl::STLStackArray<IDrivingAgent*>(
+                non_simulated_driving_agent_dict.get_values());
+
+    structures::IArray<IDrivingAgent*> *simulated_driving_agents =
+            new structures::stl::STLStackArray<IDrivingAgent*>(simulated_driving_agent_dict.count());
+    cast_array<DrivingSimulationAgent*, IDrivingAgent*>(
+                *(simulated_driving_agent_dict.get_values()), *simulated_driving_agents);
+    driving_agents->get_array(1) = simulated_driving_agents;
+
+    return driving_agents;
+}
+
+IDrivingAgent* DrivingSimulationScene::get_mutable_driving_agent(std::string const &driving_agent_name)
+{
+    if (non_simulated_driving_agent_dict.contains(driving_agent_name))
+    {
+        return non_simulated_driving_agent_dict[driving_agent_name];
+    }
+    else
+    {
+        return simulated_driving_agent_dict[driving_agent_name];
+    }
 }
 
 }

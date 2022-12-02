@@ -22,12 +22,12 @@ template <typename T>
 class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulatedValuelessVariable
 {
     IVariable<T> const *original_variable;
-    ISimulationScene const *simulation_scene;
+    ISimulationScene *simulation_scene;
 
     mutable temporal::Time simulation_start_time;
     temporal::Time simulation_end_time;
 
-    mutable temporal::PrecedenceTemporalDictionary<IEvent<T> const*> time_event_dict;
+    mutable temporal::PrecedenceTemporalDictionary<IEvent<T>*> time_event_dict;
 
     void simulation_check(temporal::Time time) const
     {
@@ -36,18 +36,18 @@ class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulated
         {
             if (simulation_target_time >= simulation_start_time + simulation_scene->get_time_step())
             {
-                simulation_scene->simulate_and_propogate(simulation_target_time);
+                simulation_scene->simulate(simulation_target_time);
             }
         }
         else if (time_event_dict.get_latest_timestamp() + simulation_scene->get_time_step() <= simulation_target_time)
         {
-            simulation_scene->simulate_and_propogate(simulation_target_time);
+            simulation_scene->simulate(simulation_target_time);
         }
     }
 
 public:
     SimulatedVariable(IVariable<T> const *original_variable,
-                      ISimulationScene const *simulation_scene,
+                      ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       bool start_simulated,
                       size_t max_cache_size = 10) :
@@ -57,7 +57,7 @@ public:
                           start_simulated,
                           max_cache_size) {}
     SimulatedVariable(IVariable<T> const *original_variable,
-                      ISimulationScene const *simulation_scene,
+                      ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       temporal::Time simulation_end_time,
                       bool start_simulated,
@@ -93,7 +93,7 @@ public:
 
     ~SimulatedVariable()
     {
-        structures::IArray<IEvent<T> const*> const *events = time_event_dict.get_values();
+        structures::IArray<IEvent<T>*> const *events = time_event_dict.get_values();
 
         for (size_t i = 0; i < events->count(); ++i)
         {
@@ -114,7 +114,7 @@ public:
     {
         SimulatedVariable<T> *variable =
                 new SimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
-                                         simulation_end_time, time_event_dict.get_max_cache_size());
+                                         simulation_end_time, true, time_event_dict.get_max_cache_size());
         size_t i;
 
         structures::IArray<temporal::Time> const *times = time_event_dict.get_keys();
@@ -156,7 +156,12 @@ public:
         return simulation_end_time;
     }
 
-    T get_value(temporal::Time time) const override
+    bool has_event(temporal::Time time) const override
+    {
+        return time_event_dict.contains(time) || original_variable->has_event(time);
+    }
+
+    T const& get_value(temporal::Time time) const override
     {
         simulation_check(time);
 
@@ -181,7 +186,7 @@ public:
 
         events->get_array(0) = original_variable->get_events(time_window_start, time_window_end);
 
-        structures::IArray<IEvent<T> const*> const *unfiltered_simulated_events =
+        structures::IArray<IEvent<T>*> const *unfiltered_simulated_events =
                 time_event_dict.get_values();
         structures::IStackArray<IEvent<T> const*> *filtered_simulated_events =
                 new structures::stl::STLStackArray<IEvent<T> const*>;
@@ -222,43 +227,70 @@ public:
         }
     }
 
-    bool add_event(IEvent<T> const *event) override
+    void set_value(temporal::Time time, T const &value) override
     {
-        if (event->get_time() <= simulation_start_time
-                || event->get_time() > simulation_end_time)
+        if (time > simulation_start_time
+                && time <= simulation_end_time)
         {
-            return false;
-        }
-        else
-        {
-            if (time_event_dict.contains(event->get_time()))
+            if (time_event_dict.contains(time))
             {
-                delete time_event_dict[event->get_time()];
+                IEvent<T> *other_event = time_event_dict[time];
+                if (time == other_event->get_time())
+                {
+                    other_event->set_value(value);
+                    return;
+                }
             }
 
-            time_event_dict.update(event->get_time(), event);
-
-            return true;
+            time_event_dict.update(time,
+                                   new BasicEvent(this->get_entity_name(),
+                                                  this->get_parameter_name(),
+                                                  value, time));
         }
     }
 
-    bool remove_event(IEvent<T> const *event) override
+    structures::IArray<IEvent<T>*>* get_mutable_events(
+            temporal::Time time_window_start,
+            temporal::Time time_window_end) override
     {
-        try
+        simulation_check(time_window_end);
+
+        structures::IArray<IEvent<T>*> const *unfiltered_simulated_events =
+                time_event_dict.get_values();
+        structures::IStackArray<IEvent<T>*> *filtered_simulated_events =
+                new structures::stl::STLStackArray<IEvent<T>*>;
+
+        for (size_t i = 0; i < unfiltered_simulated_events->count(); ++i)
         {
-            if (time_event_dict[event->get_time()] == event)
+            if ((*unfiltered_simulated_events)[i]->get_time() >= time_window_start
+                    && (*unfiltered_simulated_events)[i]->get_time() <= time_window_end)
             {
-                time_event_dict.erase(event->get_time());
-                return true;
+                filtered_simulated_events->push_back((*unfiltered_simulated_events)[i]);
+            }
+        }
+
+        return filtered_simulated_events;
+    }
+
+    IEvent<T>* get_mutable_event(temporal::Time time, bool exact) override
+    {
+        simulation_check(time);
+
+        if (time >= simulation_start_time + simulation_scene->get_time_step())
+        {
+            IEvent<T> *prospective_event = time_event_dict[time];
+            if (!exact || prospective_event->get_time() == time)
+            {
+                return prospective_event;
             }
             else
             {
-                return false;
+                throw std::out_of_range("No event at specified time");
             }
         }
-        catch (std::out_of_range)
+        else
         {
-            return false;
+            throw std::out_of_range("Specified time outside of simulation window");
         }
     }
 
@@ -293,7 +325,8 @@ public:
 
     void begin_simulation(temporal::Time simulation_start_time) const override
     {
-        if (this->simulation_start_time == this->simulation_end_time)
+        if (this->simulation_start_time == this->simulation_end_time &&
+                simulation_start_time <= original_variable->get_max_temporal_limit())
         {
             this->simulation_start_time = simulation_start_time;
         }

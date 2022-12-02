@@ -32,7 +32,13 @@ public:
     virtual structures::IArray<IEntity const*>* get_entities() const = 0;
     virtual IEntity const* get_entity(std::string const &entity_name) const = 0;
 
-    virtual ISceneState* get_state(temporal::Time time) const = 0;
+    virtual IReadOnlySceneState const* get_state(temporal::Time time) const = 0;
+
+
+    virtual structures::IArray<IEntity*>* get_mutable_entities() = 0;
+    virtual IEntity* get_mutable_entity(std::string const &entity_name) = 0;
+
+    virtual ISceneState* get_mutable_state(temporal::Time time) = 0;
 };
 
 }

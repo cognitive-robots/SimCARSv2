@@ -21,8 +21,8 @@ class LyftDrivingAgent : public virtual ADrivingAgent
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
 
-    structures::stl::STLDictionary<std::string, IValuelessConstant const*> constant_dict;
-    structures::stl::STLDictionary<std::string, IValuelessVariable const*> variable_dict;
+    structures::stl::STLDictionary<std::string, IValuelessConstant*> constant_dict;
+    structures::stl::STLDictionary<std::string, IValuelessVariable*> variable_dict;
 
     LyftDrivingAgent();
 
@@ -48,6 +48,15 @@ public:
     structures::IArray<IValuelessEvent const*>* get_events() const override;
 
     IDrivingAgent* driving_agent_deep_copy() const override;
+
+
+    structures::IArray<IValuelessConstant*>* get_mutable_constant_parameters() override;
+    IValuelessConstant* get_mutable_constant_parameter(std::string const &constant_name) override;
+
+    structures::IArray<IValuelessVariable*>* get_mutable_variable_parameters() override;
+    IValuelessVariable* get_mutable_variable_parameter(std::string const &variable_name) override;
+
+    structures::IArray<IValuelessEvent*>* get_mutable_events() override;
 };
 
 }

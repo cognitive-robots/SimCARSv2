@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    agent::IDrivingScene const *scene;
+    agent::IDrivingScene *scene;
 
     try
     {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning action extraction" << std::endl;
 
-    agent::IDrivingScene const *scene_with_actions;
+    agent::IDrivingScene *scene_with_actions;
 
     try
     {
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning scene save" << std::endl;
 
-    agent::IFileBasedScene const *csv_scene_with_actions;
+    agent::IFileBasedScene *csv_scene_with_actions;
 
     try
     {

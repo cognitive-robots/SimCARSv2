@@ -15,7 +15,7 @@ class ISimulator
 public:
     virtual ~ISimulator() = default;
 
-    virtual void simulate(agent::ISceneState const *current_state, agent::ISceneState *next_state, temporal::Duration time_step) const = 0;
+    virtual void simulate(agent::IReadOnlySceneState const *current_state, agent::ISceneState *next_state, temporal::Duration time_step) const = 0;
 };
 
 }

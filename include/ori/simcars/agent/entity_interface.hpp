@@ -28,6 +28,8 @@ public:
     virtual temporal::Time get_min_temporal_limit() const = 0;
     virtual temporal::Time get_max_temporal_limit() const = 0;
 
+    virtual bool is_state_available(temporal::Time) const = 0;
+
     virtual structures::IArray<IValuelessConstant const*>* get_constant_parameters() const = 0;
     virtual IValuelessConstant const* get_constant_parameter(std::string const &constant_name) const = 0;
 
@@ -36,7 +38,18 @@ public:
 
     virtual structures::IArray<IValuelessEvent const*>* get_events() const = 0;
 
-    virtual IEntityState* get_state(temporal::Time time, bool throw_on_out_of_range = true) const = 0;
+    virtual IReadOnlyEntityState const* get_state(temporal::Time time) const = 0;
+
+
+    virtual structures::IArray<IValuelessConstant*>* get_mutable_constant_parameters() = 0;
+    virtual IValuelessConstant* get_mutable_constant_parameter(std::string const &constant_name) = 0;
+
+    virtual structures::IArray<IValuelessVariable*>* get_mutable_variable_parameters() = 0;
+    virtual IValuelessVariable* get_mutable_variable_parameter(std::string const &variable_name) = 0;
+
+    virtual structures::IArray<IValuelessEvent*>* get_mutable_events() = 0;
+
+    virtual IEntityState* get_mutable_state(temporal::Time time) = 0;
 };
 
 }

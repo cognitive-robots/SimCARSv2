@@ -16,7 +16,7 @@ class BasicConstant : public virtual AConstant<T>
     std::string const entity_name;
     std::string const parameter_name;
 
-    T const value;
+    T value;
 
 public:
     BasicConstant(std::string const &entity_name, std::string const &parameter_name, T value) :
@@ -37,9 +37,14 @@ public:
         return parameter_name;
     }
 
-    T get_value() const override
+    T const& get_value() const override
     {
         return value;
+    }
+
+    void set_value(T const &value) override
+    {
+        this->value = value;
     }
 };
 

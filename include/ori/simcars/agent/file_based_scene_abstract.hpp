@@ -43,7 +43,7 @@ public:
         this->save_virt(output_filestream);
     }
 
-    static T_scene const* load(std::string const &input_file_path_str, structures::ISet<std::string>* agent_names = nullptr)
+    static T_scene* load(std::string const &input_file_path_str, structures::ISet<std::string>* agent_names = nullptr)
     {
         std::filesystem::path input_file_path(input_file_path_str);
 
@@ -58,7 +58,7 @@ public:
 
         scene->load_virt(input_filestream, agent_names);
 
-        return dynamic_cast<T_scene const*>(scene);
+        return dynamic_cast<T_scene*>(scene);
     }
 };
 

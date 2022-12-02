@@ -2,6 +2,7 @@
 
 #include <ori/simcars/temporal/precedence_temporal_dictionary.hpp>
 #include <ori/simcars/agent/variable_abstract.hpp>
+#include <ori/simcars/agent/basic_event.hpp>
 
 #include <stdexcept>
 
@@ -16,20 +17,20 @@ template <typename T>
 class BasicVariable : public AVariable<T>
 {
     std::string const entity_name;
-    std::string const parameter_name;
+    std::string const variable_name;
 
     IValuelessVariable::Type const type;
 
-    temporal::PrecedenceTemporalDictionary<IEvent<T> const*> time_event_dict;
+    temporal::PrecedenceTemporalDictionary<IEvent<T>*> time_event_dict;
 
 public:
     BasicVariable(std::string const &entity_name, std::string const &parameter_name, IValuelessVariable::Type type,
-             temporal::Duration time_diff_threshold = temporal::Duration::max() / 2, size_t max_cache_size = 10) : entity_name(entity_name), parameter_name(parameter_name), type(type),
+             temporal::Duration time_diff_threshold = temporal::Duration::max() / 2, size_t max_cache_size = 10) : entity_name(entity_name), variable_name(parameter_name), type(type),
         time_event_dict(time_diff_threshold, max_cache_size) {}
 
     ~BasicVariable()
     {
-        structures::IArray<IEvent<T> const*> const *events = time_event_dict.get_values();
+        structures::IArray<IEvent<T>*> const *events = time_event_dict.get_values();
 
         for (size_t i = 0; i < events->count(); ++i)
         {
@@ -47,7 +48,7 @@ public:
         BasicVariable<T> *variable =
                 new BasicVariable<T>(
                     entity_name,
-                    parameter_name,
+                    variable_name,
                     type,
                     time_event_dict.get_time_diff_threshold(),
                     time_event_dict.get_max_cache_size());
@@ -68,7 +69,7 @@ public:
 
     std::string get_variable_name() const override
     {
-        return parameter_name;
+        return variable_name;
     }
 
     IValuelessVariable::Type get_type() const override
@@ -86,7 +87,12 @@ public:
         return time_event_dict.get_latest_timestamp();
     }
 
-    T get_value(temporal::Time time) const override
+    bool has_event(temporal::Time time) const override
+    {
+        return time_event_dict.contains(time);
+    }
+
+    T const& get_value(temporal::Time time) const override
     {
         return time_event_dict[time]->get_value();
     }
@@ -95,7 +101,7 @@ public:
             temporal::Time time_window_start,
             temporal::Time time_window_end) const override
     {
-        structures::IArray<IEvent<T> const*> const *unfiltered_events =
+        structures::IArray<IEvent<T>*> const *unfiltered_events =
                 time_event_dict.get_values();
         structures::IStackArray<IEvent<T> const*> *filtered_events =
                 new structures::stl::STLStackArray<IEvent<T> const*>;
@@ -125,39 +131,54 @@ public:
         }
     }
 
-    bool add_event(IEvent<T> const *event) override
+    void set_value(temporal::Time time, T const &value) override
     {
-        if (time_event_dict.contains(event->get_time()))
+        if (time_event_dict.contains(time))
         {
-            IEvent<T> const *other_event = time_event_dict[event->get_time()];
-            if (event->get_time() == other_event->get_time())
+            IEvent<T> *other_event = time_event_dict[time];
+            if (time == other_event->get_time())
             {
-                delete time_event_dict[event->get_time()];
+                other_event->set_value(value);
+                return;
             }
         }
 
-        time_event_dict.update(event->get_time(), event);
-
-        return true;
+        time_event_dict.update(time, new BasicEvent(this->get_entity_name(),
+                                                    this->get_parameter_name(),
+                                                    value, time));
     }
 
-    bool remove_event(IEvent<T> const *event) override
+    structures::IArray<IEvent<T>*>* get_mutable_events(
+            temporal::Time time_window_start,
+            temporal::Time time_window_end) override
     {
-        try
+        structures::IArray<IEvent<T>*> const *unfiltered_events =
+                time_event_dict.get_values();
+        structures::IStackArray<IEvent<T>*> *filtered_events =
+                new structures::stl::STLStackArray<IEvent<T>*>;
+
+        for (size_t i = 0; i < unfiltered_events->count(); ++i)
         {
-            if (time_event_dict[event->get_time()] == event)
+            if ((*unfiltered_events)[i]->get_time() >= time_window_start
+                    && (*unfiltered_events)[i]->get_time() <= time_window_end)
             {
-                time_event_dict.erase(event->get_time());
-                return true;
-            }
-            else
-            {
-                return false;
+                filtered_events->push_back((*unfiltered_events)[i]);
             }
         }
-        catch (std::out_of_range)
+
+        return filtered_events;
+    }
+
+    IEvent<T>* get_mutable_event(temporal::Time time, bool exact) override
+    {
+        IEvent<T> *prospective_event = time_event_dict[time];
+        if (!exact || prospective_event->get_time() == time)
         {
-            return false;
+            return prospective_event;
+        }
+        else
+        {
+            throw std::out_of_range("No event at specified time");
         }
     }
 };

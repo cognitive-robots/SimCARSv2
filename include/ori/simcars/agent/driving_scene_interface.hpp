@@ -17,7 +17,13 @@ public:
     virtual structures::IArray<IDrivingAgent const*>* get_driving_agents() const = 0;
     virtual IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const = 0;
 
-    virtual IDrivingSceneState* get_driving_scene_state(temporal::Time time) const = 0;
+    virtual IReadOnlyDrivingSceneState const* get_driving_scene_state(temporal::Time time) const = 0;
+
+
+    virtual structures::IArray<IDrivingAgent*>* get_mutable_driving_agents() = 0;
+    virtual IDrivingAgent* get_mutable_driving_agent(std::string const &driving_agent_name) = 0;
+
+    virtual IDrivingSceneState* get_mutable_driving_scene_state(temporal::Time time) = 0;
 };
 
 }
