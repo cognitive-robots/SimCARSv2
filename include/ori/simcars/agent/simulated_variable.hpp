@@ -50,21 +50,24 @@ public:
                       ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       bool start_simulated,
+                      temporal::Duration time_diff_threshold = temporal::Duration::max() / 2,
                       size_t max_cache_size = 10) :
         SimulatedVariable(original_variable, simulation_scene,
                           simulation_start_time,
                           original_variable->get_max_temporal_limit(),
                           start_simulated,
+                          time_diff_threshold,
                           max_cache_size) {}
     SimulatedVariable(IVariable<T> const *original_variable,
                       ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       temporal::Time simulation_end_time,
                       bool start_simulated,
+                      temporal::Duration time_diff_threshold = temporal::Duration::max() / 2,
                       size_t max_cache_size = 10) :
         original_variable(original_variable), simulation_scene(simulation_scene),
         simulation_end_time(simulation_end_time),
-        time_event_dict(max_cache_size)
+        time_event_dict(time_diff_threshold, max_cache_size)
     {
         if (simulation_start_time < original_variable->get_min_temporal_limit())
         {
@@ -114,7 +117,7 @@ public:
     {
         SimulatedVariable<T> *variable =
                 new SimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
-                                         simulation_end_time, true, time_event_dict.get_max_cache_size());
+                                         simulation_end_time, true, time_event_dict.get_time_diff_threshold(), time_event_dict.get_max_cache_size());
         size_t i;
 
         structures::IArray<temporal::Time> const *times = time_event_dict.get_keys();
@@ -158,7 +161,7 @@ public:
 
     bool has_event(temporal::Time time) const override
     {
-        return time_event_dict.contains(time) || original_variable->has_event(time);
+        return time_event_dict.contains(time) || (time <= simulation_start_time && original_variable->has_event(time));
     }
 
     T const& get_value(temporal::Time time) const override

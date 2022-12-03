@@ -54,6 +54,12 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
             if (current_driving_agent_state->get_name() == next_driving_agent_state->get_name())
             {
+                bool result;
+                if (next_driving_agent_state->get_name().find("non_ego") == std::string::npos)
+                {
+                    result = next_driving_agent_state->is_populated();
+                }
+
                 if (next_driving_agent_state->is_populated())
                 {
                     break;

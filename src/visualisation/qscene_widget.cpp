@@ -17,10 +17,10 @@ QSceneWidget::QSceneWidget(agent::IScene const *scene, QWidget *parent, QPoint c
                            QSize const &size, FP_DATA_TYPE frame_rate, FP_DATA_TYPE realtime_factor,
                            FP_DATA_TYPE pixels_per_metre, bool flip_y)
     : AQSFMLCanvas(parent, position, size, int(1000.0f / frame_rate)), text_enabled(true), scene(scene),
-      focus_mode(FocusMode::FIXED), focal_position(geometry::Vec::Zero()),
-      focal_entities(new structures::stl::STLStackArray<std::string>()), realtime_factor(realtime_factor),
-      pixels_per_metre(pixels_per_metre), flip_y(flip_y), current_time(scene->get_min_temporal_limit()),
-      last_time(temporal::Time::min()), last_realtime(temporal::Time::min()), update_required(true),
+      realtime_factor(realtime_factor), pixels_per_metre(pixels_per_metre), flip_y(flip_y), focus_mode(FocusMode::FIXED),
+      focal_position(geometry::Vec::Zero()), focal_entities(new structures::stl::STLStackArray<std::string>()),
+      current_time(scene->get_min_temporal_limit()), last_time(temporal::Time::min()),
+      last_realtime(temporal::Time::min()), update_required(true),
       trig_buff(geometry::TrigBuff::get_instance())
 {
 }

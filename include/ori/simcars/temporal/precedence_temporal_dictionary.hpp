@@ -74,7 +74,7 @@ class PrecedenceTemporalDictionary : public virtual AbstractTemporalDictionary<V
         }
 
         if (timestamp < timestamps[search_window_start]
-                || timestamp > timestamps[search_window_end - 1] + this->get_time_diff_threshold())
+                || timestamp >= timestamps[search_window_end - 1] + this->get_time_diff_threshold())
         {
             return false;
         }

@@ -70,63 +70,63 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent *driving_agent,
     IVariable<geometry::Vec> *position_variable = driving_agent->get_mutable_position_variable();
     SimulatedVariable<geometry::Vec> *simulated_position_variable =
                 new SimulatedVariable(position_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_position_variable->get_full_name(), simulated_position_variable);
 
     IVariable<geometry::Vec> *linear_velocity_variable =
             driving_agent->get_mutable_linear_velocity_variable();
     SimulatedVariable<geometry::Vec> *simulated_linear_velocity_variable =
                 new SimulatedVariable(linear_velocity_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_linear_velocity_variable->get_full_name(), simulated_linear_velocity_variable);
 
     IVariable<FP_DATA_TYPE> *aligned_linear_velocity_variable =
             driving_agent->get_mutable_aligned_linear_velocity_variable();
     SimulatedVariable<FP_DATA_TYPE> *simulated_aligned_linear_velocity_variable =
                 new SimulatedVariable(aligned_linear_velocity_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_aligned_linear_velocity_variable->get_full_name(), simulated_aligned_linear_velocity_variable);
 
     IVariable<geometry::Vec> *linear_acceleration_variable =
             driving_agent->get_mutable_linear_acceleration_variable();
     SimulatedVariable<geometry::Vec> *simulated_linear_acceleration_variable =
                 new SimulatedVariable(linear_acceleration_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_linear_acceleration_variable->get_full_name(), simulated_linear_acceleration_variable);
 
     IVariable<FP_DATA_TYPE> *aligned_linear_acceleration_variable =
             driving_agent->get_mutable_aligned_linear_acceleration_variable();
     SimulatedVariable<FP_DATA_TYPE> *simulated_aligned_linear_acceleration_variable =
                 new SimulatedVariable(aligned_linear_acceleration_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_aligned_linear_acceleration_variable->get_full_name(), simulated_aligned_linear_acceleration_variable);
 
     IVariable<geometry::Vec> *external_linear_acceleration_variable =
             driving_agent->get_mutable_external_linear_acceleration_variable();
     SimulatedVariable<geometry::Vec> *simulated_external_linear_acceleration_variable =
                 new SimulatedVariable(external_linear_acceleration_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_external_linear_acceleration_variable->get_full_name(), simulated_external_linear_acceleration_variable);
 
     IVariable<FP_DATA_TYPE> *rotation_variable =
             driving_agent->get_mutable_rotation_variable();
     SimulatedVariable<FP_DATA_TYPE> *simulated_rotation_variable =
                 new SimulatedVariable(rotation_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_rotation_variable->get_full_name(), simulated_rotation_variable);
 
     IVariable<FP_DATA_TYPE> *steer_variable =
             driving_agent->get_mutable_steer_variable();
     SimulatedVariable<FP_DATA_TYPE> *simulated_steer_variable =
                 new SimulatedVariable(steer_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_steer_variable->get_full_name(), simulated_steer_variable);
 
     IVariable<FP_DATA_TYPE> *angular_velocity_variable =
             driving_agent->get_mutable_angular_velocity_variable();
     SimulatedVariable<FP_DATA_TYPE> *simulated_angular_velocity_variable =
                 new SimulatedVariable(angular_velocity_variable, simulation_scene, simulation_start_time,
-                                      simulation_end_time, start_simulated);
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_angular_velocity_variable->get_full_name(), simulated_angular_velocity_variable);
 
 
@@ -181,7 +181,8 @@ temporal::Time DrivingSimulationAgent::get_max_temporal_limit() const
 
 bool DrivingSimulationAgent::is_state_available(temporal::Time time) const
 {
-    return driving_agent->is_state_available(time) ||
+    return (time <= simulation_start_time &&
+            driving_agent->is_state_available(time)) ||
             (time > simulation_start_time &&
              time <= simulation_end_time &&
              driving_agent->is_state_available(simulation_start_time));

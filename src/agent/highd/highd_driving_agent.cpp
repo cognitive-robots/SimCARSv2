@@ -74,31 +74,31 @@ HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Doc
     this->constant_dict.update(driving_agent_class_constant->get_full_name(), driving_agent_class_constant);
 
 
-    IVariable<geometry::Vec>* const position_variable = new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<geometry::Vec>* const position_variable = new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, temporal::Duration(40));
     this->variable_dict.update(position_variable->get_full_name(), position_variable);
 
-    IVariable<geometry::Vec>* const linear_velocity_variable = new BasicVariable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<geometry::Vec>* const linear_velocity_variable = new BasicVariable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(40));
     this->variable_dict.update(linear_velocity_variable->get_full_name(), linear_velocity_variable);
 
-    IVariable<FP_DATA_TYPE>* const aligned_linear_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const aligned_linear_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(40));
     this->variable_dict.update(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity_variable);
 
-    IVariable<geometry::Vec>* const linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<geometry::Vec>* const linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE, temporal::Duration(40));
     this->variable_dict.update(linear_acceleration_variable->get_full_name(), linear_acceleration_variable);
 
-    IVariable<FP_DATA_TYPE>* const aligned_linear_acceleration_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const aligned_linear_acceleration_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(40));
     this->variable_dict.update(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration_variable);
 
-    IVariable<geometry::Vec>* const external_linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::EXTERNAL, temporal::Duration(100));
+    IVariable<geometry::Vec>* const external_linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::EXTERNAL, temporal::Duration(40));
     this->variable_dict.update(external_linear_acceleration_variable->get_full_name(), external_linear_acceleration_variable);
 
-    IVariable<FP_DATA_TYPE>* const rotation_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const rotation_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE, temporal::Duration(40));
     this->variable_dict.update(rotation_variable->get_full_name(), rotation_variable);
 
-    IVariable<FP_DATA_TYPE>* const steer_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const steer_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(40));
     this->variable_dict.update(steer_variable->get_full_name(), steer_variable);
 
-    IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, temporal::Duration(40));
     this->variable_dict.update(angular_velocity_variable->get_full_name(), angular_velocity_variable);
 
 
