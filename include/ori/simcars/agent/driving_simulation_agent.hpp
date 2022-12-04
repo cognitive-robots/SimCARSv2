@@ -64,8 +64,6 @@ public:
 
     IDrivingAgent* driving_agent_deep_copy() const override;
 
-    void propogate(temporal::Time time, IDrivingAgentState const *state) const;
-
     void begin_simulation(temporal::Time simulation_start_time) const;
 
 

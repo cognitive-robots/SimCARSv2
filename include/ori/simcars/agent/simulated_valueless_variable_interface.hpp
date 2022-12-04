@@ -15,8 +15,6 @@ class ISimulatedValuelessVariable : public virtual IValuelessVariable
 public:
     virtual ISimulatedValuelessVariable* simulated_valueless_deep_copy() const = 0;
 
-    virtual bool simulation_update(temporal::Time time, IEntityState const *state) const = 0;
-
     virtual void begin_simulation(temporal::Time simulation_start_time) const = 0;
 };
 

@@ -297,35 +297,6 @@ public:
         }
     }
 
-    bool simulation_update(temporal::Time time, IEntityState const *state) const override
-    {
-        if (time <= simulation_start_time
-                || time > simulation_end_time)
-        {
-            return false;
-        }
-        else
-        {
-            try
-            {
-                IValuelessConstant const *valueless_parameter_value =
-                        state->get_parameter_value(this->get_full_name());
-
-                IConstant<T> const *parameter_value =
-                        dynamic_cast<IConstant<T> const*>(valueless_parameter_value);
-                IEvent<T> *update_event = new BasicEvent(parameter_value, time);
-
-                time_event_dict.update(update_event->get_time(), update_event);
-            }
-            catch (std::out_of_range)
-            {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
     void begin_simulation(temporal::Time simulation_start_time) const override
     {
         if (this->simulation_start_time == this->simulation_end_time &&

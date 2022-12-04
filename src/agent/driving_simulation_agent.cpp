@@ -282,20 +282,6 @@ IDrivingAgent* DrivingSimulationAgent::driving_agent_deep_copy() const
     return driving_agent;
 }
 
-void DrivingSimulationAgent::propogate(temporal::Time time, IDrivingAgentState const *state) const
-{
-    if (time > simulation_start_time
-            && time <= simulation_end_time)
-    {
-        structures::IArray<ISimulatedValuelessVariable*> const *simulated_variables =
-                simulated_variable_dict.get_values();
-        for(size_t i = 0; i < simulated_variables->count(); ++i)
-        {
-            (*simulated_variables)[i]->simulation_update(time, state);
-        }
-    }
-}
-
 void DrivingSimulationAgent::begin_simulation(temporal::Time simulation_start_time) const
 {
     if (this->simulation_start_time == this->simulation_end_time)
