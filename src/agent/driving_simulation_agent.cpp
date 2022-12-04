@@ -284,7 +284,8 @@ IDrivingAgent* DrivingSimulationAgent::driving_agent_deep_copy() const
 
 void DrivingSimulationAgent::begin_simulation(temporal::Time simulation_start_time) const
 {
-    if (this->simulation_start_time == this->simulation_end_time)
+    if (this->simulation_start_time == this->simulation_end_time &&
+            simulation_start_time <= driving_agent->get_max_temporal_limit())
     {
         this->simulation_start_time = simulation_start_time;
 

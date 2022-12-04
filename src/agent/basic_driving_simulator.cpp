@@ -6,6 +6,8 @@
 #include <ori/simcars/agent/basic_constant.hpp>
 #include <ori/simcars/agent/basic_driving_agent_state.hpp>
 #include <ori/simcars/agent/basic_driving_simulator.hpp>
+#include <ori/simcars/agent/view_driving_agent_state.hpp>
+#include <ori/simcars/agent/driving_simulation_agent.hpp>
 
 #include <iostream>
 #include <cassert>
@@ -88,7 +90,6 @@ void BasicDrivingSimulator::simulate_driving_scene(
     for (i = 0; i < next_driving_agent_states->count(); ++i)
     {
         IDrivingAgentState *next_driving_agent_state_1 = (*next_driving_agent_states)[i];
-        /*
 
         geometry::Vec position_1 = next_driving_agent_state_1->get_position_variable()->get_value();
         FP_DATA_TYPE length_1 = next_driving_agent_state_1->get_bb_length_constant()->get_value();
@@ -110,10 +111,10 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
             if (bounding_box_1.check_collision(bounding_box_2))
             {
-                IDrivingAgentState const *current_driving_agent_state_1 =
-                        current_state->get_driving_agent_state(next_driving_agent_state_1->get_driving_agent_name());
-                IDrivingAgentState const *current_driving_agent_state_2 =
-                        current_state->get_driving_agent_state(next_driving_agent_state_2->get_driving_agent_name());
+                IReadOnlyDrivingAgentState const *current_driving_agent_state_1 =
+                        current_state->get_driving_agent_state(next_driving_agent_state_1->get_name());
+                IReadOnlyDrivingAgentState const *current_driving_agent_state_2 =
+                        current_state->get_driving_agent_state(next_driving_agent_state_2->get_name());
 
                 geometry::Vec direction = (position_2 - position_1).normalized();
 
@@ -150,24 +151,45 @@ void BasicDrivingSimulator::simulate_driving_scene(
                 geometry::Vec external_acceleration_1 = new_acceleration_1 - acceleration_1;
                 geometry::Vec external_acceleration_2 = new_acceleration_2 - acceleration_2;
 
+                // This is quite messy, would be better not to rely upon casts, this is a temporary solution to see if this
+                // approach is viable
+                ViewDrivingAgentState *view_driving_agent_state_1 =
+                        dynamic_cast<ViewDrivingAgentState*>(next_driving_agent_state_1);
+                dynamic_cast<DrivingSimulationAgent const*>(
+                            view_driving_agent_state_1->get_agent())->begin_simulation(
+                            view_driving_agent_state_1->get_time() - time_step);
+                next_driving_agent_state_1->set_aligned_linear_acceleration_variable
+                        (next_driving_agent_state_1->get_aligned_linear_acceleration_variable()->constant_shallow_copy());
+                next_driving_agent_state_1->set_steer_variable
+                        (next_driving_agent_state_1->get_steer_variable()->constant_shallow_copy());
                 IConstant<geometry::Vec> *external_linear_acceleration_variable_1(
                             new BasicConstant<geometry::Vec>(
-                                next_driving_agent_state_1->get_driving_agent_name(),
+                                next_driving_agent_state_1->get_name(),
                                 "linear_acceleration.external",
                                 external_acceleration_1));
                 next_driving_agent_state_1->set_external_linear_acceleration_variable(external_linear_acceleration_variable_1);
                 simulate_driving_agent(current_driving_agent_state_1, next_driving_agent_state_1, time_step);
 
+                // This is quite messy, would be better not to rely upon casts, this is a temporary solution to see if this
+                // approach is viable
+                ViewDrivingAgentState *view_driving_agent_state_2 =
+                        dynamic_cast<ViewDrivingAgentState*>(next_driving_agent_state_2);
+                dynamic_cast<DrivingSimulationAgent const*>(
+                            view_driving_agent_state_2->get_agent())->begin_simulation(
+                            view_driving_agent_state_2->get_time() - time_step);
+                next_driving_agent_state_2->set_aligned_linear_acceleration_variable
+                        (next_driving_agent_state_2->get_aligned_linear_acceleration_variable()->constant_shallow_copy());
+                next_driving_agent_state_2->set_steer_variable
+                        (next_driving_agent_state_2->get_steer_variable()->constant_shallow_copy());
                 IConstant<geometry::Vec> *external_linear_acceleration_variable_2(
                             new BasicConstant<geometry::Vec>(
-                                next_driving_agent_state_2->get_driving_agent_name(),
+                                next_driving_agent_state_2->get_name(),
                                 "linear_acceleration.external",
                                 external_acceleration_2));
                 next_driving_agent_state_2->set_external_linear_acceleration_variable(external_linear_acceleration_variable_2);
                 simulate_driving_agent(current_driving_agent_state_2, next_driving_agent_state_2, time_step);
             }
         }
-        */
 
         delete next_driving_agent_state_1;
     }
