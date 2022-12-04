@@ -13,10 +13,33 @@
 #include <random>
 
 #define NUMBER_OF_AGENTS 10
-#define NUMBER_OF_SIMULATED_AGENTS 10
+#define NUMBER_OF_SIMULATED_AGENTS 2
 
 using namespace ori::simcars;
 using namespace std::chrono;
+
+void simulate(agent::IDrivingScene const *simulated_scene)
+{
+    structures::IArray<agent::IDrivingAgent const*> *driving_agents =
+            simulated_scene->get_driving_agents();
+
+    for (size_t i = 0; i < driving_agents->count(); ++i)
+    {
+        try
+        {
+            agent::IDrivingAgent const *driving_agent = (*driving_agents)[i];
+            agent::IVariable<geometry::Vec> const *position_variable =
+                    driving_agent->get_position_variable();
+            position_variable->get_value(simulated_scene->get_max_temporal_limit());
+        }
+        catch (std::out_of_range)
+        {
+            //std::cerr << "Position not available for this time" << std::endl;
+        }
+    }
+
+    delete driving_agents;
+}
 
 int main(int argc, char *argv[])
 {
@@ -145,25 +168,7 @@ int main(int argc, char *argv[])
 
     start_time = high_resolution_clock::now();
 
-    structures::IArray<agent::IDrivingAgent const*> *driving_agents =
-            simulated_scene->get_driving_agents();
-
-    for (i = 0; i < driving_agents->count(); ++i)
-    {
-        try
-        {
-            agent::IDrivingAgent const *driving_agent = (*driving_agents)[i];
-            agent::IVariable<geometry::Vec> const *position_variable =
-                    driving_agent->get_position_variable();
-            position_variable->get_value(simulated_scene->get_max_temporal_limit());
-        }
-        catch (std::out_of_range)
-        {
-            //std::cerr << "Position not available for this time" << std::endl;
-        }
-    }
-
-    delete driving_agents;
+    simulate(simulated_scene);
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
 
