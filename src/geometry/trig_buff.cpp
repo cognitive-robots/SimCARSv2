@@ -94,6 +94,8 @@ FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle) const
         throw std::invalid_argument("Angle is infinite");
     }
 
+    assert(std::abs(angle) <= 10.0f);
+
     switch (default_angle_type)
     {
     case AngleType::RADIANS:

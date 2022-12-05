@@ -27,7 +27,7 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
     FP_DATA_TYPE left_mean_steer = 0.0f;
 
     size_t i;
-    geometry::Vec current_link, previous_link;
+    geometry::Vec current_link, previous_link, current_link_normalized, previous_link_normalized;
     for (i = 0; i < left_boundary_size; ++i)
     {
         left_boundary(0, i) = left_boundary_data[i][0].GetDouble();
@@ -35,12 +35,14 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
         if (i > 0)
         {
             current_link = left_boundary.col(i) - left_boundary.col(i - 1);
+            current_link_normalized = current_link.normalized();
             if (i > 1)
             {
-                FP_DATA_TYPE angle_mag = std::acos(current_link.dot(previous_link));
+                FP_DATA_TYPE link_dot_product = std::max(std::min(current_link_normalized.dot(previous_link_normalized), 1.0f), -1.0f);
+                FP_DATA_TYPE angle_mag = std::acos(link_dot_product);
                 FP_DATA_TYPE angle;
-                if (current_link.dot(trig_buff->get_rot_mat(angle_mag) * previous_link) >=
-                        current_link.dot(trig_buff->get_rot_mat(-angle_mag) * previous_link))
+                if (current_link_normalized.dot(trig_buff->get_rot_mat(angle_mag) * previous_link_normalized) >=
+                        current_link_normalized.dot(trig_buff->get_rot_mat(-angle_mag) * previous_link_normalized))
                 {
                     angle = angle_mag;
                 }
@@ -53,6 +55,7 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
                 left_mean_steer += lane_midpoint_steer;
             }
             previous_link = current_link;
+            previous_link_normalized = current_link_normalized;
         }
     }
 
@@ -74,12 +77,14 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
         if (i > 0)
         {
             current_link = right_boundary.col(i) - right_boundary.col(i - 1);
+            current_link_normalized = current_link.normalized();
             if (i > 1)
             {
-                FP_DATA_TYPE angle_mag = std::acos(current_link.dot(previous_link));
+                FP_DATA_TYPE link_dot_product = std::max(std::min(current_link_normalized.dot(previous_link_normalized), 1.0f), -1.0f);
+                FP_DATA_TYPE angle_mag = std::acos(link_dot_product);
                 FP_DATA_TYPE angle;
-                if (current_link.dot(trig_buff->get_rot_mat(angle_mag) * previous_link) >=
-                        current_link.dot(trig_buff->get_rot_mat(-angle_mag) * previous_link))
+                if (current_link_normalized.dot(trig_buff->get_rot_mat(angle_mag) * previous_link_normalized) >=
+                        current_link_normalized.dot(trig_buff->get_rot_mat(-angle_mag) * previous_link_normalized))
                 {
                     angle = angle_mag;
                 }
@@ -92,6 +97,7 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
                 right_mean_steer += lane_midpoint_steer;
             }
             previous_link = current_link;
+            previous_link_normalized = current_link_normalized;
         }
     }
 

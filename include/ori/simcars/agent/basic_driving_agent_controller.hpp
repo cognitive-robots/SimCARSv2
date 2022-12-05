@@ -73,20 +73,21 @@ public:
             new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
             new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
             assert(!std::isnan(new_aligned_linear_acceleration));
-
-            IConstant<FP_DATA_TYPE> *new_aligned_linear_acceleration_variable =
-                        new BasicConstant(
-                            modified_state->get_name(),
-                            "aligned_linear_acceleration.indirect_actuation",
-                            new_aligned_linear_acceleration);
-            modified_state->set_aligned_linear_acceleration_variable(new_aligned_linear_acceleration_variable);
         }
         catch (std::out_of_range)
         {
             std::cerr << "Could not actuate aligned linear acceleration variable" << std::endl;
-            modified_state->set_aligned_linear_acceleration_variable(
-                        original_state->get_aligned_linear_acceleration_variable()->constant_shallow_copy());
+            new_aligned_linear_acceleration = 0.0f;
         }
+
+        IConstant<FP_DATA_TYPE> *new_aligned_linear_acceleration_variable =
+                    new BasicConstant(
+                        modified_state->get_name(),
+                        "aligned_linear_acceleration.indirect_actuation",
+                        new_aligned_linear_acceleration);
+        modified_state->set_aligned_linear_acceleration_variable(new_aligned_linear_acceleration_variable);
+
+
 
         FP_DATA_TYPE aligned_linear_acceleration = original_state->get_aligned_linear_acceleration_variable()->get_value();
 
