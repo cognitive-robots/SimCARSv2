@@ -12,7 +12,7 @@ namespace geometry
 class Rect
 {
     Vec origin;
-    FP_DATA_TYPE half_width, half_height;
+    FP_DATA_TYPE half_width, half_height, half_span;
     mutable FP_DATA_TYPE min_x, min_y, max_x, max_y;
     mutable bool calc_bounds_flag;
 
@@ -44,6 +44,7 @@ public:
     Vec const& get_origin() const;
     FP_DATA_TYPE get_width() const;
     FP_DATA_TYPE get_height() const;
+    FP_DATA_TYPE get_span() const;
     FP_DATA_TYPE get_min_x() const;
     FP_DATA_TYPE get_min_y() const;
     FP_DATA_TYPE get_max_x() const;

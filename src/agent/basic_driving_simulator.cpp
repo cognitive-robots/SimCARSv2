@@ -137,9 +137,6 @@ void BasicDrivingSimulator::simulate_driving_scene(
                 geometry::Vec previous_velocity_1 = current_driving_agent_state_1->get_linear_velocity_variable()->get_value();
                 geometry::Vec previous_velocity_2 = current_driving_agent_state_2->get_linear_velocity_variable()->get_value();
 
-                geometry::Vec velocity_diff_1 = new_velocity_1 - previous_velocity_1;
-                geometry::Vec velocity_diff_2 = new_velocity_2 - previous_velocity_2;
-
                 geometry::Vec mean_acceleration_1 = (new_velocity_1 - previous_velocity_1) / time_step.count();
                 geometry::Vec mean_acceleration_2 = (new_velocity_2 - previous_velocity_2) / time_step.count();
 

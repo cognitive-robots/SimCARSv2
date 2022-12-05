@@ -14,7 +14,9 @@ namespace geometry
 Rect::Rect() : Rect(0.0f, 0.0f, 0.0f, 0.0f) {}
 
 Rect::Rect(Vec origin, FP_DATA_TYPE width, FP_DATA_TYPE height)
-    : origin(origin), half_width(0.5f * width), half_height(0.5f * height), calc_bounds_flag(true) {}
+    : origin(origin), half_width(0.5f * width), half_height(0.5f * height),
+      half_span(0.5f * std::sqrt(std::pow(width, 2.0f) + std::pow(height, 2.0f))),
+      calc_bounds_flag(true) {}
 
 Rect::Rect(FP_DATA_TYPE min_x, FP_DATA_TYPE min_y, FP_DATA_TYPE max_x, FP_DATA_TYPE max_y)
     : min_x(min_x), min_y(min_y), max_x(max_x), max_y(max_y), calc_bounds_flag(false)
@@ -25,6 +27,8 @@ Rect::Rect(FP_DATA_TYPE min_x, FP_DATA_TYPE min_y, FP_DATA_TYPE max_x, FP_DATA_T
     origin << (min_x + max_x) / 2.0f, (min_y + max_y) / 2.0f;
     half_width = 0.5f * (max_x - min_x);
     half_height = 0.5f * (max_y - min_y);
+    half_span = std::sqrt(std::pow(half_width, 2.0f) +
+                          std::pow(half_height, 2.0f));
 }
 
 Rect::Rect(Vecs points)
@@ -32,8 +36,8 @@ Rect::Rect(Vecs points)
 
 Rect::Rect(Rect const &rect)
     : origin(rect.origin), half_width(rect.half_width), half_height(rect.half_height),
-      min_x(rect.min_x), min_y(rect.min_y), max_x(rect.max_x), max_y(rect.max_y),
-      calc_bounds_flag(rect.calc_bounds_flag) {}
+      half_span(rect.half_span), min_x(rect.min_x), min_y(rect.min_y),
+      max_x(rect.max_x), max_y(rect.max_y), calc_bounds_flag(rect.calc_bounds_flag) {}
 
 Rect::Rect(Rect const &rect_1, Rect const &rect_2)
     : Rect(fmin(rect_1.get_min_x(), rect_2.get_min_x()),
@@ -84,17 +88,31 @@ void Rect::calc_bounds() const
 
 bool Rect::check_bounds(Vec const &point) const
 {
-    if (this->calc_bounds_flag) calc_bounds();
-    return !(this->min_x > point.x() || this->max_x < point.x()
-             || this->min_y > point.y() || this->max_y < point.y());
+    if ((point - origin).norm() <= half_span)
+    {
+        if (this->calc_bounds_flag) calc_bounds();
+        return !(this->min_x > point.x() || this->max_x < point.x()
+                 || this->min_y > point.y() || this->max_y < point.y());
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool Rect::check_bounds(Rect const &rect) const
 {
-    if (this->calc_bounds_flag) this->calc_bounds();
-    if (rect.calc_bounds_flag) rect.calc_bounds();
-    return !(this->min_x > rect.max_x || this->max_x < rect.min_x
-             || this->min_y > rect.max_y || this->max_y < rect.min_y);
+    if ((rect.origin - this->origin).norm() <= (this->half_span + rect.half_span))
+    {
+        if (this->calc_bounds_flag) this->calc_bounds();
+        if (rect.calc_bounds_flag) rect.calc_bounds();
+        return !(this->min_x > rect.max_x || this->max_x < rect.min_x
+                 || this->min_y > rect.max_y || this->max_y < rect.min_y);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool Rect::check_collision_virt(Rect const &rect) const
@@ -128,6 +146,11 @@ FP_DATA_TYPE Rect::get_width() const
 FP_DATA_TYPE Rect::get_height() const
 {
     return 2.0f * half_height;
+}
+
+FP_DATA_TYPE Rect::get_span() const
+{
+    return 2.0f * half_span;
 }
 
 FP_DATA_TYPE Rect::get_min_x() const
