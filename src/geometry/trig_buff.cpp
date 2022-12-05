@@ -75,18 +75,6 @@ void TrigBuff::destroy_instance()
     }
 }
 
-TrigBuff const* TrigBuff::get_instance()
-{
-    if (TrigBuff::instance != nullptr)
-    {
-        return TrigBuff::instance;
-    }
-    else
-    {
-        throw std::runtime_error("A trigonometry buffer instance has not been initialised");
-    }
-}
-
 FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle) const
 {
     if (std::isinf(angle))

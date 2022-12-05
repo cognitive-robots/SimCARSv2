@@ -166,12 +166,14 @@ void BasicDrivingSimulator::simulate_driving_scene(
                 FP_DATA_TYPE revised_aligned_acceleration_1 = view_driving_agent_state_1->get_aligned_linear_acceleration_variable()->get_value();
                 FP_DATA_TYPE revised_aligned_acceleration_2 = view_driving_agent_state_2->get_aligned_linear_acceleration_variable()->get_value();
 
+                geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
+
                 geometry::Vec revised_acceleration_1;
-                revised_acceleration_1.x() = revised_aligned_acceleration_1 * cos(rotation_1);
-                revised_acceleration_1.y() = revised_aligned_acceleration_1 * sin(rotation_1);
+                revised_acceleration_1.x() = revised_aligned_acceleration_1 * trig_buff->get_cos(rotation_1);
+                revised_acceleration_1.y() = revised_aligned_acceleration_1 * trig_buff->get_sin(rotation_1);
                 geometry::Vec revised_acceleration_2;
-                revised_acceleration_2.x() = revised_aligned_acceleration_2 * cos(rotation_2);
-                revised_acceleration_2.y() = revised_aligned_acceleration_2 * sin(rotation_2);
+                revised_acceleration_2.x() = revised_aligned_acceleration_2 * trig_buff->get_cos(rotation_2);
+                revised_acceleration_2.y() = revised_aligned_acceleration_2 * trig_buff->get_sin(rotation_2);
 
                 geometry::Vec new_acceleration_1 = mean_acceleration_1 - 0.5 * (previous_acceleration_1 + revised_acceleration_1);
                 geometry::Vec new_acceleration_2 = mean_acceleration_2 - 0.5 * (previous_acceleration_2 + revised_acceleration_2);
@@ -267,9 +269,11 @@ void BasicDrivingSimulator::simulate_driving_agent(
     next_state->set_rotation_variable(new_rotation_variable);
 
 
+    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
+
     geometry::Vec new_linear_acceleration;
-    new_linear_acceleration.x() = new_aligned_linear_acceleration * cos(new_rotation);
-    new_linear_acceleration.y() = new_aligned_linear_acceleration * sin(new_rotation);
+    new_linear_acceleration.x() = new_aligned_linear_acceleration * trig_buff->get_cos(new_rotation);
+    new_linear_acceleration.y() = new_aligned_linear_acceleration * trig_buff->get_sin(new_rotation);
     new_linear_acceleration += new_external_linear_acceleration;
 
     IConstant<geometry::Vec> *new_linear_acceleration_variable =
@@ -285,7 +289,6 @@ void BasicDrivingSimulator::simulate_driving_agent(
                 new BasicConstant<geometry::Vec>(next_state->get_name(), "linear_velocity.base", new_linear_velocity);
     next_state->set_linear_velocity_variable(new_linear_velocity_variable);
 
-    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
     FP_DATA_TYPE new_aligned_linear_velocity = (trig_buff->get_rot_mat(-new_rotation) * new_linear_velocity).x();
 
     IConstant<FP_DATA_TYPE> *new_aligned_linear_velocity_variable =

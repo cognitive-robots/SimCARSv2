@@ -33,7 +33,17 @@ class TrigBuff
 public:
     static TrigBuff const* init_instance(size_t num_bins, AngleType default_angle_type);
     static void destroy_instance();
-    static TrigBuff const* get_instance();
+    static TrigBuff const* get_instance()
+    {
+        if (TrigBuff::instance != nullptr)
+        {
+            return TrigBuff::instance;
+        }
+        else
+        {
+            throw std::runtime_error("A trigonometry buffer instance has not been initialised");
+        }
+    }
 
     virtual ~TrigBuff();
 

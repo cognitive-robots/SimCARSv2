@@ -213,9 +213,10 @@ public:
                     throw std::runtime_error("Could not find nearest lane boundary segment for driving agent");
                 }
 
-                // TODO: Remove previous start direction assignments
-                start_direction = geometry::Vec(std::cos(rotation), std::sin(rotation));
+                geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
+                // TODO: Remove previous start direction assignments
+                start_direction = geometry::Vec(trig_buff->get_cos(rotation), trig_buff->get_sin(rotation));
 
                 geometry::Vecs const &right_boundary = current_lane->get_right_boundary();
 
