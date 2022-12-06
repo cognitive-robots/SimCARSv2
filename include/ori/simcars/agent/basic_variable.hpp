@@ -82,6 +82,11 @@ public:
         return time_event_dict.get_earliest_timestamp();
     }
 
+    temporal::Time get_last_event_time() const override
+    {
+        return time_event_dict.get_latest_timestamp();
+    }
+
     temporal::Time get_max_temporal_limit() const override
     {
         return time_event_dict.get_latest_timestamp();
@@ -92,9 +97,17 @@ public:
         return time_event_dict.contains(time);
     }
 
-    T const& get_value(temporal::Time time) const override
+    bool get_value(temporal::Time time, T &value) const override
     {
-        return time_event_dict[time]->get_value();
+        if (time_event_dict.contains(time))
+        {
+            value = time_event_dict[time]->get_value();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     structures::IArray<IEvent<T> const*>* get_events(
@@ -127,7 +140,7 @@ public:
         }
         else
         {
-            throw std::out_of_range("No event at specified time");
+            return nullptr;
         }
     }
 
@@ -178,7 +191,7 @@ public:
         }
         else
         {
-            throw std::out_of_range("No event at specified time");
+            return nullptr;
         }
     }
 };

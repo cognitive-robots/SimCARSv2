@@ -18,6 +18,28 @@ IEntity* ADrivingAgent::entity_deep_copy() const
     return this->driving_agent_deep_copy();
 }
 
+// Avoid using this if you can, it isn't very efficient
+temporal::Time ADrivingAgent::get_last_event_time() const
+{
+    structures::IArray<IValuelessEvent const*> *events =
+            this->get_events();
+    if (events->count() > 0)
+    {
+        temporal::Time latest_event_time =
+                (*events)[0]->get_time();
+        for (size_t i = 1; i < events->count(); ++i)
+        {
+            latest_event_time = std::max((*events)[i]->get_time(),
+                                         latest_event_time);
+        }
+        return latest_event_time;
+    }
+    else
+    {
+        throw std::out_of_range("The entity has no variables");
+    }
+}
+
 bool ADrivingAgent::is_state_available(temporal::Time time) const
 {
     return time >= this->get_min_temporal_limit() && time <= this->get_max_temporal_limit();

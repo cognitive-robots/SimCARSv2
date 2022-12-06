@@ -17,10 +17,15 @@ template <typename T>
 class AVariable : public virtual IVariable<T>, public virtual AValuelessVariable
 {
 public:
-    std::string get_value_as_string(temporal::Time time) const override
+    bool get_value_as_string(temporal::Time time, std::string &str) const override
     {
         std::stringstream string_stream;
-        string_stream << this->get_value(time);
+        T value;
+        if (!this->get_value(time, value))
+        {
+            return false;
+        }
+        string_stream << value;
         std::string value_as_string = string_stream.str();
 
         std::stringstream updated_string_stream;
@@ -60,7 +65,8 @@ public:
             i = j + 1;
         }
 
-        return updated_string_stream.str();
+        str = updated_string_stream.str();
+        return true;
     }
 
     structures::IArray<IValuelessEvent const*>* get_valueless_events(

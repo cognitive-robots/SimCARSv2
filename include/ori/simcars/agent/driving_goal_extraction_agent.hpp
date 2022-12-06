@@ -51,58 +51,40 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         FP_DATA_TYPE action_start_aligned_linear_velocity = std::numeric_limits<FP_DATA_TYPE>::max();
         for (current_time = this->get_min_temporal_limit() + time_step; current_time <= this->get_max_temporal_limit(); current_time += time_step)
         {
-            try
+            FP_DATA_TYPE current_aligned_linear_acceleration;
+            if (!aligned_linear_acceleration_variable->get_value(current_time, current_aligned_linear_acceleration))
             {
-                FP_DATA_TYPE current_aligned_linear_acceleration = aligned_linear_acceleration_variable->get_value(current_time);
-                FP_DATA_TYPE previous_aligned_linear_acceleration = aligned_linear_acceleration_variable->get_value(current_time - time_step);
+                continue;
+            }
+            FP_DATA_TYPE current_aligned_linear_velocity;
+            if (!aligned_linear_velocity_variable->get_value(current_time, current_aligned_linear_velocity))
+            {
+                continue;
+            }
+            FP_DATA_TYPE previous_aligned_linear_acceleration;
+            if (!aligned_linear_acceleration_variable->get_value(current_time - time_step, previous_aligned_linear_acceleration))
+            {
+                continue;
+            }
+            FP_DATA_TYPE previous_aligned_linear_velocity;
+            if (!aligned_linear_velocity_variable->get_value(current_time - time_step, previous_aligned_linear_velocity))
+            {
+                continue;
+            }
 
-                if (previous_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+            if (previous_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+            {
+                if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
                 {
-                    if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
-                    {
-                        // STATUS QUO
+                    // STATUS QUO
 
-                        if (current_time + time_step > this->get_max_temporal_limit())
-                        {
-                            if ((current_time - action_start_time >= min_duration_threshold
-                                 && std::abs(aligned_linear_velocity_variable->get_value(current_time) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                                    || action_start_time == this->get_min_temporal_limit())
-                            {
-                                aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time));
-
-                                for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
-                                {
-                                    aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                                }
-                            }
-                        }
-                    }
-                    else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
-                    {
-                        if (((current_time - time_step) - action_start_time >= min_duration_threshold
-                             && std::abs(aligned_linear_velocity_variable->get_value(current_time - time_step) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                                || (current_time + time_step > this->get_max_temporal_limit()
-                                    && action_start_time == this->get_min_temporal_limit()))
-                        {
-                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time - time_step));
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
-                            {
-                                aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
-                            }
-                        }
-
-                        action_start_time = current_time - time_step;
-                        action_start_aligned_linear_velocity = aligned_linear_velocity_variable->get_value(current_time - time_step);
-                    }
-                    else
+                    if (current_time + time_step > this->get_max_temporal_limit())
                     {
                         if ((current_time - action_start_time >= min_duration_threshold
-                             && std::abs(aligned_linear_velocity_variable->get_value(current_time) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                                || (current_time + time_step > this->get_max_temporal_limit()
-                                    && action_start_time == this->get_min_temporal_limit()))
+                             && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
+                                || action_start_time == this->get_min_temporal_limit())
                         {
-                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time));
+                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
@@ -111,53 +93,71 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                         }
                     }
                 }
-                else if (previous_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+                else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
                 {
-                    if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                    if (((current_time - time_step) - action_start_time >= min_duration_threshold
+                         && std::abs(previous_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
+                            || (current_time + time_step > this->get_max_temporal_limit()
+                                && action_start_time == this->get_min_temporal_limit()))
                     {
-                        if (((current_time - time_step) - action_start_time >= min_duration_threshold
-                             && std::abs(aligned_linear_velocity_variable->get_value(current_time - time_step) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                                || (current_time + time_step > this->get_max_temporal_limit()
-                                    && action_start_time == this->get_min_temporal_limit()))
+                        aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
                         {
-                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time - time_step));
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
-                            {
-                                aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
-                            }
-                        }
-
-                        action_start_time = current_time - time_step;
-                        action_start_aligned_linear_velocity = aligned_linear_velocity_variable->get_value(current_time - time_step);
-                    }
-                    else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
-                    {
-                        // STATUS QUO
-
-                        if (current_time + time_step > this->get_max_temporal_limit())
-                        {
-                            if ((current_time - action_start_time >= min_duration_threshold
-                                 && std::abs(aligned_linear_velocity_variable->get_value(current_time) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                                    || action_start_time == this->get_min_temporal_limit())
-                            {
-                                aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time));
-
-                                for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
-                                {
-                                    aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                                }
-                            }
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
                         }
                     }
-                    else
+
+                    action_start_time = current_time - time_step;
+                    action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
+                }
+                else
+                {
+                    if ((current_time - action_start_time >= min_duration_threshold
+                         && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
+                            || (current_time + time_step > this->get_max_temporal_limit()
+                                && action_start_time == this->get_min_temporal_limit()))
+                    {
+                        aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                        {
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
+                        }
+                    }
+                }
+            }
+            else if (previous_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+            {
+                if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                {
+                    if (((current_time - time_step) - action_start_time >= min_duration_threshold
+                         && std::abs(previous_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
+                            || (current_time + time_step > this->get_max_temporal_limit()
+                                && action_start_time == this->get_min_temporal_limit()))
+                    {
+                        aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
+                        {
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
+                        }
+                    }
+
+                    action_start_time = current_time - time_step;
+                    action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
+                }
+                else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+                {
+                    // STATUS QUO
+
+                    if (current_time + time_step > this->get_max_temporal_limit())
                     {
                         if ((current_time - action_start_time >= min_duration_threshold
-                             && std::abs(aligned_linear_velocity_variable->get_value(current_time) - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                                || (current_time + time_step > this->get_max_temporal_limit()
-                                    && action_start_time == this->get_min_temporal_limit()))
+                             && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
+                                || action_start_time == this->get_min_temporal_limit())
                         {
-                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time));
+                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
 
                             for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                             {
@@ -168,55 +168,66 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                 }
                 else
                 {
-                    if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                    if ((current_time - action_start_time >= min_duration_threshold
+                         && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
+                            || (current_time + time_step > this->get_max_temporal_limit()
+                                && action_start_time == this->get_min_temporal_limit()))
                     {
-                        if (action_start_time == this->get_min_temporal_limit())
+                        aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
                         {
-                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time - time_step));
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
-                            {
-                                aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
-                            }
-                        }
-
-                        action_start_time = current_time - time_step;
-                        action_start_aligned_linear_velocity = aligned_linear_velocity_variable->get_value(current_time - time_step);
-                    }
-                    else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
-                    {
-                        if (action_start_time == this->get_min_temporal_limit())
-                        {
-                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time - time_step));
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
-                            {
-                                aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
-                            }
-                        }
-
-                        action_start_time = current_time - time_step;
-                        action_start_aligned_linear_velocity = aligned_linear_velocity_variable->get_value(current_time - time_step);
-                    }
-                    else
-                    {
-                        // STATUS QUO
-
-                        if (current_time + time_step > this->get_max_temporal_limit() && action_start_time == this->get_min_temporal_limit())
-                        {
-                            aligned_linear_velocity_goal_value_variable->set_value(action_start_time, aligned_linear_velocity_variable->get_value(current_time));
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
-                            {
-                                aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                            }
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
                         }
                     }
                 }
             }
-            catch (std::out_of_range)
+            else
             {
-                // Attempt to get value from before variable was initialised
+                if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
+                {
+                    if (action_start_time == this->get_min_temporal_limit())
+                    {
+                        aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
+                        {
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
+                        }
+                    }
+
+                    action_start_time = current_time - time_step;
+                    action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
+                }
+                else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
+                {
+                    if (action_start_time == this->get_min_temporal_limit())
+                    {
+                        aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
+                        {
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
+                        }
+                    }
+
+                    action_start_time = current_time - time_step;
+                    action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
+                }
+                else
+                {
+                    // STATUS QUO
+
+                    if (current_time + time_step > this->get_max_temporal_limit() && action_start_time == this->get_min_temporal_limit())
+                    {
+                        aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                        {
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
+                        }
+                    }
+                }
             }
         }
 
@@ -224,8 +235,16 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         if (events->count() == 0 ||
                 aligned_linear_velocity_goal_value_variable->get_min_temporal_limit() > this->get_min_temporal_limit())
         {
-            aligned_linear_velocity_goal_value_variable->set_value(this->get_min_temporal_limit(), aligned_linear_velocity_variable->get_value(this->get_min_temporal_limit()));
-            aligned_linear_velocity_goal_duration_variable->set_value(this->get_min_temporal_limit(), temporal::Duration(0));
+            FP_DATA_TYPE initial_aligned_linear_velocity;
+            if (aligned_linear_velocity_variable->get_value(this->get_min_temporal_limit(), initial_aligned_linear_velocity))
+            {
+                aligned_linear_velocity_goal_value_variable->set_value(this->get_min_temporal_limit(), initial_aligned_linear_velocity);
+                aligned_linear_velocity_goal_duration_variable->set_value(this->get_min_temporal_limit(), temporal::Duration(0));
+            }
+            else
+            {
+                throw std::runtime_error("Aligned linear velocity is not available at minimum temporal limit of agent");
+            }
         }
         delete events;
 
@@ -258,121 +277,119 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
             map::LivingLaneStackArray<T_map_id> *left_lanes = nullptr;
             map::LivingLaneStackArray<T_map_id> *right_lanes = nullptr;
 
-            try
+            geometry::Vec current_position;
+            if (!position_variable->get_value(current_time, current_position))
             {
-                geometry::Vec current_position = position_variable->get_value(current_time);
-                current_lanes = map->get_encapsulating_lanes(current_position);
+                continue;
+            }
 
-                if (current_lanes->count() == 0)
+            current_lanes = map->get_encapsulating_lanes(current_position);
+
+            if (current_lanes->count() == 0)
+            {
+                // Vehicle is currently not on a lane segment. This can happen quite often due to small gaps inbetween the lane segments. As such we just disregard this timestep.
+                delete current_lanes;
+                continue;
+            }
+
+            if (previous_lanes != nullptr)
+            {
+                continuing_lanes = new map::LivingLaneStackArray<T_map_id>;
+                left_lanes = new map::LivingLaneStackArray<T_map_id>;
+                right_lanes = new map::LivingLaneStackArray<T_map_id>;
+                for (size_t j = 0; j < current_lanes->count(); ++j)
                 {
-                    // Vehicle is currently not on a lane segment. This can happen quite often due to small gaps inbetween the lane segments. As such we just disregard this timestep.
-                    delete current_lanes;
-                    continue;
+                    map::ILane<T_map_id> const *current_lane = (*current_lanes)[j];
+                    map::ILaneArray<T_map_id> const *current_lane_aft_lanes = current_lane->get_aft_lanes();
+                    for (size_t k = 0; k < previous_lanes->count(); ++k)
+                    {
+                        map::ILane<T_map_id> const *previous_lane = (*previous_lanes)[k];
+                        if (current_lane == previous_lane || (current_lane_aft_lanes != nullptr && current_lane_aft_lanes->contains(previous_lane)))
+                        {
+                            continuing_lanes->push_back(current_lane);
+                        }
+                        else if (current_lane->get_right_adjacent_lane() == previous_lane)
+                        {
+                            left_lanes->push_back(current_lane);
+                        }
+                        else if (current_lane->get_left_adjacent_lane() == previous_lane)
+                        {
+                            right_lanes->push_back(current_lane);
+                        }
+                    }
                 }
 
-                if (previous_lanes != nullptr)
+                if (continuing_lanes->count() == 0)
                 {
-                    continuing_lanes = new map::LivingLaneStackArray<T_map_id>;
-                    left_lanes = new map::LivingLaneStackArray<T_map_id>;
-                    right_lanes = new map::LivingLaneStackArray<T_map_id>;
-                    for (size_t j = 0; j < current_lanes->count(); ++j)
+                    if (left_lanes->count() > 0)
                     {
-                        map::ILane<T_map_id> const *current_lane = (*current_lanes)[j];
-                        map::ILaneArray<T_map_id> const *current_lane_aft_lanes = current_lane->get_aft_lanes();
-                        for (size_t k = 0; k < previous_lanes->count(); ++k)
-                        {
-                            map::ILane<T_map_id> const *previous_lane = (*previous_lanes)[k];
-                            if (current_lane == previous_lane || (current_lane_aft_lanes != nullptr && current_lane_aft_lanes->contains(previous_lane)))
-                            {
-                                continuing_lanes->push_back(current_lane);
-                            }
-                            else if (current_lane->get_right_adjacent_lane() == previous_lane)
-                            {
-                                left_lanes->push_back(current_lane);
-                            }
-                            else if (current_lane->get_left_adjacent_lane() == previous_lane)
-                            {
-                                right_lanes->push_back(current_lane);
-                            }
-                        }
-                    }
-
-                    if (continuing_lanes->count() == 0)
-                    {
-                        if (left_lanes->count() > 0)
-                        {
-                            --lane_change_offset;
-                            lane_change_time = current_time;
-                            delete previous_lanes;
-                            previous_lanes = left_lanes;
-                            left_lanes = nullptr;
-                        }
-                        else if (right_lanes->count() > 0)
-                        {
-                            ++lane_change_offset;
-                            lane_change_time = current_time;
-                            delete previous_lanes;
-                            previous_lanes = right_lanes;
-                            right_lanes = nullptr;
-                        }
-                        else
-                        {
-                            // This should be an exceptionally rare occurance, the vehicle is occupying at least one valid lane, but none of the occupied lanes are adjacent to the previously occupied lanes.
-                            // Because this is so rare, and difficult to handle, for now we essentially treat it as though the current lane occupation is a continuation of the previous lane occupation.
-                            delete previous_lanes;
-                            previous_lanes = current_lanes;
-                            current_lanes = nullptr;
-                        }
-                    }
-                    else
-                    {
-                        // We've found a valid continuation for the previous lanes, so now update the previous lanes with the lanes found to be valid continuations.
+                        --lane_change_offset;
+                        lane_change_time = current_time;
                         delete previous_lanes;
-                        previous_lanes = continuing_lanes;
-                        continuing_lanes = nullptr;
+                        previous_lanes = left_lanes;
+                        left_lanes = nullptr;
                     }
-                }
-                else
-                {
-                    // There were no previous lanes from which to calculate continuing lanes, so use current lanes for updating the previous lanes.
-                    previous_lanes = current_lanes;
-                    current_lanes = nullptr;
-                }
-
-                if (lane_change_time != temporal::Time::max())
-                {
-                    if (current_time - lane_change_time >= min_duration_threshold)
+                    else if (right_lanes->count() > 0)
                     {
-                        if (lane_change_offset != 0)
-                        {
-                            lane_goal_value_variable->set_value(action_start_time, lane_change_offset);
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
-                            {
-                                lane_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                            }
-                        }
-                        else
-                        {
-                            // We ended up in the same lane as we started with too little time in any other lane to consider a lane change to have occured.
-                            // In other words, do nothing.
-                        }
-
-                        lane_change_time = temporal::Time::max();
+                        ++lane_change_offset;
+                        lane_change_time = current_time;
+                        delete previous_lanes;
+                        previous_lanes = right_lanes;
+                        right_lanes = nullptr;
                     }
                     else
                     {
-                        // We haven't been in this lane long enough to consider it an actual lane change. Keep waiting!
+                        // This should be an exceptionally rare occurance, the vehicle is occupying at least one valid lane, but none of the occupied lanes are adjacent to the previously occupied lanes.
+                        // Because this is so rare, and difficult to handle, for now we essentially treat it as though the current lane occupation is a continuation of the previous lane occupation.
+                        delete previous_lanes;
+                        previous_lanes = current_lanes;
+                        current_lanes = nullptr;
                     }
                 }
                 else
                 {
-                    action_start_time = current_time;
+                    // We've found a valid continuation for the previous lanes, so now update the previous lanes with the lanes found to be valid continuations.
+                    delete previous_lanes;
+                    previous_lanes = continuing_lanes;
+                    continuing_lanes = nullptr;
                 }
             }
-            catch (std::out_of_range)
+            else
             {
-                // Attempt to get value from before variable was initialised
+                // There were no previous lanes from which to calculate continuing lanes, so use current lanes for updating the previous lanes.
+                previous_lanes = current_lanes;
+                current_lanes = nullptr;
+            }
+
+            if (lane_change_time != temporal::Time::max())
+            {
+                if (current_time - lane_change_time >= min_duration_threshold)
+                {
+                    if (lane_change_offset != 0)
+                    {
+                        lane_goal_value_variable->set_value(action_start_time, lane_change_offset);
+
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                        {
+                            lane_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
+                        }
+                    }
+                    else
+                    {
+                        // We ended up in the same lane as we started with too little time in any other lane to consider a lane change to have occured.
+                        // In other words, do nothing.
+                    }
+
+                    lane_change_time = temporal::Time::max();
+                }
+                else
+                {
+                    // We haven't been in this lane long enough to consider it an actual lane change. Keep waiting!
+                }
+            }
+            else
+            {
+                action_start_time = current_time;
             }
 
             delete current_lanes;
@@ -479,7 +496,14 @@ public:
     }
     IValuelessVariable const* get_variable_parameter(std::string const &variable_name) const override
     {
-        return variable_dict[variable_name];
+        if (variable_dict.contains(variable_name))
+        {
+            return variable_dict[variable_name];
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
     structures::IArray<IValuelessEvent const*>* get_events() const override
@@ -532,7 +556,14 @@ public:
     }
     IValuelessVariable* get_mutable_variable_parameter(std::string const &variable_name) override
     {
-        return variable_dict[variable_name];
+        if (variable_dict.contains(variable_name))
+        {
+            return variable_dict[variable_name];
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 
     structures::IArray<IValuelessEvent*>* get_mutable_events() override

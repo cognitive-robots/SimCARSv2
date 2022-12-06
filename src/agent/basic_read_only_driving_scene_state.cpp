@@ -17,13 +17,10 @@ BasicReadOnlyDrivingSceneState::BasicReadOnlyDrivingSceneState(IDrivingScene con
 
     for (size_t i = 0; i < driving_agents->count(); ++i)
     {
-        try
+        IReadOnlyDrivingAgentState const *driving_agent_state = (*driving_agents)[i]->get_driving_agent_state(time);
+        if (driving_agent_state != nullptr)
         {
-            driving_agent_state_dict.update((*driving_agents)[i]->get_name(), (*driving_agents)[i]->get_driving_agent_state(time));
-        }
-        catch (std::out_of_range)
-        {
-            // Driving agent is not present for this timestamp
+            driving_agent_state_dict.update(driving_agent_state->get_name(), driving_agent_state);
         }
     }
 

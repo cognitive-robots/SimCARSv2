@@ -203,7 +203,14 @@ structures::IArray<IValuelessConstant const*>* LyftDrivingAgent::get_constant_pa
 
 IValuelessConstant const* LyftDrivingAgent::get_constant_parameter(std::string const &constant_name) const
 {
-    return constant_dict[constant_name];
+    if (constant_dict.contains(constant_name))
+    {
+        return constant_dict[constant_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessVariable const*>* LyftDrivingAgent::get_variable_parameters() const
@@ -216,7 +223,14 @@ structures::IArray<IValuelessVariable const*>* LyftDrivingAgent::get_variable_pa
 
 IValuelessVariable const* LyftDrivingAgent::get_variable_parameter(std::string const &variable_name) const
 {
-    return variable_dict[variable_name];
+    if (variable_dict.contains(variable_name))
+    {
+        return variable_dict[variable_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessEvent const*>* LyftDrivingAgent::get_events() const
@@ -271,7 +285,14 @@ structures::IArray<IValuelessConstant*>* LyftDrivingAgent::get_mutable_constant_
 
 IValuelessConstant* LyftDrivingAgent::get_mutable_constant_parameter(std::string const &constant_name)
 {
-    return constant_dict[constant_name];
+    if (constant_dict.contains(constant_name))
+    {
+        return constant_dict[constant_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessVariable*>* LyftDrivingAgent::get_mutable_variable_parameters()
@@ -284,7 +305,14 @@ structures::IArray<IValuelessVariable*>* LyftDrivingAgent::get_mutable_variable_
 
 IValuelessVariable* LyftDrivingAgent::get_mutable_variable_parameter(std::string const &variable_name)
 {
-    return variable_dict[variable_name];
+    if (variable_dict.contains(variable_name))
+    {
+        return variable_dict[variable_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessEvent*>* LyftDrivingAgent::get_mutable_events()

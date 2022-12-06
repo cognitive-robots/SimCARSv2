@@ -25,16 +25,13 @@ void simulate(agent::IDrivingScene const *simulated_scene)
 
     for (size_t i = 0; i < driving_agents->count(); ++i)
     {
-        try
+        agent::IDrivingAgent const *driving_agent = (*driving_agents)[i];
+        agent::IVariable<geometry::Vec> const *position_variable =
+                driving_agent->get_position_variable();
+        geometry::Vec position;
+        if (position_variable->get_value(driving_agent->get_last_event_time(), position))
         {
-            agent::IDrivingAgent const *driving_agent = (*driving_agents)[i];
-            agent::IVariable<geometry::Vec> const *position_variable =
-                    driving_agent->get_position_variable();
-            position_variable->get_value(simulated_scene->get_max_temporal_limit());
-        }
-        catch (std::out_of_range)
-        {
-            //std::cerr << "Position not available for this time" << std::endl;
+            std::cout << "Got position variable value for agent " << i << " at end of scene" << std::endl;
         }
     }
 

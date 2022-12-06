@@ -132,13 +132,13 @@ HighDMap::~HighDMap()
 
 ILane<uint8_t> const* HighDMap::get_lane(uint8_t id) const
 {
-    try
+    if (id_to_lane_dict->contains(id))
     {
         return (*id_to_lane_dict)[id];
     }
-    catch (std::out_of_range const&)
+    else
     {
-        throw IMap::ObjectNotFound();
+        return nullptr;
     }
 }
 
@@ -188,7 +188,7 @@ ILaneArray<uint8_t> const* HighDMap::get_lanes_in_range(geometry::Vec point, FP_
 
 ITrafficLight<uint8_t> const* HighDMap::get_traffic_light(uint8_t id) const
 {
-    throw IMap::ObjectNotFound();
+    return nullptr;
 }
 
 ITrafficLightArray<uint8_t> const* HighDMap::get_traffic_lights(structures::IArray<uint8_t> const *ids) const

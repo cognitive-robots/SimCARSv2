@@ -26,6 +26,7 @@ public:
     virtual geometry::Vec get_max_spatial_limits() const = 0;
 
     virtual temporal::Time get_min_temporal_limit() const = 0;
+    virtual temporal::Time get_last_event_time() const = 0;
     virtual temporal::Time get_max_temporal_limit() const = 0;
 
     virtual bool is_state_available(temporal::Time) const = 0;

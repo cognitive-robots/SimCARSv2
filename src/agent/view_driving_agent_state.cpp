@@ -61,26 +61,25 @@ structures::IArray<IValuelessConstant const*>* ViewDrivingAgentState::get_parame
 // Inefficient, use other access functions if you can
 IValuelessConstant const* ViewDrivingAgentState::get_parameter_value(std::string const &parameter_name) const
 {
-    try
+    IValuelessConstant const *parameter_value;
+    parameter_value = agent->get_constant_parameter(parameter_name);
+    if (parameter_value != nullptr)
     {
-        return agent->get_constant_parameter(parameter_name);
+        return parameter_value;
     }
-    catch (std::out_of_range)
+    else
     {
-        // Parameter was not in constant dictionary
+        IValuelessVariable const *valueless_variable =
+                agent->get_variable_parameter(parameter_name);
+        if (valueless_variable != nullptr)
+        {
+            return valueless_variable->get_valueless_event(time);
+        }
+        else
+        {
+            return nullptr;
+        }
     }
-
-    try
-    {
-        return agent->get_variable_parameter(parameter_name)->get_valueless_event(time);
-    }
-    catch (std::out_of_range)
-    {
-        // Parameter was not in variable dictionary or variable did not have event at specified time
-    }
-
-    return nullptr;
-    throw std::out_of_range("Could not find value for specified parameter name at time associated with this state");
 }
 
 IConstant<uint32_t> const* ViewDrivingAgentState::get_id_constant() const
@@ -186,26 +185,25 @@ structures::IArray<IValuelessConstant*>* ViewDrivingAgentState::get_mutable_para
 // Inefficient, use other access functions if you can
 IValuelessConstant* ViewDrivingAgentState::get_mutable_parameter_value(std::string const &parameter_name)
 {
-    try
+    IValuelessConstant *parameter_value;
+    parameter_value = agent->get_mutable_constant_parameter(parameter_name);
+    if (parameter_value != nullptr)
     {
-        return agent->get_mutable_constant_parameter(parameter_name);
+        return parameter_value;
     }
-    catch (std::out_of_range)
+    else
     {
-        // Parameter was not in constant dictionary
+        IValuelessVariable *valueless_variable =
+                agent->get_mutable_variable_parameter(parameter_name);
+        if (valueless_variable != nullptr)
+        {
+            return valueless_variable->get_mutable_valueless_event(time);
+        }
+        else
+        {
+            return nullptr;
+        }
     }
-
-    try
-    {
-        return agent->get_mutable_variable_parameter(parameter_name)->get_mutable_valueless_event(time);
-    }
-    catch (std::out_of_range)
-    {
-        // Parameter was not in variable dictionary or variable did not have event at specified time
-    }
-
-    return nullptr;
-    throw std::out_of_range("Could not find value for specified parameter name at time associated with this state");
 }
 
 void ViewDrivingAgentState::set_id_constant(IConstant<uint32_t> *id_constant)

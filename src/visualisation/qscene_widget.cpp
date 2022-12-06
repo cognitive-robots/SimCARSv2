@@ -83,99 +83,107 @@ void QSceneWidget::on_update()
 
 void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
 {
-    try
-    {
-        agent::IValuelessConstant const *ego_valueless_constant =
-                vehicle->get_constant_parameter(vehicle->get_name() + ".ego");
-        agent::IValuelessConstant const *id_valueless_constant =
-                vehicle->get_constant_parameter(vehicle->get_name() + ".id");
-        agent::IValuelessConstant const *driving_agent_class_valueless_constant =
-                vehicle->get_constant_parameter(vehicle->get_name() + ".driving_agent_class");
-        agent::IValuelessConstant const *bb_length_valueless_constant =
-                vehicle->get_constant_parameter(vehicle->get_name() + ".bb_length");
-        agent::IValuelessConstant const *bb_width_valueless_constant =
-                vehicle->get_constant_parameter(vehicle->get_name() + ".bb_width");
+    agent::IValuelessConstant const *ego_valueless_constant =
+            vehicle->get_constant_parameter(vehicle->get_name() + ".ego");
+    agent::IValuelessConstant const *id_valueless_constant =
+            vehicle->get_constant_parameter(vehicle->get_name() + ".id");
+    agent::IValuelessConstant const *driving_agent_class_valueless_constant =
+            vehicle->get_constant_parameter(vehicle->get_name() + ".driving_agent_class");
+    agent::IValuelessConstant const *bb_length_valueless_constant =
+            vehicle->get_constant_parameter(vehicle->get_name() + ".bb_length");
+    agent::IValuelessConstant const *bb_width_valueless_constant =
+            vehicle->get_constant_parameter(vehicle->get_name() + ".bb_width");
 
-        agent::IConstant<bool> const *ego_constant =
-                dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
-        agent::IConstant<uint32_t> const *id_constant =
-                dynamic_cast<agent::IConstant<uint32_t> const*>(id_valueless_constant);
-        agent::IConstant<agent::DrivingAgentClass> const *driving_agent_class_constant =
-                dynamic_cast<agent::IConstant<agent::DrivingAgentClass> const*>(driving_agent_class_valueless_constant);
-        agent::IConstant<FP_DATA_TYPE> const *bb_length_constant =
-                dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_length_valueless_constant);
-        agent::IConstant<FP_DATA_TYPE> const *bb_width_constant =
-                dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_width_valueless_constant);
+    agent::IValuelessVariable const *position_valueless_variable =
+            vehicle->get_variable_parameter(vehicle->get_name() + ".position.base");
+    agent::IValuelessVariable const *rotation_valueless_variable =
+            vehicle->get_variable_parameter(vehicle->get_name() + ".rotation.base");
 
-        agent::IValuelessVariable const *position_valueless_variable =
-                vehicle->get_variable_parameter(vehicle->get_name() + ".position.base");
-        agent::IValuelessVariable const *rotation_valueless_variable =
-                vehicle->get_variable_parameter(vehicle->get_name() + ".rotation.base");
-
-        agent::IVariable<geometry::Vec> const *position_variable =
-                dynamic_cast<agent::IVariable<geometry::Vec> const*>(position_valueless_variable);
-        agent::IVariable<FP_DATA_TYPE> const *rotation_variable =
-                dynamic_cast<agent::IVariable<FP_DATA_TYPE> const*>(rotation_valueless_variable);
-
-        temporal::Time current_time = this->get_time();
-
-        sf::RectangleShape *rectangle = nullptr;
-        sf::CircleShape *circle = nullptr;
-        sf::Text *text = nullptr;
-        try
-        {
-            sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position_variable->get_value(current_time), false, this->get_flip_y());
-
-            FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
-            FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
-            FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
-            rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
-            sf::Vector2f agent_rectangle_position = agent_base_shape_position
-                    - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation_variable->get_value(current_time))
-                                  * geometry::Vec(agent_rectangle_length, agent_rectangle_width));
-            rectangle->setPosition(agent_rectangle_position);
-            rectangle->setRotation(-180.0f * rotation_variable->get_value(current_time) / M_PI);
-            rectangle->setFillColor(to_sfml_colour(driving_agent_class_constant->get_value()));
-            rectangle->setOutlineThickness(agent_rectangle_min_side * 0.1f);
-
-            FP_DATA_TYPE agent_circle_radius = 0.25f * agent_rectangle_min_side;
-            circle = new sf::CircleShape(agent_circle_radius);
-            sf::Vector2f agent_circle_position = agent_base_shape_position - sf::Vector2f(agent_circle_radius, agent_circle_radius);
-            circle->setPosition(agent_circle_position);
-            circle->setOutlineThickness(agent_circle_radius * 0.4f);
-            if (ego_constant->get_value())
-            {
-                circle->setOutlineColor(sf::Color(255, 255, 255));
-            }
-            else
-            {
-                circle->setOutlineColor(sf::Color(0, 0, 0));
-            }
-
-            FP_DATA_TYPE agent_text_size = 0.4f * agent_rectangle_min_side;
-            text = new sf::Text(std::to_string(id_constant->get_value()), text_font, agent_text_size);
-            sf::FloatRect text_bounds = text->getGlobalBounds();
-            sf::Vector2f agent_text_position = agent_base_shape_position
-                    - 0.5f * sf::Vector2f(text_bounds.width, agent_text_size);
-            text->setPosition(agent_text_position);
-            text->setFillColor(sf::Color(0, 0, 0));
-
-            render_stack.push_back(rectangle);
-            render_stack.push_back(circle);
-            render_stack.push_back(text);
-        }
-        catch (std::out_of_range)
-        {
-            //std::cerr << "Position / Rotation not available for this time" << std::endl;
-            delete rectangle;
-            delete circle;
-            delete text;
-        }
-    }
-    catch (std::out_of_range)
+    if (ego_valueless_constant == nullptr ||
+            id_valueless_constant == nullptr ||
+            driving_agent_class_valueless_constant == nullptr ||
+            bb_length_valueless_constant == nullptr ||
+            bb_width_valueless_constant == nullptr ||
+            position_valueless_variable == nullptr ||
+            rotation_valueless_variable == nullptr)
     {
         std::cerr << "Vehicle entity missing a required parameter" << std::endl;
+        return;
     }
+
+    agent::IConstant<bool> const *ego_constant =
+            dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
+    agent::IConstant<uint32_t> const *id_constant =
+            dynamic_cast<agent::IConstant<uint32_t> const*>(id_valueless_constant);
+    agent::IConstant<agent::DrivingAgentClass> const *driving_agent_class_constant =
+            dynamic_cast<agent::IConstant<agent::DrivingAgentClass> const*>(driving_agent_class_valueless_constant);
+    agent::IConstant<FP_DATA_TYPE> const *bb_length_constant =
+            dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_length_valueless_constant);
+    agent::IConstant<FP_DATA_TYPE> const *bb_width_constant =
+            dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_width_valueless_constant);
+
+    agent::IVariable<geometry::Vec> const *position_variable =
+            dynamic_cast<agent::IVariable<geometry::Vec> const*>(position_valueless_variable);
+    agent::IVariable<FP_DATA_TYPE> const *rotation_variable =
+            dynamic_cast<agent::IVariable<FP_DATA_TYPE> const*>(rotation_valueless_variable);
+
+    temporal::Time current_time = this->get_time();
+
+    sf::RectangleShape *rectangle = nullptr;
+    sf::CircleShape *circle = nullptr;
+    sf::Text *text = nullptr;
+
+    geometry::Vec position;
+    if (!position_variable->get_value(current_time, position))
+    {
+        return;
+    }
+
+    FP_DATA_TYPE rotation;
+    if (!rotation_variable->get_value(current_time, rotation))
+    {
+        return;
+    }
+
+    sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position, false, this->get_flip_y());
+
+    FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
+    FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
+    FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
+    rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
+    sf::Vector2f agent_rectangle_position = agent_base_shape_position
+            - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation)
+                          * geometry::Vec(agent_rectangle_length, agent_rectangle_width));
+    rectangle->setPosition(agent_rectangle_position);
+    rectangle->setRotation(-180.0f * rotation / M_PI);
+    rectangle->setFillColor(to_sfml_colour(driving_agent_class_constant->get_value()));
+    rectangle->setOutlineThickness(agent_rectangle_min_side * 0.1f);
+
+    FP_DATA_TYPE agent_circle_radius = 0.25f * agent_rectangle_min_side;
+    circle = new sf::CircleShape(agent_circle_radius);
+    sf::Vector2f agent_circle_position = agent_base_shape_position - sf::Vector2f(agent_circle_radius, agent_circle_radius);
+    circle->setPosition(agent_circle_position);
+    circle->setOutlineThickness(agent_circle_radius * 0.4f);
+    if (ego_constant->get_value())
+    {
+        circle->setOutlineColor(sf::Color(255, 255, 255));
+    }
+    else
+    {
+        circle->setOutlineColor(sf::Color(0, 0, 0));
+    }
+
+    FP_DATA_TYPE agent_text_size = 0.4f * agent_rectangle_min_side;
+    text = new sf::Text(std::to_string(id_constant->get_value()), text_font, agent_text_size);
+    sf::FloatRect text_bounds = text->getGlobalBounds();
+    sf::Vector2f agent_text_position = agent_base_shape_position
+            - 0.5f * sf::Vector2f(text_bounds.width, agent_text_size);
+    text->setPosition(agent_text_position);
+    text->setFillColor(sf::Color(0, 0, 0));
+
+    render_stack.push_back(rectangle);
+    render_stack.push_back(circle);
+    render_stack.push_back(text);
 }
 
 void QSceneWidget::add_scene_to_render_stack()
@@ -200,33 +208,28 @@ void QSceneWidget::add_scene_to_render_stack()
                     (focus_mode == FocusMode::FOCAL_AGENTS &&
                      focal_entities->contains(entity->get_name())))
             {
-                try
-                {
-                    agent::IValuelessVariable const *position_valueless_variable =
-                            entity->get_variable_parameter(entity->get_name() + ".position.base");
+                agent::IValuelessVariable const *position_valueless_variable =
+                        entity->get_variable_parameter(entity->get_name() + ".position.base");
 
-                    agent::IVariable<geometry::Vec> const *position_variable =
-                            dynamic_cast<agent::IVariable<geometry::Vec> const*>(position_valueless_variable);
-
-                    // TODO: Replace this with something more efficient
-                    try
-                    {
-                        geometry::Vec position = position_variable->get_value(this->get_time());
-                        focal_position += position;
-                        ++focal_agent_count;
-                    }
-                    catch (std::out_of_range)
-                    {
-                        //std::cerr << "Position not available for this time" << std::endl;
-                    }
-                }
-                catch (std::out_of_range)
+                if (position_valueless_variable == nullptr)
                 {
                     if (focus_mode == FocusMode::FOCAL_AGENTS)
                     {
                         std::cerr << "Focal entity '" << entity->get_name() << "' does not have a position parameter" << std::endl;
                     }
+                    continue;
                 }
+
+                agent::IVariable<geometry::Vec> const *position_variable =
+                        dynamic_cast<agent::IVariable<geometry::Vec> const*>(position_valueless_variable);
+
+                geometry::Vec position;
+                if (!position_variable->get_value(this->get_time(), position))
+                {
+                    continue;
+                }
+                focal_position += position;
+                ++focal_agent_count;
             }
         }
     }

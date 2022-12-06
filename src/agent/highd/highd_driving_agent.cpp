@@ -235,7 +235,14 @@ structures::IArray<IValuelessConstant const*>* HighDDrivingAgent::get_constant_p
 
 IValuelessConstant const* HighDDrivingAgent::get_constant_parameter(std::string const &constant_name) const
 {
-    return constant_dict[constant_name];
+    if (constant_dict.contains(constant_name))
+    {
+        return constant_dict[constant_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessVariable const*>* HighDDrivingAgent::get_variable_parameters() const
@@ -248,7 +255,14 @@ structures::IArray<IValuelessVariable const*>* HighDDrivingAgent::get_variable_p
 
 IValuelessVariable const* HighDDrivingAgent::get_variable_parameter(std::string const &variable_name) const
 {
-    return variable_dict[variable_name];
+    if (variable_dict.contains(variable_name))
+    {
+        return variable_dict[variable_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessEvent const*>* HighDDrivingAgent::get_events() const
@@ -303,7 +317,14 @@ structures::IArray<IValuelessConstant*>* HighDDrivingAgent::get_mutable_constant
 
 IValuelessConstant* HighDDrivingAgent::get_mutable_constant_parameter(std::string const &constant_name)
 {
-    return constant_dict[constant_name];
+    if (constant_dict.contains(constant_name))
+    {
+        return constant_dict[constant_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessVariable*>* HighDDrivingAgent::get_mutable_variable_parameters()
@@ -316,7 +337,14 @@ structures::IArray<IValuelessVariable*>* HighDDrivingAgent::get_mutable_variable
 
 IValuelessVariable* HighDDrivingAgent::get_mutable_variable_parameter(std::string const &variable_name)
 {
-    return variable_dict[variable_name];
+    if (variable_dict.contains(variable_name))
+    {
+        return variable_dict[variable_name];
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 structures::IArray<IValuelessEvent*>* HighDDrivingAgent::get_mutable_events()

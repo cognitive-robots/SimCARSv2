@@ -56,25 +56,16 @@ structures::IArray<IValuelessConstant const*>* ViewReadOnlyDrivingAgentState::ge
 // Inefficient, use other access functions if you can
 IValuelessConstant const* ViewReadOnlyDrivingAgentState::get_parameter_value(std::string const &parameter_name) const
 {
-    try
+    IValuelessConstant const *parameter_value;
+    parameter_value = agent->get_constant_parameter(parameter_name);
+    if (parameter_value != nullptr)
     {
-        return agent->get_constant_parameter(parameter_name);
+        return parameter_value;
     }
-    catch (std::out_of_range)
-    {
-        // Parameter was not in constant dictionary
-    }
-
-    try
+    else
     {
         return agent->get_variable_parameter(parameter_name)->get_valueless_event(time);
     }
-    catch (std::out_of_range)
-    {
-        // Parameter was not in variable dictionary or variable did not have event at specified time
-    }
-
-    throw std::out_of_range("Could not find value for specified parameter name at time associated with this state");
 }
 
 IConstant<uint32_t> const* ViewReadOnlyDrivingAgentState::get_id_constant() const

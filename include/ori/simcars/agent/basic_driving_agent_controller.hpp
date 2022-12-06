@@ -53,32 +53,32 @@ public:
 
         FP_DATA_TYPE new_aligned_linear_acceleration;
 
-        try
-        {
-            IValuelessConstant const *aligned_linear_velocity_goal_value_valueless_variable =
-                    original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_value");
-            IValuelessConstant const *aligned_linear_velocity_goal_duration_valueless_variable =
-                    original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_duration");
 
-            IConstant<FP_DATA_TYPE> const *aligned_linear_velocity_goal_value_variable =
-                    dynamic_cast<IConstant<FP_DATA_TYPE> const*>(aligned_linear_velocity_goal_value_valueless_variable);
-            IConstant<temporal::Duration> const *aligned_linear_velocity_goal_duration_variable =
-                    dynamic_cast<IConstant<temporal::Duration> const*>(aligned_linear_velocity_goal_duration_valueless_variable);
+        IValuelessConstant const *aligned_linear_velocity_goal_value_valueless_variable =
+                original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_value");
+        IValuelessConstant const *aligned_linear_velocity_goal_duration_valueless_variable =
+                original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_duration");
 
-            FP_DATA_TYPE aligned_linear_velocity_goal_value = aligned_linear_velocity_goal_value_variable->get_value();
-            temporal::Duration aligned_linear_velocity_goal_duration = aligned_linear_velocity_goal_duration_variable->get_value();
-
-            FP_DATA_TYPE aligned_linear_velocity_error = aligned_linear_velocity_goal_value - aligned_linear_velocity;
-            new_aligned_linear_acceleration = aligned_linear_velocity_error / std::max(aligned_linear_velocity_goal_duration.count(), time_step.count());
-            new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
-            new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
-            assert(!std::isnan(new_aligned_linear_acceleration));
-        }
-        catch (std::out_of_range)
+        if (aligned_linear_velocity_goal_value_valueless_variable == nullptr ||
+                aligned_linear_velocity_goal_duration_valueless_variable == nullptr)
         {
             std::cerr << "Could not actuate aligned linear acceleration variable" << std::endl;
             new_aligned_linear_acceleration = 0.0f;
         }
+
+        IConstant<FP_DATA_TYPE> const *aligned_linear_velocity_goal_value_variable =
+                dynamic_cast<IConstant<FP_DATA_TYPE> const*>(aligned_linear_velocity_goal_value_valueless_variable);
+        IConstant<temporal::Duration> const *aligned_linear_velocity_goal_duration_variable =
+                dynamic_cast<IConstant<temporal::Duration> const*>(aligned_linear_velocity_goal_duration_valueless_variable);
+
+        FP_DATA_TYPE aligned_linear_velocity_goal_value = aligned_linear_velocity_goal_value_variable->get_value();
+        temporal::Duration aligned_linear_velocity_goal_duration = aligned_linear_velocity_goal_duration_variable->get_value();
+
+        FP_DATA_TYPE aligned_linear_velocity_error = aligned_linear_velocity_goal_value - aligned_linear_velocity;
+        new_aligned_linear_acceleration = aligned_linear_velocity_error / std::max(aligned_linear_velocity_goal_duration.count(), time_step.count());
+        new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
+        new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
+        assert(!std::isnan(new_aligned_linear_acceleration));
 
         IConstant<FP_DATA_TYPE> *new_aligned_linear_acceleration_variable =
                     new BasicConstant(
@@ -104,195 +104,185 @@ public:
 
         map::ILaneArray<T_map_id> const *lanes;
 
-        try
+        // TODO: Accomodate branching lanes
+        lanes = map->get_encapsulating_lanes(position);
+
+        if (lanes->count() > 0)
         {
-            // TODO: Accomodate branching lanes
-            lanes = map->get_encapsulating_lanes(position);
+            map::ILane<T_map_id> const *lane = (*lanes)[0];
 
-            if (lanes->count() > 0)
+            map::ILane<T_map_id> const *current_lane = lane;
+
+            bool found_start = false;
+
+            FP_DATA_TYPE distance_remaining = lookahead_distance_covered;
+
+            geometry::Vec start_direction, end_direction, end_point;
+
+            size_t i;
+
+            FP_DATA_TYPE previous_distance_along_link = std::nanf("");
+
+            while (true)
             {
-                map::ILane<T_map_id> const *lane = (*lanes)[0];
+                geometry::Vecs const &left_boundary = current_lane->get_left_boundary();
 
-                map::ILane<T_map_id> const *current_lane = lane;
-
-                bool found_start = false;
-
-                FP_DATA_TYPE distance_remaining = lookahead_distance_covered;
-
-                geometry::Vec start_direction, end_direction, end_point;
-
-                size_t i;
-
-                FP_DATA_TYPE previous_distance_along_link = std::nanf("");
-
-                while (true)
+                for (i = 0;
+                     i < left_boundary.cols() - 1;
+                     ++i)
                 {
-                    geometry::Vecs const &left_boundary = current_lane->get_left_boundary();
-
-                    for (i = 0;
-                         i < left_boundary.cols() - 1;
-                         ++i)
+                    geometry::Vec on_boundary = left_boundary.col(i + 1) - left_boundary.col(i);
+                    if (!found_start)
                     {
-                        geometry::Vec on_boundary = left_boundary.col(i + 1) - left_boundary.col(i);
-                        if (!found_start)
+                        geometry::Vec from_boundary = position - left_boundary.col(i);
+                        geometry::Vec on_boundary_normalised = on_boundary.normalized();
+                        FP_DATA_TYPE distance_along_link = on_boundary_normalised.dot(from_boundary);
+
+                        //std::cerr << "distance_along_link: " << distance_along_link << std::endl;
+                        //std::cerr << "on_boundary.norm(): " << on_boundary.norm() << std::endl;
+
+                        if (distance_along_link >= 0 && distance_along_link <= on_boundary.norm())
                         {
-                            geometry::Vec from_boundary = position - left_boundary.col(i);
-                            geometry::Vec on_boundary_normalised = on_boundary.normalized();
-                            FP_DATA_TYPE distance_along_link = on_boundary_normalised.dot(from_boundary);
-
-                            //std::cerr << "distance_along_link: " << distance_along_link << std::endl;
-                            //std::cerr << "on_boundary.norm(): " << on_boundary.norm() << std::endl;
-
-                            if (distance_along_link >= 0 && distance_along_link <= on_boundary.norm())
-                            {
-                                //std::cerr << "start found!" << std::endl;
-                                found_start = true;
-                                start_direction = on_boundary_normalised;
-                                distance_remaining += distance_along_link;
-                            }
-                            else
-                            {
-                                if (!std::isnan(previous_distance_along_link))
-                                {
-                                    if ((distance_along_link >= 0 && previous_distance_along_link < 0) ||
-                                            (distance_along_link < 0 && previous_distance_along_link >= 0))
-                                    {
-                                        //std::cerr << "Error sign changed" << std::endl;
-                                        found_start = true;
-                                        start_direction = on_boundary_normalised;
-                                        distance_remaining += distance_along_link;
-                                    }
-
-                                    //if (std::abs(distance_along_link) > std::abs(previous_distance_along_link))
-                                    //{
-                                    //    std::cerr << "Error increased" << std::endl;
-                                    //}
-                                }
-
-                                previous_distance_along_link = distance_along_link;
-                            }
-                        }
-
-                        if (found_start)
-                        {
-                            distance_remaining -= on_boundary.norm();
-
-                            if (distance_remaining < 0)
-                            {
-                                end_direction = on_boundary.normalized();
-                                end_point = left_boundary.col(i + 1);
-                                break;
-                            }
-                        }
-                    }
-
-                    if (distance_remaining >= 0)
-                    {
-                        map::ILane<T_map_id> const *straight_fore_lane = current_lane->get_straight_fore_lane();
-                        if (straight_fore_lane != nullptr)
-                        {
-                            //std::cerr << "new lane!" << std::endl;
-                            current_lane = straight_fore_lane;
+                            //std::cerr << "start found!" << std::endl;
+                            found_start = true;
+                            start_direction = on_boundary_normalised;
+                            distance_remaining += distance_along_link;
                         }
                         else
                         {
-                            size_t last_index = left_boundary.cols() - 1;
-                            end_direction = (left_boundary.col(last_index) - left_boundary.col(last_index - 1)).normalized();
-                            end_point = left_boundary.col(last_index - 1);
+                            if (!std::isnan(previous_distance_along_link))
+                            {
+                                if ((distance_along_link >= 0 && previous_distance_along_link < 0) ||
+                                        (distance_along_link < 0 && previous_distance_along_link >= 0))
+                                {
+                                    //std::cerr << "Error sign changed" << std::endl;
+                                    found_start = true;
+                                    start_direction = on_boundary_normalised;
+                                    distance_remaining += distance_along_link;
+                                }
+
+                                //if (std::abs(distance_along_link) > std::abs(previous_distance_along_link))
+                                //{
+                                //    std::cerr << "Error increased" << std::endl;
+                                //}
+                            }
+
+                            previous_distance_along_link = distance_along_link;
+                        }
+                    }
+
+                    if (found_start)
+                    {
+                        distance_remaining -= on_boundary.norm();
+
+                        if (distance_remaining < 0)
+                        {
+                            end_direction = on_boundary.normalized();
+                            end_point = left_boundary.col(i + 1);
                             break;
                         }
                     }
+                }
+
+                if (distance_remaining >= 0)
+                {
+                    map::ILane<T_map_id> const *straight_fore_lane = current_lane->get_straight_fore_lane();
+                    if (straight_fore_lane != nullptr)
+                    {
+                        //std::cerr << "new lane!" << std::endl;
+                        current_lane = straight_fore_lane;
+                    }
                     else
                     {
+                        size_t last_index = left_boundary.cols() - 1;
+                        end_direction = (left_boundary.col(last_index) - left_boundary.col(last_index - 1)).normalized();
+                        end_point = left_boundary.col(last_index - 1);
                         break;
                     }
                 }
-
-                if (!found_start)
-                {
-                    throw std::runtime_error("Could not find nearest lane boundary segment for driving agent");
-                }
-
-                geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
-
-                // TODO: Remove previous start direction assignments
-                start_direction = geometry::Vec(trig_buff->get_cos(rotation), trig_buff->get_sin(rotation));
-
-                geometry::Vecs const &right_boundary = current_lane->get_right_boundary();
-
-                geometry::Vec closest_right_boundary_point = right_boundary.col(0);
-                FP_DATA_TYPE closest_right_boundary_point_distance =
-                        (end_point - closest_right_boundary_point).norm();
-
-                for (i = 1; i < right_boundary.cols(); ++i)
-                {
-                    geometry::Vec right_boundary_point = right_boundary.col(i);
-                    FP_DATA_TYPE right_boundary_point_distance = (end_point - right_boundary_point).norm();
-                    if (right_boundary_point_distance < closest_right_boundary_point_distance)
-                    {
-                        closest_right_boundary_point = right_boundary_point;
-                        closest_right_boundary_point_distance = right_boundary_point_distance;
-                    }
-                }
-
-                geometry::Vec lane_midpoint = (end_point + closest_right_boundary_point) / 2.0f;
-
-                geometry::Vec midpoint_direction = (lane_midpoint - position).normalized();
-
-                FP_DATA_TYPE lane_midpoint_dot_prod = start_direction.dot(midpoint_direction);
-                lane_midpoint_dot_prod = std::min(lane_midpoint_dot_prod, 1.0f);
-                lane_midpoint_dot_prod = std::max(lane_midpoint_dot_prod, -1.0f);
-                FP_DATA_TYPE lane_midpoint_angle_mag = std::acos(lane_midpoint_dot_prod);
-                FP_DATA_TYPE lane_midpoint_angle;
-                if (midpoint_direction.dot(trig_buff->get_rot_mat(lane_midpoint_angle_mag) * start_direction) >=
-                        midpoint_direction.dot(trig_buff->get_rot_mat(-lane_midpoint_angle_mag) * start_direction))
-                {
-                    lane_midpoint_angle = lane_midpoint_angle_mag;
-                }
                 else
                 {
-                    lane_midpoint_angle = -lane_midpoint_angle_mag;
+                    break;
                 }
-                FP_DATA_TYPE lane_midpoint_steer = lane_midpoint_angle / lookahead_distance_covered;
+            }
 
+            if (!found_start)
+            {
+                modified_state->set_steer_variable(original_state->get_steer_variable()->constant_shallow_copy());
+                delete lanes;
+                return;
+            }
 
-                FP_DATA_TYPE lane_orientation_angle_mag = std::acos(start_direction.dot(end_direction));
-                FP_DATA_TYPE lane_orientation_angle;
-                if (end_direction.dot(trig_buff->get_rot_mat(lane_orientation_angle_mag) * start_direction) >=
-                        end_direction.dot(trig_buff->get_rot_mat(-lane_orientation_angle_mag) * start_direction))
+            geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
+
+            // TODO: Remove previous start direction assignments
+            start_direction = geometry::Vec(trig_buff->get_cos(rotation), trig_buff->get_sin(rotation));
+
+            geometry::Vecs const &right_boundary = current_lane->get_right_boundary();
+
+            geometry::Vec closest_right_boundary_point = right_boundary.col(0);
+            FP_DATA_TYPE closest_right_boundary_point_distance =
+                    (end_point - closest_right_boundary_point).norm();
+
+            for (i = 1; i < right_boundary.cols(); ++i)
+            {
+                geometry::Vec right_boundary_point = right_boundary.col(i);
+                FP_DATA_TYPE right_boundary_point_distance = (end_point - right_boundary_point).norm();
+                if (right_boundary_point_distance < closest_right_boundary_point_distance)
                 {
-                    lane_orientation_angle = lane_orientation_angle_mag;
+                    closest_right_boundary_point = right_boundary_point;
+                    closest_right_boundary_point_distance = right_boundary_point_distance;
                 }
-                else
-                {
-                    lane_orientation_angle = -lane_orientation_angle_mag;
-                }
-                FP_DATA_TYPE lane_orientation_steer = lane_orientation_angle / lookahead_distance_covered;
+            }
 
+            geometry::Vec lane_midpoint = (end_point + closest_right_boundary_point) / 2.0f;
 
-                FP_DATA_TYPE new_steer = (lane_midpoint_steer + lane_orientation_steer) / 2.0f;
-                assert(!std::isnan(new_steer));
+            geometry::Vec midpoint_direction = (lane_midpoint - position).normalized();
 
-                IConstant<FP_DATA_TYPE> *new_steer_variable =
-                            new BasicConstant(
-                                modified_state->get_name(),
-                                "steer.indirect_actuation",
-                                new_steer);
-                modified_state->set_steer_variable(new_steer_variable);
+            FP_DATA_TYPE lane_midpoint_dot_prod = start_direction.dot(midpoint_direction);
+            lane_midpoint_dot_prod = std::min(lane_midpoint_dot_prod, 1.0f);
+            lane_midpoint_dot_prod = std::max(lane_midpoint_dot_prod, -1.0f);
+            FP_DATA_TYPE lane_midpoint_angle_mag = std::acos(lane_midpoint_dot_prod);
+            FP_DATA_TYPE lane_midpoint_angle;
+            if (midpoint_direction.dot(trig_buff->get_rot_mat(lane_midpoint_angle_mag) * start_direction) >=
+                    midpoint_direction.dot(trig_buff->get_rot_mat(-lane_midpoint_angle_mag) * start_direction))
+            {
+                lane_midpoint_angle = lane_midpoint_angle_mag;
             }
             else
             {
-                // Driving agent not on lane
-                modified_state->set_steer_variable(original_state->get_steer_variable()->constant_shallow_copy());
+                lane_midpoint_angle = -lane_midpoint_angle_mag;
             }
+            FP_DATA_TYPE lane_midpoint_steer = lane_midpoint_angle / lookahead_distance_covered;
+
+
+            FP_DATA_TYPE lane_orientation_angle_mag = std::acos(start_direction.dot(end_direction));
+            FP_DATA_TYPE lane_orientation_angle;
+            if (end_direction.dot(trig_buff->get_rot_mat(lane_orientation_angle_mag) * start_direction) >=
+                    end_direction.dot(trig_buff->get_rot_mat(-lane_orientation_angle_mag) * start_direction))
+            {
+                lane_orientation_angle = lane_orientation_angle_mag;
+            }
+            else
+            {
+                lane_orientation_angle = -lane_orientation_angle_mag;
+            }
+            FP_DATA_TYPE lane_orientation_steer = lane_orientation_angle / lookahead_distance_covered;
+
+
+            FP_DATA_TYPE new_steer = (lane_midpoint_steer + lane_orientation_steer) / 2.0f;
+            assert(!std::isnan(new_steer));
+
+            IConstant<FP_DATA_TYPE> *new_steer_variable =
+                    new BasicConstant(
+                        modified_state->get_name(),
+                        "steer.indirect_actuation",
+                        new_steer);
+            modified_state->set_steer_variable(new_steer_variable);
         }
-        catch (std::out_of_range)
+        else
         {
-            std::cerr << "Could not actuate steer variable" << std::endl;
-            modified_state->set_steer_variable(original_state->get_steer_variable()->constant_shallow_copy());
-        }
-        catch (std::runtime_error)
-        {
+            // Driving agent not on lane
             modified_state->set_steer_variable(original_state->get_steer_variable()->constant_shallow_copy());
         }
 

@@ -88,23 +88,23 @@ int main(int argc, char *argv[])
     for (size_t i = 0; i < entities->count(); ++i)
     {
         agent::IEntity const *entity = (*entities)[i];
-        try
-        {
-            agent::IValuelessConstant const *ego_valueless_constant =
-                    entity->get_constant_parameter(entity->get_name() + ".ego");
 
-            agent::IConstant<bool> const *ego_constant =
-                    dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
+        agent::IValuelessConstant const *ego_valueless_constant =
+                entity->get_constant_parameter(entity->get_name() + ".ego");
 
-            if (ego_constant->get_value())
-            {
-                focal_entities->push_back(entity->get_name());
-                agent_names->insert(entity->get_name());
-            }
-        }
-        catch (std::out_of_range)
+        if (ego_valueless_constant == nullptr)
         {
             // Entity does not have an ego parameter
+            continue;
+        }
+
+        agent::IConstant<bool> const *ego_constant =
+                dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
+
+        if (ego_constant->get_value())
+        {
+            focal_entities->push_back(entity->get_name());
+            agent_names->insert(entity->get_name());
         }
     }
 

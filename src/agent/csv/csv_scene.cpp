@@ -67,12 +67,12 @@ void CSVScene::save_virt(std::ofstream &output_filestream) const
         {
             for (j = 0; j < variables->count(); ++j)
             {
-                try
+                std::string value_as_string;
+                if ((*variables)[j]->get_value_as_string(current_time, value_as_string))
                 {
-                    std::string value_as_string = (*variables)[j]->get_value_as_string(current_time);
                     output_filestream << value_as_string << ";";
                 }
-                catch (std::out_of_range)
+                else
                 {
                     // Not the best solution, since it's not impossible a variable could take the value "NA"
                     output_filestream << "NA;";

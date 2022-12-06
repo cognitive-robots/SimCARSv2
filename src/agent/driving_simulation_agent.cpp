@@ -225,7 +225,14 @@ IValuelessVariable const* DrivingSimulationAgent::get_variable_parameter(std::st
     }
     else
     {
-        return simulated_variable_dict[variable_name];
+        if (simulated_variable_dict.contains(variable_name))
+        {
+            return simulated_variable_dict[variable_name];
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 }
 
@@ -334,7 +341,14 @@ IValuelessVariable* DrivingSimulationAgent::get_mutable_variable_parameter(std::
     }
     else
     {
-        return simulated_variable_dict[variable_name];
+        if (simulated_variable_dict.contains(variable_name))
+        {
+            return simulated_variable_dict[variable_name];
+        }
+        else
+        {
+            return nullptr;
+        }
     }
 }
 

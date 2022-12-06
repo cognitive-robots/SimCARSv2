@@ -14,6 +14,8 @@ class ADrivingAgent : public virtual IDrivingAgent
 public:
     IEntity* entity_deep_copy() const override;
 
+    temporal::Time get_last_event_time() const override;
+
     bool is_state_available(temporal::Time) const override;
 
     IReadOnlyEntityState const* get_state(temporal::Time time) const override;

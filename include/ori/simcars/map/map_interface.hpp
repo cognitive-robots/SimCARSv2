@@ -17,17 +17,6 @@ template <typename T_id>
 class IMap
 {
 public:
-    class ObjectNotFound : public std::exception
-    {
-    public:
-        using std::exception::exception;
-
-        char const* what() const noexcept override
-        {
-            return "Could not find a map object when a lookup was performed";
-        }
-    };
-
     virtual ~IMap() = default;
 
     virtual ILane<T_id> const* get_lane(T_id id) const = 0;

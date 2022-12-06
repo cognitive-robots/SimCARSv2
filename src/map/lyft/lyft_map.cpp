@@ -313,13 +313,13 @@ LyftMap::~LyftMap()
 
 ILane<std::string> const* LyftMap::get_lane(std::string id) const
 {
-    try
+    if (id_to_lane_dict->contains(id))
     {
         return (*id_to_lane_dict)[id];
     }
-    catch (std::out_of_range const&)
+    else
     {
-        throw IMap::ObjectNotFound();
+        return nullptr;
     }
 }
 
@@ -374,13 +374,13 @@ ILaneArray<std::string> const* LyftMap::get_lanes_in_range(geometry::Vec point, 
 
 ITrafficLight<std::string> const* LyftMap::get_traffic_light(std::string id) const
 {
-    try
+    if (id_to_traffic_light_dict->contains(id))
     {
         return (*id_to_traffic_light_dict)[id];
     }
-    catch (std::out_of_range const&)
+    else
     {
-        throw IMap::ObjectNotFound();
+        return nullptr;
     }
 }
 

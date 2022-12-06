@@ -154,6 +154,18 @@ public:
         return original_variable->get_min_temporal_limit();
     }
 
+    temporal::Time get_last_event_time() const override
+    {
+        if (time_event_dict.count() > 0)
+        {
+            return time_event_dict.get_latest_timestamp();
+        }
+        else
+        {
+            return original_variable->get_last_event_time();
+        }
+    }
+
     temporal::Time get_max_temporal_limit() const override
     {
         return simulation_end_time;
@@ -164,17 +176,25 @@ public:
         return time_event_dict.contains(time) || (time <= simulation_start_time && original_variable->has_event(time));
     }
 
-    T const& get_value(temporal::Time time) const override
+    bool get_value(temporal::Time time, T &value) const override
     {
         simulation_check(time);
 
         if (time < simulation_start_time + simulation_scene->get_time_step())
         {
-            return original_variable->get_value(time);
+            return original_variable->get_value(time, value);
         }
         else
         {
-            return time_event_dict[time]->get_value();
+            if (time_event_dict.contains(time))
+            {
+                value = time_event_dict[time]->get_value();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -225,7 +245,7 @@ public:
             }
             else
             {
-                throw std::out_of_range("No event at specified time");
+                return nullptr;
             }
         }
     }
@@ -288,12 +308,12 @@ public:
             }
             else
             {
-                throw std::out_of_range("No event at specified time");
+                return nullptr;
             }
         }
         else
         {
-            throw std::out_of_range("Specified time outside of simulation window");
+            return nullptr;
         }
     }
 

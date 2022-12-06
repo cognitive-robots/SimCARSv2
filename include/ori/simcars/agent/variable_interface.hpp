@@ -16,7 +16,7 @@ class IVariable : public virtual IValuelessVariable
 public:
     virtual IVariable<T>* deep_copy() const = 0;
 
-    virtual T const& get_value(temporal::Time time) const = 0;
+    virtual bool get_value(temporal::Time time, T &value) const = 0;
 
     virtual structures::IArray<IEvent<T> const*>* get_events(
             temporal::Time time_window_start = temporal::Time::min(),

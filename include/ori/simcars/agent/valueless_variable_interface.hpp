@@ -39,9 +39,10 @@ public:
 
     virtual Type get_type() const = 0;
 
-    virtual std::string get_value_as_string(temporal::Time time) const = 0;
+    virtual bool get_value_as_string(temporal::Time time, std::string &str) const = 0;
 
     virtual temporal::Time get_min_temporal_limit() const = 0;
+    virtual temporal::Time get_last_event_time() const = 0;
     virtual temporal::Time get_max_temporal_limit() const = 0;
 
     virtual bool has_event(temporal::Time time) const = 0;
