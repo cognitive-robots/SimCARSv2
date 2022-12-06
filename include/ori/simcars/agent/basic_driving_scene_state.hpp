@@ -13,16 +13,19 @@ namespace agent
 
 class BasicDrivingSceneState : public virtual ADrivingSceneState
 {
+    temporal::Time time;
     bool delete_dicts;
 
     structures::stl::STLDictionary<std::string, IDrivingAgentState*> driving_agent_state_dict;
 
 public:
-    BasicDrivingSceneState(bool delete_dicts = true);
+    BasicDrivingSceneState(temporal::Time time, bool delete_dicts = true);
     BasicDrivingSceneState(IDrivingScene *scene, temporal::Time time, bool delete_dicts = true);
     BasicDrivingSceneState(IDrivingSceneState *driving_scene_state, bool copy_parameters = true);
 
     ~BasicDrivingSceneState();
+
+    temporal::Time get_time() const override;
 
     structures::IArray<IReadOnlyDrivingAgentState const*>* get_driving_agent_states() const override;
     IReadOnlyDrivingAgentState const* get_driving_agent_state(std::string const &driving_agent_name) const override;

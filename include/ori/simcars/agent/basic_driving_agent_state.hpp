@@ -13,6 +13,7 @@ namespace agent
 class BasicDrivingAgentState : public virtual ADrivingAgentState
 {
     std::string name;
+    temporal::Time time;
     bool delete_dicts;
 
     void set_parameter_value(IValuelessConstant *parameter_value);
@@ -21,13 +22,14 @@ protected:
     structures::stl::STLDictionary<std::string, IValuelessConstant*> parameter_dict;
 
 public:
-    BasicDrivingAgentState(std::string const &name, bool delete_dicts = true);
+    BasicDrivingAgentState(std::string const &name, temporal::Time time, bool delete_dicts = true);
     BasicDrivingAgentState(IReadOnlyDrivingAgentState const *driving_agent_state);
     BasicDrivingAgentState(IDrivingAgentState *driving_agent_state, bool copy_parameters = true);
 
     ~BasicDrivingAgentState();
 
     std::string get_name() const override;
+    temporal::Time get_time() const override;
 
     bool is_populated() const override;
 

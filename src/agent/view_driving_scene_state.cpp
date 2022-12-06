@@ -14,6 +14,11 @@ ViewDrivingSceneState::ViewDrivingSceneState(IDrivingScene *scene, temporal::Tim
 {
 }
 
+temporal::Time ViewDrivingSceneState::get_time() const
+{
+    return time;
+}
+
 structures::IArray<IReadOnlyDrivingAgentState const*>* ViewDrivingSceneState::get_driving_agent_states() const
 {
     structures::IArray<IDrivingAgent const*> *driving_agents = scene->get_driving_agents();
@@ -38,11 +43,6 @@ IReadOnlyDrivingAgentState const* ViewDrivingSceneState::get_driving_agent_state
 IDrivingScene const* ViewDrivingSceneState::get_scene() const
 {
     return scene;
-}
-
-temporal::Time ViewDrivingSceneState::get_time() const
-{
-    return time;
 }
 
 structures::IArray<IDrivingAgentState*>* ViewDrivingSceneState::get_mutable_driving_agent_states()

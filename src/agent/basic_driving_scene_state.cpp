@@ -10,13 +10,13 @@ namespace simcars
 namespace agent
 {
 
-BasicDrivingSceneState::BasicDrivingSceneState(bool delete_dicts) :
-    delete_dicts(delete_dicts)
+BasicDrivingSceneState::BasicDrivingSceneState(temporal::Time time, bool delete_dicts) :
+    time(time), delete_dicts(delete_dicts)
 {
 }
 
 BasicDrivingSceneState::BasicDrivingSceneState(IDrivingScene *scene, temporal::Time time, bool delete_dicts) :
-    delete_dicts(delete_dicts)
+    time(time), delete_dicts(delete_dicts)
 {
     structures::IArray<IDrivingAgent*> *driving_agents = scene->get_mutable_driving_agents();
 
@@ -37,7 +37,7 @@ BasicDrivingSceneState::BasicDrivingSceneState(IDrivingScene *scene, temporal::T
 
 BasicDrivingSceneState::BasicDrivingSceneState(
         IDrivingSceneState *driving_scene_state, bool copy_parameters) :
-    delete_dicts(copy_parameters)
+    time(driving_scene_state->get_time()), delete_dicts(copy_parameters)
 {
     structures::IArray<IDrivingAgentState*> *driving_agent_states =
             driving_scene_state->get_mutable_driving_agent_states();
@@ -58,6 +58,11 @@ BasicDrivingSceneState::~BasicDrivingSceneState()
             delete (*driving_agent_states)[i];
         }
     }
+}
+
+temporal::Time BasicDrivingSceneState::get_time() const
+{
+    return time;
 }
 
 structures::IArray<IReadOnlyDrivingAgentState const*>* BasicDrivingSceneState::get_driving_agent_states() const

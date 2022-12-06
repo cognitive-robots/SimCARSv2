@@ -21,6 +21,11 @@ std::string ViewDrivingAgentState::get_name() const
     return agent->get_name();
 }
 
+temporal::Time ViewDrivingAgentState::get_time() const
+{
+    return time;
+}
+
 // Is not the best approach to check if state is populated, relies upon fact
 // that simulator updates position variable last
 bool ViewDrivingAgentState::is_populated() const
@@ -74,6 +79,7 @@ IValuelessConstant const* ViewDrivingAgentState::get_parameter_value(std::string
         // Parameter was not in variable dictionary or variable did not have event at specified time
     }
 
+    return nullptr;
     throw std::out_of_range("Could not find value for specified parameter name at time associated with this state");
 }
 
@@ -152,11 +158,6 @@ IDrivingAgent const* ViewDrivingAgentState::get_agent() const
     return agent;
 }
 
-temporal::Time ViewDrivingAgentState::get_time() const
-{
-    return time;
-}
-
 // Inefficient, use other access functions if you can
 structures::IArray<IValuelessConstant*>* ViewDrivingAgentState::get_mutable_parameter_values()
 {
@@ -203,6 +204,7 @@ IValuelessConstant* ViewDrivingAgentState::get_mutable_parameter_value(std::stri
         // Parameter was not in variable dictionary or variable did not have event at specified time
     }
 
+    return nullptr;
     throw std::out_of_range("Could not find value for specified parameter name at time associated with this state");
 }
 

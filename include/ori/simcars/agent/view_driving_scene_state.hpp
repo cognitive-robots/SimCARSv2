@@ -18,11 +18,13 @@ class ViewDrivingSceneState : public virtual ADrivingSceneState
 public:
     ViewDrivingSceneState(IDrivingScene *scene, temporal::Time time);
 
+    temporal::Time get_time() const override;
+
     structures::IArray<IReadOnlyDrivingAgentState const*>* get_driving_agent_states() const override;
     IReadOnlyDrivingAgentState const* get_driving_agent_state(std::string const &driving_agent_name) const override;
 
     IDrivingScene const* get_scene() const;
-    temporal::Time get_time() const;
+
 
     structures::IArray<IDrivingAgentState*>* get_mutable_driving_agent_states() override;
     IDrivingAgentState* get_mutable_driving_agent_state(std::string const &driving_agent_name) override;

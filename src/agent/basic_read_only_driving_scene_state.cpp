@@ -11,7 +11,7 @@ namespace agent
 {
 
 BasicReadOnlyDrivingSceneState::BasicReadOnlyDrivingSceneState(IDrivingScene const *scene, temporal::Time time, bool delete_dicts) :
-    delete_dicts(delete_dicts)
+    time(time), delete_dicts(delete_dicts)
 {
     structures::IArray<IDrivingAgent const*> *driving_agents = scene->get_driving_agents();
 
@@ -32,7 +32,7 @@ BasicReadOnlyDrivingSceneState::BasicReadOnlyDrivingSceneState(IDrivingScene con
 
 BasicReadOnlyDrivingSceneState::BasicReadOnlyDrivingSceneState(
         IReadOnlyDrivingSceneState *driving_scene_state, bool copy_parameters) :
-    delete_dicts(copy_parameters)
+    time(driving_scene_state->get_time()), delete_dicts(copy_parameters)
 {
     structures::IArray<IReadOnlyDrivingAgentState const*> *driving_agent_states =
             driving_scene_state->get_driving_agent_states();
@@ -53,6 +53,11 @@ BasicReadOnlyDrivingSceneState::~BasicReadOnlyDrivingSceneState()
             delete (*driving_agent_states)[i];
         }
     }
+}
+
+temporal::Time BasicReadOnlyDrivingSceneState::get_time() const
+{
+    return time;
 }
 
 structures::IArray<IReadOnlyDrivingAgentState const*>* BasicReadOnlyDrivingSceneState::get_driving_agent_states() const

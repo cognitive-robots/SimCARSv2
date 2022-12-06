@@ -19,6 +19,7 @@ public:
     ViewDrivingAgentState(IDrivingAgent *agent, temporal::Time time);
 
     std::string get_name() const override;
+    temporal::Time get_time() const override;
 
     bool is_populated() const override;
 
@@ -41,7 +42,6 @@ public:
     IConstant<FP_DATA_TYPE> const* get_angular_velocity_variable() const override;
 
     IDrivingAgent const* get_agent() const;
-    temporal::Time get_time() const;
 
 
     structures::IArray<IValuelessConstant*>* get_mutable_parameter_values() override;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ori/simcars/temporal/typedefs.hpp>
 #include <ori/simcars/agent/valueless_constant_interface.hpp>
 
 namespace ori
@@ -15,6 +16,7 @@ public:
     virtual ~IReadOnlyEntityState() = default;
 
     virtual std::string get_name() const = 0;
+    virtual temporal::Time get_time() const = 0;
 
     virtual bool is_populated() const = 0;
 

@@ -8,8 +8,8 @@ namespace simcars
 namespace agent
 {
 
-BasicGoalDrivingAgentState::BasicGoalDrivingAgentState(std::string const &driving_agent_name, bool delete_dicts) :
-    BasicDrivingAgentState(driving_agent_name, delete_dicts) {}
+BasicGoalDrivingAgentState::BasicGoalDrivingAgentState(std::string const &driving_agent_name, temporal::Time time, bool delete_dicts) :
+    BasicDrivingAgentState(driving_agent_name, time, delete_dicts) {}
 
 BasicGoalDrivingAgentState::BasicGoalDrivingAgentState(IDrivingAgentState *driving_agent_state, bool copy_parameters) :
     BasicDrivingAgentState(driving_agent_state, copy_parameters) {}

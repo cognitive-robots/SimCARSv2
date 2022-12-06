@@ -13,7 +13,7 @@ namespace agent
 class BasicGoalDrivingAgentState : public virtual BasicDrivingAgentState
 {
 public:
-    BasicGoalDrivingAgentState(std::string const &name, bool delete_dicts = true);
+    BasicGoalDrivingAgentState(std::string const &name, temporal::Time time, bool delete_dicts = true);
     BasicGoalDrivingAgentState(IDrivingAgentState *driving_agent_state, bool copy_parameters = true);
 
     virtual IConstant<FP_DATA_TYPE> const* get_aligned_linear_velocity_goal_value_variable() const;

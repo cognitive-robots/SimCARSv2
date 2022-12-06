@@ -13,6 +13,7 @@ namespace agent
 
 class BasicReadOnlyDrivingSceneState : public virtual AReadOnlyDrivingSceneState
 {
+    temporal::Time time;
     bool delete_dicts;
 
     structures::stl::STLDictionary<std::string, IReadOnlyDrivingAgentState const*> driving_agent_state_dict;
@@ -22,6 +23,8 @@ public:
     BasicReadOnlyDrivingSceneState(IReadOnlyDrivingSceneState *driving_scene_state, bool copy_parameters = true);
 
     ~BasicReadOnlyDrivingSceneState();
+
+    temporal::Time get_time() const override;
 
     structures::IArray<IReadOnlyDrivingAgentState const*>* get_driving_agent_states() const override;
     IReadOnlyDrivingAgentState const* get_driving_agent_state(std::string const &driving_agent_name) const override;

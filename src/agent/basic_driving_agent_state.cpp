@@ -19,10 +19,11 @@ void BasicDrivingAgentState::set_parameter_value(IValuelessConstant *parameter_v
     parameter_dict.update(parameter_name, parameter_value);
 }
 
-BasicDrivingAgentState::BasicDrivingAgentState(std::string const &driving_agent_name, bool delete_dicts) : name(driving_agent_name), delete_dicts(delete_dicts) {}
+BasicDrivingAgentState::BasicDrivingAgentState(std::string const &driving_agent_name, temporal::Time time, bool delete_dicts) :
+    name(driving_agent_name), time(time), delete_dicts(delete_dicts) {}
 
 BasicDrivingAgentState::BasicDrivingAgentState(IReadOnlyDrivingAgentState const *driving_agent_state) :
-    name(driving_agent_state->get_name()), delete_dicts(true)
+    name(driving_agent_state->get_name()), time(driving_agent_state->get_time()), delete_dicts(true)
 {
     structures::IArray<IValuelessConstant const*> *parameter_values =
             driving_agent_state->get_parameter_values();
@@ -36,7 +37,7 @@ BasicDrivingAgentState::BasicDrivingAgentState(IReadOnlyDrivingAgentState const 
 }
 
 BasicDrivingAgentState::BasicDrivingAgentState(IDrivingAgentState *driving_agent_state, bool copy_parameters) :
-    name(driving_agent_state->get_name()), delete_dicts(copy_parameters)
+    name(driving_agent_state->get_name()), time(driving_agent_state->get_time()), delete_dicts(copy_parameters)
 {
     structures::IArray<IValuelessConstant*> *parameter_values =
             driving_agent_state->get_mutable_parameter_values();
@@ -75,6 +76,11 @@ BasicDrivingAgentState::~BasicDrivingAgentState()
 std::string BasicDrivingAgentState::get_name() const
 {
     return name;
+}
+
+temporal::Time BasicDrivingAgentState::get_time() const
+{
+    return time;
 }
 
 // Is not the best approach to check if state is populated, relies upon fact
