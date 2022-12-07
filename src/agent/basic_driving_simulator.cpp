@@ -44,6 +44,7 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
     structures::IStackArray<IDrivingAgentState*> *next_driving_agent_states =
             new structures::stl::STLStackArray<IDrivingAgentState*>;
+    bool simulation_flags[current_driving_agent_states->count()];
 
     size_t i, j;
 
@@ -54,7 +55,9 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
         if (next_driving_agent_state != nullptr)
         {
-            if (!next_driving_agent_state->is_populated())
+            bool simulation_flag = !next_driving_agent_state->is_populated();
+
+            if (simulation_flag)
             {
                 IConstant<geometry::Vec> *external_linear_acceleration_variable_value =
                         new BasicConstant<geometry::Vec>(
@@ -67,6 +70,7 @@ void BasicDrivingSimulator::simulate_driving_scene(
                 simulate_driving_agent(current_driving_agent_state, next_driving_agent_state, time_step);
             }
 
+            simulation_flags[next_driving_agent_states->count()] = simulation_flag;
             next_driving_agent_states->push_back(next_driving_agent_state);
         }
 
@@ -100,6 +104,11 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
         for (size_t j = i + 1; j < next_driving_agent_states->count(); ++j)
         {
+            if (!simulation_flags[i] && !simulation_flags[j])
+            {
+                continue;
+            }
+
             IDrivingAgentState *next_driving_agent_state_2 = (*next_driving_agent_states)[j];
             IReadOnlyDrivingAgentState const *current_driving_agent_state_2 =
                     current_state->get_driving_agent_state(next_driving_agent_state_2->get_name());
