@@ -32,10 +32,12 @@ temporal::Time ADrivingAgent::get_last_event_time() const
             latest_event_time = std::max((*events)[i]->get_time(),
                                          latest_event_time);
         }
+        delete events;
         return latest_event_time;
     }
     else
     {
+        delete events;
         throw std::out_of_range("The entity has no variables");
     }
 }
@@ -148,6 +150,20 @@ IVariable<FP_DATA_TYPE> const* ADrivingAgent::get_angular_velocity_variable() co
     return dynamic_cast<IVariable<FP_DATA_TYPE> const*>(angular_velocity_valueless_variable);
 }
 
+IVariable<temporal::Duration> const* ADrivingAgent::get_ttc_variable() const
+{
+    IValuelessVariable const *ttc_valueless_variable =
+            this->get_variable_parameter(this->get_name() + ".ttc.base");
+    return dynamic_cast<IVariable<temporal::Duration> const*>(ttc_valueless_variable);
+}
+
+IVariable<temporal::Duration> const* ADrivingAgent::get_cumilative_collision_time_variable() const
+{
+    IValuelessVariable const *cumilative_collision_time_valueless_variable =
+            this->get_variable_parameter(this->get_name() + ".cumilative_collision_time.base");
+    return dynamic_cast<IVariable<temporal::Duration> const*>(cumilative_collision_time_valueless_variable);
+}
+
 IReadOnlyDrivingAgentState const* ADrivingAgent::get_driving_agent_state(temporal::Time time) const
 {
     return new ViewReadOnlyDrivingAgentState(this, time);
@@ -254,6 +270,20 @@ IVariable<FP_DATA_TYPE>* ADrivingAgent::get_mutable_angular_velocity_variable()
     IValuelessVariable *angular_velocity_valueless_variable =
             this->get_mutable_variable_parameter(this->get_name() + ".angular_velocity.base");
     return dynamic_cast<IVariable<FP_DATA_TYPE>*>(angular_velocity_valueless_variable);
+}
+
+IVariable<temporal::Duration>* ADrivingAgent::get_mutable_ttc_variable()
+{
+    IValuelessVariable *ttc_valueless_variable =
+            this->get_mutable_variable_parameter(this->get_name() + ".ttc.base");
+    return dynamic_cast<IVariable<temporal::Duration>*>(ttc_valueless_variable);
+}
+
+IVariable<temporal::Duration>* ADrivingAgent::get_mutable_cumilative_collision_time_variable()
+{
+    IValuelessVariable *cumilative_collision_time_valueless_variable =
+            this->get_mutable_variable_parameter(this->get_name() + ".cumilative_collision_time.base");
+    return dynamic_cast<IVariable<temporal::Duration>*>(cumilative_collision_time_valueless_variable);
 }
 
 IDrivingAgentState* ADrivingAgent::get_mutable_driving_agent_state(temporal::Time time)

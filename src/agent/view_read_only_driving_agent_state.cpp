@@ -138,6 +138,16 @@ IConstant<FP_DATA_TYPE> const* ViewReadOnlyDrivingAgentState::get_angular_veloci
     return agent->get_angular_velocity_variable()->get_event(time);
 }
 
+IConstant<temporal::Duration> const* ViewReadOnlyDrivingAgentState::get_ttc_variable() const
+{
+    return agent->get_ttc_variable()->get_event(time);
+}
+
+IConstant<temporal::Duration> const* ViewReadOnlyDrivingAgentState::get_cumilative_collision_time_variable() const
+{
+    return agent->get_cumilative_collision_time_variable()->get_event(time);
+}
+
 IDrivingAgent const* ViewReadOnlyDrivingAgentState::get_agent() const
 {
     return agent;

@@ -50,6 +50,8 @@ public:
     void set_rotation_variable(IConstant<FP_DATA_TYPE> *rotation_variable) override;
     void set_steer_variable(IConstant<FP_DATA_TYPE> *steer_variable) override;
     void set_angular_velocity_variable(IConstant<FP_DATA_TYPE> *angular_velocity_variable) override;
+    void set_ttc_variable(IConstant<temporal::Duration> *ttc_variable) override;
+    void set_cumilative_collision_time_variable(IConstant<temporal::Duration> *cumilative_collision_time_variable) override;
 
 
     structures::IArray<IValuelessConstant*>* get_mutable_parameter_values() override;

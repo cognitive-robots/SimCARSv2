@@ -129,6 +129,20 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent *driving_agent,
                                       simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_angular_velocity_variable->get_full_name(), simulated_angular_velocity_variable);
 
+    IVariable<temporal::Duration> *ttc_variable =
+            driving_agent->get_mutable_ttc_variable();
+    SimulatedVariable<temporal::Duration> *simulated_ttc_variable =
+                new SimulatedVariable(ttc_variable, simulation_scene, simulation_start_time,
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
+    this->simulated_variable_dict.update(simulated_ttc_variable->get_full_name(), simulated_ttc_variable);
+
+    IVariable<temporal::Duration> *cumilative_collision_time_variable =
+            driving_agent->get_mutable_cumilative_collision_time_variable();
+    SimulatedVariable<temporal::Duration> *simulated_cumilative_collision_time_variable =
+                new SimulatedVariable(cumilative_collision_time_variable, simulation_scene, simulation_start_time,
+                                      simulation_end_time, start_simulated, simulation_scene->get_time_step());
+    this->simulated_variable_dict.update(simulated_cumilative_collision_time_variable->get_full_name(), simulated_cumilative_collision_time_variable);
+
 
     structures::IArray<IValuelessVariable*> const *variables =
             driving_agent->get_mutable_variable_parameters();

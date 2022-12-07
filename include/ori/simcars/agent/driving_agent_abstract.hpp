@@ -36,6 +36,8 @@ public:
     IVariable<FP_DATA_TYPE> const* get_rotation_variable() const override;
     IVariable<FP_DATA_TYPE> const* get_steer_variable() const override;
     IVariable<FP_DATA_TYPE> const* get_angular_velocity_variable() const override;
+    IVariable<temporal::Duration> const* get_ttc_variable() const override;
+    IVariable<temporal::Duration> const* get_cumilative_collision_time_variable() const override;
 
     IReadOnlyDrivingAgentState const* get_driving_agent_state(temporal::Time time) const override;
 
@@ -58,6 +60,8 @@ public:
     IVariable<FP_DATA_TYPE>* get_mutable_rotation_variable() override;
     IVariable<FP_DATA_TYPE>* get_mutable_steer_variable() override;
     IVariable<FP_DATA_TYPE>* get_mutable_angular_velocity_variable() override;
+    IVariable<temporal::Duration>* get_mutable_ttc_variable() override;
+    IVariable<temporal::Duration>* get_mutable_cumilative_collision_time_variable() override;
 
     IDrivingAgentState* get_mutable_driving_agent_state(temporal::Time time) override;
 };

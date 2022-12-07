@@ -68,6 +68,7 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     IConstant<DrivingAgentClass>* const driving_agent_class_constant = new BasicConstant<DrivingAgentClass>(this->name, "driving_agent_class", class_value);
     this->constant_dict.update(driving_agent_class_constant->get_full_name(), driving_agent_class_constant);
 
+
     rapidjson::Value::ConstArray const &state_data = json_agent_data["states"].GetArray();
     size_t const state_data_size = state_data.Capacity();
 
@@ -97,6 +98,13 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
 
     IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
     this->variable_dict.update(angular_velocity_variable->get_full_name(), angular_velocity_variable);
+
+    IVariable<temporal::Duration>* const ttc_variable = new BasicVariable<temporal::Duration>(this->name, "ttc", IValuelessVariable::Type::BASE, temporal::Duration(40));
+    this->variable_dict.update(ttc_variable->get_full_name(), ttc_variable);
+
+    IVariable<temporal::Duration>* const cumilative_collision_time_variable = new BasicVariable<temporal::Duration>(this->name, "cumilative_collision_time", IValuelessVariable::Type::BASE, temporal::Duration(40));
+    this->variable_dict.update(cumilative_collision_time_variable->get_full_name(), cumilative_collision_time_variable);
+
 
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
@@ -143,6 +151,12 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
 
         FP_DATA_TYPE const steer = angular_velocity / aligned_linear_velocity;
         steer_variable->set_value(timestamp, steer);
+
+        // WARNING: Sets TTC to maximum, could potentially mess with reward and IDM calculations
+        ttc_variable->set_value(timestamp, temporal::Duration::max());
+
+        // WARNING: Assumes no collisions are present in the dataset
+        cumilative_collision_time_variable->set_value(timestamp, temporal::Duration(0));
     }
 
     this->min_spatial_limits = geometry::Vec(min_position_x, min_position_y);

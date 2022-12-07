@@ -27,6 +27,8 @@ public:
     virtual void set_rotation_variable(IConstant<FP_DATA_TYPE> *rotation_variable) = 0;
     virtual void set_steer_variable(IConstant<FP_DATA_TYPE> *steer_variable) = 0;
     virtual void set_angular_velocity_variable(IConstant<FP_DATA_TYPE> *angular_velocity_variable) = 0;
+    virtual void set_ttc_variable(IConstant<temporal::Duration> *ttc_variable) = 0;
+    virtual void set_cumilative_collision_time_variable(IConstant<temporal::Duration> *cumilative_collision_time_variable) = 0;
 };
 
 }

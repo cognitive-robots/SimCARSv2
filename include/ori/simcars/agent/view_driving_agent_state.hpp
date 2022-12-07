@@ -40,6 +40,8 @@ public:
     IConstant<FP_DATA_TYPE> const* get_rotation_variable() const override;
     IConstant<FP_DATA_TYPE> const* get_steer_variable() const override;
     IConstant<FP_DATA_TYPE> const* get_angular_velocity_variable() const override;
+    IConstant<temporal::Duration> const* get_ttc_variable() const override;
+    IConstant<temporal::Duration> const* get_cumilative_collision_time_variable() const override;
 
     IDrivingAgent const* get_agent() const;
 
@@ -61,6 +63,8 @@ public:
     void set_rotation_variable(IConstant<FP_DATA_TYPE> *rotation_variable) override;
     void set_steer_variable(IConstant<FP_DATA_TYPE> *steer_variable) override;
     void set_angular_velocity_variable(IConstant<FP_DATA_TYPE> *angular_velocity_variable) override;
+    void set_ttc_variable(IConstant<temporal::Duration> *ttc_variable) override;
+    void set_cumilative_collision_time_variable(IConstant<temporal::Duration> *cumilative_collision_time_variable) override;
 
     void set_agent(IDrivingAgent *agent);
     void set_time(temporal::Time time);

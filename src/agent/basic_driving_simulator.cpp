@@ -42,44 +42,32 @@ void BasicDrivingSimulator::simulate_driving_scene(
     structures::IArray<IReadOnlyDrivingAgentState const*> *current_driving_agent_states =
             current_state->get_driving_agent_states();
 
-    structures::IArray<IDrivingAgentState*> *next_driving_agent_states =
-            next_state->get_mutable_driving_agent_states();
+    structures::IStackArray<IDrivingAgentState*> *next_driving_agent_states =
+            new structures::stl::STLStackArray<IDrivingAgentState*>;
 
     size_t i, j;
+
     for (i = 0; i < current_driving_agent_states->count(); ++i)
     {
         IReadOnlyDrivingAgentState const *current_driving_agent_state = (*current_driving_agent_states)[i];
+        IDrivingAgentState *next_driving_agent_state = next_state->get_mutable_driving_agent_state(current_driving_agent_state->get_name());
 
-        for (j = 0; j < next_driving_agent_states->count(); ++j)
+        if (next_driving_agent_state != nullptr)
         {
-            IDrivingAgentState *next_driving_agent_state = (*next_driving_agent_states)[j];
-
-            if (current_driving_agent_state->get_name() == next_driving_agent_state->get_name())
+            if (!next_driving_agent_state->is_populated())
             {
-                bool result;
-                if (next_driving_agent_state->get_name().find("non_ego") == std::string::npos)
-                {
-                    result = next_driving_agent_state->is_populated();
-                }
-
-                if (next_driving_agent_state->is_populated())
-                {
-                    break;
-                }
-
                 IConstant<geometry::Vec> *external_linear_acceleration_variable_value =
-                            new BasicConstant<geometry::Vec>(
-                                next_driving_agent_state->get_name(),
-                                "linear_acceleration.external",
-                                geometry::Vec::Zero());
+                        new BasicConstant<geometry::Vec>(
+                            next_driving_agent_state->get_name(),
+                            "linear_acceleration.external",
+                            geometry::Vec::Zero());
                 next_driving_agent_state->set_external_linear_acceleration_variable(external_linear_acceleration_variable_value);
 
                 controller->modify_driving_agent_state(current_driving_agent_state, next_driving_agent_state);
                 simulate_driving_agent(current_driving_agent_state, next_driving_agent_state, time_step);
-
-                break;
             }
 
+            next_driving_agent_states->push_back(next_driving_agent_state);
         }
 
         delete current_driving_agent_state;
@@ -87,11 +75,20 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
     delete current_driving_agent_states;
 
+    structures::IArray<temporal::Duration> *next_cumilative_collision_times =
+            new structures::stl::STLStackArray<temporal::Duration>(next_driving_agent_states->count());
+    for (i = 0; i < next_driving_agent_states->count(); ++i)
+    {
+        (*next_cumilative_collision_times)[i] = temporal::Duration(0);
+    }
+
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
     for (i = 0; i < next_driving_agent_states->count(); ++i)
     {
         IDrivingAgentState *next_driving_agent_state_1 = (*next_driving_agent_states)[i];
+        IReadOnlyDrivingAgentState const *current_driving_agent_state_1 =
+                current_state->get_driving_agent_state(next_driving_agent_state_1->get_name());
 
         geometry::Vec position_1 = next_driving_agent_state_1->get_position_variable()->get_value();
         geometry::Vec velocity_1 = next_driving_agent_state_1->get_linear_velocity_variable()->get_value();
@@ -104,6 +101,8 @@ void BasicDrivingSimulator::simulate_driving_scene(
         for (size_t j = i + 1; j < next_driving_agent_states->count(); ++j)
         {
             IDrivingAgentState *next_driving_agent_state_2 = (*next_driving_agent_states)[j];
+            IReadOnlyDrivingAgentState const *current_driving_agent_state_2 =
+                    current_state->get_driving_agent_state(next_driving_agent_state_2->get_name());
 
             geometry::Vec position_2 = next_driving_agent_state_2->get_position_variable()->get_value();
             geometry::Vec velocity_2 = next_driving_agent_state_2->get_linear_velocity_variable()->get_value();
@@ -113,12 +112,10 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
             geometry::ORect bounding_box_2(position_2, length_2, width_2, rotation_2);
 
+            bool collision_occured = false;
             if (bounding_box_1.check_collision(bounding_box_2))
             {
-                IReadOnlyDrivingAgentState const *current_driving_agent_state_1 =
-                        current_state->get_driving_agent_state(next_driving_agent_state_1->get_name());
-                IReadOnlyDrivingAgentState const *current_driving_agent_state_2 =
-                        current_state->get_driving_agent_state(next_driving_agent_state_2->get_name());
+                collision_occured = true;
 
                 geometry::Vec direction = (position_2 - position_1).normalized();
 
@@ -181,66 +178,86 @@ void BasicDrivingSimulator::simulate_driving_scene(
                 geometry::Vec external_acceleration_1 = new_acceleration_1 - revised_acceleration_1;
                 geometry::Vec external_acceleration_2 = new_acceleration_2 - revised_acceleration_2;
 
-                IConstant<geometry::Vec> *external_linear_acceleration_variable_1(
+                IConstant<geometry::Vec> *external_linear_acceleration_variable_value_1(
                             new BasicConstant<geometry::Vec>(
                                 view_driving_agent_state_1->get_name(),
                                 "linear_acceleration.external",
                                 external_acceleration_1));
-                view_driving_agent_state_1->set_external_linear_acceleration_variable(external_linear_acceleration_variable_1);
+                view_driving_agent_state_1->set_external_linear_acceleration_variable(external_linear_acceleration_variable_value_1);
                 simulate_driving_agent(current_driving_agent_state_1, view_driving_agent_state_1, time_step);
 
-                IConstant<geometry::Vec> *external_linear_acceleration_variable_2(
+                IConstant<geometry::Vec> *external_linear_acceleration_variable_value_2(
                             new BasicConstant<geometry::Vec>(
                                 next_driving_agent_state_2->get_name(),
                                 "linear_acceleration.external",
                                 external_acceleration_2));
-                next_driving_agent_state_2->set_external_linear_acceleration_variable(external_linear_acceleration_variable_2);
+                next_driving_agent_state_2->set_external_linear_acceleration_variable(external_linear_acceleration_variable_value_2);
                 simulate_driving_agent(current_driving_agent_state_2, next_driving_agent_state_2, time_step);
             }
-        }
 
-        IValuelessConstant *ttc_valueless_variable_value =
-                next_driving_agent_state_1->get_mutable_parameter_value(
-                    next_driving_agent_state_1->get_name() + ".ttc.base");
-        if (ttc_valueless_variable_value != nullptr)
-        {
-            IConstant<temporal::Duration> *ttc_variable_value =
-                    dynamic_cast<IConstant<temporal::Duration>*>(
-                        ttc_valueless_variable_value);
-            temporal::Duration smallest_ttc = temporal::Duration::max();
-            for (size_t j = 0; j < next_driving_agent_states->count(); ++j)
+
+            if (collision_occured)
             {
-                IDrivingAgentState *next_driving_agent_state_2 = (*next_driving_agent_states)[j];
-
-                geometry::Vec position_2 = next_driving_agent_state_2->get_position_variable()->get_value();
-                geometry::Vec velocity_2 = next_driving_agent_state_2->get_linear_velocity_variable()->get_value();
-                FP_DATA_TYPE length_2 = next_driving_agent_state_2->get_bb_length_constant()->get_value();
-                FP_DATA_TYPE width_2 = next_driving_agent_state_2->get_bb_width_constant()->get_value();
-                FP_DATA_TYPE rotation_2 = next_driving_agent_state_2->get_rotation_variable()->get_value();
-
-                geometry::ORect bounding_box_2(position_2, length_2, width_2, rotation_2);
-
-                geometry::Vec position_diff = position_2 - position_1;
-                FP_DATA_TYPE position_diff_norm = position_diff.norm();
-                geometry::Vec velocity_diff = velocity_1 - velocity_2;
-                FP_DATA_TYPE velocity_diff_norm = velocity_diff.norm();
-                FP_DATA_TYPE combined_span =
-                        0.5f * (bounding_box_1.get_span() + bounding_box_2.get_span());
-                FP_DATA_TYPE dot_product_limit =
-                        1.0f / std::sqrt(std::pow(combined_span / position_diff_norm, 2.0f) + 1.0f);
-                FP_DATA_TYPE dot_product =
-                        position_diff.dot(velocity_diff) /
-                        (position_diff_norm * velocity_diff_norm);
-
-                if (dot_product <= dot_product_limit)
-                {
-                    temporal::Duration ttc(int64_t(position_diff_norm / (velocity_diff_norm * dot_product)));
-                    smallest_ttc = std::min(ttc, smallest_ttc);
-                }
+                (*next_cumilative_collision_times)[i] += time_step;
+                (*next_cumilative_collision_times)[j] += time_step;
             }
-            ttc_variable_value->set_value(smallest_ttc);
+
+            delete current_driving_agent_state_2;
         }
+
+
+        IConstant<temporal::Duration> *cumilative_collision_time_variable_value =
+                new BasicConstant<temporal::Duration>(
+                    next_driving_agent_state_1->get_name(),
+                    "cumilative_collision_time.base",
+                    (*next_cumilative_collision_times)[i] +
+                    current_driving_agent_state_1->get_cumilative_collision_time_variable()->get_value());
+        next_driving_agent_state_1->set_cumilative_collision_time_variable(cumilative_collision_time_variable_value);
+
+
+        temporal::Duration smallest_ttc = temporal::Duration::max();
+        for (size_t j = 0; j < next_driving_agent_states->count(); ++j)
+        {
+            IDrivingAgentState *next_driving_agent_state_2 = (*next_driving_agent_states)[j];
+
+            geometry::Vec position_2 = next_driving_agent_state_2->get_position_variable()->get_value();
+            geometry::Vec velocity_2 = next_driving_agent_state_2->get_linear_velocity_variable()->get_value();
+            FP_DATA_TYPE length_2 = next_driving_agent_state_2->get_bb_length_constant()->get_value();
+            FP_DATA_TYPE width_2 = next_driving_agent_state_2->get_bb_width_constant()->get_value();
+            FP_DATA_TYPE rotation_2 = next_driving_agent_state_2->get_rotation_variable()->get_value();
+
+            geometry::ORect bounding_box_2(position_2, length_2, width_2, rotation_2);
+
+            geometry::Vec position_diff = position_2 - position_1;
+            FP_DATA_TYPE position_diff_norm = position_diff.norm();
+            geometry::Vec velocity_diff = velocity_1 - velocity_2;
+            FP_DATA_TYPE velocity_diff_norm = velocity_diff.norm();
+            FP_DATA_TYPE combined_span =
+                    0.5f * (bounding_box_1.get_span() + bounding_box_2.get_span());
+            FP_DATA_TYPE dot_product_limit =
+                    1.0f / std::sqrt(std::pow(combined_span / position_diff_norm, 2.0f) + 1.0f);
+            FP_DATA_TYPE dot_product =
+                    position_diff.dot(velocity_diff) /
+                    (position_diff_norm * velocity_diff_norm);
+
+            if (dot_product <= dot_product_limit)
+            {
+                temporal::Duration ttc(int64_t(position_diff_norm / (velocity_diff_norm * dot_product)));
+                smallest_ttc = std::min(ttc, smallest_ttc);
+            }
+        }
+        IConstant<temporal::Duration> *ttc_variable_value =
+                new BasicConstant<temporal::Duration>(
+                    next_driving_agent_state_1->get_name(),
+                    "ttc.base",
+                    smallest_ttc);
+        next_driving_agent_state_1->set_ttc_variable(ttc_variable_value);
+
+
+        delete current_driving_agent_state_1;
     }
+
+    delete next_cumilative_collision_times;
 
     for (size_t i = 0; i < next_driving_agent_states->count(); ++i)
     {

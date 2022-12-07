@@ -152,6 +152,16 @@ IConstant<FP_DATA_TYPE> const* ViewDrivingAgentState::get_angular_velocity_varia
     return agent->get_angular_velocity_variable()->get_event(time);
 }
 
+IConstant<temporal::Duration> const* ViewDrivingAgentState::get_ttc_variable() const
+{
+    return agent->get_ttc_variable()->get_event(time);
+}
+
+IConstant<temporal::Duration> const* ViewDrivingAgentState::get_cumilative_collision_time_variable() const
+{
+    return agent->get_cumilative_collision_time_variable()->get_event(time);
+}
+
 IDrivingAgent const* ViewDrivingAgentState::get_agent() const
 {
     return agent;
@@ -288,6 +298,18 @@ void ViewDrivingAgentState::set_angular_velocity_variable(IConstant<FP_DATA_TYPE
 {
     agent->get_mutable_angular_velocity_variable()->set_value(time, angular_velocity_variable->get_value());
     delete angular_velocity_variable;
+}
+
+void ViewDrivingAgentState::set_ttc_variable(IConstant<temporal::Duration> *ttc_variable)
+{
+    agent->get_mutable_ttc_variable()->set_value(time, ttc_variable->get_value());
+    delete ttc_variable;
+}
+
+void ViewDrivingAgentState::set_cumilative_collision_time_variable(IConstant<temporal::Duration> *cumilative_collision_time_variable)
+{
+    agent->get_mutable_cumilative_collision_time_variable()->set_value(time, cumilative_collision_time_variable->get_value());
+    delete cumilative_collision_time_variable;
 }
 
 void ViewDrivingAgentState::set_agent(IDrivingAgent *agent)

@@ -35,6 +35,8 @@ public:
     virtual IVariable<FP_DATA_TYPE> const* get_rotation_variable() const = 0;
     virtual IVariable<FP_DATA_TYPE> const* get_steer_variable() const = 0;
     virtual IVariable<FP_DATA_TYPE> const* get_angular_velocity_variable() const = 0;
+    virtual IVariable<temporal::Duration> const* get_ttc_variable() const = 0;
+    virtual IVariable<temporal::Duration> const* get_cumilative_collision_time_variable() const = 0;
 
     virtual IReadOnlyDrivingAgentState const* get_driving_agent_state(temporal::Time time) const = 0;
 
@@ -54,6 +56,8 @@ public:
     virtual IVariable<FP_DATA_TYPE>* get_mutable_rotation_variable() = 0;
     virtual IVariable<FP_DATA_TYPE>* get_mutable_steer_variable() = 0;
     virtual IVariable<FP_DATA_TYPE>* get_mutable_angular_velocity_variable() = 0;
+    virtual IVariable<temporal::Duration>* get_mutable_ttc_variable() = 0;
+    virtual IVariable<temporal::Duration>* get_mutable_cumilative_collision_time_variable() = 0;
 
     virtual IDrivingAgentState* get_mutable_driving_agent_state(temporal::Time time) = 0;
 };

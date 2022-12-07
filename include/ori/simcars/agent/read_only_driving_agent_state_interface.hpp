@@ -29,6 +29,8 @@ public:
     virtual IConstant<FP_DATA_TYPE> const* get_rotation_variable() const = 0;
     virtual IConstant<FP_DATA_TYPE> const* get_steer_variable() const = 0;
     virtual IConstant<FP_DATA_TYPE> const* get_angular_velocity_variable() const = 0;
+    virtual IConstant<temporal::Duration> const* get_ttc_variable() const = 0;
+    virtual IConstant<temporal::Duration> const* get_cumilative_collision_time_variable() const = 0;
 };
 
 }

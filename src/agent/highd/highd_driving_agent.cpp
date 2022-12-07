@@ -101,6 +101,12 @@ HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Doc
     IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, temporal::Duration(40));
     this->variable_dict.update(angular_velocity_variable->get_full_name(), angular_velocity_variable);
 
+    IVariable<temporal::Duration>* const ttc_variable = new BasicVariable<temporal::Duration>(this->name, "ttc", IValuelessVariable::Type::BASE, temporal::Duration(40));
+    this->variable_dict.update(ttc_variable->get_full_name(), ttc_variable);
+
+    IVariable<temporal::Duration>* const cumilative_collision_time_variable = new BasicVariable<temporal::Duration>(this->name, "cumilative_collision_time", IValuelessVariable::Type::BASE, temporal::Duration(40));
+    this->variable_dict.update(cumilative_collision_time_variable->get_full_name(), cumilative_collision_time_variable);
+
 
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
@@ -175,6 +181,21 @@ HighDDrivingAgent::HighDDrivingAgent(size_t tracks_meta_row, const rapidcsv::Doc
 
         FP_DATA_TYPE const steer = angular_velocity / aligned_linear_velocity;
         steer_variable->set_value(timestamp, steer);
+
+        FP_DATA_TYPE const ttc_raw = tracks_csv_document.GetCell<FP_DATA_TYPE>("ttc", i);
+        temporal::Duration ttc;
+        if (ttc_raw > 0.0f)
+        {
+            ttc = temporal::Duration(int64_t(ttc_raw * 1e+3f));
+        }
+        else
+        {
+            ttc = temporal::Duration::max();
+        }
+        ttc_variable->set_value(timestamp, ttc);
+
+        // WARNING: Assumes no collisions are present in the dataset
+        cumilative_collision_time_variable->set_value(timestamp, temporal::Duration(0));
     }
 
     this->min_spatial_limits = geometry::Vec(min_position_x, min_position_y);

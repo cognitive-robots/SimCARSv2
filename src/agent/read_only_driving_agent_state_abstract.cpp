@@ -106,6 +106,20 @@ IConstant<FP_DATA_TYPE> const* AReadOnlyDrivingAgentState::get_angular_velocity_
     return dynamic_cast<IConstant<FP_DATA_TYPE> const*>(angular_velocity_valueless_variable);
 }
 
+IConstant<temporal::Duration> const* AReadOnlyDrivingAgentState::get_ttc_variable() const
+{
+    IValuelessConstant const *ttc_valueless_variable =
+            this->get_parameter_value(this->get_name() + ".ttc.base");
+    return dynamic_cast<IConstant<temporal::Duration> const*>(ttc_valueless_variable);
+}
+
+IConstant<temporal::Duration> const* AReadOnlyDrivingAgentState::get_cumilative_collision_time_variable() const
+{
+    IValuelessConstant const *cumilative_collision_time_valueless_variable =
+            this->get_parameter_value(this->get_name() + ".cumilative_collision_time.base");
+    return dynamic_cast<IConstant<temporal::Duration> const*>(cumilative_collision_time_valueless_variable);
+}
+
 }
 }
 }
