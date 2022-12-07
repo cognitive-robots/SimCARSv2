@@ -182,6 +182,7 @@ add_library(simcars_agent STATIC
   src/agent/driving_scene_abstract.cpp
   src/agent/read_only_driving_scene_state_abstract.cpp
   src/agent/driving_scene_state_abstract.cpp
+  src/agent/driving_agent_reward_calculator_abstract.cpp
   src/agent/basic_driving_agent_state.cpp
   src/agent/view_read_only_driving_agent_state.cpp
   src/agent/view_driving_agent_state.cpp
@@ -189,6 +190,7 @@ add_library(simcars_agent STATIC
   src/agent/basic_driving_scene_state.cpp
   src/agent/view_driving_scene_state.cpp
   src/agent/basic_goal_driving_agent_state.cpp
+  src/agent/safe_speedy_driving_agent_reward_calculator.cpp
   src/agent/basic_driving_simulator.cpp
   src/agent/driving_simulation_agent.cpp
   src/agent/driving_simulation_scene.cpp
@@ -222,9 +224,11 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/file_based_scene_interface.hpp
   include/ori/simcars/agent/two_file_based_scene_interface.hpp
   include/ori/simcars/agent/controller_interface.hpp
+  include/ori/simcars/agent/reward_calculator_interface.hpp
   include/ori/simcars/agent/simulator_interface.hpp
   include/ori/simcars/agent/simulation_scene_interface.hpp
   include/ori/simcars/agent/driving_agent_controller_interface.hpp
+  include/ori/simcars/agent/driving_agent_reward_calculator_interface.hpp
   include/ori/simcars/agent/driving_simulator_interface.hpp
   include/ori/simcars/agent/valueless_constant_abstract.hpp
   include/ori/simcars/agent/valueless_variable_abstract.hpp
@@ -239,6 +243,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/driving_scene_state_abstract.hpp
   include/ori/simcars/agent/file_based_scene_abstract.hpp
   include/ori/simcars/agent/two_file_based_scene_abstract.hpp
+  include/ori/simcars/agent/driving_agent_reward_calculator_abstract.hpp
   include/ori/simcars/agent/basic_constant.hpp
   include/ori/simcars/agent/basic_event.hpp
   include/ori/simcars/agent/basic_variable.hpp
@@ -256,6 +261,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/driving_simulation_agent.hpp
   include/ori/simcars/agent/driving_simulation_scene.hpp
   include/ori/simcars/agent/basic_driving_agent_controller.hpp
+  include/ori/simcars/agent/safe_speedy_driving_agent_reward_calculator.hpp
   include/ori/simcars/agent/lyft/lyft_driving_agent.hpp
   include/ori/simcars/agent/lyft/lyft_scene.hpp
   include/ori/simcars/agent/highd/highd_driving_agent.hpp
