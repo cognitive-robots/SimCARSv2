@@ -102,7 +102,7 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
         geometry::ORect bounding_box_1(position_1, length_1, width_1, rotation_1);
 
-        for (size_t j = i + 1; j < next_driving_agent_states->count(); ++j)
+        for (j = i + 1; j < next_driving_agent_states->count(); ++j)
         {
             if (!simulation_flags[i] && !simulation_flags[j])
             {
@@ -225,7 +225,7 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
 
         temporal::Duration smallest_ttc = temporal::Duration::max();
-        for (size_t j = 0; j < next_driving_agent_states->count(); ++j)
+        for (j = 0; j < next_driving_agent_states->count(); ++j)
         {
             IDrivingAgentState *next_driving_agent_state_2 = (*next_driving_agent_states)[j];
 
@@ -243,13 +243,14 @@ void BasicDrivingSimulator::simulate_driving_scene(
             FP_DATA_TYPE velocity_diff_norm = velocity_diff.norm();
             FP_DATA_TYPE combined_span =
                     0.5f * (bounding_box_1.get_span() + bounding_box_2.get_span());
+
             FP_DATA_TYPE dot_product_limit =
                     1.0f / std::sqrt(std::pow(combined_span / position_diff_norm, 2.0f) + 1.0f);
             FP_DATA_TYPE dot_product =
                     position_diff.dot(velocity_diff) /
                     (position_diff_norm * velocity_diff_norm);
 
-            if (dot_product <= dot_product_limit)
+            if (dot_product >= dot_product_limit)
             {
                 temporal::Duration ttc(int64_t(position_diff_norm / (velocity_diff_norm * dot_product)));
                 smallest_ttc = std::min(ttc, smallest_ttc);

@@ -4,6 +4,7 @@
 #include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/agent/scene_interface.hpp>
+#include <ori/simcars/agent/safe_speedy_driving_agent_reward_calculator.hpp>
 #include <ori/simcars/visualisation/qsfml_canvas_abstract.hpp>
 
 #include <mutex>
@@ -30,6 +31,7 @@ private:
     sf::Font text_font;
 
     agent::IScene const *scene;
+    agent::SafeSpeedyDrivingAgentRewardCalculator reward_calculator;
 
     FP_DATA_TYPE realtime_factor;
     FP_DATA_TYPE pixels_per_metre;

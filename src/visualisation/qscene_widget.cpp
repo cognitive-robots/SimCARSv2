@@ -1,10 +1,12 @@
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/agent/variable_interface.hpp>
+#include <ori/simcars/agent/view_read_only_driving_agent_state.hpp>
 #include <ori/simcars/visualisation/utils.hpp>
 #include <ori/simcars/visualisation/qscene_widget.hpp>
 
 #include <iostream>
+#include <algorithm>
 
 namespace ori
 {
@@ -128,6 +130,8 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
             dynamic_cast<agent::IVariable<FP_DATA_TYPE> const*>(rotation_valueless_variable);
 
     temporal::Time current_time = this->get_time();
+    agent::ViewReadOnlyDrivingAgentState state(
+                dynamic_cast<agent::IDrivingAgent const*>(vehicle), current_time);
 
     sf::RectangleShape *rectangle = nullptr;
     sf::CircleShape *circle = nullptr;
@@ -150,6 +154,7 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
     FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
     FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
     FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
+    FP_DATA_TYPE reward = reward_calculator.calculate_reward(&state);
     rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
     sf::Vector2f agent_rectangle_position = agent_base_shape_position
             - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation)
@@ -157,7 +162,11 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
     rectangle->setPosition(agent_rectangle_position);
     rectangle->setRotation(-180.0f * rotation / M_PI);
     rectangle->setFillColor(to_sfml_colour(driving_agent_class_constant->get_value()));
-    rectangle->setOutlineThickness(agent_rectangle_min_side * 0.1f);
+    rectangle->setOutlineThickness(agent_rectangle_min_side * 0.2f);
+    rectangle->setOutlineColor(sf::Color(
+                                   uint8_t(std::min(255.0f * 2.0f * (1.0f - reward), 255.0f)),
+                                   uint8_t(std::min(255.0f * 2.0f * reward, 255.0f)),
+                                   0));
 
     FP_DATA_TYPE agent_circle_radius = 0.25f * agent_rectangle_min_side;
     circle = new sf::CircleShape(agent_circle_radius);
