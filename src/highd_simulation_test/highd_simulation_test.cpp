@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
 
-    std::cout << "Finished map load (" << time_elapsed.count() << " us)" << std::endl;
+    std::cout << "Finished map load (" << time_elapsed.count() << " μs)" << std::endl;
 
     std::cout << "Beginning scene load" << std::endl;
 
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
 
-    std::cout << "Finished scene load (" << time_elapsed.count() << " us)" << std::endl;
+    std::cout << "Finished scene load (" << time_elapsed.count() << " μs)" << std::endl;
 
     delete agent_names;
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
 
-    std::cout << "Finished action extraction (" << time_elapsed.count() << " us)" << std::endl;
+    std::cout << "Finished action extraction (" << time_elapsed.count() << " μs)" << std::endl;
 
     temporal::Time simulation_start_time = scene->get_min_temporal_limit() +
             temporal::Duration(1000);
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     temporal::Duration simulation_time_covered = scene->get_max_temporal_limit() - simulation_start_time;
     float real_time_factor = float(duration_cast<microseconds>(simulation_time_covered).count()) / float(time_elapsed.count());
 
-    std::cout << "Finished simulation (" << time_elapsed.count() << " us, rtf = " << real_time_factor << ")" << std::endl;
+    std::cout << "Finished simulation (" << time_elapsed.count() << " μs, rtf = " << real_time_factor << ")" << std::endl;
 
     delete simulated_scene;
     delete scene_with_actions;
