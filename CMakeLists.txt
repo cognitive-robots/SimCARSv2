@@ -284,6 +284,7 @@ PUBLIC
   simcars_map
   magic_enum::magic_enum
   rapidcsv
+  idm
 PRIVATE
   lz4_stream
 )
