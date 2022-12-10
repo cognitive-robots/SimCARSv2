@@ -18,7 +18,9 @@ find_package(SFML REQUIRED COMPONENTS graphics)
 add_subdirectory(extern/intelligent-driver-model)
 add_subdirectory(extern/magic_enum)
 add_subdirectory(extern/lz4_stream)
-add_subdirectory(extern/rapidcsv)
+if (NOT TARGET rapidcsv)
+    add_subdirectory(extern/rapidcsv)
+endif()
 
 add_library(simcars_utils STATIC
   src/utils/sanity_check.cpp
