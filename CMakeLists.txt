@@ -15,6 +15,7 @@ find_package(RapidJSON REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(SFML REQUIRED COMPONENTS graphics)
 
+add_subdirectory(extern/intelligent-driver-model)
 add_subdirectory(extern/magic_enum)
 add_subdirectory(extern/lz4_stream)
 add_subdirectory(extern/rapidcsv)

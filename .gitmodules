@@ -7,3 +7,6 @@
 [submodule "extern/rapidcsv"]
 	path = extern/rapidcsv
 	url = https://github.com/d99kris/rapidcsv.git
+[submodule "extern/intelligent-driver-model"]
+	path = extern/intelligent-driver-model
+	url = git@github.com:cognitive-robots/intelligent-driver-model.git
