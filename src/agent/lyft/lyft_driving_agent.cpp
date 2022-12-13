@@ -19,7 +19,8 @@ namespace lyft
 
 LyftDrivingAgent::LyftDrivingAgent() {}
 
-LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_agent_data)
+LyftDrivingAgent::LyftDrivingAgent(IDrivingScene const *driving_scene, rapidjson::Value::ConstObject const &json_agent_data)
+    : driving_scene(driving_scene)
 {
     this->min_temporal_limit = temporal::Time::max();
     this->max_temporal_limit = temporal::Time::min();
@@ -72,37 +73,37 @@ LyftDrivingAgent::LyftDrivingAgent(rapidjson::Value::ConstObject const &json_age
     rapidjson::Value::ConstArray const &state_data = json_agent_data["states"].GetArray();
     size_t const state_data_size = state_data.Capacity();
 
-    IVariable<geometry::Vec>* const position_variable = new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<geometry::Vec>* const position_variable = new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(position_variable->get_full_name(), position_variable);
 
-    IVariable<geometry::Vec>* const linear_velocity_variable = new BasicVariable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<geometry::Vec>* const linear_velocity_variable = new BasicVariable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(linear_velocity_variable->get_full_name(), linear_velocity_variable);
 
-    IVariable<FP_DATA_TYPE>* const aligned_linear_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const aligned_linear_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity_variable);
 
-    IVariable<geometry::Vec>* const linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<geometry::Vec>* const linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(linear_acceleration_variable->get_full_name(), linear_acceleration_variable);
 
-    IVariable<FP_DATA_TYPE>* const aligned_linear_acceleration_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const aligned_linear_acceleration_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION, this->get_scene()->get_time_step());
     this->variable_dict.update(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration_variable);
 
-    IVariable<geometry::Vec>* const external_linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::EXTERNAL, temporal::Duration(100));
+    IVariable<geometry::Vec>* const external_linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::EXTERNAL, this->get_scene()->get_time_step());
     this->variable_dict.update(external_linear_acceleration_variable->get_full_name(), external_linear_acceleration_variable);
 
-    IVariable<FP_DATA_TYPE>* const rotation_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const rotation_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(rotation_variable->get_full_name(), rotation_variable);
 
-    IVariable<FP_DATA_TYPE>* const steer_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const steer_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION, this->get_scene()->get_time_step());
     this->variable_dict.update(steer_variable->get_full_name(), steer_variable);
 
-    IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(angular_velocity_variable->get_full_name(), angular_velocity_variable);
 
-    IVariable<temporal::Duration>* const ttc_variable = new BasicVariable<temporal::Duration>(this->name, "ttc", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<temporal::Duration>* const ttc_variable = new BasicVariable<temporal::Duration>(this->name, "ttc", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(ttc_variable->get_full_name(), ttc_variable);
 
-    IVariable<temporal::Duration>* const cumilative_collision_time_variable = new BasicVariable<temporal::Duration>(this->name, "cumilative_collision_time", IValuelessVariable::Type::BASE, temporal::Duration(100));
+    IVariable<temporal::Duration>* const cumilative_collision_time_variable = new BasicVariable<temporal::Duration>(this->name, "cumilative_collision_time", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
     this->variable_dict.update(cumilative_collision_time_variable->get_full_name(), cumilative_collision_time_variable);
 
 
@@ -185,6 +186,11 @@ LyftDrivingAgent::~LyftDrivingAgent()
 std::string LyftDrivingAgent::get_name() const
 {
     return this->name;
+}
+
+IDrivingScene const* LyftDrivingAgent::get_driving_scene() const
+{
+    return this->driving_scene;
 }
 
 geometry::Vec LyftDrivingAgent::get_min_spatial_limits() const

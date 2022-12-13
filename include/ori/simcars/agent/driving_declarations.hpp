@@ -7,11 +7,11 @@ namespace simcars
 namespace agent
 {
 
-class IEntity;
+class IDrivingAgent;
 
-class IScene;
+class IDrivingScene;
 
-class ISimulationScene;
+class IDrivingSimulationScene;
 
 }
 }

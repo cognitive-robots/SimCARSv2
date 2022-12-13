@@ -27,6 +27,7 @@ HighDScene* HighDScene::construct_from(IDrivingScene *driving_scene)
 
     new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
     new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
+    new_driving_scene->time_step = driving_scene->get_time_step();
     new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
     new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
@@ -54,6 +55,8 @@ void HighDScene::load_virt(std::ifstream &input_filestream_1, std::ifstream &inp
     rapidcsv::Document tracks_meta_csv_document(input_filestream_1);
     rapidcsv::Document tracks_csv_document(input_filestream_2);
 
+    this->time_step = temporal::Duration(40);
+
     this->min_temporal_limit = temporal::Time::max();
     this->max_temporal_limit = temporal::Time::min();
 
@@ -74,7 +77,9 @@ void HighDScene::load_virt(std::ifstream &input_filestream_1, std::ifstream &inp
             continue;
         }
 
-        HighDDrivingAgent *driving_agent = new HighDDrivingAgent(i, tracks_meta_csv_document, tracks_csv_document);
+        HighDDrivingAgent *driving_agent =
+                new HighDDrivingAgent(this, i, tracks_meta_csv_document,
+                                      tracks_csv_document);
 
         driving_agent_dict.update(driving_agent->get_name(), driving_agent);
 
@@ -102,6 +107,11 @@ geometry::Vec HighDScene::get_min_spatial_limits() const
 geometry::Vec HighDScene::get_max_spatial_limits() const
 {
     return this->max_spatial_limits;
+}
+
+temporal::Duration HighDScene::get_time_step() const
+{
+    return this->time_step;
 }
 
 temporal::Time HighDScene::get_min_temporal_limit() const

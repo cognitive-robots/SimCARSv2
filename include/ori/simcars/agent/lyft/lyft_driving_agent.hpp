@@ -24,10 +24,13 @@ class LyftDrivingAgent : public virtual ADrivingAgent
     structures::stl::STLDictionary<std::string, IValuelessConstant*> constant_dict;
     structures::stl::STLDictionary<std::string, IValuelessVariable*> variable_dict;
 
+    IDrivingScene const *driving_scene;
+
+protected:
     LyftDrivingAgent();
 
 public:
-    LyftDrivingAgent(rapidjson::Value::ConstObject const &json_agent_data);
+    LyftDrivingAgent(IDrivingScene const *driving_scene, rapidjson::Value::ConstObject const &json_agent_data);
 
     ~LyftDrivingAgent();
 
@@ -48,6 +51,8 @@ public:
     structures::IArray<IValuelessEvent const*>* get_events() const override;
 
     IDrivingAgent* driving_agent_deep_copy() const override;
+
+    IDrivingScene const* get_driving_scene() const override;
 
 
     structures::IArray<IValuelessConstant*>* get_mutable_constant_parameters() override;

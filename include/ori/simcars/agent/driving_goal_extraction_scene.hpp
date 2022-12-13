@@ -16,9 +16,12 @@ template <typename T_map_id>
 class DrivingGoalExtractionScene : public virtual ADrivingScene
 {
     geometry::Vec min_spatial_limits, max_spatial_limits;
+    temporal::Duration time_step;
     temporal::Time min_temporal_limit, max_temporal_limit;
 
     structures::stl::STLDictionary<std::string, IDrivingAgent*> driving_agent_dict;
+
+    IScene const *driving_scene;
 
     map::IMap<T_map_id> const *map;
 
@@ -42,6 +45,7 @@ public:
 
         new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
         new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
+        new_driving_scene->time_step = driving_scene->get_time_step();
         new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
         new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
@@ -50,7 +54,9 @@ public:
 
         for(size_t i = 0; i < driving_agents->count(); ++i)
         {
-            IDrivingAgent *driving_goal_extraction_agent = new DrivingGoalExtractionAgent<T_map_id>((*driving_agents)[i]);
+            IDrivingAgent *driving_goal_extraction_agent =
+                    new DrivingGoalExtractionAgent<T_map_id>(
+                        (*driving_agents)[i], new_driving_scene);
 
             new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(), driving_goal_extraction_agent);
         }
@@ -66,6 +72,7 @@ public:
 
         new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
         new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
+        new_driving_scene->time_step = driving_scene->get_time_step();
         new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
         new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
@@ -76,7 +83,9 @@ public:
 
         for(size_t i = 0; i < driving_agents->count(); ++i)
         {
-            IDrivingAgent *driving_goal_extraction_agent = new DrivingGoalExtractionAgent<T_map_id>((*driving_agents)[i], map);
+            IDrivingAgent *driving_goal_extraction_agent =
+                    new DrivingGoalExtractionAgent<T_map_id>(
+                        (*driving_agents)[i], new_driving_scene, map);
 
             new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(), driving_goal_extraction_agent);
         }
@@ -93,6 +102,11 @@ public:
     geometry::Vec get_max_spatial_limits() const override
     {
         return max_spatial_limits;
+    }
+
+    temporal::Duration get_time_step() const override
+    {
+        return time_step;
     }
 
     temporal::Time get_min_temporal_limit() const override

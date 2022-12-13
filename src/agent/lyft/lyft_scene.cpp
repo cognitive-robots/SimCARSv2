@@ -31,6 +31,7 @@ LyftScene* LyftScene::construct_from(IDrivingScene *driving_scene)
 
     new_driving_scene->min_spatial_limits = driving_scene->get_min_spatial_limits();
     new_driving_scene->max_spatial_limits = driving_scene->get_max_spatial_limits();
+    new_driving_scene->time_step = driving_scene->get_time_step();
     new_driving_scene->min_temporal_limit = driving_scene->get_min_temporal_limit();
     new_driving_scene->max_temporal_limit = driving_scene->get_max_temporal_limit();
 
@@ -60,6 +61,8 @@ void LyftScene::load_virt(std::ifstream &input_filestream, structures::ISet<std:
     rapidjson::Document json_document;
     json_document.ParseStream(input_lz4_json_stream);
 
+    this->time_step = temporal::Duration(100);
+
     this->min_temporal_limit = temporal::Time::max();
     this->max_temporal_limit = temporal::Time::min();
 
@@ -82,7 +85,7 @@ void LyftScene::load_virt(std::ifstream &input_filestream, structures::ISet<std:
             continue;
         }
 
-        LyftDrivingAgent *driving_agent = new LyftDrivingAgent(json_agent_data);
+        LyftDrivingAgent *driving_agent = new LyftDrivingAgent(this, json_agent_data);
 
         driving_agent_dict.update(driving_agent->get_name(), driving_agent);
 
@@ -110,6 +113,11 @@ geometry::Vec LyftScene::get_min_spatial_limits() const
 geometry::Vec LyftScene::get_max_spatial_limits() const
 {
     return this->max_spatial_limits;
+}
+
+temporal::Duration LyftScene::get_time_step() const
+{
+    return this->time_step;
 }
 
 temporal::Time LyftScene::get_min_temporal_limit() const

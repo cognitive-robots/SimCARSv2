@@ -204,6 +204,7 @@ add_library(simcars_agent STATIC
   src/agent/csv/csv_scene.cpp
   include/ori/simcars/agent/defines.hpp
   include/ori/simcars/agent/declarations.hpp
+  include/ori/simcars/agent/driving_declarations.hpp
   include/ori/simcars/agent/valueless_constant_interface.hpp
   include/ori/simcars/agent/valueless_event_interface.hpp
   include/ori/simcars/agent/valueless_variable_interface.hpp
@@ -230,6 +231,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/reward_calculator_interface.hpp
   include/ori/simcars/agent/simulator_interface.hpp
   include/ori/simcars/agent/simulation_scene_interface.hpp
+  include/ori/simcars/agent/driving_simulation_scene_interface.hpp
   include/ori/simcars/agent/driving_agent_controller_interface.hpp
   include/ori/simcars/agent/driving_agent_reward_calculator_interface.hpp
   include/ori/simcars/agent/driving_simulator_interface.hpp

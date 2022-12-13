@@ -17,6 +17,7 @@ namespace highd
 class HighDScene : public virtual ATwoFileBasedScene<HighDScene>, public virtual ADrivingScene
 {
     geometry::Vec min_spatial_limits, max_spatial_limits;
+    temporal::Duration time_step;
     temporal::Time min_temporal_limit, max_temporal_limit;
 
     structures::stl::STLDictionary<std::string, IDrivingAgent*> driving_agent_dict;
@@ -33,6 +34,8 @@ public:
 
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
+
+    temporal::Duration get_time_step() const override;
 
     temporal::Time get_min_temporal_limit() const override;
     temporal::Time get_max_temporal_limit() const override;

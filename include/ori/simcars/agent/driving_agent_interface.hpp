@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ori/simcars/geometry/typedefs.hpp>
+#include <ori/simcars/agent/driving_declarations.hpp>
 #include <ori/simcars/agent/constant_interface.hpp>
 #include <ori/simcars/agent/variable_interface.hpp>
 #include <ori/simcars/agent/entity_interface.hpp>
@@ -19,6 +20,7 @@ class IDrivingAgent : public virtual IEntity
 public:
     virtual IDrivingAgent* driving_agent_deep_copy() const = 0;
 
+    virtual IDrivingScene const* get_driving_scene() const = 0;
 
     virtual IConstant<uint32_t> const* get_id_constant() const = 0;
     virtual IConstant<bool> const* get_ego_constant() const = 0;

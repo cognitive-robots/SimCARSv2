@@ -25,9 +25,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 
     structures::stl::STLDictionary<std::string, IValuelessVariable*> variable_dict;
 
-    DrivingGoalExtractionAgent()
-    {
-    }
+    IDrivingScene const *driving_scene;
 
     void extract_aligned_linear_velocity_change_events()
     {
@@ -45,11 +43,10 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 
         temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_ALIGNED_LINEAR_VELOCITY_CHANGE_DURATION_THRESHOLD));
 
-        temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
         temporal::Time current_time;
         temporal::Time action_start_time = this->get_min_temporal_limit();
         FP_DATA_TYPE action_start_aligned_linear_velocity = std::numeric_limits<FP_DATA_TYPE>::max();
-        for (current_time = this->get_min_temporal_limit() + time_step; current_time <= this->get_max_temporal_limit(); current_time += time_step)
+        for (current_time = this->get_min_temporal_limit() + this->get_scene()->get_time_step(); current_time <= this->get_max_temporal_limit(); current_time += this->get_scene()->get_time_step())
         {
             FP_DATA_TYPE current_aligned_linear_acceleration;
             if (!aligned_linear_acceleration_variable->get_value(current_time, current_aligned_linear_acceleration))
@@ -62,12 +59,12 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                 continue;
             }
             FP_DATA_TYPE previous_aligned_linear_acceleration;
-            if (!aligned_linear_acceleration_variable->get_value(current_time - time_step, previous_aligned_linear_acceleration))
+            if (!aligned_linear_acceleration_variable->get_value(current_time - this->get_scene()->get_time_step(), previous_aligned_linear_acceleration))
             {
                 continue;
             }
             FP_DATA_TYPE previous_aligned_linear_velocity;
-            if (!aligned_linear_velocity_variable->get_value(current_time - time_step, previous_aligned_linear_velocity))
+            if (!aligned_linear_velocity_variable->get_value(current_time - this->get_scene()->get_time_step(), previous_aligned_linear_velocity))
             {
                 continue;
             }
@@ -78,7 +75,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                 {
                     // STATUS QUO
 
-                    if (current_time + time_step > this->get_max_temporal_limit())
+                    if (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit())
                     {
                         if ((current_time - action_start_time >= min_duration_threshold
                              && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
@@ -86,7 +83,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                         {
                             aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
 
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
                             {
                                 aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
                             }
@@ -95,32 +92,32 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                 }
                 else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
                 {
-                    if (((current_time - time_step) - action_start_time >= min_duration_threshold
+                    if (((current_time - this->get_scene()->get_time_step()) - action_start_time >= min_duration_threshold
                          && std::abs(previous_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                            || (current_time + time_step > this->get_max_temporal_limit()
+                            || (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
                         {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
                         }
                     }
 
-                    action_start_time = current_time - time_step;
+                    action_start_time = current_time - this->get_scene()->get_time_step();
                     action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
                 }
                 else
                 {
                     if ((current_time - action_start_time >= min_duration_threshold
                          && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                            || (current_time + time_step > this->get_max_temporal_limit()
+                            || (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
                         {
                             aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
                         }
@@ -131,27 +128,27 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
             {
                 if (current_aligned_linear_acceleration >= ACTION_BACKED_ACCELERATION_THRESHOLD)
                 {
-                    if (((current_time - time_step) - action_start_time >= min_duration_threshold
+                    if (((current_time - this->get_scene()->get_time_step()) - action_start_time >= min_duration_threshold
                          && std::abs(previous_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                            || (current_time + time_step > this->get_max_temporal_limit()
+                            || (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
                         {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
                         }
                     }
 
-                    action_start_time = current_time - time_step;
+                    action_start_time = current_time - this->get_scene()->get_time_step();
                     action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
                 }
                 else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
                 {
                     // STATUS QUO
 
-                    if (current_time + time_step > this->get_max_temporal_limit())
+                    if (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit())
                     {
                         if ((current_time - action_start_time >= min_duration_threshold
                              && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
@@ -159,7 +156,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                         {
                             aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
 
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
                             {
                                 aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
                             }
@@ -170,12 +167,12 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                 {
                     if ((current_time - action_start_time >= min_duration_threshold
                          && std::abs(current_aligned_linear_velocity - action_start_aligned_linear_velocity) >= MIN_ALIGNED_LINEAR_VELOCITY_DIFF_THRESHOLD)
-                            || (current_time + time_step > this->get_max_temporal_limit()
+                            || (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit()
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
                         {
                             aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
                         }
@@ -190,13 +187,13 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
                         {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
                         }
                     }
 
-                    action_start_time = current_time - time_step;
+                    action_start_time = current_time - this->get_scene()->get_time_step();
                     action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
                 }
                 else if (current_aligned_linear_acceleration <= -ACTION_BACKED_ACCELERATION_THRESHOLD)
@@ -205,24 +202,24 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - time_step; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
                         {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - time_step) - current_time_2);
+                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
                         }
                     }
 
-                    action_start_time = current_time - time_step;
+                    action_start_time = current_time - this->get_scene()->get_time_step();
                     action_start_aligned_linear_velocity = previous_aligned_linear_velocity;
                 }
                 else
                 {
                     // STATUS QUO
 
-                    if (current_time + time_step > this->get_max_temporal_limit() && action_start_time == this->get_min_temporal_limit())
+                    if (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit() && action_start_time == this->get_min_temporal_limit())
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
                         {
                             aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
                         }
@@ -264,13 +261,12 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     new BasicVariable<temporal::Duration>(
                         this->get_name(), "lane", IValuelessVariable::Type::GOAL_DURATION);
 
-        temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
         temporal::Time current_time;
         temporal::Time action_start_time;
         temporal::Time lane_change_time = temporal::Time::max();
         int32_t lane_change_offset = 0;
         map::ILaneArray<T_map_id> const *previous_lanes = nullptr;
-        for (current_time = this->get_min_temporal_limit(); current_time <= this->get_max_temporal_limit(); current_time += time_step)
+        for (current_time = this->get_min_temporal_limit(); current_time <= this->get_max_temporal_limit(); current_time += this->get_scene()->get_time_step())
         {
             map::ILaneArray<T_map_id> const *current_lanes = nullptr;
             map::LivingLaneStackArray<T_map_id> *continuing_lanes = nullptr;
@@ -369,7 +365,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     {
                         lane_goal_value_variable->set_value(action_start_time, lane_change_offset);
 
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += time_step)
+                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
                         {
                             lane_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
                         }
@@ -404,9 +400,15 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         this->variable_dict.update(lane_goal_duration_variable->get_full_name(), lane_goal_duration_variable);
     }
 
+protected:
+    DrivingGoalExtractionAgent()
+    {
+    }
+
 public:
-    DrivingGoalExtractionAgent(IDrivingAgent *driving_agent)
-        : driving_agent(driving_agent)
+    DrivingGoalExtractionAgent(IDrivingAgent *driving_agent,
+                               IDrivingScene const *driving_scene)
+        : driving_agent(driving_agent), driving_scene(driving_scene)
     {
         structures::IArray<IValuelessVariable*> const *variables =
                 driving_agent->get_mutable_variable_parameters();
@@ -420,8 +422,10 @@ public:
 
         this->extract_aligned_linear_velocity_change_events();
     }
-    DrivingGoalExtractionAgent(IDrivingAgent *driving_agent, map::IMap<T_map_id> const *map)
-        : DrivingGoalExtractionAgent(driving_agent)
+    DrivingGoalExtractionAgent(IDrivingAgent *driving_agent,
+                               IDrivingScene const *driving_scene,
+                               map::IMap<T_map_id> const *map)
+        : DrivingGoalExtractionAgent(driving_agent, driving_scene)
     {
         this->extract_lane_change_events(map);
     }
@@ -535,6 +539,11 @@ public:
         }
 
         return driving_agent;
+    }
+
+    IDrivingScene const* get_driving_scene() const override
+    {
+        return this->driving_scene;
     }
 
 

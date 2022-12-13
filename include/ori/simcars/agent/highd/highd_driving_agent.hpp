@@ -24,10 +24,14 @@ class HighDDrivingAgent : public virtual ADrivingAgent
     structures::stl::STLDictionary<std::string, IValuelessConstant*> constant_dict;
     structures::stl::STLDictionary<std::string, IValuelessVariable*> variable_dict;
 
+    IDrivingScene const *driving_scene;
+
+protected:
     HighDDrivingAgent();
 
 public:
-    HighDDrivingAgent(size_t tracks_meta_row, rapidcsv::Document const &tracks_meta_csv_document,
+    HighDDrivingAgent(IDrivingScene const *driving_scene, size_t tracks_meta_row,
+                      rapidcsv::Document const &tracks_meta_csv_document,
                       rapidcsv::Document const &tracks_csv_document);
 
     ~HighDDrivingAgent();
@@ -49,6 +53,8 @@ public:
     structures::IArray<IValuelessEvent const*>* get_events() const override;
 
     IDrivingAgent* driving_agent_deep_copy() const override;
+
+    IDrivingScene const* get_driving_scene() const override;
 
 
     structures::IArray<IValuelessConstant*>* get_mutable_constant_parameters() override;

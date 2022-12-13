@@ -1,5 +1,6 @@
 
 #include <ori/simcars/utils/exceptions.hpp>
+#include <ori/simcars/agent/driving_scene_interface.hpp>
 #include <ori/simcars/agent/driving_agent_abstract.hpp>
 #include <ori/simcars/agent/view_read_only_driving_agent_state.hpp>
 #include <ori/simcars/agent/view_driving_agent_state.hpp>
@@ -16,6 +17,11 @@ namespace agent
 IEntity* ADrivingAgent::entity_deep_copy() const
 {
     return this->driving_agent_deep_copy();
+}
+
+IScene const* ADrivingAgent::get_scene() const
+{
+    return this->get_driving_scene();
 }
 
 // Avoid using this if you can, it isn't very efficient

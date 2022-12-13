@@ -171,6 +171,11 @@ std::string DrivingSimulationAgent::get_name() const
     return this->driving_agent->get_name();
 }
 
+IDrivingScene const* DrivingSimulationAgent::get_driving_scene() const
+{
+    return this->driving_simulation_scene;
+}
+
 // Not updated by simulation
 geometry::Vec DrivingSimulationAgent::get_min_spatial_limits() const
 {

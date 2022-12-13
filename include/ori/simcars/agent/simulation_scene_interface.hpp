@@ -12,8 +12,6 @@ namespace agent
 class ISimulationScene : public virtual IScene
 {
 public:
-    virtual inline temporal::Duration get_time_step() const = 0;
-
     virtual void simulate(temporal::Time time) = 0;
 };
 

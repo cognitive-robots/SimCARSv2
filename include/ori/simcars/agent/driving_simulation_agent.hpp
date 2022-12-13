@@ -5,7 +5,7 @@
 #include <ori/simcars/agent/driving_agent_abstract.hpp>
 #include <ori/simcars/agent/basic_driving_agent_state.hpp>
 #include <ori/simcars/agent/simulated_valueless_variable_interface.hpp>
-#include <ori/simcars/agent/driving_simulation_scene.hpp>
+#include <ori/simcars/agent/driving_simulation_scene_interface.hpp>
 
 namespace ori
 {
@@ -20,13 +20,14 @@ class DrivingSimulationAgent : public virtual ADrivingAgent
 
     mutable temporal::Time simulation_start_time;
     temporal::Time simulation_end_time;
+    temporal::Time latest_simulated_time;
 
     structures::stl::STLDictionary<std::string, IValuelessVariable*> non_simulated_variable_dict;
     structures::stl::STLDictionary<std::string, ISimulatedValuelessVariable*> simulated_variable_dict;
 
-    DrivingSimulationScene const *driving_simulation_scene;
-    temporal::Time latest_simulated_time;
+    IDrivingSimulationScene const *driving_simulation_scene;
 
+protected:
     DrivingSimulationAgent();
 
 public:
@@ -63,6 +64,8 @@ public:
     structures::IArray<IValuelessEvent const*>* get_events() const override;
 
     IDrivingAgent* driving_agent_deep_copy() const override;
+
+    IDrivingScene const* get_driving_scene() const override;
 
     void begin_simulation(temporal::Time simulation_start_time) const;
 

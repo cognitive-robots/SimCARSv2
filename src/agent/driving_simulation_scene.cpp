@@ -16,7 +16,7 @@ namespace agent
 
 DrivingSimulationScene::~DrivingSimulationScene()
 {
-    structures::IArray<DrivingSimulationAgent*> const *simulated_driving_agents =
+    structures::IArray<IDrivingAgent*> const *simulated_driving_agents =
             simulated_driving_agent_dict.get_values();
 
     for (size_t i = 0; i < simulated_driving_agents->count(); ++i)
@@ -121,6 +121,11 @@ geometry::Vec DrivingSimulationScene::get_max_spatial_limits() const
     return max_spatial_limits;
 }
 
+temporal::Duration DrivingSimulationScene::get_time_step() const
+{
+    return time_step;
+}
+
 temporal::Time DrivingSimulationScene::get_min_temporal_limit() const
 {
     return min_temporal_limit;
@@ -143,8 +148,7 @@ structures::IArray<IDrivingAgent const*>* DrivingSimulationScene::get_driving_ag
 
     structures::IArray<IDrivingAgent const*> *simulated_driving_agents =
             new structures::stl::STLStackArray<IDrivingAgent const*>(simulated_driving_agent_dict.count());
-    cast_array<DrivingSimulationAgent*, IDrivingAgent const*>(
-                *(simulated_driving_agent_dict.get_values()), *simulated_driving_agents);
+    cast_array(*(simulated_driving_agent_dict.get_values()), *simulated_driving_agents);
     driving_agents->get_array(1) = simulated_driving_agents;
 
     return driving_agents;
@@ -160,11 +164,6 @@ IDrivingAgent const* DrivingSimulationScene::get_driving_agent(std::string const
     {
         return simulated_driving_agent_dict[driving_agent_name];
     }
-}
-
-temporal::Duration DrivingSimulationScene::get_time_step() const
-{
-    return time_step;
 }
 
 void DrivingSimulationScene::simulate(temporal::Time time)
@@ -191,11 +190,9 @@ structures::IArray<IDrivingAgent*>* DrivingSimulationScene::get_mutable_driving_
             new structures::stl::STLStackArray<IDrivingAgent*>(
                 non_simulated_driving_agent_dict.get_values());
 
-    structures::IArray<IDrivingAgent*> *simulated_driving_agents =
-            new structures::stl::STLStackArray<IDrivingAgent*>(simulated_driving_agent_dict.count());
-    cast_array<DrivingSimulationAgent*, IDrivingAgent*>(
-                *(simulated_driving_agent_dict.get_values()), *simulated_driving_agents);
-    driving_agents->get_array(1) = simulated_driving_agents;
+    driving_agents->get_array(1) =
+            new structures::stl::STLStackArray<IDrivingAgent*>(
+                simulated_driving_agent_dict.get_values());
 
     return driving_agents;
 }

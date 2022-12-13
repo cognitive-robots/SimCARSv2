@@ -23,6 +23,7 @@ CSVScene* CSVScene::construct_from(IScene *scene)
 
     new_scene->min_spatial_limits = scene->get_min_spatial_limits();
     new_scene->max_spatial_limits = scene->get_max_spatial_limits();
+    new_scene->time_step = scene->get_time_step();
     new_scene->min_temporal_limit = scene->get_min_temporal_limit();
     new_scene->max_temporal_limit = scene->get_max_temporal_limit();
 
@@ -61,9 +62,8 @@ void CSVScene::save_virt(std::ofstream &output_filestream) const
         }
         output_filestream << std::endl;
 
-        temporal::Duration time_step = temporal::Duration(temporal::DurationRep(1000.0 / OPERATING_FRAMERATE));
         temporal::Time current_time;
-        for (current_time = min_temporal_limit; current_time <= max_temporal_limit; current_time += time_step)
+        for (current_time = min_temporal_limit; current_time <= max_temporal_limit; current_time += this->get_time_step())
         {
             for (j = 0; j < variables->count(); ++j)
             {
@@ -106,6 +106,11 @@ geometry::Vec CSVScene::get_min_spatial_limits() const
 geometry::Vec CSVScene::get_max_spatial_limits() const
 {
     return this->max_spatial_limits;
+}
+
+temporal::Duration CSVScene::get_time_step() const
+{
+    return this->time_step;
 }
 
 temporal::Time CSVScene::get_min_temporal_limit() const

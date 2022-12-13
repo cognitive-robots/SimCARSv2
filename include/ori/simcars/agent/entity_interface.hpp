@@ -2,9 +2,11 @@
 
 #include <ori/simcars/structures/array_interface.hpp>
 #include <ori/simcars/geometry/typedefs.hpp>
+#include <ori/simcars/agent/declarations.hpp>
 #include <ori/simcars/agent/valueless_constant_interface.hpp>
 #include <ori/simcars/agent/valueless_variable_interface.hpp>
 #include <ori/simcars/agent/entity_state_interface.hpp>
+#include <ori/simcars/agent/scene_interface.hpp>
 
 namespace ori
 {
@@ -21,6 +23,8 @@ public:
     virtual IEntity* entity_deep_copy() const = 0;
 
     virtual std::string get_name() const = 0;
+
+    virtual IScene const* get_scene() const = 0;
 
     virtual geometry::Vec get_min_spatial_limits() const = 0;
     virtual geometry::Vec get_max_spatial_limits() const = 0;
