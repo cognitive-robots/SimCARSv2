@@ -49,7 +49,7 @@ public:
     }
     bool contains(K const &key) const override
     {
-        return data.count(key) > 0;
+        return data.contains(key);
     }
 
     V const& operator [](K const &key) const override

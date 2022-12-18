@@ -24,7 +24,7 @@ class QMapSceneWidget : public QSceneWidget
     map::IMap<T_id> const *map;
 
     std::random_device random_device;
-    std::mt19937 randomness_generator;
+    mutable std::mt19937 randomness_generator;
     std::uniform_real_distribution<float> hue_generator;
 
     structures::stl::STLDictionary<T_id, sf::Color> id_to_colour_dict;

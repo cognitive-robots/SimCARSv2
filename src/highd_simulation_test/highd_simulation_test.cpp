@@ -12,7 +12,7 @@
 #include <exception>
 #include <random>
 
-#define NUMBER_OF_AGENTS 10
+#define NUMBER_OF_AGENTS 100
 #define NUMBER_OF_SIMULATED_AGENTS 2
 
 using namespace ori::simcars;

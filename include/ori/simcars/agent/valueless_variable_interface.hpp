@@ -52,6 +52,8 @@ public:
             temporal::Time time_window_end = temporal::Time::max()) const = 0;
     virtual IValuelessEvent const* get_valueless_event(temporal::Time time, bool exact = false) const = 0;
 
+    virtual bool remove_value(temporal::Time time) = 0;
+
     virtual structures::IArray<IValuelessEvent*>* get_mutable_valueless_events(
             temporal::Time time_window_start = temporal::Time::min(),
             temporal::Time time_window_end = temporal::Time::max()) = 0;

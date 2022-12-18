@@ -93,6 +93,18 @@ public:
         return this->data.at(closest_timestamp);
     }
 
+    bool contains(Time const &timestamp, bool exact) const
+    {
+        if (exact)
+        {
+            return structures::stl::STLOrderedDictionary<Time, V>::contains(timestamp);
+        }
+        else
+        {
+            return this->contains(timestamp);
+        }
+    }
+
     Time get_earliest_timestamp() const
     {
         if (this->data.size() == 0)

@@ -279,6 +279,19 @@ public:
         }
     }
 
+    bool remove_value(temporal::Time time) override
+    {
+        if (time_event_dict.contains(time, true))
+        {
+            time_event_dict.erase(time);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     void set_value(temporal::Time time, T const &value) override
     {
         if (time > simulation_start_time
