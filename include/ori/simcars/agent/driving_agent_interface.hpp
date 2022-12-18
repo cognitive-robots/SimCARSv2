@@ -18,7 +18,7 @@ namespace agent
 class IDrivingAgent : public virtual IEntity
 {
 public:
-    virtual IDrivingAgent* driving_agent_deep_copy() const = 0;
+    virtual IDrivingAgent* driving_agent_deep_copy(IDrivingScene *driving_scene = nullptr) const = 0;
 
     virtual IDrivingScene const* get_driving_scene() const = 0;
 

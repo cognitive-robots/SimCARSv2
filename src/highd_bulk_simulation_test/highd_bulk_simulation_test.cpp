@@ -14,6 +14,7 @@
 
 #define NUMBER_OF_AGENTS 10
 #define NUMBER_OF_SIMULATED_AGENTS 2
+#define NUMBER_OF_SCENES 100
 
 using namespace ori::simcars;
 using namespace std::chrono;
@@ -29,9 +30,10 @@ void simulate(agent::IDrivingScene const *simulated_scene)
         agent::IVariable<geometry::Vec> const *position_variable =
                 driving_agent->get_position_variable();
         geometry::Vec position;
-        if (position_variable->get_value(driving_agent->get_last_event_time(), position))
+        bool result = position_variable->get_value(driving_agent->get_last_event_time(), position);
+        if (!result)
         {
-            std::cout << "Got position variable value for agent " << i << " at end of scene" << std::endl;
+            std::cout << "Failed to get position variable value for agent " << i << " at end of scene" << std::endl;
         }
     }
 
@@ -143,6 +145,16 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished action extraction (" << time_elapsed.count() << " μs)" << std::endl;
 
+    structures::IArray<agent::IDrivingScene*> *scenes_with_actions =
+            new structures::stl::STLStackArray<agent::IDrivingScene*>(NUMBER_OF_SCENES);
+
+    (*scenes_with_actions)[0] = scene_with_actions;
+
+    for (i = 1; i < NUMBER_OF_SCENES; ++i)
+    {
+        (*scenes_with_actions)[i] = scene_with_actions->driving_scene_deep_copy();
+    }
+
     temporal::Time simulation_start_time = scene->get_min_temporal_limit() +
             temporal::Duration(1000);
 
@@ -154,10 +166,15 @@ int main(int argc, char *argv[])
     agent::IDrivingSimulator *driving_simulator =
                 new agent::BasicDrivingSimulator(driving_agent_controller);
 
-    agent::IDrivingScene *simulated_scene =
-            agent::DrivingSimulationScene::construct_from(
-                scene_with_actions, driving_simulator, time_step,
-                simulation_start_time, simulated_agent_names);
+    structures::IArray<agent::IDrivingSimulationScene*> *simulated_scenes =
+            new structures::stl::STLStackArray<agent::IDrivingSimulationScene*>(NUMBER_OF_SCENES);
+
+    for (i = 0; i < NUMBER_OF_SCENES; ++i)
+    {
+        (*simulated_scenes)[i] = agent::DrivingSimulationScene::construct_from(
+                    (*scenes_with_actions)[i], driving_simulator, time_step,
+                    simulation_start_time, simulated_agent_names);
+    }
 
     delete simulated_agent_names;
 
@@ -165,7 +182,10 @@ int main(int argc, char *argv[])
 
     start_time = high_resolution_clock::now();
 
-    simulate(simulated_scene);
+    for (i = 0; i < NUMBER_OF_SCENES; ++i)
+    {
+        simulate((*simulated_scenes)[i]);
+    }
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
 
@@ -174,8 +194,14 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished simulation (" << time_elapsed.count() << " μs, rtf = " << real_time_factor << ")" << std::endl;
 
-    delete simulated_scene;
-    delete scene_with_actions;
+    for (i = 0; i < NUMBER_OF_SCENES; ++i)
+    {
+        delete (*simulated_scenes)[i];
+        delete (*scenes_with_actions)[i];
+    }
+    delete simulated_scenes;
+    delete scenes_with_actions;
+
     delete scene;
 
     delete driving_simulator;

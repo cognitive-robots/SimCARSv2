@@ -24,6 +24,8 @@ class IScene
 public:
     virtual ~IScene() = default;
 
+    virtual IScene* scene_deep_copy() const = 0;
+
     virtual geometry::Vec get_min_spatial_limits() const = 0;
     virtual geometry::Vec get_max_spatial_limits() const = 0;
 

@@ -142,18 +142,6 @@ DrivingSimulationAgent::DrivingSimulationAgent(IDrivingAgent *driving_agent,
                 new SimulatedVariable(cumilative_collision_time_variable, simulation_scene, simulation_start_time,
                                       simulation_end_time, start_simulated, simulation_scene->get_time_step());
     this->simulated_variable_dict.update(simulated_cumilative_collision_time_variable->get_full_name(), simulated_cumilative_collision_time_variable);
-
-
-    structures::IArray<IValuelessVariable*> const *variables =
-            driving_agent->get_mutable_variable_parameters();
-    for (size_t i = 0; i < variables->count(); ++i)
-    {
-        if (!this->simulated_variable_dict.contains((*variables)[i]->get_full_name()))
-        {
-            this->non_simulated_variable_dict.update((*variables)[i]->get_full_name(), (*variables)[i]);
-        }
-    }
-    delete variables;
 }
 
 DrivingSimulationAgent::~DrivingSimulationAgent()
@@ -168,29 +156,24 @@ DrivingSimulationAgent::~DrivingSimulationAgent()
 
 std::string DrivingSimulationAgent::get_name() const
 {
-    return this->driving_agent->get_name();
-}
-
-IDrivingScene const* DrivingSimulationAgent::get_driving_scene() const
-{
-    return this->driving_simulation_scene;
+    return driving_agent->get_name();
 }
 
 // Not updated by simulation
 geometry::Vec DrivingSimulationAgent::get_min_spatial_limits() const
 {
-    return this->driving_agent->get_min_spatial_limits();
+    return driving_agent->get_min_spatial_limits();
 }
 
 // Not updated by simulation
 geometry::Vec DrivingSimulationAgent::get_max_spatial_limits() const
 {
-    return this->driving_agent->get_max_spatial_limits();
+    return driving_agent->get_max_spatial_limits();
 }
 
 temporal::Time DrivingSimulationAgent::get_min_temporal_limit() const
 {
-    return this->driving_agent->get_min_temporal_limit();
+    return driving_agent->get_min_temporal_limit();
 }
 
 temporal::Time DrivingSimulationAgent::get_max_temporal_limit() const
@@ -209,12 +192,12 @@ bool DrivingSimulationAgent::is_state_available(temporal::Time time) const
 
 structures::IArray<IValuelessConstant const*>* DrivingSimulationAgent::get_constant_parameters() const
 {
-    return this->driving_agent->get_constant_parameters();
+    return driving_agent->get_constant_parameters();
 }
 
 IValuelessConstant const* DrivingSimulationAgent::get_constant_parameter(std::string const &constant_name) const
 {
-    return this->driving_agent->get_constant_parameter(constant_name);
+    return driving_agent->get_constant_parameter(constant_name);
 }
 
 structures::IArray<IValuelessVariable const*>* DrivingSimulationAgent::get_variable_parameters() const
@@ -222,59 +205,74 @@ structures::IArray<IValuelessVariable const*>* DrivingSimulationAgent::get_varia
     structures::stl::STLConcatArray<IValuelessVariable const*> *variables =
                 new structures::stl::STLConcatArray<IValuelessVariable const*>(2);
 
-    structures::IArray<IValuelessVariable const*> *non_simulated_variables =
-                new structures::stl::STLStackArray<IValuelessVariable const*>(non_simulated_variable_dict.count());
-    cast_array(*non_simulated_variable_dict.get_values(), *non_simulated_variables);
-    variables->get_array(0) = non_simulated_variables;
-
     structures::IArray<IValuelessVariable const*> *simulated_variables =
                 new structures::stl::STLStackArray<IValuelessVariable const*>(simulated_variable_dict.count());
     cast_array<ISimulatedValuelessVariable*, IValuelessVariable const*>(
                 *(simulated_variable_dict.get_values()), *simulated_variables);
-    variables->get_array(1) = simulated_variables;
+    variables->get_array(0) = simulated_variables;
+
+    structures::IArray<IValuelessVariable const*> *unfiltered_non_simulated_variables =
+            driving_agent->get_variable_parameters();
+    structures::IStackArray<IValuelessVariable const*> *filtered_non_simulated_variables =
+            new structures::stl::STLStackArray<IValuelessVariable const*>;
+
+    bool found_variable;
+    size_t i, j;
+    for (i = 0; i < unfiltered_non_simulated_variables->count(); ++i)
+    {
+        found_variable = false;
+
+        for (j = 0; j < simulated_variables->count(); ++j)
+        {
+            if ((*simulated_variables)[j]->get_parameter_name() ==
+                    (*unfiltered_non_simulated_variables)[i]->get_parameter_name())
+            {
+                found_variable = true;
+                break;
+            }
+        }
+
+        if (!found_variable)
+        {
+            filtered_non_simulated_variables->push_back((*unfiltered_non_simulated_variables)[i]);
+        }
+    }
+
+    variables->get_array(1) = filtered_non_simulated_variables;
+
+    delete unfiltered_non_simulated_variables;
 
     return variables;
 }
 
 IValuelessVariable const* DrivingSimulationAgent::get_variable_parameter(std::string const &variable_name) const
 {
-    if (non_simulated_variable_dict.contains(variable_name))
+    if (simulated_variable_dict.contains(variable_name))
     {
-        return non_simulated_variable_dict[variable_name];
+        return simulated_variable_dict[variable_name];
     }
     else
     {
-        if (simulated_variable_dict.contains(variable_name))
-        {
-            return simulated_variable_dict[variable_name];
-        }
-        else
-        {
-            return nullptr;
-        }
+        return driving_agent->get_variable_parameter(variable_name);
     }
 }
 
 structures::IArray<IValuelessEvent const*>* DrivingSimulationAgent::get_events() const
 {
-    structures::IArray<std::string> const *non_simulated_variable_names = non_simulated_variable_dict.get_keys();
-    structures::IArray<std::string> const *simulated_variable_names = simulated_variable_dict.get_keys();
+    structures::IArray<IValuelessVariable const*> *variables = this->get_variable_parameters();
 
     structures::stl::STLConcatArray<IValuelessEvent const*> *events =
                 new structures::stl::STLConcatArray<IValuelessEvent const*>(
-                    non_simulated_variable_names->count() + simulated_variable_names->count());
+                    variables->count());
 
     size_t i;
 
-    for(i = 0; i < non_simulated_variable_names->count(); ++i)
+    for(i = 0; i < variables->count(); ++i)
     {
-        events->get_array(i) = non_simulated_variable_dict[(*non_simulated_variable_names)[i]]->get_valueless_events();
+        events->get_array(i) = (*variables)[i]->get_valueless_events();
     }
 
-    for(i = 0; i < simulated_variable_names->count(); ++i)
-    {
-        events->get_array(non_simulated_variable_names->count() + i) = simulated_variable_dict[(*simulated_variable_names)[i]]->get_valueless_events();
-    }
+    delete variables;
 
     return events;
 }
@@ -283,29 +281,37 @@ structures::IArray<IValuelessEvent const*>* DrivingSimulationAgent::get_events()
  * NOTE: This should not be called directly by external code, as the simulation scene will not have a pointer to the
  * resulting copy and thus any new simulation data will not be propogated to the copy.
  */
-IDrivingAgent* DrivingSimulationAgent::driving_agent_deep_copy() const
+IDrivingSimulationAgent* DrivingSimulationAgent::driving_simulation_agent_deep_copy(IDrivingSimulationScene *driving_simulation_scene) const
 {
     DrivingSimulationAgent *driving_agent = new DrivingSimulationAgent();
 
     driving_agent->driving_agent = this->driving_agent;
+
     driving_agent->simulation_start_time = this->simulation_start_time;
     driving_agent->simulation_end_time = this->simulation_end_time;
-
-    size_t i;
-
-    structures::IArray<std::string> const *non_simulated_variable_names = non_simulated_variable_dict.get_keys();
-    for(i = 0; i < non_simulated_variable_names->count(); ++i)
-    {
-        driving_agent->non_simulated_variable_dict.update((*non_simulated_variable_names)[i], non_simulated_variable_dict[(*non_simulated_variable_names)[i]]->valueless_deep_copy());
-    }
+    driving_agent->latest_simulated_time = this->latest_simulated_time;
 
     structures::IArray<std::string> const *simulated_variable_names = simulated_variable_dict.get_keys();
-    for(i = 0; i < simulated_variable_names->count(); ++i)
+    for(size_t i = 0; i < simulated_variable_names->count(); ++i)
     {
         driving_agent->simulated_variable_dict.update((*simulated_variable_names)[i], simulated_variable_dict[(*simulated_variable_names)[i]]->simulated_valueless_deep_copy());
     }
 
+    if (driving_simulation_scene == nullptr)
+    {
+        driving_agent->driving_simulation_scene = this->driving_simulation_scene;
+    }
+    else
+    {
+        driving_agent->driving_simulation_scene = driving_simulation_scene;
+    }
+
     return driving_agent;
+}
+
+IDrivingSimulationScene const* DrivingSimulationAgent::get_driving_simulation_scene() const
+{
+    return this->driving_simulation_scene;
 }
 
 void DrivingSimulationAgent::begin_simulation(temporal::Time simulation_start_time) const
@@ -339,58 +345,74 @@ structures::IArray<IValuelessVariable*>* DrivingSimulationAgent::get_mutable_var
     structures::stl::STLConcatArray<IValuelessVariable*> *variables =
                 new structures::stl::STLConcatArray<IValuelessVariable*>(2);
 
-    variables->get_array(0) =
-                new structures::stl::STLStackArray<IValuelessVariable*>(
-                    non_simulated_variable_dict.get_values());
-
     structures::IArray<IValuelessVariable*> *simulated_variables =
                 new structures::stl::STLStackArray<IValuelessVariable*>(simulated_variable_dict.count());
     cast_array<ISimulatedValuelessVariable*, IValuelessVariable*>(
                 *(simulated_variable_dict.get_values()), *simulated_variables);
-    variables->get_array(1) = simulated_variables;
+    variables->get_array(0) = simulated_variables;
+
+    structures::IArray<IValuelessVariable*> *unfiltered_non_simulated_variables =
+            driving_agent->get_mutable_variable_parameters();
+    structures::IStackArray<IValuelessVariable*> *filtered_non_simulated_variables =
+            new structures::stl::STLStackArray<IValuelessVariable*>;
+
+    bool found_variable;
+    size_t i, j;
+    for (i = 0; i < unfiltered_non_simulated_variables->count(); ++i)
+    {
+        found_variable = false;
+
+        for (j = 0; j < simulated_variables->count(); ++j)
+        {
+            if ((*simulated_variables)[j]->get_parameter_name() ==
+                    (*unfiltered_non_simulated_variables)[i]->get_parameter_name())
+            {
+                found_variable = true;
+                break;
+            }
+        }
+
+        if (!found_variable)
+        {
+            filtered_non_simulated_variables->push_back((*unfiltered_non_simulated_variables)[i]);
+        }
+    }
+
+    variables->get_array(1) = filtered_non_simulated_variables;
+
+    delete unfiltered_non_simulated_variables;
 
     return variables;
 }
 
 IValuelessVariable* DrivingSimulationAgent::get_mutable_variable_parameter(std::string const &variable_name)
 {
-    if (non_simulated_variable_dict.contains(variable_name))
+    if (simulated_variable_dict.contains(variable_name))
     {
-        return non_simulated_variable_dict[variable_name];
+        return simulated_variable_dict[variable_name];
     }
     else
     {
-        if (simulated_variable_dict.contains(variable_name))
-        {
-            return simulated_variable_dict[variable_name];
-        }
-        else
-        {
-            return nullptr;
-        }
+        return driving_agent->get_mutable_variable_parameter(variable_name);
     }
 }
 
 structures::IArray<IValuelessEvent*>* DrivingSimulationAgent::get_mutable_events()
 {
-    structures::IArray<std::string> const *non_simulated_variable_names = non_simulated_variable_dict.get_keys();
-    structures::IArray<std::string> const *simulated_variable_names = simulated_variable_dict.get_keys();
+    structures::IArray<IValuelessVariable*> *variables = this->get_mutable_variable_parameters();
 
     structures::stl::STLConcatArray<IValuelessEvent*> *events =
                 new structures::stl::STLConcatArray<IValuelessEvent*>(
-                    non_simulated_variable_names->count() + simulated_variable_names->count());
+                    variables->count());
 
     size_t i;
 
-    for(i = 0; i < non_simulated_variable_names->count(); ++i)
+    for(i = 0; i < variables->count(); ++i)
     {
-        events->get_array(i) = non_simulated_variable_dict[(*non_simulated_variable_names)[i]]->get_mutable_valueless_events();
+        events->get_array(i) = (*variables)[i]->get_mutable_valueless_events();
     }
 
-    for(i = 0; i < simulated_variable_names->count(); ++i)
-    {
-        events->get_array(non_simulated_variable_names->count() + i) = simulated_variable_dict[(*simulated_variable_names)[i]]->get_mutable_valueless_events();
-    }
+    delete variables;
 
     return events;
 }

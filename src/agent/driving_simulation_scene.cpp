@@ -23,8 +23,6 @@ DrivingSimulationScene::~DrivingSimulationScene()
     {
         delete (*simulated_driving_agents)[i];
     }
-
-    delete simulator;
 }
 
 DrivingSimulationScene* DrivingSimulationScene::construct_from(
@@ -164,6 +162,46 @@ IDrivingAgent const* DrivingSimulationScene::get_driving_agent(std::string const
     {
         return simulated_driving_agent_dict[driving_agent_name];
     }
+}
+
+IDrivingSimulationScene* DrivingSimulationScene::driving_simulation_scene_deep_copy() const
+{
+    DrivingSimulationScene *new_driving_simulation_scene = new DrivingSimulationScene();
+
+    new_driving_simulation_scene->min_spatial_limits = this->min_spatial_limits;
+    new_driving_simulation_scene->max_spatial_limits = this->max_spatial_limits;
+    new_driving_simulation_scene->time_step = this->time_step;
+    new_driving_simulation_scene->min_temporal_limit = this->min_temporal_limit;
+    new_driving_simulation_scene->max_temporal_limit = this->max_temporal_limit;
+
+    new_driving_simulation_scene->furthest_simulation_time = this->furthest_simulation_time;
+
+    // Might as well reuse the same simulator, it doesn't actually contain any data
+    new_driving_simulation_scene->simulator = this->simulator;
+
+    structures::IArray<IDrivingAgent*> const *simulated_driving_agents =
+            this->simulated_driving_agent_dict.get_values();
+
+    size_t i;
+
+    for (i = 0; i < simulated_driving_agents->count(); ++i)
+    {
+        new_driving_simulation_scene->simulated_driving_agent_dict.update(
+                    (*simulated_driving_agents)[i]->get_name(),
+                    (*simulated_driving_agents)[i]->driving_agent_deep_copy());
+    }
+
+    structures::IArray<IDrivingAgent*> const *non_simulated_driving_agents =
+            this->non_simulated_driving_agent_dict.get_values();
+
+    for (i = 0; i < non_simulated_driving_agents->count(); ++i)
+    {
+        new_driving_simulation_scene->non_simulated_driving_agent_dict.update(
+                    (*non_simulated_driving_agents)[i]->get_name(),
+                    (*non_simulated_driving_agents)[i]->driving_agent_deep_copy());
+    }
+
+    return new_driving_simulation_scene;
 }
 
 void DrivingSimulationScene::simulate(temporal::Time time)

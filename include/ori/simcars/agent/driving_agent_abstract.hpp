@@ -12,7 +12,7 @@ namespace agent
 class ADrivingAgent : public virtual IDrivingAgent
 {
 public:
-    IEntity* entity_deep_copy() const override;
+    IEntity* entity_deep_copy(IScene *scene) const override;
 
     IScene const* get_scene() const override;
 

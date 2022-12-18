@@ -12,6 +12,8 @@ namespace agent
 class ADrivingScene : public virtual IDrivingScene
 {
 public:
+    IScene* scene_deep_copy() const override;
+
     structures::IArray<IEntity const*>* get_entities() const override;
     IEntity const* get_entity(std::string const &entity_name) const override;
 

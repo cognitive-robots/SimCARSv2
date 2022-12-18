@@ -269,14 +269,16 @@ structures::IArray<IValuelessEvent const*>* LyftDrivingAgent::get_events() const
     return events;
 }
 
-IDrivingAgent* LyftDrivingAgent::driving_agent_deep_copy() const
+IDrivingAgent* LyftDrivingAgent::driving_agent_deep_copy(IDrivingScene *driving_scene) const
 {
     LyftDrivingAgent *driving_agent = new LyftDrivingAgent();
 
-    driving_agent->min_spatial_limits = this->get_min_spatial_limits();
-    driving_agent->max_spatial_limits = this->get_max_spatial_limits();
-    driving_agent->min_temporal_limit = this->get_min_temporal_limit();
-    driving_agent->max_temporal_limit = this->get_max_temporal_limit();
+    driving_agent->name = this->name;
+
+    driving_agent->min_spatial_limits = this->min_spatial_limits;
+    driving_agent->max_spatial_limits = this->max_spatial_limits;
+    driving_agent->min_temporal_limit = this->min_temporal_limit;
+    driving_agent->max_temporal_limit = this->max_temporal_limit;
 
     size_t i;
 
@@ -290,6 +292,15 @@ IDrivingAgent* LyftDrivingAgent::driving_agent_deep_copy() const
     for(i = 0; i < variable_names->count(); ++i)
     {
         driving_agent->variable_dict.update((*variable_names)[i], variable_dict[(*variable_names)[i]]->valueless_deep_copy());
+    }
+
+    if (driving_scene == nullptr)
+    {
+        driving_agent->driving_scene = this->driving_scene;
+    }
+    else
+    {
+        driving_agent->driving_scene = driving_scene;
     }
 
     return driving_agent;

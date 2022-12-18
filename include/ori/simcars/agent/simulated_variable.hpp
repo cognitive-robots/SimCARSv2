@@ -117,7 +117,10 @@ public:
     {
         SimulatedVariable<T> *variable =
                 new SimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
-                                         simulation_end_time, true, time_event_dict.get_time_diff_threshold(), time_event_dict.get_max_cache_size());
+                                         simulation_end_time, simulation_start_time < simulation_end_time,
+                                         time_event_dict.get_time_diff_threshold(),
+                                         time_event_dict.get_max_cache_size());
+
         size_t i;
 
         structures::IArray<temporal::Time> const *times = time_event_dict.get_keys();
@@ -202,12 +205,26 @@ public:
             temporal::Time time_window_start,
             temporal::Time time_window_end) const override
     {
+        if (time_window_end < simulation_start_time + simulation_scene->get_time_step())
+        {
+            return original_variable->get_events(time_window_start, time_window_end);
+        }
+
+        if (time_window_start > this->get_max_temporal_limit())
+        {
+            return new structures::stl::STLStackArray<IEvent<T> const*>;
+        }
+
+
+        structures::IArray<IEvent<T> const*> *non_simulated_events = nullptr;
+        if (time_window_start <= simulation_start_time)
+        {
+            non_simulated_events =
+                    original_variable->get_events(time_window_start, time_window_end);
+        }
+
+
         simulation_check(time_window_end);
-
-        structures::stl::STLConcatArray<IEvent<T> const*> *events =
-                new structures::stl::STLConcatArray<IEvent<T> const*>(2);
-
-        events->get_array(0) = original_variable->get_events(time_window_start, time_window_end);
 
         structures::IArray<IEvent<T>*> const *unfiltered_simulated_events =
                 time_event_dict.get_values();
@@ -223,9 +240,21 @@ public:
             }
         }
 
-        events->get_array(1) = filtered_simulated_events;
 
-        return events;
+        if (non_simulated_events != nullptr)
+        {
+            structures::stl::STLConcatArray<IEvent<T> const*> *events =
+                    new structures::stl::STLConcatArray<IEvent<T> const*>(2);
+
+            events->get_array(0) = non_simulated_events;
+            events->get_array(1) = filtered_simulated_events;
+
+            return events;
+        }
+        else
+        {
+            return filtered_simulated_events;
+        }
     }
 
     IEvent<T> const* get_event(temporal::Time time, bool exact) const override
@@ -276,6 +305,12 @@ public:
             temporal::Time time_window_start,
             temporal::Time time_window_end) override
     {
+        if (time_window_end < simulation_start_time + simulation_scene->get_time_step() ||
+                time_window_start > this->get_max_temporal_limit())
+        {
+            return new structures::stl::STLStackArray<IEvent<T>*>;
+        }
+
         simulation_check(time_window_end);
 
         structures::IArray<IEvent<T>*> const *unfiltered_simulated_events =

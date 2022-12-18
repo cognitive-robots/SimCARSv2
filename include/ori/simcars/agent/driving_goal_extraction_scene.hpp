@@ -21,8 +21,6 @@ class DrivingGoalExtractionScene : public virtual ADrivingScene
 
     structures::stl::STLDictionary<std::string, IDrivingAgent*> driving_agent_dict;
 
-    IScene const *driving_scene;
-
     map::IMap<T_map_id> const *map;
 
 protected:
@@ -87,10 +85,34 @@ public:
                     new DrivingGoalExtractionAgent<T_map_id>(
                         (*driving_agents)[i], new_driving_scene, map);
 
-            new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(), driving_goal_extraction_agent);
+            new_driving_scene->driving_agent_dict.update(driving_goal_extraction_agent->get_name(),
+                                                         driving_goal_extraction_agent);
         }
 
         delete driving_agents;
+
+        return new_driving_scene;
+    }
+
+    IDrivingScene* driving_scene_deep_copy() const override
+    {
+        DrivingGoalExtractionScene *new_driving_scene = new DrivingGoalExtractionScene;
+
+        new_driving_scene->min_spatial_limits = this->min_spatial_limits;
+        new_driving_scene->max_spatial_limits = this->max_spatial_limits;
+        new_driving_scene->time_step = this->time_step;
+        new_driving_scene->min_temporal_limit = this->min_temporal_limit;
+        new_driving_scene->max_temporal_limit = this->max_temporal_limit;
+
+        new_driving_scene->map = this->map;
+
+        structures::IArray<IDrivingAgent*> const *driving_agents = this->driving_agent_dict.get_values();
+
+        for(size_t i = 0; i < driving_agents->count(); ++i)
+        {
+            new_driving_scene->driving_agent_dict.update((*driving_agents)[i]->get_name(),
+                                                         (*driving_agents)[i]->driving_agent_deep_copy(new_driving_scene));
+        }
 
         return new_driving_scene;
     }

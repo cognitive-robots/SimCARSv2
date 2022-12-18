@@ -185,6 +185,8 @@ add_library(simcars_agent STATIC
   src/agent/driving_scene_abstract.cpp
   src/agent/read_only_driving_scene_state_abstract.cpp
   src/agent/driving_scene_state_abstract.cpp
+  src/agent/driving_simulation_agent_abstract.cpp
+  src/agent/driving_simulation_scene_abstract.cpp
   src/agent/driving_agent_reward_calculator_abstract.cpp
   src/agent/basic_driving_agent_state.cpp
   src/agent/view_read_only_driving_agent_state.cpp
@@ -231,6 +233,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/reward_calculator_interface.hpp
   include/ori/simcars/agent/simulator_interface.hpp
   include/ori/simcars/agent/simulation_scene_interface.hpp
+  include/ori/simcars/agent/driving_simulation_agent_interface.hpp
   include/ori/simcars/agent/driving_simulation_scene_interface.hpp
   include/ori/simcars/agent/driving_agent_controller_interface.hpp
   include/ori/simcars/agent/driving_agent_reward_calculator_interface.hpp
@@ -248,6 +251,8 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/driving_scene_state_abstract.hpp
   include/ori/simcars/agent/file_based_scene_abstract.hpp
   include/ori/simcars/agent/two_file_based_scene_abstract.hpp
+  include/ori/simcars/agent/driving_simulation_agent_abstract.hpp
+  include/ori/simcars/agent/driving_simulation_scene_abstract.hpp
   include/ori/simcars/agent/driving_agent_reward_calculator_abstract.hpp
   include/ori/simcars/agent/basic_constant.hpp
   include/ori/simcars/agent/basic_event.hpp
@@ -368,6 +373,10 @@ add_dependencies(highd_scene_test simcars_utils simcars_structures simcars_geome
 add_executable(highd_simulation_test src/highd_simulation_test/highd_simulation_test.cpp)
 target_link_libraries(highd_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 add_dependencies(highd_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+
+add_executable(highd_bulk_simulation_test src/highd_bulk_simulation_test/highd_bulk_simulation_test.cpp)
+target_link_libraries(highd_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+add_dependencies(highd_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 
 add_executable(highd_simcars_demo src/highd_simcars_demo/highd_simcars_demo.cpp)
 target_link_libraries(highd_simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)

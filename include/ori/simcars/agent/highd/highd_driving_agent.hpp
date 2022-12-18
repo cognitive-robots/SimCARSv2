@@ -52,7 +52,7 @@ public:
 
     structures::IArray<IValuelessEvent const*>* get_events() const override;
 
-    IDrivingAgent* driving_agent_deep_copy() const override;
+    IDrivingAgent* driving_agent_deep_copy(IDrivingScene *driving_scene) const override;
 
     IDrivingScene const* get_driving_scene() const override;
 

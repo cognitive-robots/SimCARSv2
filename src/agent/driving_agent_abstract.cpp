@@ -14,9 +14,9 @@ namespace simcars
 namespace agent
 {
 
-IEntity* ADrivingAgent::entity_deep_copy() const
+IEntity* ADrivingAgent::entity_deep_copy(IScene *scene) const
 {
-    return this->driving_agent_deep_copy();
+    return this->driving_agent_deep_copy(dynamic_cast<IDrivingScene*>(scene));
 }
 
 IScene const* ADrivingAgent::get_scene() const

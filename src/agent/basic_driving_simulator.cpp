@@ -21,11 +21,6 @@ namespace agent
 
 BasicDrivingSimulator::BasicDrivingSimulator(IDrivingAgentController const *controller) : controller(controller) {}
 
-BasicDrivingSimulator::~BasicDrivingSimulator()
-{
-    delete controller;
-}
-
 void BasicDrivingSimulator::simulate(IReadOnlySceneState const *current_state, ISceneState *next_state, temporal::Duration time_step) const
 {
     this->simulate_driving_scene(

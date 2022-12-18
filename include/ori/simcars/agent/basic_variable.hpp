@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ori/simcars/structures/stl/stl_stack_array.hpp>
 #include <ori/simcars/temporal/precedence_temporal_dictionary.hpp>
 #include <ori/simcars/agent/variable_abstract.hpp>
 #include <ori/simcars/agent/basic_event.hpp>
@@ -114,6 +115,13 @@ public:
             temporal::Time time_window_start,
             temporal::Time time_window_end) const override
     {
+        if (time_event_dict.count() == 0 ||
+                time_window_end < this->get_min_temporal_limit() ||
+                time_window_start > this->get_max_temporal_limit())
+        {
+            return new structures::stl::STLStackArray<IEvent<T> const*>;
+        }
+
         structures::IArray<IEvent<T>*> const *unfiltered_events =
                 time_event_dict.get_values();
         structures::IStackArray<IEvent<T> const*> *filtered_events =
@@ -165,6 +173,13 @@ public:
             temporal::Time time_window_start,
             temporal::Time time_window_end) override
     {
+        if (time_event_dict.count() == 0 ||
+                time_window_end < this->get_min_temporal_limit() ||
+                time_window_start > this->get_max_temporal_limit())
+        {
+            return new structures::stl::STLStackArray<IEvent<T>*>;
+        }
+
         structures::IArray<IEvent<T>*> const *unfiltered_events =
                 time_event_dict.get_values();
         structures::IStackArray<IEvent<T>*> *filtered_events =

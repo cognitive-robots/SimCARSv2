@@ -12,6 +12,8 @@ namespace agent
 
 class IDrivingSimulationScene : public virtual IDrivingScene, public virtual ISimulationScene
 {
+public:
+    virtual IDrivingSimulationScene* driving_simulation_scene_deep_copy() const = 0;
 };
 
 }

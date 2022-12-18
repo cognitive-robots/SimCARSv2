@@ -32,10 +32,33 @@ CSVScene* CSVScene::construct_from(IScene *scene)
     size_t i;
     for(i = 0; i < entities->count(); ++i)
     {
-        new_scene->entity_dict.update((*entities)[i]->get_name(), (*entities)[i]);
+        new_scene->entity_dict.update((*entities)[i]->get_name(),
+                                      (*entities)[i]->entity_deep_copy());
     }
 
     delete entities;
+
+    return new_scene;
+}
+
+IScene* CSVScene::scene_deep_copy() const
+{
+    CSVScene *new_scene = new CSVScene();
+
+    new_scene->min_spatial_limits = this->min_spatial_limits;
+    new_scene->max_spatial_limits = this->max_spatial_limits;
+    new_scene->time_step = this->time_step;
+    new_scene->min_temporal_limit = this->min_temporal_limit;
+    new_scene->max_temporal_limit = this->max_temporal_limit;
+
+    structures::IArray<IEntity*> const *entities = this->entity_dict.get_values();
+
+    size_t i;
+    for(i = 0; i < entities->count(); ++i)
+    {
+        new_scene->entity_dict.update((*entities)[i]->get_name(),
+                                      (*entities)[i]->entity_deep_copy());
+    }
 
     return new_scene;
 }

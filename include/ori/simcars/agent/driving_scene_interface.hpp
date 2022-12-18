@@ -14,6 +14,8 @@ namespace agent
 class IDrivingScene : public virtual IScene
 {
 public:
+    virtual IDrivingScene* driving_scene_deep_copy() const = 0;
+
     virtual structures::IArray<IDrivingAgent const*>* get_driving_agents() const = 0;
     virtual IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const = 0;
 

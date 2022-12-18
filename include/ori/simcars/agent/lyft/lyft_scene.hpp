@@ -31,6 +31,8 @@ public:
 
     static LyftScene* construct_from(IDrivingScene *driving_scene);
 
+    IDrivingScene* driving_scene_deep_copy() const override;
+
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
 
@@ -41,6 +43,7 @@ public:
 
     structures::IArray<IDrivingAgent const*>* get_driving_agents() const override;
     IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const override;
+
 
     structures::IArray<IDrivingAgent*>* get_mutable_driving_agents() override;
     IDrivingAgent* get_mutable_driving_agent(std::string const &driving_agent_name) override;

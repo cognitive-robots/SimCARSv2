@@ -27,6 +27,8 @@ protected:
 public:
     static CSVScene* construct_from(IScene *scene);
 
+    IScene* scene_deep_copy() const override;
+
     geometry::Vec get_min_spatial_limits() const override;
     geometry::Vec get_max_spatial_limits() const override;
 

@@ -3,9 +3,8 @@
 #include <ori/simcars/structures/set_interface.hpp>
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/agent/declarations.hpp>
-#include <ori/simcars/agent/driving_simulation_scene_interface.hpp>
 #include <ori/simcars/agent/driving_simulator_interface.hpp>
-#include <ori/simcars/agent/driving_scene_abstract.hpp>
+#include <ori/simcars/agent/driving_simulation_scene_abstract.hpp>
 #include <ori/simcars/agent/driving_simulation_agent.hpp>
 
 namespace ori
@@ -15,7 +14,7 @@ namespace simcars
 namespace agent
 {
 
-class DrivingSimulationScene : public virtual ADrivingScene, public virtual IDrivingSimulationScene
+class DrivingSimulationScene : public virtual ADrivingSimulationScene
 {
     geometry::Vec min_spatial_limits, max_spatial_limits;
     temporal::Time min_temporal_limit, max_temporal_limit;
@@ -53,6 +52,9 @@ public:
 
     structures::IArray<IDrivingAgent const*>* get_driving_agents() const override;
     IDrivingAgent const* get_driving_agent(std::string const &driving_agent_name) const override;
+
+    IDrivingSimulationScene* driving_simulation_scene_deep_copy() const override;
+
 
     void simulate(temporal::Time time) override;
 

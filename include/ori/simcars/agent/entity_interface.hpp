@@ -20,7 +20,7 @@ class IEntity
 public:
     virtual ~IEntity() = default;
 
-    virtual IEntity* entity_deep_copy() const = 0;
+    virtual IEntity* entity_deep_copy(IScene *scene = nullptr) const = 0;
 
     virtual std::string get_name() const = 0;
 

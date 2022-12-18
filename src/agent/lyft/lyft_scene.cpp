@@ -40,10 +40,33 @@ LyftScene* LyftScene::construct_from(IDrivingScene *driving_scene)
     size_t i;
     for(i = 0; i < driving_agents->count(); ++i)
     {
-        new_driving_scene->driving_agent_dict.update((*driving_agents)[i]->get_name(), (*driving_agents)[i]);
+        new_driving_scene->driving_agent_dict.update((*driving_agents)[i]->get_name(),
+                                                     (*driving_agents)[i]->driving_agent_deep_copy(new_driving_scene));
     }
 
     delete driving_agents;
+
+    return new_driving_scene;
+}
+
+IDrivingScene* LyftScene::driving_scene_deep_copy() const
+{
+    LyftScene *new_driving_scene = new LyftScene();
+
+    new_driving_scene->min_spatial_limits = this->min_spatial_limits;
+    new_driving_scene->max_spatial_limits = this->max_spatial_limits;
+    new_driving_scene->time_step = this->time_step;
+    new_driving_scene->min_temporal_limit = this->min_temporal_limit;
+    new_driving_scene->max_temporal_limit = this->max_temporal_limit;
+
+    structures::IArray<IDrivingAgent*> const *driving_agents = this->driving_agent_dict.get_values();
+
+    size_t i;
+    for(i = 0; i < driving_agents->count(); ++i)
+    {
+        new_driving_scene->driving_agent_dict.update((*driving_agents)[i]->get_name(),
+                                                     (*driving_agents)[i]->driving_agent_deep_copy(new_driving_scene));
+    }
 
     return new_driving_scene;
 }

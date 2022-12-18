@@ -2,10 +2,10 @@
 
 #include <ori/simcars/temporal/precedence_temporal_dictionary.hpp>
 #include <ori/simcars/agent/declarations.hpp>
-#include <ori/simcars/agent/driving_agent_abstract.hpp>
 #include <ori/simcars/agent/basic_driving_agent_state.hpp>
 #include <ori/simcars/agent/simulated_valueless_variable_interface.hpp>
 #include <ori/simcars/agent/driving_simulation_scene_interface.hpp>
+#include <ori/simcars/agent/driving_simulation_agent_abstract.hpp>
 
 namespace ori
 {
@@ -14,7 +14,7 @@ namespace simcars
 namespace agent
 {
 
-class DrivingSimulationAgent : public virtual ADrivingAgent
+class DrivingSimulationAgent : public virtual ADrivingSimulationAgent
 {
     IDrivingAgent *driving_agent;
 
@@ -22,7 +22,6 @@ class DrivingSimulationAgent : public virtual ADrivingAgent
     temporal::Time simulation_end_time;
     temporal::Time latest_simulated_time;
 
-    structures::stl::STLDictionary<std::string, IValuelessVariable*> non_simulated_variable_dict;
     structures::stl::STLDictionary<std::string, ISimulatedValuelessVariable*> simulated_variable_dict;
 
     IDrivingSimulationScene const *driving_simulation_scene;
@@ -63,11 +62,11 @@ public:
 
     structures::IArray<IValuelessEvent const*>* get_events() const override;
 
-    IDrivingAgent* driving_agent_deep_copy() const override;
+    IDrivingSimulationAgent* driving_simulation_agent_deep_copy(IDrivingSimulationScene *driving_simulation_scene) const override;
 
-    IDrivingScene const* get_driving_scene() const override;
+    IDrivingSimulationScene const* get_driving_simulation_scene() const override;
 
-    void begin_simulation(temporal::Time simulation_start_time) const;
+    void begin_simulation(temporal::Time simulation_start_time) const override;
 
 
     structures::IArray<IValuelessConstant*>* get_mutable_constant_parameters() override;

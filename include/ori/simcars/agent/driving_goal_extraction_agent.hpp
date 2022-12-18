@@ -410,16 +410,6 @@ public:
                                IDrivingScene const *driving_scene)
         : driving_agent(driving_agent), driving_scene(driving_scene)
     {
-        structures::IArray<IValuelessVariable*> const *variables =
-                driving_agent->get_mutable_variable_parameters();
-
-        for(size_t i = 0; i < variables->count(); ++i)
-        {
-            this->variable_dict.update((*variables)[i]->get_full_name(), (*variables)[i]);
-        }
-
-        delete variables;
-
         this->extract_aligned_linear_velocity_change_events();
     }
     DrivingGoalExtractionAgent(IDrivingAgent *driving_agent,
@@ -432,70 +422,87 @@ public:
 
     ~DrivingGoalExtractionAgent()
     {
-        std::string variable_name;
+        structures::IArray<IValuelessVariable*> const *variables = variable_dict.get_values();
 
-        variable_name = this->get_name() + ".aligned_linear_velocity.goal_value";
-        if (variable_dict.contains(variable_name))
+        for (size_t i = 0; i < variables->count(); ++i)
         {
-            delete variable_dict[variable_name];
-        }
-
-        variable_name = this->get_name() + ".aligned_linear_velocity.goal_duration";
-        if (variable_dict.contains(variable_name))
-        {
-            delete variable_dict[variable_name];
-        }
-
-        variable_name = this->get_name() + ".lane.goal_value";
-        if (variable_dict.contains(variable_name))
-        {
-            delete variable_dict[variable_name];
-        }
-
-        variable_name = this->get_name() + ".lane.goal_duration";
-        if (variable_dict.contains(variable_name))
-        {
-            delete variable_dict[variable_name];
+            delete (*variables)[i];
         }
     }
 
     std::string get_name() const override
     {
-        return this->driving_agent->get_name();
+        return driving_agent->get_name();
     }
 
     geometry::Vec get_min_spatial_limits() const override
     {
-        return this->driving_agent->get_min_spatial_limits();
+        return driving_agent->get_min_spatial_limits();
     }
     geometry::Vec get_max_spatial_limits() const override
     {
-        return this->driving_agent->get_max_spatial_limits();
+        return driving_agent->get_max_spatial_limits();
     }
 
     temporal::Time get_min_temporal_limit() const override
     {
-        return this->driving_agent->get_min_temporal_limit();
+        return driving_agent->get_min_temporal_limit();
     }
     temporal::Time get_max_temporal_limit() const override
     {
-        return this->driving_agent->get_max_temporal_limit();
+        return driving_agent->get_max_temporal_limit();
     }
 
     structures::IArray<IValuelessConstant const*>* get_constant_parameters() const override
     {
-        return this->driving_agent->get_constant_parameters();
+        return driving_agent->get_constant_parameters();
     }
     IValuelessConstant const* get_constant_parameter(std::string const &constant_name) const override
     {
-        return this->driving_agent->get_constant_parameter(constant_name);
+        return driving_agent->get_constant_parameter(constant_name);
     }
 
     structures::IArray<IValuelessVariable const*>* get_variable_parameters() const override
     {
-        structures::stl::STLStackArray<IValuelessVariable const*> *variables =
+        structures::stl::STLConcatArray<IValuelessVariable const*> *variables =
+                    new structures::stl::STLConcatArray<IValuelessVariable const*>(2);
+
+        structures::IArray<IValuelessVariable const*> *goal_extraction_variables =
                 new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.count());
-        cast_array(*variable_dict.get_values(), *variables);
+        cast_array(*(variable_dict.get_values()), *goal_extraction_variables);
+        variables->get_array(0) = goal_extraction_variables;
+
+        structures::IArray<IValuelessVariable const*> *unfiltered_other_variables =
+                driving_agent->get_variable_parameters();
+        structures::IStackArray<IValuelessVariable const*> *filtered_other_variables =
+                new structures::stl::STLStackArray<IValuelessVariable const*>;
+
+        bool found_variable;
+        size_t i, j;
+        for (i = 0; i < unfiltered_other_variables->count(); ++i)
+        {
+            found_variable = false;
+
+            for (j = 0; j < goal_extraction_variables->count(); ++j)
+            {
+                if ((*goal_extraction_variables)[j]->get_parameter_name() ==
+                        (*unfiltered_other_variables)[i]->get_parameter_name())
+                {
+                    found_variable = true;
+                    break;
+                }
+            }
+
+            if (!found_variable)
+            {
+                filtered_other_variables->push_back((*unfiltered_other_variables)[i]);
+            }
+        }
+
+        variables->get_array(1) = filtered_other_variables;
+
+        delete unfiltered_other_variables;
+
         return variables;
     }
     IValuelessVariable const* get_variable_parameter(std::string const &variable_name) const override
@@ -506,27 +513,31 @@ public:
         }
         else
         {
-            return nullptr;
+            return driving_agent->get_variable_parameter(variable_name);
         }
     }
 
     structures::IArray<IValuelessEvent const*>* get_events() const override
     {
-        structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
+        structures::IArray<IValuelessVariable const*> *variables = this->get_variable_parameters();
 
         structures::stl::STLConcatArray<IValuelessEvent const*> *events =
-                    new structures::stl::STLConcatArray<IValuelessEvent const*>(variable_names->count());
+                    new structures::stl::STLConcatArray<IValuelessEvent const*>(
+                        variables->count());
 
         size_t i;
-        for(i = 0; i < variable_names->count(); ++i)
+
+        for(i = 0; i < variables->count(); ++i)
         {
-            events->get_array(i) = variable_dict[(*variable_names)[i]]->get_valueless_events();
+            events->get_array(i) = (*variables)[i]->get_valueless_events();
         }
+
+        delete variables;
 
         return events;
     }
 
-    IDrivingAgent* driving_agent_deep_copy() const override
+    IDrivingAgent* driving_agent_deep_copy(IDrivingScene *driving_scene) const override
     {
         DrivingGoalExtractionAgent *driving_agent = new DrivingGoalExtractionAgent;
 
@@ -536,6 +547,15 @@ public:
         for(size_t i = 0; i < variable_names->count(); ++i)
         {
             driving_agent->variable_dict.update((*variable_names)[i], variable_dict[(*variable_names)[i]]->valueless_deep_copy());
+        }
+
+        if (driving_scene == nullptr)
+        {
+            driving_agent->driving_scene = this->driving_scene;
+        }
+        else
+        {
+            driving_agent->driving_scene = driving_scene;
         }
 
         return driving_agent;
@@ -558,9 +578,45 @@ public:
 
     structures::IArray<IValuelessVariable*>* get_mutable_variable_parameters() override
     {
-        structures::stl::STLStackArray<IValuelessVariable*> *variables =
-                new structures::stl::STLStackArray<IValuelessVariable*>(variable_dict.count());
-        variable_dict.get_values(variables);
+        structures::stl::STLConcatArray<IValuelessVariable*> *variables =
+                    new structures::stl::STLConcatArray<IValuelessVariable*>(2);
+
+        structures::IArray<IValuelessVariable*> *goal_extraction_variables =
+                new structures::stl::STLStackArray<IValuelessVariable*>(
+                    variable_dict.get_values());
+        variables->get_array(0) = goal_extraction_variables;
+
+        structures::IArray<IValuelessVariable*> *unfiltered_other_variables =
+                driving_agent->get_mutable_variable_parameters();
+        structures::IStackArray<IValuelessVariable*> *filtered_other_variables =
+                new structures::stl::STLStackArray<IValuelessVariable*>;
+
+        bool found_variable;
+        size_t i, j;
+        for (i = 0; i < unfiltered_other_variables->count(); ++i)
+        {
+            found_variable = false;
+
+            for (j = 0; j < goal_extraction_variables->count(); ++j)
+            {
+                if ((*goal_extraction_variables)[j]->get_parameter_name() ==
+                        (*unfiltered_other_variables)[i]->get_parameter_name())
+                {
+                    found_variable = true;
+                    break;
+                }
+            }
+
+            if (!found_variable)
+            {
+                filtered_other_variables->push_back((*unfiltered_other_variables)[i]);
+            }
+        }
+
+        variables->get_array(1) = filtered_other_variables;
+
+        delete unfiltered_other_variables;
+
         return variables;
     }
     IValuelessVariable* get_mutable_variable_parameter(std::string const &variable_name) override
@@ -571,22 +627,26 @@ public:
         }
         else
         {
-            return nullptr;
+            return driving_agent->get_mutable_variable_parameter(variable_name);
         }
     }
 
     structures::IArray<IValuelessEvent*>* get_mutable_events() override
     {
-        structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
+        structures::IArray<IValuelessVariable*> *variables = this->get_mutable_variable_parameters();
 
         structures::stl::STLConcatArray<IValuelessEvent*> *events =
-                new structures::stl::STLConcatArray<IValuelessEvent*>(variable_names->count());
+                    new structures::stl::STLConcatArray<IValuelessEvent*>(
+                        variables->count());
 
         size_t i;
-        for(i = 0; i < variable_names->count(); ++i)
+
+        for(i = 0; i < variables->count(); ++i)
         {
-            events->get_array(i) = variable_dict[(*variable_names)[i]]->get_mutable_valueless_events();
+            events->get_array(i) = (*variables)[i]->get_mutable_valueless_events();
         }
+
+        delete variables;
 
         return events;
     }

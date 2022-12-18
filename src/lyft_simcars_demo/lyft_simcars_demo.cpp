@@ -173,6 +173,9 @@ int main(int argc, char *argv[])
     delete scene_with_actions;
     delete scene;
 
+    delete driving_simulator;
+    delete driving_agent_controller;
+
     delete map;
 
     geometry::TrigBuff::destroy_instance();
