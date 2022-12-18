@@ -34,8 +34,8 @@ std::string AValuelessVariable::get_type_name() const
         case IValuelessVariable::Type::GOAL_VALUE:
             return "goal_value";
 
-        case IValuelessVariable::Type::GOAL_DURATION:
-            return "goal_duration";
+        case IValuelessVariable::Type::GOAL_TIME:
+            return "goal_time";
 
         case IValuelessVariable::Type::EXTERNAL:
             return "external";

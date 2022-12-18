@@ -37,9 +37,9 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         IVariable<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_variable =
                     new BasicVariable<FP_DATA_TYPE>(
                         this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL_VALUE);
-        IVariable<temporal::Duration> *aligned_linear_velocity_goal_duration_variable =
-                    new BasicVariable<temporal::Duration>(
-                        this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL_DURATION);
+        IVariable<temporal::Time> *aligned_linear_velocity_goal_time_variable =
+                    new BasicVariable<temporal::Time>(
+                        this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL_TIME);
 
         temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_ALIGNED_LINEAR_VELOCITY_CHANGE_DURATION_THRESHOLD));
 
@@ -82,11 +82,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 || action_start_time == this->get_min_temporal_limit())
                         {
                             aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
-                            {
-                                aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                            }
+                            aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time);
                         }
                     }
                 }
@@ -98,11 +94,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
-                        }
+                        aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time - this->get_scene()->get_time_step());
                     }
 
                     action_start_time = current_time - this->get_scene()->get_time_step();
@@ -116,11 +108,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                        }
+                        aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time);
                     }
                 }
             }
@@ -134,11 +122,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
-                        }
+                        aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time - this->get_scene()->get_time_step());
                     }
 
                     action_start_time = current_time - this->get_scene()->get_time_step();
@@ -155,11 +139,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 || action_start_time == this->get_min_temporal_limit())
                         {
                             aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
-
-                            for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
-                            {
-                                aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                            }
+                            aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time);
                         }
                     }
                 }
@@ -171,11 +151,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                                 && action_start_time == this->get_min_temporal_limit()))
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                        }
+                        aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time);
                     }
                 }
             }
@@ -186,11 +162,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     if (action_start_time == this->get_min_temporal_limit())
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
-                        }
+                        aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time - this->get_scene()->get_time_step());
                     }
 
                     action_start_time = current_time - this->get_scene()->get_time_step();
@@ -201,11 +173,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     if (action_start_time == this->get_min_temporal_limit())
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, previous_aligned_linear_velocity);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time - this->get_scene()->get_time_step(); current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, (current_time - this->get_scene()->get_time_step()) - current_time_2);
-                        }
+                        aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time - this->get_scene()->get_time_step());
                     }
 
                     action_start_time = current_time - this->get_scene()->get_time_step();
@@ -218,11 +186,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     if (current_time + this->get_scene()->get_time_step() > this->get_max_temporal_limit() && action_start_time == this->get_min_temporal_limit())
                     {
                         aligned_linear_velocity_goal_value_variable->set_value(action_start_time, current_aligned_linear_velocity);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            aligned_linear_velocity_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                        }
+                        aligned_linear_velocity_goal_time_variable->set_value(action_start_time, current_time);
                     }
                 }
             }
@@ -236,7 +200,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
             if (aligned_linear_velocity_variable->get_value(this->get_min_temporal_limit(), initial_aligned_linear_velocity))
             {
                 aligned_linear_velocity_goal_value_variable->set_value(this->get_min_temporal_limit(), initial_aligned_linear_velocity);
-                aligned_linear_velocity_goal_duration_variable->set_value(this->get_min_temporal_limit(), temporal::Duration(0));
+                aligned_linear_velocity_goal_time_variable->set_value(this->get_min_temporal_limit(), this->get_min_temporal_limit());
             }
             else
             {
@@ -246,7 +210,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         delete events;
 
         this->variable_dict.update(aligned_linear_velocity_goal_value_variable->get_full_name(), aligned_linear_velocity_goal_value_variable);
-        this->variable_dict.update(aligned_linear_velocity_goal_duration_variable->get_full_name(), aligned_linear_velocity_goal_duration_variable);
+        this->variable_dict.update(aligned_linear_velocity_goal_time_variable->get_full_name(), aligned_linear_velocity_goal_time_variable);
     }
     void extract_lane_change_events(map::IMap<T_map_id> const *map)
     {
@@ -257,9 +221,9 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         IVariable<int32_t> *lane_goal_value_variable =
                     new BasicVariable<int32_t>(
                         this->get_name(), "lane", IValuelessVariable::Type::GOAL_VALUE);
-        IVariable<temporal::Duration> *lane_goal_duration_variable =
-                    new BasicVariable<temporal::Duration>(
-                        this->get_name(), "lane", IValuelessVariable::Type::GOAL_DURATION);
+        IVariable<temporal::Time> *lane_goal_time_variable =
+                    new BasicVariable<temporal::Time>(
+                        this->get_name(), "lane", IValuelessVariable::Type::GOAL_TIME);
 
         temporal::Time current_time;
         temporal::Time action_start_time;
@@ -364,11 +328,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
                     if (lane_change_offset != 0)
                     {
                         lane_goal_value_variable->set_value(action_start_time, lane_change_offset);
-
-                        for (temporal::Time current_time_2 = action_start_time; current_time_2 <= current_time; current_time_2 += this->get_scene()->get_time_step())
-                        {
-                            lane_goal_duration_variable->set_value(current_time_2, current_time - current_time_2);
-                        }
+                        lane_goal_time_variable->set_value(action_start_time, current_time);
                     }
                     else
                     {
@@ -397,7 +357,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         delete previous_lanes;
 
         this->variable_dict.update(lane_goal_value_variable->get_full_name(), lane_goal_value_variable);
-        this->variable_dict.update(lane_goal_duration_variable->get_full_name(), lane_goal_duration_variable);
+        this->variable_dict.update(lane_goal_time_variable->get_full_name(), lane_goal_time_variable);
     }
 
 protected:

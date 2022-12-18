@@ -23,7 +23,7 @@ public:
         INDIRECT_ACTUATION = 1,
         DIRECT_ACTUATION = 2,
         GOAL_VALUE = 3,
-        GOAL_DURATION = 4,
+        GOAL_TIME = 4,
         EXTERNAL = 5
     };
 

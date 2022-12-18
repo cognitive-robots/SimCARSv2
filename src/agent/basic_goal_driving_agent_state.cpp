@@ -21,12 +21,12 @@ IConstant<FP_DATA_TYPE> const* BasicGoalDrivingAgentState::get_aligned_linear_ve
     return dynamic_cast<IConstant<FP_DATA_TYPE> const*>(aligned_linear_velocity_goal_value_valueless_variable);
 }
 
-IConstant<temporal::Duration> const* BasicGoalDrivingAgentState::get_aligned_linear_velocity_goal_duration_variable() const
+IConstant<temporal::Time> const* BasicGoalDrivingAgentState::get_aligned_linear_velocity_goal_time_variable() const
 {
-    IValuelessConstant const *aligned_linear_velocity_goal_duration_valueless_variable =
-            this->get_parameter_value(this->get_name() + ".aligned_linear_velocity.goal_duration");
-    return dynamic_cast<IConstant<temporal::Duration> const*>(
-                aligned_linear_velocity_goal_duration_valueless_variable);
+    IValuelessConstant const *aligned_linear_velocity_goal_time_valueless_variable =
+            this->get_parameter_value(this->get_name() + ".aligned_linear_velocity.goal_time");
+    return dynamic_cast<IConstant<temporal::Time> const*>(
+                aligned_linear_velocity_goal_time_valueless_variable);
 }
 
 void BasicGoalDrivingAgentState::set_aligned_linear_velocity_goal_value_variable(
@@ -36,11 +36,11 @@ void BasicGoalDrivingAgentState::set_aligned_linear_velocity_goal_value_variable
                           aligned_linear_velocity_goal_value_variable);
 }
 
-void BasicGoalDrivingAgentState::set_aligned_linear_velocity_goal_duration_variable(
-        IConstant<temporal::Duration> *aligned_linear_velocity_goal_duration_variable)
+void BasicGoalDrivingAgentState::set_aligned_linear_velocity_goal_time_variable(
+        IConstant<temporal::Time> *aligned_linear_velocity_goal_time_variable)
 {
-    parameter_dict.update(aligned_linear_velocity_goal_duration_variable->get_full_name(),
-                          aligned_linear_velocity_goal_duration_variable);
+    parameter_dict.update(aligned_linear_velocity_goal_time_variable->get_full_name(),
+                          aligned_linear_velocity_goal_time_variable);
 }
 
 }

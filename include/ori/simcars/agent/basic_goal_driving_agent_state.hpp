@@ -17,12 +17,12 @@ public:
     BasicGoalDrivingAgentState(IDrivingAgentState *driving_agent_state, bool copy_parameters = true);
 
     virtual IConstant<FP_DATA_TYPE> const* get_aligned_linear_velocity_goal_value_variable() const;
-    virtual IConstant<temporal::Duration> const* get_aligned_linear_velocity_goal_duration_variable() const;
+    virtual IConstant<temporal::Time> const* get_aligned_linear_velocity_goal_time_variable() const;
 
     virtual void set_aligned_linear_velocity_goal_value_variable(
             IConstant<FP_DATA_TYPE>* aligned_linear_velocity_goal_value_variable);
-    virtual void set_aligned_linear_velocity_goal_duration_variable(
-            IConstant<temporal::Duration>* aligned_linear_velocity_goal_duration_variable);
+    virtual void set_aligned_linear_velocity_goal_time_variable(
+            IConstant<temporal::Time>* aligned_linear_velocity_goal_time_variable);
 };
 
 }
