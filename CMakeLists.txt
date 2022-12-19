@@ -256,6 +256,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/driving_simulation_agent_abstract.hpp
   include/ori/simcars/agent/driving_simulation_scene_abstract.hpp
   include/ori/simcars/agent/driving_agent_reward_calculator_abstract.hpp
+  include/ori/simcars/agent/goal.hpp
   include/ori/simcars/agent/basic_constant.hpp
   include/ori/simcars/agent/basic_event.hpp
   include/ori/simcars/agent/basic_variable.hpp

@@ -134,8 +134,7 @@ int main(int argc, char *argv[])
     structures::IArray<agent::IDrivingAgent const*> *driving_agents_with_actions =
             scene_with_actions->get_driving_agents();
 
-    agent::IEvent<FP_DATA_TYPE> const *selected_action_goal_value_event = nullptr;
-    agent::IEvent<temporal::Time> const *selected_action_goal_time_event = nullptr;
+    agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *selected_action_goal_event = nullptr;
     temporal::Time previous_action_time, next_action_time;
 
     for (i = 0; i < driving_agents_with_actions->count(); ++i)
@@ -143,73 +142,54 @@ int main(int argc, char *argv[])
         agent::IDrivingAgent const *driving_agent_with_actions =
                 (*driving_agents_with_actions)[i];
 
-        agent::IValuelessVariable const *aligned_linear_velocity_goal_value_valueless_variable =
+        agent::IValuelessVariable const *aligned_linear_velocity_goal_valueless_variable =
                 driving_agent_with_actions->get_variable_parameter(
                     driving_agent_with_actions->get_name() +
-                    ".aligned_linear_velocity.goal_value");
-        agent::IValuelessVariable const *aligned_linear_velocity_goal_time_valueless_variable =
-                driving_agent_with_actions->get_variable_parameter(
-                    driving_agent_with_actions->get_name() +
-                    ".aligned_linear_velocity.goal_time");
+                    ".aligned_linear_velocity.goal");
 
-        agent::IVariable<FP_DATA_TYPE> const *aligned_linear_velocity_goal_value_variable =
-                dynamic_cast<agent::IVariable<FP_DATA_TYPE> const*>(
-                    aligned_linear_velocity_goal_value_valueless_variable);
-        agent::IVariable<temporal::Time> const *aligned_linear_velocity_goal_time_variable =
-                dynamic_cast<agent::IVariable<temporal::Time> const*>(
-                    aligned_linear_velocity_goal_time_valueless_variable);
+        agent::IVariable<agent::Goal<FP_DATA_TYPE>> const *aligned_linear_velocity_goal_variable =
+                dynamic_cast<agent::IVariable<agent::Goal<FP_DATA_TYPE>> const*>(
+                    aligned_linear_velocity_goal_valueless_variable);
 
-        structures::IArray<agent::IEvent<FP_DATA_TYPE> const*> *aligned_linear_velocity_goal_value_events =
-                aligned_linear_velocity_goal_value_variable->get_events();
+        structures::IArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*> *aligned_linear_velocity_goal_events =
+                aligned_linear_velocity_goal_variable->get_events();
 
-        for (j = 0; j < aligned_linear_velocity_goal_value_events->count(); ++j)
+        for (j = 0; j < aligned_linear_velocity_goal_events->count(); ++j)
         {
-            agent::IEvent<FP_DATA_TYPE> const *aligned_linear_velocity_goal_value_event =
-                    (*aligned_linear_velocity_goal_value_events)[j];
+            agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *aligned_linear_velocity_goal_event =
+                    (*aligned_linear_velocity_goal_events)[j];
 
-            if (aligned_linear_velocity_goal_value_event->get_time() >
+            if (aligned_linear_velocity_goal_event->get_time() >
                     driving_agent_with_actions->get_min_temporal_limit())
             {
-                selected_action_goal_value_event = aligned_linear_velocity_goal_value_event;
-                selected_action_goal_time_event =
-                        aligned_linear_velocity_goal_time_variable->get_event(
-                            selected_action_goal_value_event->get_time(),
-                            true);
-                if (selected_action_goal_time_event != nullptr)
+                selected_action_goal_event = aligned_linear_velocity_goal_event;
+                if (j == 0)
                 {
-                    if (j == 0)
-                    {
-                        previous_action_time =
-                                driving_agent_with_actions->get_min_temporal_limit();
-                    }
-                    else
-                    {
-                        previous_action_time =
-                                (*aligned_linear_velocity_goal_value_events)[j - 1]->get_time();
-                    }
-                    if (j == aligned_linear_velocity_goal_value_events->count() - 1)
-                    {
-                        next_action_time =
-                                driving_agent_with_actions->get_max_temporal_limit();
-                    }
-                    else
-                    {
-                        next_action_time =
-                                (*aligned_linear_velocity_goal_value_events)[j + 1]->get_time();
-                    }
-                    break;
+                    previous_action_time =
+                            driving_agent_with_actions->get_min_temporal_limit();
                 }
                 else
                 {
-                    selected_action_goal_value_event = nullptr;
-                    continue;
+                    previous_action_time =
+                            (*aligned_linear_velocity_goal_events)[j - 1]->get_time();
                 }
+                if (j == aligned_linear_velocity_goal_events->count() - 1)
+                {
+                    next_action_time =
+                            driving_agent_with_actions->get_max_temporal_limit();
+                }
+                else
+                {
+                    next_action_time =
+                            (*aligned_linear_velocity_goal_events)[j + 1]->get_time();
+                }
+                break;
             }
         }
 
-        delete aligned_linear_velocity_goal_value_events;
+        delete aligned_linear_velocity_goal_events;
 
-        if (selected_action_goal_value_event != nullptr)
+        if (selected_action_goal_event != nullptr)
         {
             break;
         }
@@ -217,7 +197,7 @@ int main(int argc, char *argv[])
 
     delete driving_agents_with_actions;
 
-    if (selected_action_goal_value_event == nullptr)
+    if (selected_action_goal_event == nullptr)
     {
         std::cerr << "Could not find action to replace" << std::endl;
         return -1;
@@ -229,7 +209,7 @@ int main(int argc, char *argv[])
 
     structures::ISet<std::string> *simulated_agent_names = new structures::stl::STLSet<std::string>;
 
-    simulated_agent_names->insert(selected_action_goal_value_event->get_entity_name());
+    simulated_agent_names->insert(selected_action_goal_event->get_entity_name());
 
     for (i = 1; i < NUMBER_OF_SIMULATED_AGENTS; ++i)
     {
@@ -258,21 +238,15 @@ int main(int argc, char *argv[])
 
         agent::IDrivingAgent *driving_agent_to_edit =
                 new_scene->get_mutable_driving_agent(
-                    selected_action_goal_value_event->get_entity_name());
+                    selected_action_goal_event->get_entity_name());
 
-        agent::IValuelessVariable *aligned_linear_velocity_goal_value_valueless_variable =
+        agent::IValuelessVariable *aligned_linear_velocity_goal_valueless_variable =
                 driving_agent_to_edit->get_mutable_variable_parameter(
-                    selected_action_goal_value_event->get_full_name());
-        agent::IValuelessVariable *aligned_linear_velocity_goal_time_valueless_variable =
-                driving_agent_to_edit->get_mutable_variable_parameter(
-                    selected_action_goal_time_event->get_full_name());
+                    selected_action_goal_event->get_full_name());
 
-        agent::IVariable<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_variable =
-                dynamic_cast<agent::IVariable<FP_DATA_TYPE>*>(
-                    aligned_linear_velocity_goal_value_valueless_variable);
-        agent::IVariable<temporal::Time> *aligned_linear_velocity_goal_time_variable =
-                dynamic_cast<agent::IVariable<temporal::Time>*>(
-                    aligned_linear_velocity_goal_time_valueless_variable);
+        agent::IVariable<agent::Goal<FP_DATA_TYPE>> *aligned_linear_velocity_goal_variable =
+                dynamic_cast<agent::IVariable<agent::Goal<FP_DATA_TYPE>>*>(
+                    aligned_linear_velocity_goal_valueless_variable);
 
         FP_DATA_TYPE new_goal_value;
         temporal::Time new_action_start_time;
@@ -286,15 +260,13 @@ int main(int argc, char *argv[])
                                      new_action_start_time,
                                      new_action_end_time);
 
-        aligned_linear_velocity_goal_value_variable->remove_value(
-                    selected_action_goal_value_event->get_time());
-        aligned_linear_velocity_goal_time_variable->remove_value(
-                    selected_action_goal_time_event->get_time());
+        aligned_linear_velocity_goal_variable->remove_value(
+                    selected_action_goal_event->get_time());
 
-        aligned_linear_velocity_goal_value_variable->set_value(new_action_start_time,
-                                                               new_goal_value);
-        aligned_linear_velocity_goal_time_variable->set_value(new_action_start_time,
-                                                              new_action_end_time);
+        aligned_linear_velocity_goal_variable->set_value(
+                    new_action_start_time,
+                    agent::Goal(new_goal_value,
+                                new_action_end_time));
 
         (*scenes_with_actions)[i] = new_scene;
     }

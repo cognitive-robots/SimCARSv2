@@ -14,33 +14,18 @@ BasicGoalDrivingAgentState::BasicGoalDrivingAgentState(std::string const &drivin
 BasicGoalDrivingAgentState::BasicGoalDrivingAgentState(IDrivingAgentState *driving_agent_state, bool copy_parameters) :
     BasicDrivingAgentState(driving_agent_state, copy_parameters) {}
 
-IConstant<FP_DATA_TYPE> const* BasicGoalDrivingAgentState::get_aligned_linear_velocity_goal_value_variable() const
+IConstant<Goal<FP_DATA_TYPE>> const* BasicGoalDrivingAgentState::get_aligned_linear_velocity_goal_variable() const
 {
-    IValuelessConstant const *aligned_linear_velocity_goal_value_valueless_variable =
-            this->get_parameter_value(this->get_name() + ".aligned_linear_velocity.goal_value");
-    return dynamic_cast<IConstant<FP_DATA_TYPE> const*>(aligned_linear_velocity_goal_value_valueless_variable);
+    IValuelessConstant const *aligned_linear_velocity_goal_valueless_variable =
+            this->get_parameter_value(this->get_name() + ".aligned_linear_velocity.goal");
+    return dynamic_cast<IConstant<Goal<FP_DATA_TYPE>> const*>(aligned_linear_velocity_goal_valueless_variable);
 }
 
-IConstant<temporal::Time> const* BasicGoalDrivingAgentState::get_aligned_linear_velocity_goal_time_variable() const
+void BasicGoalDrivingAgentState::set_aligned_linear_velocity_goal_variable(
+        IConstant<Goal<FP_DATA_TYPE>> *aligned_linear_velocity_goal_variable)
 {
-    IValuelessConstant const *aligned_linear_velocity_goal_time_valueless_variable =
-            this->get_parameter_value(this->get_name() + ".aligned_linear_velocity.goal_time");
-    return dynamic_cast<IConstant<temporal::Time> const*>(
-                aligned_linear_velocity_goal_time_valueless_variable);
-}
-
-void BasicGoalDrivingAgentState::set_aligned_linear_velocity_goal_value_variable(
-        IConstant<FP_DATA_TYPE> *aligned_linear_velocity_goal_value_variable)
-{
-    parameter_dict.update(aligned_linear_velocity_goal_value_variable->get_full_name(),
-                          aligned_linear_velocity_goal_value_variable);
-}
-
-void BasicGoalDrivingAgentState::set_aligned_linear_velocity_goal_time_variable(
-        IConstant<temporal::Time> *aligned_linear_velocity_goal_time_variable)
-{
-    parameter_dict.update(aligned_linear_velocity_goal_time_variable->get_full_name(),
-                          aligned_linear_velocity_goal_time_variable);
+    parameter_dict.update(aligned_linear_velocity_goal_variable->get_full_name(),
+                          aligned_linear_velocity_goal_variable);
 }
 
 }

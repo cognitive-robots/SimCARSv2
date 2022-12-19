@@ -16,12 +16,12 @@ typedef std::chrono::time_point<std::chrono::steady_clock, Duration> Time;
 
 }
 
-inline std::ostream& operator <<(std::ostream &output_stream, temporal::Duration const &duration)
+inline std::ostream& operator<<(std::ostream &output_stream, temporal::Duration const &duration)
 {
     return output_stream << std::to_string(duration.count());
 }
 
-inline std::ostream& operator <<(std::ostream &output_stream, temporal::Time const &time)
+inline std::ostream& operator<<(std::ostream &output_stream, temporal::Time const &time)
 {
     return output_stream << time.time_since_epoch();
 }

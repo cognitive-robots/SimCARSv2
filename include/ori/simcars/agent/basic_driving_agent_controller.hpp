@@ -8,6 +8,7 @@
 #include <ori/simcars/agent/scene_interface.hpp>
 #include <ori/simcars/agent/driving_agent_interface.hpp>
 #include <ori/simcars/agent/driving_agent_controller_interface.hpp>
+#include <ori/simcars/agent/goal.hpp>
 #include <ori/simcars/agent/basic_constant.hpp>
 #include <ori/simcars/agent/basic_driving_agent_state.hpp>
 #include <ori/simcars/agent/basic_driving_agent_controller.hpp>
@@ -53,28 +54,22 @@ public:
 
         FP_DATA_TYPE new_aligned_linear_acceleration;
 
-        IValuelessConstant const *aligned_linear_velocity_goal_value_valueless_variable =
-                original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_value");
-        IValuelessConstant const *aligned_linear_velocity_goal_time_valueless_variable =
-                original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal_time");
+        IValuelessConstant const *aligned_linear_velocity_goal_valueless_variable =
+                original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal");
 
-        if (aligned_linear_velocity_goal_value_valueless_variable == nullptr ||
-                aligned_linear_velocity_goal_time_valueless_variable == nullptr)
+        if (aligned_linear_velocity_goal_valueless_variable == nullptr)
         {
             std::cerr << "Could not actuate aligned linear acceleration variable" << std::endl;
             new_aligned_linear_acceleration = 0.0f;
         }
 
-        IConstant<FP_DATA_TYPE> const *aligned_linear_velocity_goal_value_variable =
-                dynamic_cast<IConstant<FP_DATA_TYPE> const*>(aligned_linear_velocity_goal_value_valueless_variable);
-        IConstant<temporal::Time> const *aligned_linear_velocity_goal_time_variable =
-                dynamic_cast<IConstant<temporal::Time> const*>(aligned_linear_velocity_goal_time_valueless_variable);
+        IConstant<Goal<FP_DATA_TYPE>> const *aligned_linear_velocity_goal_variable =
+                dynamic_cast<IConstant<Goal<FP_DATA_TYPE>> const*>(aligned_linear_velocity_goal_valueless_variable);
 
-        FP_DATA_TYPE aligned_linear_velocity_goal_value = aligned_linear_velocity_goal_value_variable->get_value();
-        temporal::Time aligned_linear_velocity_goal_time = aligned_linear_velocity_goal_time_variable->get_value();
+        Goal<FP_DATA_TYPE> aligned_linear_velocity_goal = aligned_linear_velocity_goal_variable->get_value();
 
-        FP_DATA_TYPE aligned_linear_velocity_error = aligned_linear_velocity_goal_value - aligned_linear_velocity;
-        temporal::Duration time_diff = aligned_linear_velocity_goal_time - original_state->get_time();
+        FP_DATA_TYPE aligned_linear_velocity_error = aligned_linear_velocity_goal.get_goal_value() - aligned_linear_velocity;
+        temporal::Duration time_diff = aligned_linear_velocity_goal.get_goal_time() - original_state->get_time();
         new_aligned_linear_acceleration = aligned_linear_velocity_error / std::max(time_diff.count(), time_step.count());
         new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
         new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);

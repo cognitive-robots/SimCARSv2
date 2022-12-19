@@ -22,9 +22,8 @@ public:
         BASE = 0,
         INDIRECT_ACTUATION = 1,
         DIRECT_ACTUATION = 2,
-        GOAL_VALUE = 3,
-        GOAL_TIME = 4,
-        EXTERNAL = 5
+        GOAL = 3,
+        EXTERNAL = 4
     };
 
     virtual ~IValuelessVariable() = default;

@@ -31,11 +31,8 @@ std::string AValuelessVariable::get_type_name() const
         case IValuelessVariable::Type::DIRECT_ACTUATION:
             return "direct_actuation";
 
-        case IValuelessVariable::Type::GOAL_VALUE:
-            return "goal_value";
-
-        case IValuelessVariable::Type::GOAL_TIME:
-            return "goal_time";
+        case IValuelessVariable::Type::GOAL:
+            return "goal";
 
         case IValuelessVariable::Type::EXTERNAL:
             return "external";
