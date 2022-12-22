@@ -75,14 +75,52 @@ void TrigBuff::destroy_instance()
     }
 }
 
-FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle) const
+FP_DATA_TYPE TrigBuff::wrap(FP_DATA_TYPE angle) const
 {
     if (std::isinf(angle))
     {
         throw std::invalid_argument("Angle is infinite");
     }
 
-    assert(std::abs(angle) <= 10.0f);
+    switch (default_angle_type)
+    {
+    case AngleType::RADIANS:
+        return std::remainder(angle, 2.0f * M_PI);
+
+    case AngleType::DEGREES:
+        return std::remainder(angle, 360.0f);
+
+    default:
+        throw utils::NotImplementedException();
+    }
+}
+
+FP_DATA_TYPE TrigBuff::wrap(FP_DATA_TYPE angle, AngleType angle_type) const
+{
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
+
+    switch (angle_type)
+    {
+    case AngleType::RADIANS:
+        return std::remainder(angle, 2.0f * M_PI);
+
+    case AngleType::DEGREES:
+        return std::remainder(angle, 360.0f);
+
+    default:
+        throw utils::NotImplementedException();
+    }
+}
+
+FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle) const
+{
+    if (std::isinf(angle))
+    {
+        throw std::invalid_argument("Angle is infinite");
+    }
 
     switch (default_angle_type)
     {

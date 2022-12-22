@@ -41,10 +41,10 @@ public:
 
     IValuelessVariable* valueless_deep_copy() const override
     {
-        return deep_copy();
+        return variable_deep_copy();
     }
 
-    IVariable<T>* deep_copy() const override
+    IVariable<T>* variable_deep_copy() const override
     {
         BasicVariable<T> *variable =
                 new BasicVariable<T>(
@@ -156,7 +156,9 @@ public:
     {
         if (time_event_dict.contains(time, true))
         {
+            IEvent<T> *event = time_event_dict[time];
             time_event_dict.erase(time);
+            delete event;
             return true;
         }
         else

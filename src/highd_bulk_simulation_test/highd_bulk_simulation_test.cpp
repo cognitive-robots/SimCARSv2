@@ -13,7 +13,7 @@
 #include <exception>
 #include <random>
 
-#define NUMBER_OF_AGENTS 100
+#define NUMBER_OF_AGENTS 11
 #define NUMBER_OF_SIMULATED_AGENTS 2
 #define NUMBER_OF_SCENES 100
 
@@ -30,8 +30,9 @@ void simulate(agent::IDrivingScene const *simulated_scene)
         agent::IDrivingAgent const *driving_agent = (*driving_agents)[i];
         agent::IVariable<geometry::Vec> const *position_variable =
                 driving_agent->get_position_variable();
+        temporal::Time last_event_time = position_variable->get_last_event_time();
         geometry::Vec position;
-        bool result = position_variable->get_value(driving_agent->get_last_event_time(), position);
+        bool result = position_variable->get_value(last_event_time, position);
         if (!result)
         {
             std::cout << "Failed to get position variable value for agent " << i << " at end of scene" << std::endl;
@@ -276,8 +277,8 @@ int main(int argc, char *argv[])
     std::cout << "Finished action selection, scene duplication, and action sampling/replacement (" << time_elapsed.count() << " μs)" << std::endl;
 
 
-    temporal::Time simulation_start_time = scene->get_min_temporal_limit() +
-            temporal::Duration(1000);
+    temporal::Time simulation_start_time = previous_action_time;
+    temporal::Time simulation_end_time = next_action_time;
 
     temporal::Duration time_step(40);
 
@@ -294,7 +295,8 @@ int main(int argc, char *argv[])
     {
         (*simulated_scenes)[i] = agent::DrivingSimulationScene::construct_from(
                     (*scenes_with_actions)[i], driving_simulator, time_step,
-                    simulation_start_time, simulated_agent_names);
+                    simulation_start_time, simulation_end_time,
+                    simulated_agent_names);
     }
 
     delete simulated_agent_names;
@@ -310,7 +312,7 @@ int main(int argc, char *argv[])
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
 
-    temporal::Duration simulation_time_covered = scene->get_max_temporal_limit() - simulation_start_time;
+    temporal::Duration simulation_time_covered = simulation_end_time - simulation_start_time;
     float real_time_factor =
             NUMBER_OF_SCENES *
             float(duration_cast<microseconds>(simulation_time_covered).count()) /

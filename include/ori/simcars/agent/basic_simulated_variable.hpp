@@ -2,11 +2,10 @@
 
 #include <ori/simcars/structures/stl/stl_concat_array.hpp>
 #include <ori/simcars/temporal/precedence_temporal_dictionary.hpp>
-#include <ori/simcars/agent/simulated_valueless_variable_interface.hpp>
 #include <ori/simcars/agent/constant_interface.hpp>
 #include <ori/simcars/agent/entity_state_interface.hpp>
 #include <ori/simcars/agent/simulation_scene_interface.hpp>
-#include <ori/simcars/agent/variable_abstract.hpp>
+#include <ori/simcars/agent/simulated_variable_abstract.hpp>
 #include <ori/simcars/agent/basic_event.hpp>
 
 #include <stdexcept>
@@ -19,7 +18,7 @@ namespace agent
 {
 
 template <typename T>
-class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulatedValuelessVariable
+class BasicSimulatedVariable : public virtual ASimulatedVariable<T>
 {
     IVariable<T> const *original_variable;
     ISimulationScene *simulation_scene;
@@ -46,19 +45,19 @@ class SimulatedVariable : public virtual AVariable<T>, public virtual ISimulated
     }
 
 public:
-    SimulatedVariable(IVariable<T> const *original_variable,
+    BasicSimulatedVariable(IVariable<T> const *original_variable,
                       ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       bool start_simulated,
                       temporal::Duration time_diff_threshold = temporal::Duration::max() / 2,
                       size_t max_cache_size = 10) :
-        SimulatedVariable(original_variable, simulation_scene,
+        BasicSimulatedVariable(original_variable, simulation_scene,
                           simulation_start_time,
                           original_variable->get_max_temporal_limit(),
                           start_simulated,
                           time_diff_threshold,
                           max_cache_size) {}
-    SimulatedVariable(IVariable<T> const *original_variable,
+    BasicSimulatedVariable(IVariable<T> const *original_variable,
                       ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       temporal::Time simulation_end_time,
@@ -94,7 +93,7 @@ public:
         }
     }
 
-    ~SimulatedVariable()
+    ~BasicSimulatedVariable()
     {
         structures::IArray<IEvent<T>*> const *events = time_event_dict.get_values();
 
@@ -104,19 +103,14 @@ public:
         }
     }
 
-    IValuelessVariable* valueless_deep_copy() const override
-    {
-        return deep_copy();
-    }
-
     /*
      * NOTE: This should not be called directly by external code, as the simulation scene will not have a pointer to the
      * resulting copy and thus any new simulation data will not be propogated to the copy.
      */
-    IVariable<T>* deep_copy() const override
+    ISimulatedVariable<T>* simulated_variable_deep_copy() const override
     {
-        SimulatedVariable<T> *variable =
-                new SimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
+        BasicSimulatedVariable<T> *variable =
+                new BasicSimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
                                          simulation_end_time, simulation_start_time < simulation_end_time,
                                          time_event_dict.get_time_diff_threshold(),
                                          time_event_dict.get_max_cache_size());
@@ -130,11 +124,6 @@ public:
         }
 
         return variable;
-    }
-
-    ISimulatedValuelessVariable* simulated_valueless_deep_copy() const override
-    {
-        return dynamic_cast<ISimulatedValuelessVariable*>(deep_copy());
     }
 
     std::string get_entity_name() const override
@@ -165,7 +154,7 @@ public:
         }
         else
         {
-            return original_variable->get_last_event_time();
+            return std::min(original_variable->get_last_event_time(), simulation_end_time);
         }
     }
 
@@ -283,7 +272,9 @@ public:
     {
         if (time_event_dict.contains(time, true))
         {
+            IEvent<T> *event = time_event_dict[time];
             time_event_dict.erase(time);
+            delete event;
             return true;
         }
         else

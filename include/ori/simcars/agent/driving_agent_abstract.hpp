@@ -22,7 +22,6 @@ public:
 
     IReadOnlyEntityState const* get_state(temporal::Time time) const override;
 
-
     IConstant<uint32_t> const* get_id_constant() const override;
     IConstant<bool> const* get_ego_constant() const override;
     IConstant<FP_DATA_TYPE> const* get_bb_length_constant() const override;
@@ -45,7 +44,6 @@ public:
 
 
     IEntityState* get_mutable_state(temporal::Time time) override;
-
 
     IConstant<uint32_t>* get_mutable_id_constant() override;
     IConstant<bool>* get_mutable_ego_constant() override;

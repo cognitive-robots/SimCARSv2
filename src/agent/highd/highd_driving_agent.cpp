@@ -43,20 +43,16 @@ HighDDrivingAgent::HighDDrivingAgent(IDrivingScene const *driving_scene,
 
     this->name = (ego ? "ego_vehicle_" : "non_ego_vehicle_") + std::to_string(id);
 
-    IConstant<uint32_t>* const id_constant = new BasicConstant<uint32_t>(this->name, "id", id);
-    this->constant_dict.update(id_constant->get_full_name(), id_constant);
+    id_constant = new BasicConstant<uint32_t>(this->name, "id", id);
 
-    IConstant<bool>* const ego_constant = new BasicConstant<bool>(this->name, "ego", ego);
-    this->constant_dict.update(ego_constant->get_full_name(), ego_constant);
+    ego_constant = new BasicConstant<bool>(this->name, "ego", ego);
 
     FP_DATA_TYPE const bb_length = tracks_meta_csv_document.GetCell<FP_DATA_TYPE>("width", tracks_meta_row);
     FP_DATA_TYPE const bb_width = tracks_meta_csv_document.GetCell<FP_DATA_TYPE>("height", tracks_meta_row);
 
-    IConstant<FP_DATA_TYPE>* const bb_length_constant = new BasicConstant<FP_DATA_TYPE>(this->name, "bb_length", bb_length);
-    this->constant_dict.update(bb_length_constant->get_full_name(), bb_length_constant);
+    bb_length_constant = new BasicConstant<FP_DATA_TYPE>(this->name, "bb_length", bb_length);
 
-    IConstant<FP_DATA_TYPE>* const bb_width_constant = new BasicConstant<FP_DATA_TYPE>(this->name, "bb_width", bb_width);
-    this->constant_dict.update(bb_width_constant->get_full_name(), bb_width_constant);
+    bb_width_constant = new BasicConstant<FP_DATA_TYPE>(this->name, "bb_width", bb_width);
 
     std::string class_label = tracks_meta_csv_document.GetCell<std::string>("class", tracks_meta_row);
     DrivingAgentClass class_value;
@@ -73,42 +69,30 @@ HighDDrivingAgent::HighDDrivingAgent(IDrivingScene const *driving_scene,
         class_value = DrivingAgentClass::UNKNOWN;
     }
 
-    IConstant<DrivingAgentClass>* const driving_agent_class_constant = new BasicConstant<DrivingAgentClass>(this->name, "driving_agent_class", class_value);
-    this->constant_dict.update(driving_agent_class_constant->get_full_name(), driving_agent_class_constant);
+    driving_agent_class_constant = new BasicConstant<DrivingAgentClass>(this->name, "driving_agent_class", class_value);
 
 
-    IVariable<geometry::Vec>* const position_variable = new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(position_variable->get_full_name(), position_variable);
+    position_variable = new BasicVariable<geometry::Vec>(this->name, "position", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
-    IVariable<geometry::Vec>* const linear_velocity_variable = new BasicVariable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(linear_velocity_variable->get_full_name(), linear_velocity_variable);
+    linear_velocity_variable = new BasicVariable<geometry::Vec>(this->name, "linear_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
-    IVariable<FP_DATA_TYPE>* const aligned_linear_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(aligned_linear_velocity_variable->get_full_name(), aligned_linear_velocity_variable);
+    aligned_linear_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
-    IVariable<geometry::Vec>* const linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(linear_acceleration_variable->get_full_name(), linear_acceleration_variable);
+    linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
-    IVariable<FP_DATA_TYPE>* const aligned_linear_acceleration_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION, this->get_scene()->get_time_step());
-    this->variable_dict.update(aligned_linear_acceleration_variable->get_full_name(), aligned_linear_acceleration_variable);
+    aligned_linear_acceleration_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "aligned_linear_acceleration", IValuelessVariable::Type::INDIRECT_ACTUATION, this->get_scene()->get_time_step());
 
-    IVariable<geometry::Vec>* const external_linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::EXTERNAL, this->get_scene()->get_time_step());
-    this->variable_dict.update(external_linear_acceleration_variable->get_full_name(), external_linear_acceleration_variable);
+    external_linear_acceleration_variable = new BasicVariable<geometry::Vec>(this->name, "linear_acceleration", IValuelessVariable::Type::EXTERNAL, this->get_scene()->get_time_step());
 
-    IVariable<FP_DATA_TYPE>* const rotation_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(rotation_variable->get_full_name(), rotation_variable);
+    rotation_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "rotation", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
-    IVariable<FP_DATA_TYPE>* const steer_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION, this->get_scene()->get_time_step());
-    this->variable_dict.update(steer_variable->get_full_name(), steer_variable);
+    steer_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "steer", IValuelessVariable::Type::INDIRECT_ACTUATION, this->get_scene()->get_time_step());
 
-    IVariable<FP_DATA_TYPE>* const angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(angular_velocity_variable->get_full_name(), angular_velocity_variable);
+    angular_velocity_variable = new BasicVariable<FP_DATA_TYPE>(this->name, "angular_velocity", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
-    IVariable<temporal::Duration>* const ttc_variable = new BasicVariable<temporal::Duration>(this->name, "ttc", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(ttc_variable->get_full_name(), ttc_variable);
+    ttc_variable = new BasicVariable<temporal::Duration>(this->name, "ttc", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
-    IVariable<temporal::Duration>* const cumilative_collision_time_variable = new BasicVariable<temporal::Duration>(this->name, "cumilative_collision_time", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
-    this->variable_dict.update(cumilative_collision_time_variable->get_full_name(), cumilative_collision_time_variable);
+    cumilative_collision_time_variable = new BasicVariable<temporal::Duration>(this->name, "cumilative_collision_time", IValuelessVariable::Type::BASE, this->get_scene()->get_time_step());
 
 
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
@@ -207,21 +191,23 @@ HighDDrivingAgent::HighDDrivingAgent(IDrivingScene const *driving_scene,
 
 HighDDrivingAgent::~HighDDrivingAgent()
 {
-    size_t i;
+    delete id_constant;
+    delete ego_constant;
+    delete bb_length_constant;
+    delete bb_width_constant;
+    delete driving_agent_class_constant;
 
-    structures::IArray<IValuelessConstant*> const *constants = constant_dict.get_values();
-
-    for (i = 0; i < constants->count(); ++i)
-    {
-        delete (*constants)[i];
-    }
-
-    structures::IArray<IValuelessVariable*> const *variables = variable_dict.get_values();
-
-    for (i = 0; i < variables->count(); ++i)
-    {
-        delete (*variables)[i];
-    }
+    delete position_variable;
+    delete linear_velocity_variable;
+    delete aligned_linear_velocity_variable;
+    delete linear_acceleration_variable;
+    delete aligned_linear_acceleration_variable;
+    delete external_linear_acceleration_variable;
+    delete rotation_variable;
+    delete steer_variable;
+    delete angular_velocity_variable;
+    delete ttc_variable;
+    delete cumilative_collision_time_variable;
 }
 
 std::string HighDDrivingAgent::get_name() const
@@ -256,17 +242,37 @@ temporal::Time HighDDrivingAgent::get_max_temporal_limit() const
 
 structures::IArray<IValuelessConstant const*>* HighDDrivingAgent::get_constant_parameters() const
 {
-    structures::stl::STLStackArray<IValuelessConstant const*> *constants =
-            new structures::stl::STLStackArray<IValuelessConstant const*>(constant_dict.count());
-    cast_array(*constant_dict.get_values(), *constants);
-    return constants;
+    return new structures::stl::STLStackArray<IValuelessConstant const*>(
+    {
+                    id_constant,
+                    ego_constant,
+                    bb_length_constant,
+                    bb_width_constant,
+                    driving_agent_class_constant
+                });
 }
 
 IValuelessConstant const* HighDDrivingAgent::get_constant_parameter(std::string const &constant_name) const
 {
-    if (constant_dict.contains(constant_name))
+    if (constant_name == this->get_name() + ".id")
     {
-        return constant_dict[constant_name];
+        return id_constant;
+    }
+    else if (constant_name == this->get_name() + ".ego")
+    {
+        return ego_constant;
+    }
+    else if (constant_name == this->get_name() + ".bb_length")
+    {
+        return bb_length_constant;
+    }
+    else if (constant_name == this->get_name() + ".bb_width")
+    {
+        return bb_width_constant;
+    }
+    else if (constant_name == this->get_name() + ".driving_agent_class")
+    {
+        return driving_agent_class_constant;
     }
     else
     {
@@ -276,17 +282,67 @@ IValuelessConstant const* HighDDrivingAgent::get_constant_parameter(std::string 
 
 structures::IArray<IValuelessVariable const*>* HighDDrivingAgent::get_variable_parameters() const
 {
-    structures::stl::STLStackArray<IValuelessVariable const*> *variables =
-            new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.count());
-    cast_array(*variable_dict.get_values(), *variables);
-    return variables;
+    return new structures::stl::STLStackArray<IValuelessVariable const*>(
+    {
+                    position_variable,
+                    linear_velocity_variable,
+                    aligned_linear_velocity_variable,
+                    linear_acceleration_variable,
+                    aligned_linear_acceleration_variable,
+                    external_linear_acceleration_variable,
+                    rotation_variable,
+                    steer_variable,
+                    angular_velocity_variable,
+                    ttc_variable,
+                    cumilative_collision_time_variable
+                });
 }
 
 IValuelessVariable const* HighDDrivingAgent::get_variable_parameter(std::string const &variable_name) const
 {
-    if (variable_dict.contains(variable_name))
+    if (variable_name == this->get_name() + ".position.base")
     {
-        return variable_dict[variable_name];
+        return position_variable;
+    }
+    else if (variable_name == this->get_name() + ".linear_velocity.base")
+    {
+        return linear_velocity_variable;
+    }
+    else if (variable_name == this->get_name() + ".aligned_linear_velocity.base")
+    {
+        return aligned_linear_velocity_variable;
+    }
+    else if (variable_name == this->get_name() + ".linear_acceleration.base")
+    {
+        return linear_acceleration_variable;
+    }
+    else if (variable_name == this->get_name() + ".aligned_linear_acceleration.indirect_actuation")
+    {
+        return aligned_linear_acceleration_variable;
+    }
+    else if (variable_name == this->get_name() + ".linear_acceleration.external")
+    {
+        return external_linear_acceleration_variable;
+    }
+    else if (variable_name == this->get_name() + ".rotation.base")
+    {
+        return rotation_variable;
+    }
+    else if (variable_name == this->get_name() + ".steer.indirect_actuation")
+    {
+        return steer_variable;
+    }
+    else if (variable_name == this->get_name() + ".angular_velocity.base")
+    {
+        return angular_velocity_variable;
+    }
+    else if (variable_name == this->get_name() + ".ttc.base")
+    {
+        return ttc_variable;
+    }
+    else if (variable_name == this->get_name() + ".cumilative_collision_time.base")
+    {
+        return cumilative_collision_time_variable;
     }
     else
     {
@@ -296,16 +352,20 @@ IValuelessVariable const* HighDDrivingAgent::get_variable_parameter(std::string 
 
 structures::IArray<IValuelessEvent const*>* HighDDrivingAgent::get_events() const
 {
-    structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
-
     structures::stl::STLConcatArray<IValuelessEvent const*> *events =
-            new structures::stl::STLConcatArray<IValuelessEvent const*>(variable_names->count());
+            new structures::stl::STLConcatArray<IValuelessEvent const*>(11);
 
-    size_t i;
-    for(i = 0; i < variable_names->count(); ++i)
-    {
-        events->get_array(i) = variable_dict[(*variable_names)[i]]->get_valueless_events();
-    }
+    events->get_array(0) = position_variable->get_valueless_events();
+    events->get_array(1) = linear_velocity_variable->get_valueless_events();
+    events->get_array(2) = aligned_linear_velocity_variable->get_valueless_events();
+    events->get_array(3) = linear_acceleration_variable->get_valueless_events();
+    events->get_array(4) = aligned_linear_acceleration_variable->get_valueless_events();
+    events->get_array(5) = external_linear_acceleration_variable->get_valueless_events();
+    events->get_array(6) = rotation_variable->get_valueless_events();
+    events->get_array(7) = steer_variable->get_valueless_events();
+    events->get_array(8) = angular_velocity_variable->get_valueless_events();
+    events->get_array(9) = ttc_variable->get_valueless_events();
+    events->get_array(10) = cumilative_collision_time_variable->get_valueless_events();
 
     return events;
 }
@@ -321,19 +381,23 @@ IDrivingAgent* HighDDrivingAgent::driving_agent_deep_copy(IDrivingScene *driving
     driving_agent->min_temporal_limit = this->min_temporal_limit;
     driving_agent->max_temporal_limit = this->max_temporal_limit;
 
-    size_t i;
+    driving_agent->id_constant = this->id_constant->constant_shallow_copy();
+    driving_agent->ego_constant = this->ego_constant->constant_shallow_copy();
+    driving_agent->bb_length_constant = this->bb_length_constant->constant_shallow_copy();
+    driving_agent->bb_width_constant = this->bb_width_constant->constant_shallow_copy();
+    driving_agent->driving_agent_class_constant = this->driving_agent_class_constant->constant_shallow_copy();
 
-    structures::IArray<std::string> const *constant_names = constant_dict.get_keys();
-    for(i = 0; i < constant_names->count(); ++i)
-    {
-        driving_agent->constant_dict.update((*constant_names)[i], constant_dict[(*constant_names)[i]]->valueless_constant_shallow_copy());
-    }
-
-    structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
-    for(i = 0; i < variable_names->count(); ++i)
-    {
-        driving_agent->variable_dict.update((*variable_names)[i], variable_dict[(*variable_names)[i]]->valueless_deep_copy());
-    }
+    driving_agent->position_variable = this->position_variable->variable_deep_copy();
+    driving_agent->linear_velocity_variable = this->linear_velocity_variable->variable_deep_copy();
+    driving_agent->aligned_linear_velocity_variable = this->aligned_linear_velocity_variable->variable_deep_copy();
+    driving_agent->linear_acceleration_variable = this->linear_acceleration_variable->variable_deep_copy();
+    driving_agent->aligned_linear_acceleration_variable = this->aligned_linear_acceleration_variable->variable_deep_copy();
+    driving_agent->external_linear_acceleration_variable = this->external_linear_acceleration_variable->variable_deep_copy();
+    driving_agent->rotation_variable = this->rotation_variable->variable_deep_copy();
+    driving_agent->steer_variable = this->steer_variable->variable_deep_copy();
+    driving_agent->angular_velocity_variable = this->angular_velocity_variable->variable_deep_copy();
+    driving_agent->ttc_variable = this->ttc_variable->variable_deep_copy();
+    driving_agent->cumilative_collision_time_variable = this->cumilative_collision_time_variable->variable_deep_copy();
 
     if (driving_scene == nullptr)
     {
@@ -347,19 +411,119 @@ IDrivingAgent* HighDDrivingAgent::driving_agent_deep_copy(IDrivingScene *driving
     return driving_agent;
 }
 
+IConstant<uint32_t> const* HighDDrivingAgent::get_id_constant() const
+{
+    return id_constant;
+}
+
+IConstant<bool> const* HighDDrivingAgent::get_ego_constant() const
+{
+    return ego_constant;
+}
+
+IConstant<FP_DATA_TYPE> const* HighDDrivingAgent::get_bb_length_constant() const
+{
+    return bb_length_constant;
+}
+
+IConstant<FP_DATA_TYPE> const* HighDDrivingAgent::get_bb_width_constant() const
+{
+    return bb_width_constant;
+}
+
+IConstant<DrivingAgentClass> const* HighDDrivingAgent::get_driving_agent_class_constant() const
+{
+    return driving_agent_class_constant;
+}
+
+IVariable<geometry::Vec> const* HighDDrivingAgent::get_position_variable() const
+{
+    return position_variable;
+}
+
+IVariable<geometry::Vec> const* HighDDrivingAgent::get_linear_velocity_variable() const
+{
+    return linear_velocity_variable;
+}
+
+IVariable<FP_DATA_TYPE> const* HighDDrivingAgent::get_aligned_linear_velocity_variable() const
+{
+    return aligned_linear_velocity_variable;
+}
+
+IVariable<geometry::Vec> const* HighDDrivingAgent::get_linear_acceleration_variable() const
+{
+    return linear_acceleration_variable;
+}
+
+IVariable<FP_DATA_TYPE> const* HighDDrivingAgent::get_aligned_linear_acceleration_variable() const
+{
+    return aligned_linear_acceleration_variable;
+}
+
+IVariable<geometry::Vec> const* HighDDrivingAgent::get_external_linear_acceleration_variable() const
+{
+    return external_linear_acceleration_variable;
+}
+
+IVariable<FP_DATA_TYPE> const* HighDDrivingAgent::get_rotation_variable() const
+{
+    return rotation_variable;
+}
+
+IVariable<FP_DATA_TYPE> const* HighDDrivingAgent::get_steer_variable() const
+{
+    return steer_variable;
+}
+
+IVariable<FP_DATA_TYPE> const* HighDDrivingAgent::get_angular_velocity_variable() const
+{
+    return angular_velocity_variable;
+}
+
+IVariable<temporal::Duration> const* HighDDrivingAgent::get_ttc_variable() const
+{
+    return ttc_variable;
+}
+
+IVariable<temporal::Duration> const* HighDDrivingAgent::get_cumilative_collision_time_variable() const
+{
+    return cumilative_collision_time_variable;
+}
+
 structures::IArray<IValuelessConstant*>* HighDDrivingAgent::get_mutable_constant_parameters()
 {
-    structures::stl::STLStackArray<IValuelessConstant*> *constants =
-            new structures::stl::STLStackArray<IValuelessConstant*>(constant_dict.get_values());
-    constant_dict.get_values(constants);
-    return constants;
+    return new structures::stl::STLStackArray<IValuelessConstant*>(
+    {
+                    id_constant,
+                    ego_constant,
+                    bb_length_constant,
+                    bb_width_constant,
+                    driving_agent_class_constant
+                });
 }
 
 IValuelessConstant* HighDDrivingAgent::get_mutable_constant_parameter(std::string const &constant_name)
 {
-    if (constant_dict.contains(constant_name))
+    if (constant_name == this->get_name() + ".id")
     {
-        return constant_dict[constant_name];
+        return id_constant;
+    }
+    else if (constant_name == this->get_name() + ".ego")
+    {
+        return ego_constant;
+    }
+    else if (constant_name == this->get_name() + ".bb_length")
+    {
+        return bb_length_constant;
+    }
+    else if (constant_name == this->get_name() + ".bb_width")
+    {
+        return bb_width_constant;
+    }
+    else if (constant_name == this->get_name() + ".driving_agent_class")
+    {
+        return driving_agent_class_constant;
     }
     else
     {
@@ -369,17 +533,67 @@ IValuelessConstant* HighDDrivingAgent::get_mutable_constant_parameter(std::strin
 
 structures::IArray<IValuelessVariable*>* HighDDrivingAgent::get_mutable_variable_parameters()
 {
-    structures::stl::STLStackArray<IValuelessVariable*> *variables =
-            new structures::stl::STLStackArray<IValuelessVariable*>(variable_dict.count());
-    variable_dict.get_values(variables);
-    return variables;
+    return new structures::stl::STLStackArray<IValuelessVariable*>(
+    {
+                    position_variable,
+                    linear_velocity_variable,
+                    aligned_linear_velocity_variable,
+                    linear_acceleration_variable,
+                    aligned_linear_acceleration_variable,
+                    external_linear_acceleration_variable,
+                    rotation_variable,
+                    steer_variable,
+                    angular_velocity_variable,
+                    ttc_variable,
+                    cumilative_collision_time_variable
+                });
 }
 
 IValuelessVariable* HighDDrivingAgent::get_mutable_variable_parameter(std::string const &variable_name)
 {
-    if (variable_dict.contains(variable_name))
+    if (variable_name == this->get_name() + ".position.base")
     {
-        return variable_dict[variable_name];
+        return position_variable;
+    }
+    else if (variable_name == this->get_name() + ".linear_velocity.base")
+    {
+        return linear_velocity_variable;
+    }
+    else if (variable_name == this->get_name() + ".aligned_linear_velocity.base")
+    {
+        return aligned_linear_velocity_variable;
+    }
+    else if (variable_name == this->get_name() + ".linear_acceleration.base")
+    {
+        return linear_acceleration_variable;
+    }
+    else if (variable_name == this->get_name() + ".aligned_linear_acceleration.indirect_actuation")
+    {
+        return aligned_linear_acceleration_variable;
+    }
+    else if (variable_name == this->get_name() + ".linear_acceleration.external")
+    {
+        return external_linear_acceleration_variable;
+    }
+    else if (variable_name == this->get_name() + ".rotation.base")
+    {
+        return rotation_variable;
+    }
+    else if (variable_name == this->get_name() + ".steer.indirect_actuation")
+    {
+        return steer_variable;
+    }
+    else if (variable_name == this->get_name() + ".angular_velocity.base")
+    {
+        return angular_velocity_variable;
+    }
+    else if (variable_name == this->get_name() + ".ttc.base")
+    {
+        return ttc_variable;
+    }
+    else if (variable_name == this->get_name() + ".cumilative_collision_time.base")
+    {
+        return cumilative_collision_time_variable;
     }
     else
     {
@@ -389,18 +603,102 @@ IValuelessVariable* HighDDrivingAgent::get_mutable_variable_parameter(std::strin
 
 structures::IArray<IValuelessEvent*>* HighDDrivingAgent::get_mutable_events()
 {
-    structures::IArray<std::string> const *variable_names = variable_dict.get_keys();
-
     structures::stl::STLConcatArray<IValuelessEvent*> *events =
-            new structures::stl::STLConcatArray<IValuelessEvent*>(variable_names->count());
+            new structures::stl::STLConcatArray<IValuelessEvent*>(11);
 
-    size_t i;
-    for(i = 0; i < variable_names->count(); ++i)
-    {
-        events->get_array(i) = variable_dict[(*variable_names)[i]]->get_mutable_valueless_events();
-    }
+    events->get_array(0) = position_variable->get_mutable_valueless_events();
+    events->get_array(1) = linear_velocity_variable->get_mutable_valueless_events();
+    events->get_array(2) = aligned_linear_velocity_variable->get_mutable_valueless_events();
+    events->get_array(3) = linear_acceleration_variable->get_mutable_valueless_events();
+    events->get_array(4) = aligned_linear_acceleration_variable->get_mutable_valueless_events();
+    events->get_array(5) = external_linear_acceleration_variable->get_mutable_valueless_events();
+    events->get_array(6) = rotation_variable->get_mutable_valueless_events();
+    events->get_array(7) = steer_variable->get_mutable_valueless_events();
+    events->get_array(8) = angular_velocity_variable->get_mutable_valueless_events();
+    events->get_array(9) = ttc_variable->get_mutable_valueless_events();
+    events->get_array(10) = cumilative_collision_time_variable->get_mutable_valueless_events();
 
     return events;
+}
+
+IConstant<uint32_t>* HighDDrivingAgent::get_mutable_id_constant()
+{
+    return id_constant;
+}
+
+IConstant<bool>* HighDDrivingAgent::get_mutable_ego_constant()
+{
+    return ego_constant;
+}
+
+IConstant<FP_DATA_TYPE>* HighDDrivingAgent::get_mutable_bb_length_constant()
+{
+    return bb_length_constant;
+}
+
+IConstant<FP_DATA_TYPE>* HighDDrivingAgent::get_mutable_bb_width_constant()
+{
+    return bb_width_constant;
+}
+
+IConstant<DrivingAgentClass>* HighDDrivingAgent::get_mutable_driving_agent_class_constant()
+{
+    return driving_agent_class_constant;
+}
+
+IVariable<geometry::Vec>* HighDDrivingAgent::get_mutable_position_variable()
+{
+    return position_variable;
+}
+
+IVariable<geometry::Vec>* HighDDrivingAgent::get_mutable_linear_velocity_variable()
+{
+    return linear_velocity_variable;
+}
+
+IVariable<FP_DATA_TYPE>* HighDDrivingAgent::get_mutable_aligned_linear_velocity_variable()
+{
+    return aligned_linear_velocity_variable;
+}
+
+IVariable<geometry::Vec>* HighDDrivingAgent::get_mutable_linear_acceleration_variable()
+{
+    return linear_acceleration_variable;
+}
+
+IVariable<FP_DATA_TYPE>* HighDDrivingAgent::get_mutable_aligned_linear_acceleration_variable()
+{
+    return aligned_linear_acceleration_variable;
+}
+
+IVariable<geometry::Vec>* HighDDrivingAgent::get_mutable_external_linear_acceleration_variable()
+{
+    return external_linear_acceleration_variable;
+}
+
+IVariable<FP_DATA_TYPE>* HighDDrivingAgent::get_mutable_rotation_variable()
+{
+    return rotation_variable;
+}
+
+IVariable<FP_DATA_TYPE>* HighDDrivingAgent::get_mutable_steer_variable()
+{
+    return steer_variable;
+}
+
+IVariable<FP_DATA_TYPE>* HighDDrivingAgent::get_mutable_angular_velocity_variable()
+{
+    return angular_velocity_variable;
+}
+
+IVariable<temporal::Duration>* HighDDrivingAgent::get_mutable_ttc_variable()
+{
+    return ttc_variable;
+}
+
+IVariable<temporal::Duration>* HighDDrivingAgent::get_mutable_cumilative_collision_time_variable()
+{
+    return cumilative_collision_time_variable;
 }
 
 }

@@ -28,8 +28,9 @@ void simulate(agent::IDrivingScene const *simulated_scene)
         agent::IDrivingAgent const *driving_agent = (*driving_agents)[i];
         agent::IVariable<geometry::Vec> const *position_variable =
                 driving_agent->get_position_variable();
+        temporal::Time last_event_time = position_variable->get_last_event_time();
         geometry::Vec position;
-        if (position_variable->get_value(driving_agent->get_last_event_time(), position))
+        if (position_variable->get_value(last_event_time, position))
         {
             std::cout << "Got position variable value for agent " << i << " at end of scene" << std::endl;
         }

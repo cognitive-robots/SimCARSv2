@@ -328,15 +328,15 @@ void BasicDrivingSimulator::simulate_driving_agent(
 
     FP_DATA_TYPE mean_angular_velocity = (angular_velocity + new_angular_velocity) / 2.0f;
 
-    FP_DATA_TYPE new_rotation = rotation + mean_angular_velocity * time_step.count();
-    assert(!std::isnan(new_rotation));
+    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
+
+    FP_DATA_TYPE new_rotation = trig_buff->wrap(rotation + mean_angular_velocity * time_step.count());
 
     IConstant<FP_DATA_TYPE> *new_rotation_variable_value =
                 new BasicConstant<FP_DATA_TYPE>(next_state->get_name(), "rotation.base", new_rotation);
     next_state->set_rotation_variable(new_rotation_variable_value);
 
 
-    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
     geometry::Vec new_linear_acceleration;
     new_linear_acceleration.x() = new_aligned_linear_acceleration * trig_buff->get_cos(new_rotation);

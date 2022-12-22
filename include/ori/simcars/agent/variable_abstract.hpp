@@ -17,6 +17,11 @@ template <typename T>
 class AVariable : public virtual IVariable<T>, public virtual AValuelessVariable
 {
 public:
+    IValuelessVariable* valueless_deep_copy() const override
+    {
+        return this->variable_deep_copy();
+    }
+
     bool get_value_as_string(temporal::Time time, std::string &str) const override
     {
         std::stringstream string_stream;

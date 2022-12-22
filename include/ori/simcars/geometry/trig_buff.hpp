@@ -47,6 +47,8 @@ public:
 
     virtual ~TrigBuff();
 
+    FP_DATA_TYPE wrap(FP_DATA_TYPE angle) const;
+    FP_DATA_TYPE wrap(FP_DATA_TYPE angle, AngleType angle_type) const;
     FP_DATA_TYPE get_sin(FP_DATA_TYPE angle) const;
     FP_DATA_TYPE get_sin(FP_DATA_TYPE angle, AngleType angle_type) const;
     FP_DATA_TYPE get_cos(FP_DATA_TYPE angle) const;

@@ -24,7 +24,8 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 {
     IDrivingAgent *driving_agent;
 
-    structures::stl::STLDictionary<std::string, IValuelessVariable*> variable_dict;
+    IVariable<Goal<FP_DATA_TYPE>> *aligned_linear_velocity_goal_variable = nullptr;
+    IVariable<Goal<int32_t>> *lane_goal_variable = nullptr;
 
     IDrivingScene const *driving_scene;
 
@@ -35,7 +36,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         IVariable<FP_DATA_TYPE> const *aligned_linear_acceleration_variable =
                 this->get_aligned_linear_acceleration_variable();
 
-        IVariable<Goal<FP_DATA_TYPE>> *aligned_linear_velocity_goal_variable =
+        aligned_linear_velocity_goal_variable =
                     new BasicVariable<Goal<FP_DATA_TYPE>>(
                         this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL);
 
@@ -230,10 +231,6 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
             }
         }
         delete events;
-
-        this->variable_dict.update(
-                    aligned_linear_velocity_goal_variable->get_full_name(),
-                    aligned_linear_velocity_goal_variable);
     }
     void extract_lane_change_events(map::IMap<T_map_id> const *map)
     {
@@ -241,7 +238,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 
         temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_LANE_CHANGE_DURATION_THRESHOLD));
 
-        IVariable<Goal<int32_t>> *lane_goal_variable =
+        lane_goal_variable =
                     new BasicVariable<Goal<int32_t>>(
                         this->get_name(), "lane", IValuelessVariable::Type::GOAL);
 
@@ -377,10 +374,6 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
         }
 
         delete previous_lanes;
-
-        this->variable_dict.update(
-                    lane_goal_variable->get_full_name(),
-                    lane_goal_variable);
     }
 
 protected:
@@ -405,12 +398,8 @@ public:
 
     ~DrivingGoalExtractionAgent()
     {
-        structures::IArray<IValuelessVariable*> const *variables = variable_dict.get_values();
-
-        for (size_t i = 0; i < variables->count(); ++i)
-        {
-            delete (*variables)[i];
-        }
+        delete aligned_linear_velocity_goal_variable;
+        delete lane_goal_variable;
     }
 
     std::string get_name() const override
@@ -450,9 +439,16 @@ public:
         structures::stl::STLConcatArray<IValuelessVariable const*> *variables =
                     new structures::stl::STLConcatArray<IValuelessVariable const*>(2);
 
-        structures::IArray<IValuelessVariable const*> *goal_extraction_variables =
-                new structures::stl::STLStackArray<IValuelessVariable const*>(variable_dict.count());
-        cast_array(*(variable_dict.get_values()), *goal_extraction_variables);
+        structures::IStackArray<IValuelessVariable const*> *goal_extraction_variables =
+                new structures::stl::STLStackArray<IValuelessVariable const*>;
+        if (aligned_linear_velocity_goal_variable != nullptr)
+        {
+            goal_extraction_variables->push_back(aligned_linear_velocity_goal_variable);
+        }
+        if (lane_goal_variable != nullptr)
+        {
+            goal_extraction_variables->push_back(lane_goal_variable);
+        }
         variables->get_array(0) = goal_extraction_variables;
 
         structures::IArray<IValuelessVariable const*> *unfiltered_other_variables =
@@ -490,9 +486,13 @@ public:
     }
     IValuelessVariable const* get_variable_parameter(std::string const &variable_name) const override
     {
-        if (variable_dict.contains(variable_name))
+        if (variable_name == this->get_name() + ".aligned_linear_velocity.goal")
         {
-            return variable_dict[variable_name];
+            return aligned_linear_velocity_goal_variable;
+        }
+        else if (variable_name == this->get_name() + ".lane.goal")
+        {
+            return lane_goal_variable;
         }
         else
         {
@@ -526,10 +526,15 @@ public:
 
         driving_agent->driving_agent = this->driving_agent;
 
-        structures::IArray<std::string> const *variable_names = this->variable_dict.get_keys();
-        for(size_t i = 0; i < variable_names->count(); ++i)
+        if (this->aligned_linear_velocity_goal_variable != nullptr)
         {
-            driving_agent->variable_dict.update((*variable_names)[i], variable_dict[(*variable_names)[i]]->valueless_deep_copy());
+            driving_agent->aligned_linear_velocity_goal_variable =
+                    this->aligned_linear_velocity_goal_variable->variable_deep_copy();
+        }
+        if (this->lane_goal_variable != nullptr)
+        {
+            driving_agent->lane_goal_variable =
+                    this->lane_goal_variable->variable_deep_copy();
         }
 
         if (driving_scene == nullptr)
@@ -549,6 +554,86 @@ public:
         return this->driving_scene;
     }
 
+    IConstant<uint32_t> const* get_id_constant() const
+    {
+        return driving_agent->get_id_constant();
+    }
+
+    IConstant<bool> const* get_ego_constant() const
+    {
+        return driving_agent->get_ego_constant();
+    }
+
+    IConstant<FP_DATA_TYPE> const* get_bb_length_constant() const
+    {
+        return driving_agent->get_bb_length_constant();
+    }
+
+    IConstant<FP_DATA_TYPE> const* get_bb_width_constant() const
+    {
+        return driving_agent->get_bb_width_constant();
+    }
+
+    IConstant<DrivingAgentClass> const* get_driving_agent_class_constant() const
+    {
+        return driving_agent->get_driving_agent_class_constant();
+    }
+
+    IVariable<geometry::Vec> const* get_position_variable() const
+    {
+        return driving_agent->get_position_variable();
+    }
+
+    IVariable<geometry::Vec> const* get_linear_velocity_variable() const
+    {
+        return driving_agent->get_linear_velocity_variable();
+    }
+
+    IVariable<FP_DATA_TYPE> const* get_aligned_linear_velocity_variable() const
+    {
+        return driving_agent->get_aligned_linear_velocity_variable();
+    }
+
+    IVariable<geometry::Vec> const* get_linear_acceleration_variable() const
+    {
+        return driving_agent->get_linear_acceleration_variable();
+    }
+
+    IVariable<FP_DATA_TYPE> const* get_aligned_linear_acceleration_variable() const
+    {
+        return driving_agent->get_aligned_linear_acceleration_variable();
+    }
+
+    IVariable<geometry::Vec> const* get_external_linear_acceleration_variable() const
+    {
+        return driving_agent->get_external_linear_acceleration_variable();
+    }
+
+    IVariable<FP_DATA_TYPE> const* get_rotation_variable() const
+    {
+        return driving_agent->get_rotation_variable();
+    }
+
+    IVariable<FP_DATA_TYPE> const* get_steer_variable() const
+    {
+        return driving_agent->get_steer_variable();
+    }
+
+    IVariable<FP_DATA_TYPE> const* get_angular_velocity_variable() const
+    {
+        return driving_agent->get_angular_velocity_variable();
+    }
+
+    IVariable<temporal::Duration> const* get_ttc_variable() const
+    {
+        return driving_agent->get_ttc_variable();
+    }
+
+    IVariable<temporal::Duration> const* get_cumilative_collision_time_variable() const
+    {
+        return driving_agent->get_cumilative_collision_time_variable();
+    }
+
 
     structures::IArray<IValuelessConstant*>* get_mutable_constant_parameters() override
     {
@@ -564,9 +649,16 @@ public:
         structures::stl::STLConcatArray<IValuelessVariable*> *variables =
                     new structures::stl::STLConcatArray<IValuelessVariable*>(2);
 
-        structures::IArray<IValuelessVariable*> *goal_extraction_variables =
-                new structures::stl::STLStackArray<IValuelessVariable*>(
-                    variable_dict.get_values());
+        structures::IStackArray<IValuelessVariable*> *goal_extraction_variables =
+                new structures::stl::STLStackArray<IValuelessVariable*>;
+        if (aligned_linear_velocity_goal_variable != nullptr)
+        {
+            goal_extraction_variables->push_back(aligned_linear_velocity_goal_variable);
+        }
+        if (lane_goal_variable != nullptr)
+        {
+            goal_extraction_variables->push_back(lane_goal_variable);
+        }
         variables->get_array(0) = goal_extraction_variables;
 
         structures::IArray<IValuelessVariable*> *unfiltered_other_variables =
@@ -604,9 +696,13 @@ public:
     }
     IValuelessVariable* get_mutable_variable_parameter(std::string const &variable_name) override
     {
-        if (variable_dict.contains(variable_name))
+        if (variable_name == this->get_name() + ".aligned_linear_velocity.goal")
         {
-            return variable_dict[variable_name];
+            return aligned_linear_velocity_goal_variable;
+        }
+        else if (variable_name == this->get_name() + ".lane.goal")
+        {
+            return lane_goal_variable;
         }
         else
         {
@@ -632,6 +728,86 @@ public:
         delete variables;
 
         return events;
+    }
+
+    IConstant<uint32_t>* get_mutable_id_constant()
+    {
+        return driving_agent->get_mutable_id_constant();
+    }
+
+    IConstant<bool>* get_mutable_ego_constant()
+    {
+        return driving_agent->get_mutable_ego_constant();
+    }
+
+    IConstant<FP_DATA_TYPE>* get_mutable_bb_length_constant()
+    {
+        return driving_agent->get_mutable_bb_length_constant();
+    }
+
+    IConstant<FP_DATA_TYPE>* get_mutable_bb_width_constant()
+    {
+        return driving_agent->get_mutable_bb_width_constant();
+    }
+
+    IConstant<DrivingAgentClass>* get_mutable_driving_agent_class_constant()
+    {
+        return driving_agent->get_mutable_driving_agent_class_constant();
+    }
+
+    IVariable<geometry::Vec>* get_mutable_position_variable()
+    {
+        return driving_agent->get_mutable_position_variable();
+    }
+
+    IVariable<geometry::Vec>* get_mutable_linear_velocity_variable()
+    {
+        return driving_agent->get_mutable_linear_velocity_variable();
+    }
+
+    IVariable<FP_DATA_TYPE>* get_mutable_aligned_linear_velocity_variable()
+    {
+        return driving_agent->get_mutable_aligned_linear_velocity_variable();
+    }
+
+    IVariable<geometry::Vec>* get_mutable_linear_acceleration_variable()
+    {
+        return driving_agent->get_mutable_linear_acceleration_variable();
+    }
+
+    IVariable<FP_DATA_TYPE>* get_mutable_aligned_linear_acceleration_variable()
+    {
+        return driving_agent->get_mutable_aligned_linear_acceleration_variable();
+    }
+
+    IVariable<geometry::Vec>* get_mutable_external_linear_acceleration_variable()
+    {
+        return driving_agent->get_mutable_external_linear_acceleration_variable();
+    }
+
+    IVariable<FP_DATA_TYPE>* get_mutable_rotation_variable()
+    {
+        return driving_agent->get_mutable_rotation_variable();
+    }
+
+    IVariable<FP_DATA_TYPE>* get_mutable_steer_variable()
+    {
+        return driving_agent->get_mutable_steer_variable();
+    }
+
+    IVariable<FP_DATA_TYPE>* get_mutable_angular_velocity_variable()
+    {
+        return driving_agent->get_mutable_angular_velocity_variable();
+    }
+
+    IVariable<temporal::Duration>* get_mutable_ttc_variable()
+    {
+        return driving_agent->get_mutable_ttc_variable();
+    }
+
+    IVariable<temporal::Duration>* get_mutable_cumilative_collision_time_variable()
+    {
+        return driving_agent->get_mutable_cumilative_collision_time_variable();
     }
 };
 

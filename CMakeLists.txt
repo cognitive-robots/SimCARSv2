@@ -215,6 +215,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/constant_interface.hpp
   include/ori/simcars/agent/event_interface.hpp
   include/ori/simcars/agent/variable_interface.hpp
+  include/ori/simcars/agent/simulated_variable_interface.hpp
   include/ori/simcars/agent/entity_interface.hpp
   include/ori/simcars/agent/read_only_entity_state_interface.hpp
   include/ori/simcars/agent/entity_state_interface.hpp
@@ -245,6 +246,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/constant_abstract.hpp
   include/ori/simcars/agent/event_abstract.hpp
   include/ori/simcars/agent/variable_abstract.hpp
+  include/ori/simcars/agent/simulated_variable_abstract.hpp
   include/ori/simcars/agent/driving_agent_abstract.hpp
   include/ori/simcars/agent/read_only_driving_agent_state_abstract.hpp
   include/ori/simcars/agent/driving_agent_state_abstract.hpp
@@ -269,7 +271,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/basic_goal_driving_agent_state.hpp
   include/ori/simcars/agent/driving_goal_extraction_agent.hpp
   include/ori/simcars/agent/driving_goal_extraction_scene.hpp
-  include/ori/simcars/agent/simulated_variable.hpp
+  include/ori/simcars/agent/basic_simulated_variable.hpp
   include/ori/simcars/agent/basic_driving_simulator.hpp
   include/ori/simcars/agent/driving_simulation_agent.hpp
   include/ori/simcars/agent/driving_simulation_scene.hpp

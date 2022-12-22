@@ -14,7 +14,7 @@ template <typename T>
 class IVariable : public virtual IValuelessVariable
 {
 public:
-    virtual IVariable<T>* deep_copy() const = 0;
+    virtual IVariable<T>* variable_deep_copy() const = 0;
 
     virtual bool get_value(temporal::Time time, T &value) const = 0;
 
