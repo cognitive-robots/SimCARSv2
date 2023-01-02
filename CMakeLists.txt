@@ -44,11 +44,14 @@ add_library(simcars_structures STATIC
   include/ori/simcars/structures/stack_array_interface.hpp
   include/ori/simcars/structures/queue_interface.hpp
   include/ori/simcars/structures/queue_array_interface.hpp
+  include/ori/simcars/structures/deque_interface.hpp
+  include/ori/simcars/structures/deque_array_interface.hpp
   include/ori/simcars/structures/set_interface.hpp
   include/ori/simcars/structures/dictionary_interface.hpp
   include/ori/simcars/structures/stl/stl_stack_array.hpp
-  include/ori/simcars/structures/stl/stl_queue_array.hpp
+  include/ori/simcars/structures/stl/stl_deque_array.hpp
   include/ori/simcars/structures/stl/stl_set.hpp
+  include/ori/simcars/structures/stl/stl_ordered_set.hpp
   include/ori/simcars/structures/stl/stl_dictionary.hpp
   include/ori/simcars/structures/stl/stl_ordered_dictionary.hpp
   include/ori/simcars/structures/stl/stl_concat_array.hpp
@@ -96,9 +99,10 @@ set_target_properties(simcars_geometry PROPERTIES VERSION ${PROJECT_VERSION})
 add_library(simcars_temporal STATIC
   src/temporal/sanity_check.cpp
   include/ori/simcars/temporal/typedefs.hpp
-  include/ori/simcars/temporal/temporal_dictionary_abstract.hpp
+  include/ori/simcars/temporal/temporal_search_dictionary_abstract.hpp
   include/ori/simcars/temporal/proximal_temporal_dictionary.hpp
   include/ori/simcars/temporal/precedence_temporal_dictionary.hpp
+  include/ori/simcars/temporal/temporal_rounding_dictionary.hpp
   include/ori/simcars/temporal/stateful_interface.hpp
   include/ori/simcars/temporal/living_interface.hpp
 )

@@ -172,7 +172,14 @@ IVariable<temporal::Duration> const* ADrivingAgent::get_cumilative_collision_tim
 
 IReadOnlyDrivingAgentState const* ADrivingAgent::get_driving_agent_state(temporal::Time time) const
 {
-    return new ViewReadOnlyDrivingAgentState(this, time);
+    if (this->is_state_available(time))
+    {
+        return new ViewReadOnlyDrivingAgentState(this, time);
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 IEntityState* ADrivingAgent::get_mutable_state(temporal::Time time)
@@ -294,7 +301,14 @@ IVariable<temporal::Duration>* ADrivingAgent::get_mutable_cumilative_collision_t
 
 IDrivingAgentState* ADrivingAgent::get_mutable_driving_agent_state(temporal::Time time)
 {
-    return new ViewDrivingAgentState(this, time);
+    if (this->is_state_available(time))
+    {
+        return new ViewDrivingAgentState(this, time);
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 }

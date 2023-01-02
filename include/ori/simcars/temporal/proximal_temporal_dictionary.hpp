@@ -1,9 +1,7 @@
 #pragma once
 
-#include <ori/simcars/structures/stl/stl_ordered_dictionary.hpp>
-#include <ori/simcars/structures/stl/stl_queue_array.hpp>
 #include <ori/simcars/temporal/typedefs.hpp>
-#include <ori/simcars/temporal/temporal_dictionary_abstract.hpp>
+#include <ori/simcars/temporal/temporal_search_dictionary_abstract.hpp>
 
 #include <stdexcept>
 
@@ -15,7 +13,7 @@ namespace temporal
 {
 
 template <typename V>
-class ProximalTemporalDictionary : public virtual AbstractTemporalDictionary<V>
+class ProximalTemporalDictionary : public virtual AbstractTemporalSearchDictionary<V>
 {
     Time search(Time const &timestamp) const override
     {
@@ -148,9 +146,9 @@ public:
     ProximalTemporalDictionary(size_t max_cache_size)
         : ProximalTemporalDictionary<V>(Duration::max() / 2, max_cache_size) {}
     ProximalTemporalDictionary(Duration time_diff_threshold, size_t max_cache_size)
-        : AbstractTemporalDictionary<V>(time_diff_threshold, max_cache_size) {}
+        : AbstractTemporalSearchDictionary<V>(time_diff_threshold, max_cache_size) {}
     ProximalTemporalDictionary(ProximalTemporalDictionary<V> const &temporal_dictionary)
-        : AbstractTemporalDictionary<V>(temporal_dictionary) {}
+        : AbstractTemporalSearchDictionary<V>(temporal_dictionary) {}
 
 };
 

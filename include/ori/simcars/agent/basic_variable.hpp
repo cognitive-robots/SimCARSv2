@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
-#include <ori/simcars/temporal/precedence_temporal_dictionary.hpp>
+#include <ori/simcars/temporal/temporal_rounding_dictionary.hpp>
 #include <ori/simcars/agent/variable_abstract.hpp>
 #include <ori/simcars/agent/basic_event.hpp>
 
@@ -22,12 +22,12 @@ class BasicVariable : public AVariable<T>
 
     IValuelessVariable::Type const type;
 
-    temporal::PrecedenceTemporalDictionary<IEvent<T>*> time_event_dict;
+    temporal::TemporalRoundingDictionary<IEvent<T>*> time_event_dict;
 
 public:
     BasicVariable(std::string const &entity_name, std::string const &parameter_name, IValuelessVariable::Type type,
-             temporal::Duration time_diff_threshold = temporal::Duration::max() / 2, size_t max_cache_size = 10) : entity_name(entity_name), variable_name(parameter_name), type(type),
-        time_event_dict(time_diff_threshold, max_cache_size) {}
+             temporal::Duration time_step) : entity_name(entity_name), variable_name(parameter_name), type(type),
+        time_event_dict(time_step, nullptr) {}
 
     ~BasicVariable()
     {
@@ -51,14 +51,19 @@ public:
                     entity_name,
                     variable_name,
                     type,
-                    time_event_dict.get_time_diff_threshold(),
-                    time_event_dict.get_max_cache_size());
+                    time_event_dict.get_time_window_step());
 
         structures::IArray<temporal::Time> const *times = time_event_dict.get_keys();
         for(size_t i = 0; i < times->count(); ++i)
         {
-            variable->time_event_dict.update((*times)[i], time_event_dict[(*times)[i]]->event_shallow_copy());
+            IEvent<T> *event = time_event_dict[(*times)[i]];
+            if (event != nullptr)
+            {
+                variable->time_event_dict.update((*times)[i], event->event_shallow_copy());
+            }
         }
+
+        variable->propogate_events_forward(this->get_max_temporal_limit());
 
         return variable;
     }
@@ -129,8 +134,9 @@ public:
 
         for (size_t i = 0; i < unfiltered_events->count(); ++i)
         {
-            if ((*unfiltered_events)[i]->get_time() >= time_window_start
-                    && (*unfiltered_events)[i]->get_time() <= time_window_end)
+            if ((*unfiltered_events)[i] != nullptr &&
+                    (*unfiltered_events)[i]->get_time() >= time_window_start &&
+                    (*unfiltered_events)[i]->get_time() <= time_window_end)
             {
                 filtered_events->push_back((*unfiltered_events)[i]);
             }
@@ -165,6 +171,15 @@ public:
         {
             return false;
         }
+    }
+
+    void propogate_events_forward() override
+    {
+        time_event_dict.propogate_values_forward();
+    }
+    void propogate_events_forward(temporal::Time time_window_end) override
+    {
+        time_event_dict.propogate_values_forward(time_window_end);
     }
 
     void set_value(temporal::Time time, T const &value) override

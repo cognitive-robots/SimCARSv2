@@ -284,9 +284,9 @@ void BasicDrivingSimulator::simulate_driving_agent(
     FP_DATA_TYPE aligned_linear_acceleration = aligned_linear_acceleration_variable_value->get_value();
     FP_DATA_TYPE new_aligned_linear_acceleration = new_aligned_linear_acceleration_variable_value->get_value();
 
-    IConstant<FP_DATA_TYPE> const *steer_variable_value = current_state->get_steer_variable();
+    //IConstant<FP_DATA_TYPE> const *steer_variable_value = current_state->get_steer_variable();
     IConstant<FP_DATA_TYPE> const *new_steer_variable_value = next_state->get_steer_variable();
-    FP_DATA_TYPE steer = steer_variable_value->get_value();
+    //FP_DATA_TYPE steer = steer_variable_value->get_value();
     FP_DATA_TYPE new_steer = new_steer_variable_value->get_value();
 
     IConstant<geometry::Vec> const *new_external_linear_acceleration_variable_value =

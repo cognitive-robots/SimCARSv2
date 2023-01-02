@@ -59,6 +59,7 @@ public:
 
         if (aligned_linear_velocity_goal_valueless_variable == nullptr)
         {
+            original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal");
             std::cerr << "Could not actuate aligned linear acceleration variable" << std::endl;
             new_aligned_linear_acceleration = 0.0f;
         }

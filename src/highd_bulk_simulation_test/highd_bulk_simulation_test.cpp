@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 4)
     {
-        std::cerr << "Usage: ./highd_simcars_demo recording_meta_file_path tracks_meta_file_path tracks_file_path" << std::endl;
+        std::cerr << "Usage: ./highd_bulk_simulation_test recording_meta_file_path tracks_meta_file_path tracks_file_path" << std::endl;
         return -1;
     }
 
@@ -261,13 +261,36 @@ int main(int argc, char *argv[])
                                      new_action_start_time,
                                      new_action_end_time);
 
-        aligned_linear_velocity_goal_variable->remove_value(
-                    selected_action_goal_event->get_time());
+        if (selected_action_goal_event->get_time() == driving_agent_to_edit->get_min_temporal_limit())
+        {
+            agent::IVariable<FP_DATA_TYPE> const *aligned_linear_velocity_variable =
+                    driving_agent_to_edit->get_aligned_linear_velocity_variable();
+            FP_DATA_TYPE starting_aligned_linear_velocity;
+            bool result = aligned_linear_velocity_variable->get_value(
+                        driving_agent_to_edit->get_min_temporal_limit(),
+                        starting_aligned_linear_velocity);
+            if (!result)
+            {
+                std::cerr << "Could not find starting velocity to create replacement starting velocity goal from" << std::endl;
+                return -1;
+            }
+            aligned_linear_velocity_goal_variable->set_value(
+                        selected_action_goal_event->get_time(),
+                        agent::Goal(starting_aligned_linear_velocity,
+                                    selected_action_goal_event->get_time()));
+        }
+        else
+        {
+            aligned_linear_velocity_goal_variable->remove_value(
+                        selected_action_goal_event->get_time());
+        }
 
         aligned_linear_velocity_goal_variable->set_value(
                     new_action_start_time,
                     agent::Goal(new_goal_value,
                                 new_action_end_time));
+
+        aligned_linear_velocity_goal_variable->propogate_events_forward();
 
         (*scenes_with_actions)[i] = new_scene;
     }

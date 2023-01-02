@@ -57,6 +57,9 @@ public:
             temporal::Time time_window_start = temporal::Time::min(),
             temporal::Time time_window_end = temporal::Time::max()) = 0;
     virtual IValuelessEvent* get_mutable_valueless_event(temporal::Time time, bool exact = false) = 0;
+
+    virtual void propogate_events_forward() = 0;
+    virtual void propogate_events_forward(temporal::Time time_window_end) = 0;
 };
 
 }

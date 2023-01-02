@@ -16,7 +16,6 @@ namespace stl
 template <typename T>
 class STLConcatArray : public virtual IArray<T>
 {
-public:
 protected:
     std::vector<IArray<T>*> data;
 

@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 4)
     {
-        std::cerr << "Usage: ./highd_simcars_demo recording_meta_file_path tracks_meta_file_path tracks_file_path" << std::endl;
+        std::cerr << "Usage: ./highd_simulation_test recording_meta_file_path tracks_meta_file_path tracks_file_path" << std::endl;
         return -1;
     }
 

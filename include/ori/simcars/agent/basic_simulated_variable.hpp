@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/stl/stl_concat_array.hpp>
-#include <ori/simcars/temporal/precedence_temporal_dictionary.hpp>
+#include <ori/simcars/temporal/temporal_rounding_dictionary.hpp>
 #include <ori/simcars/agent/constant_interface.hpp>
 #include <ori/simcars/agent/entity_state_interface.hpp>
 #include <ori/simcars/agent/simulation_scene_interface.hpp>
@@ -26,7 +26,7 @@ class BasicSimulatedVariable : public virtual ASimulatedVariable<T>
     mutable temporal::Time simulation_start_time;
     temporal::Time simulation_end_time;
 
-    mutable temporal::PrecedenceTemporalDictionary<IEvent<T>*> time_event_dict;
+    mutable temporal::TemporalRoundingDictionary<IEvent<T>*> time_event_dict;
 
     void simulation_check(temporal::Time time) const
     {
@@ -49,24 +49,21 @@ public:
                       ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       bool start_simulated,
-                      temporal::Duration time_diff_threshold = temporal::Duration::max() / 2,
-                      size_t max_cache_size = 10) :
+                      temporal::Duration time_step) :
         BasicSimulatedVariable(original_variable, simulation_scene,
                           simulation_start_time,
                           original_variable->get_max_temporal_limit(),
                           start_simulated,
-                          time_diff_threshold,
-                          max_cache_size) {}
+                          time_step) {}
     BasicSimulatedVariable(IVariable<T> const *original_variable,
                       ISimulationScene *simulation_scene,
                       temporal::Time simulation_start_time,
                       temporal::Time simulation_end_time,
                       bool start_simulated,
-                      temporal::Duration time_diff_threshold = temporal::Duration::max() / 2,
-                      size_t max_cache_size = 10) :
+                      temporal::Duration time_step) :
         original_variable(original_variable), simulation_scene(simulation_scene),
         simulation_end_time(simulation_end_time),
-        time_event_dict(time_diff_threshold, max_cache_size)
+        time_event_dict(time_step, nullptr)
     {
         if (simulation_start_time < original_variable->get_min_temporal_limit())
         {
@@ -112,16 +109,21 @@ public:
         BasicSimulatedVariable<T> *variable =
                 new BasicSimulatedVariable<T>(original_variable, simulation_scene, simulation_start_time,
                                          simulation_end_time, simulation_start_time < simulation_end_time,
-                                         time_event_dict.get_time_diff_threshold(),
-                                         time_event_dict.get_max_cache_size());
+                                         time_event_dict.get_time_window_step());
 
         size_t i;
 
         structures::IArray<temporal::Time> const *times = time_event_dict.get_keys();
         for(i = 0; i < times->count(); ++i)
         {
-            variable->time_event_dict.update((*times)[i], time_event_dict[(*times)[i]]->event_shallow_copy());
+            IEvent<T> *event = time_event_dict[(*times)[i]];
+            if (event != nullptr)
+            {
+                variable->time_event_dict.update((*times)[i], event->event_shallow_copy());
+            }
         }
+
+        variable->propogate_events_forward(this->get_max_temporal_limit());
 
         return variable;
     }
@@ -281,6 +283,15 @@ public:
         {
             return false;
         }
+    }
+
+    void propogate_events_forward() override
+    {
+        time_event_dict.propogate_values_forward();
+    }
+    void propogate_events_forward(temporal::Time time_window_end) override
+    {
+        time_event_dict.propogate_values_forward(time_window_end);
     }
 
     void set_value(temporal::Time time, T const &value) override

@@ -20,7 +20,8 @@ protected:
     std::vector<T> data;
 
 public:
-    STLStackArray(size_t size = 0) : data(size) {}
+    STLStackArray() {}
+    STLStackArray(size_t size, T const &default_value = T()) : data(size, default_value) {}
     STLStackArray(std::initializer_list<T> init_list) : data(init_list) {}
     STLStackArray(STLStackArray<T> const &stl_stack_array) : data(stl_stack_array.data) {}
     STLStackArray(IArray<T> const *array) : data(array->count())
@@ -64,6 +65,10 @@ public:
     void clear() override
     {
         data.clear();
+    }
+    void resize(size_t size) override
+    {
+        data.resize(size);
     }
 
     void erase_back() override

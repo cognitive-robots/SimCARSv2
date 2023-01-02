@@ -3,7 +3,7 @@
 #include <ori/simcars/structures/set_interface.hpp>
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 
-#include <unordered_set>
+#include <set>
 
 namespace ori
 {
@@ -15,19 +15,19 @@ namespace stl
 {
 
 template <typename T>
-class STLSet : public virtual ISet<T>
+class STLOrderedSet : public virtual ISet<T>
 {
 protected:
-    std::unordered_set<T> data;
+    std::set<T> data;
 
     mutable IStackArray<T> *values_cache;
 
 public:
-    STLSet(size_t bin_count = 10000) : data(bin_count), values_cache(nullptr) {}
-    STLSet(std::initializer_list<T> init_list, size_t bin_count = 10000) :
-        data(init_list, bin_count), values_cache(nullptr) {}
-    STLSet(STLSet const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
-    STLSet(ISet<T> const *set, size_t bin_count = 10000) : data(bin_count), values_cache(nullptr)
+    STLOrderedSet() : values_cache(nullptr) {}
+    STLOrderedSet(std::initializer_list<T> init_list) :
+        data(init_list), values_cache(nullptr) {}
+    STLOrderedSet(STLOrderedSet const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
+    STLOrderedSet(ISet<T> const *set) : values_cache(nullptr)
     {
         IArray<T> const *array = set->get_array();
         for (size_t i; i < array->count(); ++i)
@@ -36,7 +36,7 @@ public:
         }
     }
 
-    ~STLSet() override
+    ~STLOrderedSet() override
     {
         delete values_cache;
     }

@@ -362,6 +362,10 @@ int main(int argc, char *argv[])
                     agent::Goal(new_goal_value,
                                 new_action_end_time));
 
+        assert(aligned_linear_velocity_goal_variable->get_max_temporal_limit() == next_action_time);
+
+        aligned_linear_velocity_goal_variable->propogate_events_forward();
+
         (*scenes_with_actions)[i] = new_scene;
     }
 

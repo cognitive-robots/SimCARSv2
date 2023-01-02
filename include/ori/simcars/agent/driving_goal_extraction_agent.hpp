@@ -38,7 +38,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 
         aligned_linear_velocity_goal_variable =
                     new BasicVariable<Goal<FP_DATA_TYPE>>(
-                        this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL);
+                        this->get_name(), "aligned_linear_velocity", IValuelessVariable::Type::GOAL, driving_scene->get_time_step());
 
         temporal::Duration min_duration_threshold(temporal::DurationRep(1000.0 * MIN_ALIGNED_LINEAR_VELOCITY_CHANGE_DURATION_THRESHOLD));
 
@@ -231,6 +231,8 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
             }
         }
         delete events;
+
+        aligned_linear_velocity_goal_variable->propogate_events_forward(this->get_max_temporal_limit());
     }
     void extract_lane_change_events(map::IMap<T_map_id> const *map)
     {
@@ -240,7 +242,7 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
 
         lane_goal_variable =
                     new BasicVariable<Goal<int32_t>>(
-                        this->get_name(), "lane", IValuelessVariable::Type::GOAL);
+                        this->get_name(), "lane", IValuelessVariable::Type::GOAL, driving_scene->get_time_step());
 
         temporal::Time current_time;
         temporal::Time action_start_time;
@@ -372,8 +374,20 @@ class DrivingGoalExtractionAgent : public virtual ADrivingAgent
             delete left_lanes;
             delete right_lanes;
         }
-
         delete previous_lanes;
+
+        structures::IArray<IEvent<Goal<int32_t>> const*> *events = lane_goal_variable->get_events();
+        if (events->count() == 0 ||
+                lane_goal_variable->get_min_temporal_limit() >
+                this->get_min_temporal_limit())
+        {
+            lane_goal_variable->set_value(
+                        this->get_min_temporal_limit(),
+                        Goal<int32_t>(0, this->get_min_temporal_limit()));
+        }
+        delete events;
+
+        lane_goal_variable->propogate_events_forward(this->get_max_temporal_limit());
     }
 
 protected:
