@@ -22,7 +22,7 @@ class BasicVariable : public AVariable<T>
 
     IValuelessVariable::Type const type;
 
-    temporal::TemporalRoundingDictionary<IEvent<T>*> time_event_dict;
+    mutable temporal::TemporalRoundingDictionary<IEvent<T>*> time_event_dict;
 
 public:
     BasicVariable(std::string const &entity_name, std::string const &parameter_name, IValuelessVariable::Type type,
@@ -103,6 +103,15 @@ public:
         return time_event_dict.contains(time);
     }
 
+    void propogate_events_forward() const override
+    {
+        time_event_dict.propogate_values_forward();
+    }
+    void propogate_events_forward(temporal::Time time_window_end) const override
+    {
+        time_event_dict.propogate_values_forward(time_window_end);
+    }
+
     bool get_value(temporal::Time time, T &value) const override
     {
         if (time_event_dict.contains(time))
@@ -171,15 +180,6 @@ public:
         {
             return false;
         }
-    }
-
-    void propogate_events_forward() override
-    {
-        time_event_dict.propogate_values_forward();
-    }
-    void propogate_events_forward(temporal::Time time_window_end) override
-    {
-        time_event_dict.propogate_values_forward(time_window_end);
     }
 
     void set_value(temporal::Time time, T const &value) override

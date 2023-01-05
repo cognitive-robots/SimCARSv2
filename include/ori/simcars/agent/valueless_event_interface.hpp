@@ -13,8 +13,6 @@ namespace agent
 class IValuelessEvent : public virtual IValuelessConstant
 {
 public:
-    virtual ~IValuelessEvent() = default;
-
     virtual IValuelessEvent* valueless_event_shallow_copy() const = 0;
 
     virtual temporal::Time get_time() const = 0;

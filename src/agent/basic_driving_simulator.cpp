@@ -155,14 +155,32 @@ void BasicDrivingSimulator::simulate_driving_scene(
                 // approach is viable
                 ViewDrivingAgentState *view_driving_agent_state_1 =
                         dynamic_cast<ViewDrivingAgentState*>(next_driving_agent_state_1);
-                dynamic_cast<DrivingSimulationAgent const*>(
-                            view_driving_agent_state_1->get_agent())->begin_simulation(
+                DrivingSimulationAgent const* driving_agent_1 =
+                        dynamic_cast<DrivingSimulationAgent const*>(
+                            view_driving_agent_state_1->get_agent());
+                if (!simulation_flags[i])
+                {
+                    IValuelessVariable const *aligned_linear_velocity_goal_valueless_variable =
+                            driving_agent_1->get_variable_parameter(
+                                driving_agent_1->get_name() + ".aligned_linear_velocity.goal");
+                    aligned_linear_velocity_goal_valueless_variable->propogate_events_forward(driving_agent_1->get_max_temporal_limit());
+                }
+                driving_agent_1->begin_simulation(
                             view_driving_agent_state_1->get_time() - time_step);
                 controller->modify_driving_agent_state(current_driving_agent_state_1, view_driving_agent_state_1);
                 ViewDrivingAgentState *view_driving_agent_state_2 =
                         dynamic_cast<ViewDrivingAgentState*>(next_driving_agent_state_2);
-                dynamic_cast<DrivingSimulationAgent const*>(
-                            view_driving_agent_state_2->get_agent())->begin_simulation(
+                DrivingSimulationAgent const* driving_agent_2 =
+                        dynamic_cast<DrivingSimulationAgent const*>(
+                            view_driving_agent_state_2->get_agent());
+                if (!simulation_flags[j])
+                {
+                    IValuelessVariable const *aligned_linear_velocity_goal_valueless_variable =
+                            driving_agent_2->get_variable_parameter(
+                                driving_agent_2->get_name() + ".aligned_linear_velocity.goal");
+                    aligned_linear_velocity_goal_valueless_variable->propogate_events_forward(driving_agent_2->get_max_temporal_limit());
+                }
+                driving_agent_2->begin_simulation(
                             view_driving_agent_state_2->get_time() - time_step);
                 controller->modify_driving_agent_state(current_driving_agent_state_2, view_driving_agent_state_2);
 

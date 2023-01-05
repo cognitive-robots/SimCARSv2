@@ -227,16 +227,62 @@ public:
         size_t index = (key - time_window_start).count() / time_window_step.count();
         if (key >= time_window_start && index < 1)
         {
-            value_deque.pop_front();
-            time_window_start += time_window_step;
+            V value_to_erase = value_deque[0];
+            bool encountered_other_value = false;
+            for (size_t i = 0; i < value_deque.size(); ++i)
+            {
+                if (value_deque[i] == value_to_erase)
+                {
+                    if (encountered_other_value)
+                    {
+                        value_deque[i] = default_value;
+                    }
+                    else
+                    {
+                        value_deque.pop_front();
+                        time_window_start += time_window_step;
+                        --i;
+                    }
+                }
+                else
+                {
+                    encountered_other_value = true;
+                }
+            }
         }
-        else if (index == value_deque.size() - 1)
+        else if (key >= time_window_start && index == value_deque.size() - 1)
         {
-            value_deque.pop_back();
+            V value_to_erase = value_deque[value_deque.size() - 1];
+            bool encountered_other_value = false;
+            for (size_t i = value_deque.size() - 1; i >= 0; --i)
+            {
+                if (value_deque[i] == value_to_erase)
+                {
+                    if (encountered_other_value)
+                    {
+                        value_deque[i] = default_value;
+                    }
+                    else
+                    {
+                        value_deque.pop_back();
+                    }
+                }
+                else
+                {
+                    encountered_other_value = true;
+                }
+            }
         }
         else if (index > 0 && index < value_deque.size() - 1)
         {
-            value_deque[index] = default_value;
+            V value_to_erase = value_deque[index];
+            for (size_t i = index; i < value_deque.size(); ++i)
+            {
+                if (value_deque[i] == value_to_erase)
+                {
+                    value_deque[i] = default_value;
+                }
+            }
         }
 
         delete keys_cache;
@@ -273,11 +319,6 @@ public:
     }
     void propogate_values_forward(Time const &time_window_end)
     {
-        if (value_deque.size() == 0)
-        {
-            return;
-        }
-
         V current_value = default_value;
         structures::stl::STLSet<V> previous_values;
         Time current_time;

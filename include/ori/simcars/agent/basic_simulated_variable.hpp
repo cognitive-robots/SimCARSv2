@@ -170,6 +170,15 @@ public:
         return time_event_dict.contains(time) || (time <= simulation_start_time && original_variable->has_event(time));
     }
 
+    void propogate_events_forward() const override
+    {
+        time_event_dict.propogate_values_forward();
+    }
+    void propogate_events_forward(temporal::Time time_window_end) const override
+    {
+        time_event_dict.propogate_values_forward(time_window_end);
+    }
+
     bool get_value(temporal::Time time, T &value) const override
     {
         simulation_check(time);
@@ -187,6 +196,7 @@ public:
             }
             else
             {
+                time_event_dict.contains(time);
                 return false;
             }
         }
@@ -283,15 +293,6 @@ public:
         {
             return false;
         }
-    }
-
-    void propogate_events_forward() override
-    {
-        time_event_dict.propogate_values_forward();
-    }
-    void propogate_events_forward(temporal::Time time_window_end) override
-    {
-        time_event_dict.propogate_values_forward(time_window_end);
     }
 
     void set_value(temporal::Time time, T const &value) override

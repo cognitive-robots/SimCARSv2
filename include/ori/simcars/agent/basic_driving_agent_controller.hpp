@@ -59,22 +59,23 @@ public:
 
         if (aligned_linear_velocity_goal_valueless_variable == nullptr)
         {
-            original_state->get_parameter_value(original_state->get_name() + ".aligned_linear_velocity.goal");
             std::cerr << "Could not actuate aligned linear acceleration variable" << std::endl;
             new_aligned_linear_acceleration = 0.0f;
         }
+        else
+        {
+            IConstant<Goal<FP_DATA_TYPE>> const *aligned_linear_velocity_goal_variable =
+                    dynamic_cast<IConstant<Goal<FP_DATA_TYPE>> const*>(aligned_linear_velocity_goal_valueless_variable);
 
-        IConstant<Goal<FP_DATA_TYPE>> const *aligned_linear_velocity_goal_variable =
-                dynamic_cast<IConstant<Goal<FP_DATA_TYPE>> const*>(aligned_linear_velocity_goal_valueless_variable);
+            Goal<FP_DATA_TYPE> aligned_linear_velocity_goal = aligned_linear_velocity_goal_variable->get_value();
 
-        Goal<FP_DATA_TYPE> aligned_linear_velocity_goal = aligned_linear_velocity_goal_variable->get_value();
-
-        FP_DATA_TYPE aligned_linear_velocity_error = aligned_linear_velocity_goal.get_goal_value() - aligned_linear_velocity;
-        temporal::Duration time_diff = aligned_linear_velocity_goal.get_goal_time() - original_state->get_time();
-        new_aligned_linear_acceleration = aligned_linear_velocity_error / std::max(time_diff.count(), time_step.count());
-        new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
-        new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
-        assert(!std::isnan(new_aligned_linear_acceleration));
+            FP_DATA_TYPE aligned_linear_velocity_error = aligned_linear_velocity_goal.get_goal_value() - aligned_linear_velocity;
+            temporal::Duration time_diff = aligned_linear_velocity_goal.get_goal_time() - original_state->get_time();
+            new_aligned_linear_acceleration = aligned_linear_velocity_error / std::max(time_diff.count(), time_step.count());
+            new_aligned_linear_acceleration = std::min(new_aligned_linear_acceleration, MAX_ALIGNED_LINEAR_ACCELERATION);
+            new_aligned_linear_acceleration = std::max(new_aligned_linear_acceleration, MIN_ALIGNED_LINEAR_ACCELERATION);
+            assert(!std::isnan(new_aligned_linear_acceleration));
+        }
 
         IConstant<FP_DATA_TYPE> *new_aligned_linear_acceleration_variable =
                     new BasicConstant(
