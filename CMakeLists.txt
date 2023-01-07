@@ -204,6 +204,7 @@ add_library(simcars_agent STATIC
   src/agent/basic_driving_simulator.cpp
   src/agent/driving_simulation_agent.cpp
   src/agent/driving_simulation_scene.cpp
+  src/agent/driving_simulation_scene_factory.cpp
   src/agent/lyft/lyft_driving_agent.cpp
   src/agent/lyft/lyft_scene.cpp
   src/agent/highd/highd_driving_agent.cpp
@@ -240,6 +241,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/action_sampler_interface.hpp
   include/ori/simcars/agent/simulator_interface.hpp
   include/ori/simcars/agent/simulation_scene_interface.hpp
+  include/ori/simcars/agent/simulation_scene_factory_interface.hpp
   include/ori/simcars/agent/driving_simulation_agent_interface.hpp
   include/ori/simcars/agent/driving_simulation_scene_interface.hpp
   include/ori/simcars/agent/driving_agent_controller_interface.hpp
@@ -279,6 +281,7 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/basic_driving_simulator.hpp
   include/ori/simcars/agent/driving_simulation_agent.hpp
   include/ori/simcars/agent/driving_simulation_scene.hpp
+  include/ori/simcars/agent/driving_simulation_scene_factory.hpp
   include/ori/simcars/agent/basic_driving_agent_controller.hpp
   include/ori/simcars/agent/safe_speedy_driving_agent_reward_calculator.hpp
   include/ori/simcars/agent/basic_fp_action_sampler.hpp
@@ -310,6 +313,29 @@ PRIVATE
 add_dependencies(simcars_agent simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 target_compile_options(simcars_agent PRIVATE -fPIC)
 set_target_properties(simcars_agent PROPERTIES VERSION ${PROJECT_VERSION})
+
+add_library(simcars_causal STATIC
+  src/causal/necessary_fp_goal_causal_link_tester.cpp
+  include/ori/simcars/causal/causal_link_tester_interface.hpp
+  include/ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp
+)
+target_include_directories(simcars_causal
+PUBLIC
+  $<INSTALL_INTERFACE:include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(simcars_causal
+PUBLIC
+  simcars_utils
+  simcars_structures
+  simcars_geometry
+  simcars_temporal
+  simcars_map
+  simcars_agent
+)
+add_dependencies(simcars_causal simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+target_compile_options(simcars_causal PRIVATE -fPIC)
+set_target_properties(simcars_causal PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_visualisation STATIC
   src/visualisation/utils.cpp
@@ -395,6 +421,10 @@ add_dependencies(highd_json_meta_simulation_test simcars_utils simcars_structure
 add_executable(highd_json_meta_bulk_simulation_test src/highd_json_meta_bulk_simulation_test/highd_json_meta_bulk_simulation_test.cpp)
 target_link_libraries(highd_json_meta_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 add_dependencies(highd_json_meta_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+
+add_executable(highd_json_meta_ate_test src/highd_json_meta_ate_test/highd_json_meta_ate_test.cpp)
+target_link_libraries(highd_json_meta_ate_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_causal)
+add_dependencies(highd_json_meta_ate_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_causal)
 
 add_executable(highd_simcars_demo src/highd_simcars_demo/highd_simcars_demo.cpp)
 target_link_libraries(highd_simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)

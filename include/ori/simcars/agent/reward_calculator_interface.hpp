@@ -15,7 +15,7 @@ class IRewardCalculator
 public:
     virtual ~IRewardCalculator() = default;
 
-    virtual FP_DATA_TYPE calculate_reward(agent::IReadOnlyEntityState const *state) const = 0;
+    virtual FP_DATA_TYPE calculate_state_reward(agent::IReadOnlyEntityState const *state) const = 0;
 };
 
 }

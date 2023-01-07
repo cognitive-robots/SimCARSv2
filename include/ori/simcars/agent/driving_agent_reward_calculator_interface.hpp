@@ -13,7 +13,7 @@ namespace agent
 class IDrivingAgentRewardCalculator : public virtual IRewardCalculator
 {
 public:
-    virtual FP_DATA_TYPE calculate_reward(agent::IReadOnlyDrivingAgentState const *state) const = 0;
+    virtual FP_DATA_TYPE calculate_driving_state_reward(agent::IReadOnlyDrivingAgentState const *state) const = 0;
 };
 
 }

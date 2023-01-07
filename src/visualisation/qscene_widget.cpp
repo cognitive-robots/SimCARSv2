@@ -154,7 +154,7 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
     FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
     FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
     FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
-    FP_DATA_TYPE reward = reward_calculator.calculate_reward(&state);
+    FP_DATA_TYPE reward = reward_calculator.calculate_state_reward(&state);
     rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
     sf::Vector2f agent_rectangle_position = agent_base_shape_position
             - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation)

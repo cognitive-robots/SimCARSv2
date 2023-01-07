@@ -8,9 +8,9 @@ namespace simcars
 namespace agent
 {
 
-FP_DATA_TYPE ADrivingAgentRewardCalculator::calculate_reward(agent::IReadOnlyEntityState const *state) const
+FP_DATA_TYPE ADrivingAgentRewardCalculator::calculate_state_reward(IReadOnlyEntityState const *state) const
 {
-    return this->calculate_reward(dynamic_cast<agent::IReadOnlyDrivingAgentState const*>(state));
+    return this->calculate_driving_state_reward(dynamic_cast<IReadOnlyDrivingAgentState const*>(state));
 }
 
 }

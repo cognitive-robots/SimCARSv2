@@ -26,7 +26,7 @@ protected:
 public:
     ~AFileBasedScene() override
     {
-        static_assert(std::is_base_of<AFileBasedScene, T_scene>::value, "T_map is not derived from AFileBasedScene");
+        static_assert(std::is_base_of<AFileBasedScene, T_scene>::value, "T_scene is not derived from AFileBasedScene");
     }
 
     void save(std::string const &output_file_path_str) const override

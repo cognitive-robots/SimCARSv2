@@ -12,7 +12,7 @@ namespace agent
 class SafeSpeedyDrivingAgentRewardCalculator : public virtual ADrivingAgentRewardCalculator
 {
 public:
-    FP_DATA_TYPE calculate_reward(agent::IReadOnlyDrivingAgentState const *state) const override;
+    FP_DATA_TYPE calculate_driving_state_reward(agent::IReadOnlyDrivingAgentState const *state) const override;
 };
 
 }

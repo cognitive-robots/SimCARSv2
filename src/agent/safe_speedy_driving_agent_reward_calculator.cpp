@@ -10,7 +10,7 @@ namespace simcars
 namespace agent
 {
 
-FP_DATA_TYPE SafeSpeedyDrivingAgentRewardCalculator::calculate_reward(IReadOnlyDrivingAgentState const *state) const
+FP_DATA_TYPE SafeSpeedyDrivingAgentRewardCalculator::calculate_driving_state_reward(IReadOnlyDrivingAgentState const *state) const
 {
     FP_DATA_TYPE poe_reward = 1.0f;
 

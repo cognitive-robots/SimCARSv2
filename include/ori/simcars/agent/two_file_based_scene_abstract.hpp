@@ -27,7 +27,7 @@ protected:
 public:
     ~ATwoFileBasedScene() override
     {
-        static_assert(std::is_base_of<ATwoFileBasedScene, T_scene>::value, "T_map is not derived from ATwoFileBasedScene");
+        static_assert(std::is_base_of<ATwoFileBasedScene, T_scene>::value, "T_scene is not derived from ATwoFileBasedScene");
     }
 
     void save(std::string const &output_file_1_path_str, std::string const &output_file_2_path_str) const override
