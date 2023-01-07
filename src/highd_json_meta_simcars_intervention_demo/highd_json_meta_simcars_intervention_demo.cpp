@@ -14,7 +14,6 @@
 #include <QFrame>
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
-#include <rapidcsv.h>
 
 #include <iostream>
 #include <exception>
@@ -62,7 +61,9 @@ int main(int argc, char *argv[])
 
     std::filesystem::path recording_meta_file_path =
             raw_data_directory_path /
-                (std::to_string(scene_id) + "_recordingMeta.csv");
+                ("scene-" + std::to_string(scene_id) + "-" + std::to_string(convoy_tail_id) +
+                 "_follows_" + std::to_string(convoy_head_id) + "-" +
+                 std::to_string(independent_id) + "_independent-recordingMeta.csv");
 
     if (!std::filesystem::is_regular_file(recording_meta_file_path))
     {
@@ -73,7 +74,9 @@ int main(int argc, char *argv[])
 
     std::filesystem::path tracks_meta_file_path =
             raw_data_directory_path /
-                (std::to_string(scene_id) + "_tracksMeta.csv");
+                ("scene-" + std::to_string(scene_id) + "-" + std::to_string(convoy_tail_id) +
+                 "_follows_" + std::to_string(convoy_head_id) + "-" +
+                 std::to_string(independent_id) + "_independent-tracksMeta.csv");
 
     if (!std::filesystem::is_regular_file(tracks_meta_file_path))
     {
@@ -84,57 +87,15 @@ int main(int argc, char *argv[])
 
     std::filesystem::path tracks_file_path =
             raw_data_directory_path /
-                (std::to_string(scene_id) + "_tracks.csv");
+                ("scene-" + std::to_string(scene_id) + "-" + std::to_string(convoy_tail_id) +
+                 "_follows_" + std::to_string(convoy_head_id) + "-" +
+                 std::to_string(independent_id) + "_independent-tracks.csv");
 
     if (!std::filesystem::is_regular_file(tracks_file_path))
     {
         throw std::invalid_argument("Tracks file path '" +
                                     tracks_file_path.string() +
                                     "' does not indicate a valid file");
-    }
-
-    std::ifstream tracks_meta_filestream(tracks_meta_file_path);
-    rapidcsv::Document tracks_meta_document(tracks_meta_filestream);
-
-    uint32_t latest_initial_frame =
-            tracks_meta_document.GetCell<uint32_t>("initialFrame", convoy_head_id - 1);
-    latest_initial_frame =
-            std::max(tracks_meta_document.GetCell<uint32_t>("initialFrame",
-                                                            convoy_tail_id - 1),
-                     latest_initial_frame);
-    latest_initial_frame =
-            std::max(tracks_meta_document.GetCell<uint32_t>("initialFrame",
-                                                            independent_id - 1),
-                     latest_initial_frame);
-
-    uint32_t earliest_final_frame =
-            tracks_meta_document.GetCell<uint32_t>("finalFrame", convoy_head_id - 1);
-    earliest_final_frame =
-            std::min(tracks_meta_document.GetCell<uint32_t>("finalFrame",
-                                                            convoy_tail_id - 1),
-                     earliest_final_frame);
-    earliest_final_frame =
-            std::min(tracks_meta_document.GetCell<uint32_t>("finalFrame",
-                                                            independent_id - 1),
-                     earliest_final_frame);
-
-
-    structures::ISet<std::string> *agent_names =
-            new structures::stl::STLSet<std::string>;
-
-    size_t i;
-    for (i = 1; i <= tracks_meta_document.GetRowCount(); ++i)
-    {
-        uint32_t const initial_frame =
-                tracks_meta_document.GetCell<uint32_t>("initialFrame", i - 1);
-        uint32_t const final_frame =
-                tracks_meta_document.GetCell<uint32_t>("finalFrame", i - 1);
-
-        if (initial_frame <= earliest_final_frame &&
-                final_frame >= latest_initial_frame)
-        {
-            agent_names->insert("non_ego_vehicle_" + std::to_string(i));
-        }
     }
 
     structures::ISet<std::string> *simulated_agent_names =
@@ -177,7 +138,7 @@ int main(int argc, char *argv[])
     try
     {
         scene = agent::highd::HighDScene::load(tracks_meta_file_path.string(),
-                                               tracks_file_path.string(), agent_names);
+                                               tracks_file_path.string());
     }
     catch (std::exception const &e)
     {
@@ -189,7 +150,6 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished scene load (" << time_elapsed.count() << " μs)" << std::endl;
 
-    delete agent_names;
 
     std::cout << "Beginning action extraction" << std::endl;
 
