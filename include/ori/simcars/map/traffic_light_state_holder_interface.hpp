@@ -42,6 +42,7 @@ public:
         State(ITrafficLightStateHolder::FaceColour active_face = ITrafficLightStateHolder::FaceColour::UNKNOWN)
             : active_face(active_face) {}
         State(State const &state) : State(state.active_face) {}
+
         virtual ~State() = default;
 
         virtual bool operator ==(ITrafficLightStateHolder::State const &state) const
@@ -53,7 +54,7 @@ public:
     typedef structures::IDictionary<FaceColour, FaceType> IFaceDictionary;
     typedef temporal::ProximalTemporalDictionary<State const*> TemporalStateDictionary;
 
-    ~ITrafficLightStateHolder() = default;
+    virtual ~ITrafficLightStateHolder() = default;
 };
 
 }

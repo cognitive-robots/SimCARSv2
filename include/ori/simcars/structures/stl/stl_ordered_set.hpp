@@ -26,7 +26,7 @@ public:
     STLOrderedSet() : values_cache(nullptr) {}
     STLOrderedSet(std::initializer_list<T> init_list) :
         data(init_list), values_cache(nullptr) {}
-    STLOrderedSet(STLOrderedSet const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
+    STLOrderedSet(STLOrderedSet<T> const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
     STLOrderedSet(ISet<T> const *set) : values_cache(nullptr)
     {
         IArray<T> const *array = set->get_array();

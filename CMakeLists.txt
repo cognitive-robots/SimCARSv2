@@ -317,7 +317,9 @@ set_target_properties(simcars_agent PROPERTIES VERSION ${PROJECT_VERSION})
 add_library(simcars_causal STATIC
   src/causal/necessary_fp_goal_causal_link_tester.cpp
   include/ori/simcars/causal/causal_link_tester_interface.hpp
+  include/ori/simcars/causal/causal_discoverer_interface.hpp
   include/ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp
+  include/ori/simcars/causal/necessary_driving_causal_discoverer.hpp
 )
 target_include_directories(simcars_causal
 PUBLIC
@@ -425,6 +427,10 @@ add_dependencies(highd_json_meta_bulk_simulation_test simcars_utils simcars_stru
 add_executable(highd_json_meta_ate_test src/highd_json_meta_ate_test/highd_json_meta_ate_test.cpp)
 target_link_libraries(highd_json_meta_ate_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_causal)
 add_dependencies(highd_json_meta_ate_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_causal)
+
+add_executable(highd_json_meta_causal_discovery src/highd_json_meta_causal_discovery/highd_json_meta_causal_discovery.cpp)
+target_link_libraries(highd_json_meta_causal_discovery simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_causal)
+add_dependencies(highd_json_meta_causal_discovery simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_causal)
 
 add_executable(highd_simcars_demo src/highd_simcars_demo/highd_simcars_demo.cpp)
 target_link_libraries(highd_simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)

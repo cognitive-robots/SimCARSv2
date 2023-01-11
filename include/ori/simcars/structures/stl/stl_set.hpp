@@ -14,11 +14,11 @@ namespace structures
 namespace stl
 {
 
-template <typename T>
+template <typename T, class T_hash = std::hash<T>>
 class STLSet : public virtual ISet<T>
 {
 protected:
-    std::unordered_set<T> data;
+    std::unordered_set<T, T_hash> data;
 
     mutable IStackArray<T> *values_cache;
 
@@ -26,7 +26,7 @@ public:
     STLSet(size_t bin_count = 10000) : data(bin_count), values_cache(nullptr) {}
     STLSet(std::initializer_list<T> init_list, size_t bin_count = 10000) :
         data(init_list, bin_count), values_cache(nullptr) {}
-    STLSet(STLSet const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
+    STLSet(STLSet<T> const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
     STLSet(ISet<T> const *set, size_t bin_count = 10000) : data(bin_count), values_cache(nullptr)
     {
         IArray<T> const *array = set->get_array();

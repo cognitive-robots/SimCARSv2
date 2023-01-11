@@ -29,8 +29,10 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
             effect_entity->get_variable_parameter(effect->get_full_name());
 
     temporal::Time time_window_start = cause->get_time();
+    temporal::Time effect_agent_time_window_start =
+            std::max(effect_entity->get_min_temporal_limit(), time_window_start);
     temporal::Time sampling_time_window_start = time_window_start;
-    temporal::Time time_window_end = scene->get_max_temporal_limit();
+    temporal::Time time_window_end = effect_entity->get_max_temporal_limit();
 
     structures::IArray<agent::IValuelessEvent const*> *effect_variable_events =
             effect_variable->get_valueless_events();
@@ -61,7 +63,7 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
     FP_DATA_TYPE current_reward;
     if (original_scene)
     {
-        for (temporal::Time current_time = time_window_start;
+        for (temporal::Time current_time = effect_agent_time_window_start;
              current_time <= time_window_end;
              current_time += scene->get_time_step())
         {
@@ -69,6 +71,7 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
             current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
             current_reward = reward_calculator->calculate_state_reward(current_entity_state);
             effect_reward_minimum = std::min(current_reward, effect_reward_minimum);
+            delete current_scene_state;
         }
     }
     else
@@ -81,7 +84,7 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
                                                                   time_window_end,
                                                                   relevant_agent_names);
 
-        for (temporal::Time current_time = time_window_start;
+        for (temporal::Time current_time = effect_agent_time_window_start;
              current_time <= time_window_end;
              current_time += scene->get_time_step())
         {
@@ -89,6 +92,7 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
             current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
             current_reward = reward_calculator->calculate_state_reward(current_entity_state);
             effect_reward_minimum = std::min(current_reward, effect_reward_minimum);
+            delete current_scene_state;
         }
 
         delete simulation_scene;
@@ -129,7 +133,10 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
 
         branch_variable->propogate_events_forward(time_window_end);
 
-        FP_DATA_TYPE branch_reward_minimum = 1.0f;
+        if (original_scene)
+        {
+            time_window_start = new_action_start_time;
+        }
 
         agent::ISimulationScene *simulation_scene =
                 simulation_scene_factory->create_simulation_scene(branch_scene, simulator,
@@ -138,7 +145,9 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
                                                                   time_window_end,
                                                                   relevant_agent_names);
 
-        for (temporal::Time current_time = time_window_start;
+        FP_DATA_TYPE branch_reward_minimum = 1.0f;
+
+        for (temporal::Time current_time = effect_agent_time_window_start;
              current_time <= time_window_end;
              current_time += scene->get_time_step())
         {
@@ -146,6 +155,7 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
             current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
             current_reward = reward_calculator->calculate_state_reward(current_entity_state);
             branch_reward_minimum = std::min(current_reward, branch_reward_minimum);
+            delete current_scene_state;
         }
 
         if (effect_reward_minimum >= branch_reward_minimum)
@@ -183,6 +193,17 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
                                     "potential effect event");
     }
 
+
+    agent::IScene *copied_scene = scene->scene_deep_copy();
+
+    agent::IEntity *copied_entity =
+            copied_scene->get_mutable_entity(cause->get_entity_name());
+
+    agent::IValuelessVariable *copied_variable =
+            copied_entity->get_mutable_variable_parameter(cause->get_full_name());
+    copied_variable->propogate_events_forward(scene->get_max_temporal_limit());
+
+
     agent::IScene *intervened_scene = scene->scene_deep_copy();
 
     agent::IEntity *intervened_entity =
@@ -198,10 +219,15 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     intervened_variable->remove_value(cause->get_time());
     intervened_variable->propogate_events_forward(scene->get_max_temporal_limit());
 
-    FP_DATA_TYPE expected_original_reward = this->calculate_expected_reward(scene, cause, effect,
-                                                                            true);
+
+    FP_DATA_TYPE expected_original_reward = this->calculate_expected_reward(copied_scene, cause,
+                                                                            effect, true);
     FP_DATA_TYPE expected_intervened_reward = this->calculate_expected_reward(intervened_scene,
                                                                               cause, effect, false);
+
+
+    delete copied_scene;
+    delete intervened_scene;
 
     return (expected_original_reward - expected_intervened_reward) >= ate_threshold;
 }

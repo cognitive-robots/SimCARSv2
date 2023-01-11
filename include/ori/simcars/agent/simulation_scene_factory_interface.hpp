@@ -14,7 +14,7 @@ namespace agent
 class ISimulationSceneFactory
 {
 public:
-    ~ISimulationSceneFactory() = default;
+    virtual ~ISimulationSceneFactory() = default;
 
     virtual ISimulationScene* create_simulation_scene(
             IScene *scene,
