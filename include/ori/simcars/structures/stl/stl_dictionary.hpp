@@ -4,6 +4,7 @@
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 
 #include <unordered_map>
+#include <mutex>
 
 namespace ori
 {
@@ -19,6 +20,8 @@ class STLDictionary : public virtual IDictionary<K, V>
 {
 protected:
     std::unordered_map<K, V, K_hash, K_equal> data;
+
+    mutable std::mutex data_mutex;
 
     mutable IStackArray<K> *keys_cache;
     mutable IStackArray<V> *values_cache;
@@ -71,6 +74,8 @@ public:
     }
     IArray<K> const* get_keys() const override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         if (keys_cache)
         {
             return keys_cache;
@@ -101,6 +106,8 @@ public:
     }
     IArray<V> const* get_values() const override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         if (values_cache)
         {
             return values_cache;
@@ -132,6 +139,8 @@ public:
 
     void update(K const &key, V const &val) override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         data[key] = val;
 
         delete keys_cache;
@@ -142,6 +151,8 @@ public:
     }
     void erase(K const &key) override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         data.erase(key);
 
         delete keys_cache;

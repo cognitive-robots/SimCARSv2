@@ -12,6 +12,8 @@
 #include <ori/simcars/causal/causal_discoverer_interface.hpp>
 #include <ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp>
 
+#include <thread>
+
 #define GOLDEN_RATIO_MAGIC_NUM 0x9e3779b9
 
 namespace ori
@@ -147,8 +149,10 @@ public:
 
 
 
-        structures::ISet<std::pair<std::string, std::string>> *discovered_entity_causal_links =
-                new structures::stl::STLSet<std::pair<std::string, std::string>, PairHasher<std::string, std::string>>;
+        structures::stl::STLStackArray<std::thread*> threads(
+                    std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
+        structures::stl::STLStackArray<std::pair<std::string, std::string>*> discovered_entity_causal_link_array(
+                    std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
 
         for (i = 0; i < aligned_linear_velocity_goal_events.count(); ++i)
         {
@@ -162,21 +166,47 @@ public:
                 if (potential_cause->get_entity_name() != potential_effect->get_entity_name() &&
                         potential_cause->get_time() < potential_effect->get_time())
                 {
-                    bool link_present = causal_link_tester->test_causal_link(
-                                driving_scene_with_actions, potential_cause, potential_effect);
-
-                    if (link_present)
+                    threads[i * aligned_linear_velocity_goal_events.count() + j] =
+                            new std::thread([&, i, j, potential_cause, potential_effect]()
                     {
-                        std::string cause_driving_agent = potential_cause->get_entity_name();
-                        std::string effect_driving_agent = potential_effect->get_entity_name();
-                        std::pair<std::string, std::string> entity_causal_link =
-                                std::pair<std::string, std::string>(cause_driving_agent,
-                                                                    effect_driving_agent);
-                        discovered_entity_causal_links->insert(entity_causal_link);
-                    }
+                        bool link_present = causal_link_tester->test_causal_link(
+                                    driving_scene_with_actions, potential_cause, potential_effect);
+
+                        if (link_present)
+                        {
+                            std::string cause_driving_agent = potential_cause->get_entity_name();
+                            std::string effect_driving_agent = potential_effect->get_entity_name();
+                            std::pair<std::string, std::string> *entity_causal_link =
+                                    new std::pair<std::string, std::string>(cause_driving_agent,
+                                                                            effect_driving_agent);
+                            discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j] =
+                                    entity_causal_link;
+                        }
+                    });
                 }
             }
         }
+
+        structures::ISet<std::pair<std::string, std::string>> *discovered_entity_causal_links =
+                new structures::stl::STLSet<std::pair<std::string, std::string>, PairHasher<std::string, std::string>>;
+
+        assert(threads.count() == discovered_entity_causal_link_array.count());
+        for (i = 0; i < threads.count(); ++i)
+        {
+            std::thread *thread = threads[i];
+            if (thread != nullptr)
+            {
+                thread->join();
+                delete thread;
+                if (discovered_entity_causal_link_array[i] != nullptr)
+                {
+                    discovered_entity_causal_links->insert(*(discovered_entity_causal_link_array[i]));
+                    delete discovered_entity_causal_link_array[i];
+                }
+            }
+        }
+
+
 
         delete driving_scene_with_actions;
 

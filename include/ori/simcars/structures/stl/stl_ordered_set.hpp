@@ -4,6 +4,7 @@
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
 
 #include <set>
+#include <mutex>
 
 namespace ori
 {
@@ -19,6 +20,8 @@ class STLOrderedSet : public virtual ISet<T>
 {
 protected:
     std::set<T> data;
+
+    mutable std::mutex data_mutex;
 
     mutable IStackArray<T> *values_cache;
 
@@ -52,6 +55,8 @@ public:
 
     IArray<T> const* get_array() const override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         if (values_cache != nullptr)
         {
             return values_cache;
@@ -83,6 +88,8 @@ public:
 
     void union_with(ISet<T> const *set) override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         IArray<T> const *array = set->get_array();
         size_t i;
         for (i = 0; i < array->count(); ++i)
@@ -92,6 +99,8 @@ public:
     }
     void intersect_with(ISet<T> const *set) override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         IArray<T> const *array = this->get_array();
         size_t i;
         for (i = 0; i < array->count(); ++i)
@@ -104,6 +113,8 @@ public:
     }
     void difference_with(ISet<T> const *set) override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         IArray<T> const *array;
         size_t i;
         if (this->count() <= set->count())
@@ -128,6 +139,8 @@ public:
     }
     void insert(T const &val) override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         data.insert(val);
 
         if (values_cache != nullptr)
@@ -137,6 +150,8 @@ public:
     }
     void erase(T const &val) override
     {
+        std::lock_guard<std::mutex> data_guard(data_mutex);
+
         data.erase(val);
 
         delete values_cache;

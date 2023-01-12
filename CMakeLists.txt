@@ -334,6 +334,7 @@ PUBLIC
   simcars_temporal
   simcars_map
   simcars_agent
+  pthread
 )
 add_dependencies(simcars_causal simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 target_compile_options(simcars_causal PRIVATE -fPIC)
