@@ -32,6 +32,9 @@ int main(int argc, char *argv[])
     FP_DATA_TYPE ate_threshold = std::atof(argv[1]);
     size_t branch_count = std::atoi(argv[2]);
 
+    std::cout << "ATE Threshold: " << std::to_string(ate_threshold) << std::endl;
+    std::cout << "Branch Count: " << std::to_string(branch_count) << std::endl;
+
     std::string input_json_meta_file_path_str = argv[3];
     std::filesystem::path input_json_meta_file_path(input_json_meta_file_path_str);
 
