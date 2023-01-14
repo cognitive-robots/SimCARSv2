@@ -192,22 +192,60 @@ int main(int argc, char *argv[])
         {
             std::pair<std::string, std::string> const &entity_causal_link =
                     (*entity_causal_link_array)[i];
-            rapidjson::Value cause_str;
-            cause_str = rapidjson::StringRef(entity_causal_link.first.c_str());
-            rapidjson::Value effect_str;
-            effect_str = rapidjson::StringRef(entity_causal_link.second.c_str());
-            if (!json_causal_links.HasMember(cause_str))
+
+            uint32_t cause_id;
+            if (entity_causal_link.first == convoy_head_str)
+            {
+                cause_id = convoy_head_id;
+            }
+            else if (entity_causal_link.first == convoy_tail_str)
+            {
+                cause_id = convoy_tail_id;
+            }
+            else if (entity_causal_link.first == independent_str)
+            {
+                cause_id = independent_id;
+            }
+            else
+            {
+                throw std::runtime_error("Unknown entity string");
+            }
+
+            uint32_t effect_id;
+            if (entity_causal_link.second == convoy_head_str)
+            {
+                effect_id = convoy_head_id;
+            }
+            else if (entity_causal_link.second == convoy_tail_str)
+            {
+                effect_id = convoy_tail_id;
+            }
+            else if (entity_causal_link.second == independent_str)
+            {
+                effect_id = independent_id;
+            }
+            else
+            {
+                throw std::runtime_error("Unknown entity string");
+            }
+
+            std::string cause_str = std::to_string(cause_id);
+            rapidjson::Value cause_json_str;
+            cause_json_str.SetString(cause_str.c_str(), json_meta_document.GetAllocator());
+            rapidjson::Value effect_json_uint;
+            effect_json_uint.SetUint(effect_id);
+            if (!json_causal_links.HasMember(cause_json_str))
             {
                 rapidjson::Value json_causal_effects(rapidjson::kArrayType);
-                json_causal_effects.PushBack(effect_str, json_meta_document.GetAllocator());
-                json_causal_links.AddMember(cause_str, json_causal_effects,
+                json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
+                json_causal_links.AddMember(cause_json_str, json_causal_effects,
                                             json_meta_document.GetAllocator());
             }
             else
             {
                 rapidjson::Value::Array const &json_causal_effects =
-                        json_causal_links[cause_str].GetArray();
-                json_causal_effects.PushBack(effect_str, json_meta_document.GetAllocator());
+                        json_causal_links[cause_json_str].GetArray();
+                json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
             }
         }
         json_meta_document.AddMember("causal_links", json_causal_links,
