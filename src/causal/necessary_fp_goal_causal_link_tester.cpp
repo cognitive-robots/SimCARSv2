@@ -3,6 +3,7 @@
 #include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/agent/defines.hpp>
 #include <ori/simcars/agent/variable_interface.hpp>
+#include <ori/simcars/agent/basic_event.hpp>
 #include <ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp>
 
 namespace ori
@@ -14,7 +15,9 @@ namespace causal
 
 FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
         agent::IScene const *scene, agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *cause,
-        agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect, bool original_scene) const
+        agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect,
+        structures::IArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*> const *alternative_actions,
+        bool original_scene) const
 {
     FP_DATA_TYPE effect_reward_minimum = 1.0f;
 
@@ -31,31 +34,13 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
     temporal::Time time_window_start = cause->get_time();
     temporal::Time effect_agent_time_window_start =
             std::max(effect_entity->get_min_temporal_limit(), time_window_start);
-    temporal::Time sampling_time_window_start = time_window_start;
     temporal::Time time_window_end = effect_entity->get_max_temporal_limit();
 
-    structures::IArray<agent::IValuelessEvent const*> *effect_variable_events =
-            effect_variable->get_valueless_events();
-    temporal::Time event_time;
-    size_t i;
-    for (i = 0; i < effect_variable_events->count(); ++i)
-    {
-        event_time = (*effect_variable_events)[i]->get_time();
-        if (event_time > effect->get_time())
-        {
-            time_window_end = event_time;
-            break;
-        }
-        else if (event_time < effect->get_time())
-        {
-            sampling_time_window_start = std::max(event_time, sampling_time_window_start);
-        }
-    }
-    delete effect_variable_events;
 
     structures::ISet<std::string> *relevant_agent_names = new structures::stl::STLSet<std::string>;
     relevant_agent_names->insert(cause->get_entity_name());
     relevant_agent_names->insert(effect->get_entity_name());
+
 
     temporal::Time current_time;
     agent::IReadOnlySceneState const *current_scene_state;
@@ -114,28 +99,19 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
         agent::IVariable<agent::Goal<FP_DATA_TYPE>> *branch_variable =
                 dynamic_cast<agent::IVariable<agent::Goal<FP_DATA_TYPE>>*>(branch_valueless_variable);
 
-        FP_DATA_TYPE new_goal_value;
-        temporal::Time new_action_start_time;
-        temporal::Time new_action_end_time;
-
-        action_sampler->sample_action(sampling_time_window_start,
-                                      time_window_end,
-                                      MIN_ALIGNED_LINEAR_VELOCITY,
-                                      MAX_ALIGNED_LINEAR_VELOCITY,
-                                      new_goal_value,
-                                      new_action_start_time,
-                                      new_action_end_time);
+        agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *alternative_action =
+                (*alternative_actions)[i];
 
         branch_variable->remove_value(effect->get_time());
 
-        branch_variable->set_value(new_action_start_time,
-                                     agent::Goal(new_goal_value, new_action_end_time));
+        branch_variable->set_value(alternative_action->get_time(),
+                                     alternative_action->get_value());
 
         branch_variable->propogate_events_forward(time_window_end);
 
         if (original_scene)
         {
-            time_window_start = new_action_start_time;
+            time_window_start = alternative_action->get_time();
         }
 
         agent::ISimulationScene *simulation_scene =
@@ -220,11 +196,73 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     intervened_variable->propogate_events_forward(scene->get_max_temporal_limit());
 
 
-    FP_DATA_TYPE expected_original_reward = this->calculate_expected_reward(copied_scene, cause,
-                                                                            effect, true);
-    FP_DATA_TYPE expected_intervened_reward = this->calculate_expected_reward(intervened_scene,
-                                                                              cause, effect, false);
+    agent::IEntity const *effect_entity = scene->get_entity(effect->get_entity_name());
 
+    agent::IValuelessVariable const *effect_variable =
+            effect_entity->get_variable_parameter(effect->get_full_name());
+
+    temporal::Time sampling_time_window_start = cause->get_time();
+    temporal::Time sampling_time_window_end = effect_entity->get_max_temporal_limit();
+
+    structures::IArray<agent::IValuelessEvent const*> *effect_variable_events =
+            effect_variable->get_valueless_events();
+    temporal::Time event_time;
+    size_t i;
+    for (i = 0; i < effect_variable_events->count(); ++i)
+    {
+        event_time = (*effect_variable_events)[i]->get_time();
+        if (event_time > effect->get_time())
+        {
+            sampling_time_window_end = event_time;
+            break;
+        }
+        else if (event_time < effect->get_time())
+        {
+            sampling_time_window_start = std::max(event_time, sampling_time_window_start);
+        }
+    }
+    delete effect_variable_events;
+
+
+    structures::IArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*> *alternative_actions =
+            new structures::stl::STLStackArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*>(branch_count);
+
+    for (i = 0; i < branch_count; ++i)
+    {
+        FP_DATA_TYPE new_goal_value;
+        temporal::Time new_action_start_time;
+        temporal::Time new_action_end_time;
+
+        action_sampler->sample_action(sampling_time_window_start,
+                                      sampling_time_window_end,
+                                      MIN_ALIGNED_LINEAR_VELOCITY,
+                                      MAX_ALIGNED_LINEAR_VELOCITY,
+                                      new_goal_value,
+                                      new_action_start_time,
+                                      new_action_end_time);
+
+        (*alternative_actions)[i] = new agent::BasicEvent(effect_entity->get_name(),
+                                                          effect_variable->get_parameter_name(),
+                                                          agent::Goal(new_goal_value,
+                                                                      new_action_end_time),
+                                                          new_action_start_time);
+    }
+
+
+    FP_DATA_TYPE expected_original_reward = this->calculate_expected_reward(copied_scene, cause,
+                                                                            effect,
+                                                                            alternative_actions,
+                                                                            true);
+    FP_DATA_TYPE expected_intervened_reward = this->calculate_expected_reward(intervened_scene,
+                                                                              cause, effect,
+                                                                              alternative_actions,
+                                                                              false);
+
+    for (i = 0; i < branch_count; ++i)
+    {
+        delete (*alternative_actions)[i];
+    }
+    delete alternative_actions;
 
     delete copied_scene;
     delete intervened_scene;

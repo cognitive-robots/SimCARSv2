@@ -27,6 +27,7 @@ class NecessaryFPGoalCausalLinkTester
     FP_DATA_TYPE calculate_expected_reward(agent::IScene const *scene,
                                            agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *cause,
                                            agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect,
+                                           structures::IArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*> const *alternative_actions,
                                            bool original_scene) const;
 
 public:
