@@ -6,6 +6,10 @@
 #include <ori/simcars/agent/basic_event.hpp>
 #include <ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp>
 
+#include <iostream>
+
+//#define DEBUG_OUTPUT
+
 namespace ori
 {
 namespace simcars
@@ -84,6 +88,30 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
         delete scene_copy;
     }
 
+#ifdef DEBUG_OUTPUT
+    agent::Goal<FP_DATA_TYPE> previous_goal;
+    dynamic_cast<agent::IVariable<agent::Goal<FP_DATA_TYPE>> const*>(effect_variable)->get_value(
+                effect->get_time() - scene->get_time_step(), previous_goal);
+    if (original_scene)
+    {
+        std::cout << "[Original Scene]: effect action, target speed = " <<
+                     effect->get_value().get_goal_value() << ", previous target speed = " <<
+                     previous_goal.get_goal_value() << ", start time = " <<
+                     effect->get_time() << ", target time = " <<
+                     effect->get_value().get_goal_time() << ", min. reward = " <<
+                     effect_reward_minimum << std::endl;
+    }
+    else
+    {
+        std::cout << "[Intervened Scene]: effect action, target speed = " <<
+                     effect->get_value().get_goal_value() << ", previous target speed = " <<
+                     previous_goal.get_goal_value() << ", start time = " <<
+                     effect->get_time() << ", target time = " <<
+                     effect->get_value().get_goal_time() << ", min. reward = " <<
+                     effect_reward_minimum << std::endl;
+    }
+#endif
+
     size_t effect_better_action_count = 0;
 
     for (size_t i = 0; i < branch_count; ++i)
@@ -139,12 +167,78 @@ FP_DATA_TYPE NecessaryFPGoalCausalLinkTester::calculate_expected_reward(
             ++effect_better_action_count;
         }
 
+#ifdef DEBUG_OUTPUT
+        if (original_scene)
+        {
+            if (effect_reward_minimum >= branch_reward_minimum)
+            {
+                std::cout << "[Original Scene]: alternative action " << (i+1) << " of " <<
+                             branch_count << ", target speed = " <<
+                             alternative_action->get_value().get_goal_value() << ", start time = " <<
+                             alternative_action->get_time() << ", target time = " <<
+                             alternative_action->get_value().get_goal_time() << ", min. reward = " <<
+                             branch_reward_minimum << " <= " << effect_reward_minimum <<
+                             " -> ORIGINAL ACTION BETTER" << std::endl;
+            }
+            else
+            {
+                std::cout << "[Original Scene]: alternative action " << (i+1) << " of " <<
+                             branch_count << ", target speed = " <<
+                             alternative_action->get_value().get_goal_value() << ", start time = " <<
+                             alternative_action->get_time() << ", target time = " <<
+                             alternative_action->get_value().get_goal_time() << ", min. reward = " <<
+                             branch_reward_minimum << " > " << effect_reward_minimum <<
+                             " -> ALTERNATIVE ACTION BETTER" << std::endl;
+            }
+        }
+        else
+        {
+            if (effect_reward_minimum >= branch_reward_minimum)
+            {
+                std::cout << "[Intervened Scene]: alternative action " << (i+1) << " of " <<
+                             branch_count << ", target speed = " <<
+                             alternative_action->get_value().get_goal_value() << ", start time = " <<
+                             alternative_action->get_time() << ", target time = " <<
+                             alternative_action->get_value().get_goal_time() << ", min. reward = " <<
+                             branch_reward_minimum << " <= " << effect_reward_minimum <<
+                             " -> ORIGINAL ACTION BETTER" << std::endl;
+            }
+            else
+            {
+                std::cout << "[Intervened Scene]: alternative action " << (i+1) << " of " <<
+                             branch_count << ", target speed = " <<
+                             alternative_action->get_value().get_goal_value() << ", start time = " <<
+                             alternative_action->get_time() << ", target time = " <<
+                             alternative_action->get_value().get_goal_time() << ", min. reward = " <<
+                             branch_reward_minimum << " > " << effect_reward_minimum <<
+                             " -> ALTERNATIVE ACTION BETTER" << std::endl;
+            }
+        }
+#endif
+
         delete simulation_scene;
 
         delete branch_scene;
     }
 
     delete relevant_agent_names;
+
+#ifdef DEBUG_OUTPUT
+    if (original_scene)
+    {
+        std::cout << "[Original Scene]: " << std::to_string(effect_better_action_count) << " / " <<
+                     std::to_string(branch_count) << " = " <<
+                     std::to_string(FP_DATA_TYPE(effect_better_action_count) /
+                                    FP_DATA_TYPE(branch_count)) << std::endl;
+    }
+    else
+    {
+        std::cout << "[Intervened Scene]: " << std::to_string(effect_better_action_count) <<
+                     " / " << std::to_string(branch_count) << " = " <<
+                     std::to_string(FP_DATA_TYPE(effect_better_action_count) /
+                                    FP_DATA_TYPE(branch_count)) << std::endl;
+    }
+#endif
 
     return FP_DATA_TYPE(effect_better_action_count) / FP_DATA_TYPE(branch_count);
 }
@@ -178,6 +272,16 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     agent::IValuelessVariable *copied_variable =
             copied_entity->get_mutable_variable_parameter(cause->get_full_name());
     copied_variable->propogate_events_forward(scene->get_max_temporal_limit());
+
+#ifdef DEBUG_OUTPUT
+    agent::Goal<FP_DATA_TYPE> previous_goal;
+    dynamic_cast<agent::IVariable<agent::Goal<FP_DATA_TYPE>> const*>(copied_variable)->get_value(
+                cause->get_time() - scene->get_time_step(), previous_goal);
+    std::cout << "cause action, target speed = " << cause->get_value().get_goal_value() <<
+                 ", previous target speed = " << previous_goal.get_goal_value()  <<
+                 ", start time = " << cause->get_time() << ", target time = " <<
+                 cause->get_value().get_goal_time() << std::endl;
+#endif
 
 
     agent::IScene *intervened_scene = scene->scene_deep_copy();
@@ -266,6 +370,23 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
 
     delete copied_scene;
     delete intervened_scene;
+
+#ifdef DEBUG_OUTPUT
+    std::cout << "Potential Link: " << cause->get_entity_name() << " -> " <<
+                 effect->get_entity_name() << std::endl;
+    if ((expected_original_reward - expected_intervened_reward) >= ate_threshold)
+    {
+        std::cout << std::to_string(expected_original_reward) << " - " <<
+                     std::to_string(expected_intervened_reward) << " >= " <<
+                     std::to_string(ate_threshold) << " -> Link Accepted" << std::endl;
+    }
+    else
+    {
+        std::cout << std::to_string(expected_original_reward) << " - " <<
+                     std::to_string(expected_intervened_reward) << " < " <<
+                     std::to_string(ate_threshold) << " -> Link Dismissed" << std::endl;
+    }
+#endif
 
     return (expected_original_reward - expected_intervened_reward) >= ate_threshold;
 }

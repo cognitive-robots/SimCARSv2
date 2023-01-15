@@ -15,6 +15,7 @@
 #include <thread>
 
 #define GOLDEN_RATIO_MAGIC_NUM 0x9e3779b9
+//#define DEBUG_OUTPUT
 
 namespace ori
 {
@@ -153,6 +154,8 @@ public:
                     std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
         structures::stl::STLStackArray<std::pair<std::string, std::string>*> discovered_entity_causal_link_array(
                     std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
+        structures::ISet<std::pair<std::string, std::string>> *discovered_entity_causal_links =
+                new structures::stl::STLSet<std::pair<std::string, std::string>, PairHasher<std::string, std::string>>;
 
         for (i = 0; i < aligned_linear_velocity_goal_events.count(); ++i)
         {
@@ -183,13 +186,21 @@ public:
                                     entity_causal_link;
                         }
                     });
+
+#ifdef DEBUG_OUTPUT
+                    threads[i * aligned_linear_velocity_goal_events.count() + j]->join();
+                    delete threads[i * aligned_linear_velocity_goal_events.count() + j];
+                    if (discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j] != nullptr)
+                    {
+                        discovered_entity_causal_links->insert(*(discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j]));
+                        delete discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j];
+                    }
+#endif
                 }
             }
         }
 
-        structures::ISet<std::pair<std::string, std::string>> *discovered_entity_causal_links =
-                new structures::stl::STLSet<std::pair<std::string, std::string>, PairHasher<std::string, std::string>>;
-
+#ifndef DEBUG_OUTPUT
         assert(threads.count() == discovered_entity_causal_link_array.count());
         for (i = 0; i < threads.count(); ++i)
         {
@@ -205,7 +216,7 @@ public:
                 }
             }
         }
-
+#endif
 
 
         delete driving_scene_with_actions;
