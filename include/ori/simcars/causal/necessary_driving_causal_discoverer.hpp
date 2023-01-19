@@ -208,7 +208,7 @@ public:
                     std::cout << "Original Target Speed at Effect (E) = " <<
                                  potential_effect->get_value().get_goal_value() * 1e3f << " m/s" <<
                                  std::endl;
-                    std::cout << "Original Target Speed at Cause (¬E) = " <<
+                    std::cout << "Intervention Target Speed at Effect (¬E) = " <<
                                  effect_speed * 1e3f << " m/s" <<
                                  std::endl;
 #else
@@ -227,7 +227,7 @@ public:
                     std::cout << "Original Target Speed at Effect (E) = " <<
                                  potential_effect->get_value().get_goal_value() * 1e3f << " m/s" <<
                                  std::endl;
-                    std::cout << "Original Target Speed at Cause (¬E) = " <<
+                    std::cout << "Intervention Target Speed at Effect (¬E) = " <<
                                  effect_speed * 1e3f << " m/s" <<
                                  std::endl;
 #endif
