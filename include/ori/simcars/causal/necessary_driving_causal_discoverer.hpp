@@ -12,7 +12,11 @@
 #include <ori/simcars/causal/causal_discoverer_interface.hpp>
 #include <ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp>
 
+#ifdef CD_DEBUG_PRINT
+#include <iostream>
+#else
 #include <thread>
+#endif
 
 #define GOLDEN_RATIO_MAGIC_NUM 0x9e3779b9
 
@@ -148,11 +152,13 @@ public:
         delete driving_agents_with_actions;
 
 
-
+#ifndef CD_DEBUG_PRINT
         structures::stl::STLStackArray<std::thread*> threads(
                     std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
         structures::stl::STLStackArray<std::pair<std::string, std::string>*> discovered_entity_causal_link_array(
                     std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
+#endif
+
         structures::ISet<std::pair<std::string, std::string>> *discovered_entity_causal_links =
                 new structures::stl::STLSet<std::pair<std::string, std::string>, PairHasher<std::string, std::string>>;
 
@@ -168,6 +174,94 @@ public:
                 if (potential_cause->get_entity_name() != potential_effect->get_entity_name() &&
                         potential_cause->get_time() < potential_effect->get_time())
                 {
+#ifdef CD_DEBUG_PRINT
+                    agent::IDrivingAgent const *cause_agent =
+                            driving_scene_with_actions->get_driving_agent(
+                                potential_cause->get_entity_name());
+                    agent::IDrivingAgent const *effect_agent =
+                            driving_scene_with_actions->get_driving_agent(
+                                potential_effect->get_entity_name());
+
+                    agent::IVariable<FP_DATA_TYPE> const *cause_speed_variable =
+                            cause_agent->get_aligned_linear_velocity_variable();
+                    agent::IVariable<FP_DATA_TYPE> const *effect_speed_variable =
+                            effect_agent->get_aligned_linear_velocity_variable();
+
+                    FP_DATA_TYPE cause_speed;
+                    FP_DATA_TYPE effect_speed;
+
+                    cause_speed_variable->get_value(potential_cause->get_time(), cause_speed);
+                    effect_speed_variable->get_value(potential_effect->get_time(), effect_speed);
+
+#ifdef _WIN32
+                    std::cout << "───────────────────────────────────────────────────" << std::endl;
+                    std::cout << "Cause Agent: " << potential_cause->get_entity_name() << std::endl;
+                    std::cout << "Original Target Speed at Cause (C) = " <<
+                                 potential_cause->get_value().get_goal_value() * 1e3f << " m/s" <<
+                                 std::endl;
+                    std::cout << "Intervention Target Speed at Cause (¬C) = " <<
+                                 cause_speed * 1e3f << " m/s" <<
+                                 std::endl;
+
+                    std::cout << "Effect Agent: " << potential_effect->get_entity_name() <<
+                                 std::endl;
+                    std::cout << "Original Target Speed at Effect (E) = " <<
+                                 potential_effect->get_value().get_goal_value() * 1e3f << " m/s" <<
+                                 std::endl;
+                    std::cout << "Original Target Speed at Cause (¬E) = " <<
+                                 effect_speed * 1e3f << " m/s" <<
+                                 std::endl;
+#else
+                    std::cout << "───────────────────────────────────────────────────" << std::endl;
+                    std::cout << "Cause Agent: \x1B[32m" << potential_cause->get_entity_name() <<
+                                 "\x1B[0m" << std::endl;
+                    std::cout << "Original Target Speed at Cause (C) = " <<
+                                 potential_cause->get_value().get_goal_value() * 1e3f << " m/s" <<
+                                 std::endl;
+                    std::cout << "Intervention Target Speed at Cause (¬C) = " <<
+                                 cause_speed * 1e3f << " m/s" <<
+                                 std::endl;
+
+                    std::cout << "Effect Agent: \x1B[32m" << potential_effect->get_entity_name() <<
+                                 "\x1B[0m" << std::endl;
+                    std::cout << "Original Target Speed at Effect (E) = " <<
+                                 potential_effect->get_value().get_goal_value() * 1e3f << " m/s" <<
+                                 std::endl;
+                    std::cout << "Original Target Speed at Cause (¬E) = " <<
+                                 effect_speed * 1e3f << " m/s" <<
+                                 std::endl;
+#endif
+
+                    bool link_present = causal_link_tester->test_causal_link(
+                                driving_scene_with_actions, potential_cause, potential_effect);
+
+                    if (link_present)
+                    {
+                        std::string cause_driving_agent = potential_cause->get_entity_name();
+                        std::string effect_driving_agent = potential_effect->get_entity_name();
+                        std::pair<std::string, std::string> entity_causal_link(
+                                    cause_driving_agent, effect_driving_agent);
+                        discovered_entity_causal_links->insert(entity_causal_link);
+
+#ifdef _WIN32
+                        std::cout << "Link Accepted" << std::endl;
+#else
+                        std::cout << "\x1B[36mLink Accepted\x1B[0m" << std::endl;
+#endif
+                        std::cout << "───────────────────────────────────────────────────" <<
+                                     std::endl;
+                    }
+                    else
+                    {
+#ifdef _WIN32
+                        std::cout << "Link Rejected" << std::endl;
+#else
+                        std::cout << "\x1B[36mLink Rejected\x1B[0m" << std::endl;
+#endif
+                        std::cout << "───────────────────────────────────────────────────" <<
+                                     std::endl;
+                    }
+#else
                     threads[i * aligned_linear_velocity_goal_events.count() + j] =
                             new std::thread([&, i, j, potential_cause, potential_effect]()
                     {
@@ -185,12 +279,14 @@ public:
                                     entity_causal_link;
                         }
                     });
+#endif
                 }
             }
         }
 
 
 
+#ifndef CD_DEBUG_PRINT
         assert(threads.count() == discovered_entity_causal_link_array.count());
         for (i = 0; i < threads.count(); ++i)
         {
@@ -206,6 +302,7 @@ public:
                 }
             }
         }
+#endif
 
 
 

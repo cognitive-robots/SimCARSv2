@@ -6,7 +6,10 @@
 #include <ori/simcars/agent/basic_event.hpp>
 #include <ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp>
 
+#ifdef CD_DEBUG_PRINT
 #include <iostream>
+#include <iomanip>
+#endif
 
 namespace ori
 {
@@ -162,6 +165,21 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     }
 
 
+#ifdef CD_DEBUG_PRINT
+    std::cout << "┌─────┬─────┬─────┐" << std::endl;
+    std::cout << "│     │  E  │ ¬ E │" << std::endl;
+    std::cout << "├─────┼─────┼─────┤" << std::endl;
+    std::cout << "│  C  │" << std::setprecision(3) << std::fixed << original_reward_minimum << "│" <<
+                 std::setprecision(3) << std::fixed << effect_intervened_reward_minimum << "│" <<
+                 std::endl;
+    std::cout << "├─────┼─────┼─────┤" << std::endl;
+    std::cout << "│ ¬ C │" << std::setprecision(3) << std::fixed << cause_intervened_reward_minimum <<
+                 "│" << std::setprecision(3) << std::fixed <<
+                 cause_effect_intervened_reward_minimum << "│" << std::endl;
+    std::cout << "└─────┴─────┴─────┘" << std::endl;
+#endif
+
+
     FP_DATA_TYPE direct_causal_implication = original_reward_minimum -
             effect_intervened_reward_minimum;
     FP_DATA_TYPE reverse_causal_implication = cause_effect_intervened_reward_minimum -
@@ -170,12 +188,28 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
             reverse_causal_implication;
     bool causally_significant = combined_causal_implication >= reward_diff_threshold;
 
+
+#ifdef CD_DEBUG_PRINT
+    std::cout << "Direct Causal Implication = " << direct_causal_implication << std::endl;
+    std::cout << "Reverse Causal Implication = " << reverse_causal_implication << std::endl;
+    std::cout << "Combined Causal Implication = " << combined_causal_implication << std::endl;
+    std::cout << "Causally Significant: " << (causally_significant ? "Yes" : "No") << std::endl;
+#endif
+
+
     FP_DATA_TYPE effect_entity_impotus = original_reward_minimum -
             cause_intervened_reward_minimum;
     FP_DATA_TYPE cause_entity_impotus = cause_effect_intervened_reward_minimum -
             effect_intervened_reward_minimum;
     bool facilitation_type = effect_entity_impotus >= reward_diff_threshold &&
             cause_entity_impotus <= -reward_diff_threshold;
+
+
+#ifdef CD_DEBUG_PRINT
+    std::cout << "Effect Entity Impotus = " << effect_entity_impotus << std::endl;
+    std::cout << "Cause Entity Impotus = " << cause_entity_impotus << std::endl;
+    std::cout << "Facilitation Type: " << (facilitation_type ? "Yes" : "No") << std::endl;
+#endif
 
 
     delete simulated_cause_effect_intervened_scene;

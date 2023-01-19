@@ -7,6 +7,8 @@
 #include <ori/simcars/agent/goal.hpp>
 #include <ori/simcars/causal/causal_link_tester_interface.hpp>
 
+#define CD_DEBUG_PRINT
+
 namespace ori
 {
 namespace simcars

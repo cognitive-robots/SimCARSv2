@@ -257,8 +257,8 @@ void BasicDrivingSimulator::simulate_driving_scene(
 
             FP_DATA_TYPE rotation_diff = trig_buff->wrap(rotation_2 - rotation_1);
             FP_DATA_TYPE span_1 = bounding_box_1.get_height();
-            FP_DATA_TYPE span_2 = bounding_box_1.get_height() * trig_buff->get_cos(rotation_diff) +
-                    bounding_box_2.get_width() * trig_buff->get_sin(std::abs(rotation_diff));
+            FP_DATA_TYPE span_2 = bounding_box_1.get_height() * std::abs(trig_buff->get_cos(rotation_diff)) +
+                    bounding_box_2.get_width() * std::abs(trig_buff->get_sin(rotation_diff));
             FP_DATA_TYPE combined_span = 0.5f * (span_1 + span_2);
 
             FP_DATA_TYPE dot_product_limit =
