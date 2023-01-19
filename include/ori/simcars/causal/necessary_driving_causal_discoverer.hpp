@@ -15,7 +15,6 @@
 #include <thread>
 
 #define GOLDEN_RATIO_MAGIC_NUM 0x9e3779b9
-//#define DEBUG_OUTPUT
 
 namespace ori
 {
@@ -55,8 +54,8 @@ class NecessaryDrivingCausalDiscoverer : public virtual ICausalDiscoverer
 
 public:
     NecessaryDrivingCausalDiscoverer(map::IMap<T_map_id> const *map, temporal::Duration time_step,
-                                     size_t controller_lookahead_steps, FP_DATA_TYPE ate_threshold,
-                                     size_t branch_count)
+                                     size_t controller_lookahead_steps,
+                                     FP_DATA_TYPE reward_diff_threshold)
         : map(map), action_sampler(new agent::BasicFPActionSampler),
           simulation_scene_factory(new agent::DrivingSimulationSceneFactory),
           controller(new agent::BasicDrivingAgentController<T_map_id>(map, time_step,
@@ -65,8 +64,8 @@ public:
           reward_calculator(new agent::SafeSpeedyDrivingAgentRewardCalculator),
           causal_link_tester(new NecessaryFPGoalCausalLinkTester(action_sampler,
                                                                  simulation_scene_factory, simulator,
-                                                                 reward_calculator, ate_threshold,
-                                                                 branch_count))
+                                                                 reward_calculator,
+                                                                 reward_diff_threshold))
     {
     }
 
@@ -186,21 +185,12 @@ public:
                                     entity_causal_link;
                         }
                     });
-
-#ifdef DEBUG_OUTPUT
-                    threads[i * aligned_linear_velocity_goal_events.count() + j]->join();
-                    delete threads[i * aligned_linear_velocity_goal_events.count() + j];
-                    if (discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j] != nullptr)
-                    {
-                        discovered_entity_causal_links->insert(*(discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j]));
-                        delete discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j];
-                    }
-#endif
                 }
             }
         }
 
-#ifndef DEBUG_OUTPUT
+
+
         assert(threads.count() == discovered_entity_causal_link_array.count());
         for (i = 0; i < threads.count(); ++i)
         {
@@ -216,7 +206,7 @@ public:
                 }
             }
         }
-#endif
+
 
 
         delete driving_scene_with_actions;

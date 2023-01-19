@@ -254,8 +254,12 @@ void BasicDrivingSimulator::simulate_driving_scene(
             FP_DATA_TYPE position_diff_norm = position_diff.norm();
             geometry::Vec velocity_diff = velocity_1 - velocity_2;
             FP_DATA_TYPE velocity_diff_norm = velocity_diff.norm();
-            FP_DATA_TYPE combined_span =
-                    0.5f * (bounding_box_1.get_span() + bounding_box_2.get_span());
+
+            FP_DATA_TYPE rotation_diff = trig_buff->wrap(rotation_2 - rotation_1);
+            FP_DATA_TYPE span_1 = bounding_box_1.get_height();
+            FP_DATA_TYPE span_2 = bounding_box_1.get_height() * trig_buff->get_cos(rotation_diff) +
+                    bounding_box_2.get_width() * trig_buff->get_sin(std::abs(rotation_diff));
+            FP_DATA_TYPE combined_span = 0.5f * (span_1 + span_2);
 
             FP_DATA_TYPE dot_product_limit =
                     1.0f / std::sqrt(std::pow(combined_span / position_diff_norm, 2.0f) + 1.0f);

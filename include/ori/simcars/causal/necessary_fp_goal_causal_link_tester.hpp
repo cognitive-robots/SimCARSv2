@@ -21,21 +21,14 @@ class NecessaryFPGoalCausalLinkTester
     agent::ISimulationSceneFactory const *simulation_scene_factory;
     agent::ISimulator const *simulator;
     agent::IRewardCalculator const *reward_calculator;
-    FP_DATA_TYPE ate_threshold;
-    size_t branch_count;
-
-    FP_DATA_TYPE calculate_expected_reward(agent::IScene const *scene,
-                                           agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *cause,
-                                           agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect,
-                                           structures::IArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*> const *alternative_actions,
-                                           bool original_scene) const;
+    FP_DATA_TYPE reward_diff_threshold;
 
 public:
     NecessaryFPGoalCausalLinkTester(agent::IActionSampler<FP_DATA_TYPE> const *action_sampler,
                                 agent::ISimulationSceneFactory const *simulation_scene_factory,
                                 agent::ISimulator const *simulator,
                                 agent::IRewardCalculator const *reward_calculator,
-                                FP_DATA_TYPE ate_threshold, size_t branch_count);
+                                FP_DATA_TYPE reward_diff_threshol);
 
     bool test_causal_link(agent::IScene const *scene,
                           agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *cause,

@@ -22,8 +22,7 @@
 #include <fstream>
 #include <filesystem>
 
-#define ATE_THRESHOLD 0.05f
-#define BRANCH_COUNT 100
+#define REWARD_DIFF_THRESHOLD 0.05f
 
 using namespace ori::simcars;
 using namespace std::chrono;
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 3)
     {
-        std::cerr << "Usage: ./highd_json_meta_ate_test json_meta_file_path raw_data_directory_path" << std::endl;
+        std::cerr << "Usage: ./highd_json_meta_link_test json_meta_file_path trimmed_data_directory_path" << std::endl;
         return -1;
     }
 
@@ -249,7 +248,7 @@ int main(int argc, char *argv[])
     causal::NecessaryFPGoalCausalLinkTester *causal_link_tester =
             new causal::NecessaryFPGoalCausalLinkTester(
                 action_sampler, scene_factory, driving_simulator, reward_calculator,
-                ATE_THRESHOLD, BRANCH_COUNT);
+                REWARD_DIFF_THRESHOLD);
 
 
     std::cout << "Beginning test" << std::endl;

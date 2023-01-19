@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 3)
     {
-        std::cerr << "Usage: ./highd_json_meta_bulk_simulation_test json_meta_file_path raw_data_directory_path" << std::endl;
+        std::cerr << "Usage: ./highd_json_meta_bulk_simulation_test json_meta_file_path trimmed_data_directory_path" << std::endl;
         return -1;
     }
 

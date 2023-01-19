@@ -23,19 +23,17 @@ using namespace std::chrono;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 5)
+    if (argc < 4)
     {
-        std::cerr << "Usage: ./highd_json_meta_causal_discovery ate_threshold branch_count input_json_meta_file_path raw_data_directory_path [output_json_meta_file_path]" << std::endl;
+        std::cerr << "Usage: ./highd_json_meta_causal_discovery reward_diff_threshold input_json_meta_file_path trimmed_data_directory_path [output_json_meta_file_path]" << std::endl;
         return -1;
     }
 
-    FP_DATA_TYPE ate_threshold = std::atof(argv[1]);
-    size_t branch_count = std::atoi(argv[2]);
+    FP_DATA_TYPE reward_diff_threshold = std::atof(argv[1]);
 
-    std::cout << "ATE Threshold: " << std::to_string(ate_threshold) << std::endl;
-    std::cout << "Branch Count: " << std::to_string(branch_count) << std::endl;
+    std::cout << "Reward Diff. Threshold: " << std::to_string(reward_diff_threshold) << std::endl;
 
-    std::string input_json_meta_file_path_str = argv[3];
+    std::string input_json_meta_file_path_str = argv[2];
     std::filesystem::path input_json_meta_file_path(input_json_meta_file_path_str);
 
     if (!std::filesystem::is_regular_file(input_json_meta_file_path))
@@ -48,9 +46,9 @@ int main(int argc, char *argv[])
     std::string output_json_meta_file_path_str;
     std::filesystem::path output_json_meta_file_path;
 
-    if (argc > 5)
+    if (argc > 4)
     {
-        output_json_meta_file_path_str = argv[5];
+        output_json_meta_file_path_str = argv[4];
         output_json_meta_file_path = std::filesystem::path(output_json_meta_file_path_str);
         std::filesystem::path output_json_meta_file_path_dir = output_json_meta_file_path.parent_path();
 
@@ -82,7 +80,7 @@ int main(int argc, char *argv[])
     std::cout << "Convoy Tail Agent = " << convoy_tail_str << std::endl;
     std::cout << "Independent Agent = " << independent_str << std::endl;
 
-    std::string raw_data_directory_path_str = argv[4];
+    std::string raw_data_directory_path_str = argv[3];
     std::filesystem::path raw_data_directory_path(raw_data_directory_path_str);
 
     std::filesystem::path recording_meta_file_path =
@@ -161,8 +159,7 @@ int main(int argc, char *argv[])
     start_time = high_resolution_clock::now();
 
     causal::ICausalDiscoverer *causal_discoverer = new causal::NecessaryDrivingCausalDiscoverer(
-                map, scene->get_time_step(), CONTROLLER_LOOKAHEAD_STEPS, ate_threshold,
-                branch_count);
+                map, scene->get_time_step(), CONTROLLER_LOOKAHEAD_STEPS, reward_diff_threshold);
 
     structures::ISet<std::pair<std::string, std::string>> *entity_causal_links =
             causal_discoverer->discover_entity_causal_links(scene, agents_of_interest);
@@ -185,7 +182,7 @@ int main(int argc, char *argv[])
     }
 
 
-    if (argc > 5)
+    if (argc > 4)
     {
         rapidjson::Value json_causal_links(rapidjson::kObjectType);
         for (i = 0; i < entity_causal_link_array->count(); ++i)
