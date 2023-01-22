@@ -173,7 +173,7 @@ void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
     sf::Vector2f agent_circle_position = agent_base_shape_position - sf::Vector2f(agent_circle_radius, agent_circle_radius);
     circle->setPosition(agent_circle_position);
     circle->setOutlineThickness(agent_circle_radius * 0.4f);
-    if (ego_constant->get_value())
+    if (focal_entities->contains(vehicle->get_name()))
     {
         circle->setOutlineColor(sf::Color(255, 255, 255));
     }

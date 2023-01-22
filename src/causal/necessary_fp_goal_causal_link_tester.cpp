@@ -22,10 +22,10 @@ NecessaryFPGoalCausalLinkTester::NecessaryFPGoalCausalLinkTester(
         agent::IActionSampler<FP_DATA_TYPE> const *action_sampler,
         agent::ISimulationSceneFactory const *simulation_scene_factory,
         agent::ISimulator const *simulator, agent::IRewardCalculator const *reward_calculator,
-        FP_DATA_TYPE reward_diff_threshold)
+        agent::IAgencyCalculator const *agency_calculator, FP_DATA_TYPE reward_diff_threshold)
     : action_sampler(action_sampler), simulation_scene_factory(simulation_scene_factory),
       simulator(simulator), reward_calculator(reward_calculator),
-      reward_diff_threshold(reward_diff_threshold) {}
+      agency_calculator(agency_calculator), reward_diff_threshold(reward_diff_threshold) {}
 
 bool NecessaryFPGoalCausalLinkTester::test_causal_link(
         agent::IScene const *scene,
@@ -40,6 +40,14 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
 
 
     agent::IScene *original_scene = scene->scene_deep_copy();
+
+    agent::IEntity *cause_entity = original_scene->get_mutable_entity(cause->get_entity_name());
+    agent::IValuelessVariable *cause_variable =
+            cause_entity->get_mutable_variable_parameter(cause->get_full_name());
+    structures::IArray<agent::IValuelessEvent*> *cause_events =
+            cause_variable->get_mutable_valueless_events();
+    cause_variable->propogate_events_forward(scene->get_max_temporal_limit());
+
     agent::IEntity *effect_entity = original_scene->get_mutable_entity(effect->get_entity_name());
     agent::IValuelessVariable *effect_variable =
             effect_entity->get_mutable_variable_parameter(effect->get_full_name());
@@ -50,20 +58,24 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     temporal::Time time_window_end = effect_entity->get_max_temporal_limit();
 
     size_t i;
+    for (i = 0; i < cause_events->count(); ++i)
+    {
+        agent::IValuelessEvent *cause_event = (*cause_events)[i];
+        if (cause_event->get_time() > effect->get_time())
+        {
+            time_window_end = cause_event->get_time();
+            break;
+        }
+    }
     for (i = 0; i < effect_events->count(); ++i)
     {
         agent::IValuelessEvent *effect_event = (*effect_events)[i];
         if (effect_event->get_time() > effect->get_time())
         {
-            time_window_end = effect_event->get_time();
+            time_window_end = std::min(effect_event->get_time(), time_window_end);
             break;
         }
     }
-
-    agent::IEntity *cause_entity = original_scene->get_mutable_entity(cause->get_entity_name());
-    agent::IValuelessVariable *cause_variable =
-            cause_entity->get_mutable_variable_parameter(cause->get_full_name());
-    cause_variable->propogate_events_forward(scene->get_max_temporal_limit());
 
 
     structures::ISet<std::string> *relevant_agent_names = new structures::stl::STLSet<std::string>;
@@ -124,10 +136,15 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     delete relevant_agent_names;
 
 
-    FP_DATA_TYPE original_reward_minimum = 1.0f;
-    FP_DATA_TYPE cause_intervened_reward_minimum = 1.0f;
-    FP_DATA_TYPE effect_intervened_reward_minimum = 1.0f;
-    FP_DATA_TYPE cause_effect_intervened_reward_minimum = 1.0f;
+    FP_DATA_TYPE selected_original_reward = 1.0f;
+    FP_DATA_TYPE selected_cause_intervened_reward = 1.0f;
+    FP_DATA_TYPE selected_effect_intervened_reward = 1.0f;
+    FP_DATA_TYPE selected_cause_effect_intervened_reward = 1.0f;
+
+    FP_DATA_TYPE current_original_reward;
+    FP_DATA_TYPE current_cause_intervened_reward;
+    FP_DATA_TYPE current_effect_intervened_reward;
+    FP_DATA_TYPE current_cause_effect_intervened_reward;
 
     temporal::Time current_time;
     agent::IReadOnlySceneState const *current_scene_state;
@@ -139,29 +156,41 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     {
         current_scene_state = original_scene->get_state(current_time);
         current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_reward = reward_calculator->calculate_state_reward(current_entity_state);
-        original_reward_minimum = std::min(current_reward, original_reward_minimum);
+        current_original_reward = reward_calculator->calculate_state_reward(current_entity_state);
         delete current_scene_state;
 
         current_scene_state = simulated_cause_intervened_scene->get_state(current_time);
         current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_reward = reward_calculator->calculate_state_reward(current_entity_state);
-        cause_intervened_reward_minimum = std::min(current_reward, cause_intervened_reward_minimum);
+        current_cause_intervened_reward =
+                reward_calculator->calculate_state_reward(current_entity_state);
         delete current_scene_state;
 
         current_scene_state = simulated_effect_intervened_scene->get_state(current_time);
         current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_reward = reward_calculator->calculate_state_reward(current_entity_state);
-        effect_intervened_reward_minimum = std::min(current_reward,
-                                                    effect_intervened_reward_minimum);
+        current_effect_intervened_reward =
+                reward_calculator->calculate_state_reward(current_entity_state);
         delete current_scene_state;
 
         current_scene_state = simulated_cause_effect_intervened_scene->get_state(current_time);
         current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_reward = reward_calculator->calculate_state_reward(current_entity_state);
-        cause_effect_intervened_reward_minimum = std::min(current_reward,
-                                                          cause_effect_intervened_reward_minimum);
+        current_cause_effect_intervened_reward =
+                reward_calculator->calculate_state_reward(current_entity_state);
         delete current_scene_state;
+
+        if (std::abs(current_original_reward - current_effect_intervened_reward) >
+                std::abs(selected_original_reward - selected_effect_intervened_reward))
+        {
+            selected_original_reward = current_original_reward;
+            selected_effect_intervened_reward = current_effect_intervened_reward;
+        }
+
+        if (std::abs(current_cause_effect_intervened_reward - current_cause_intervened_reward) >
+                std::abs(selected_cause_effect_intervened_reward -
+                         selected_cause_intervened_reward))
+        {
+            selected_cause_effect_intervened_reward = current_cause_effect_intervened_reward;
+            selected_cause_intervened_reward = current_cause_intervened_reward;
+        }
     }
 
 
@@ -169,21 +198,21 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     std::cout << "┌─────┬─────┬─────┐" << std::endl;
     std::cout << "│     │  E  │ ¬ E │" << std::endl;
     std::cout << "├─────┼─────┼─────┤" << std::endl;
-    std::cout << "│  C  │" << std::setprecision(3) << std::fixed << original_reward_minimum << "│" <<
-                 std::setprecision(3) << std::fixed << effect_intervened_reward_minimum << "│" <<
-                 std::endl;
+    std::cout << "│  C  │" << std::setprecision(3) << std::fixed <<
+                 selected_original_reward << "│" << std::setprecision(3) << std::fixed <<
+                 selected_effect_intervened_reward << "│" << std::endl;
     std::cout << "├─────┼─────┼─────┤" << std::endl;
-    std::cout << "│ ¬ C │" << std::setprecision(3) << std::fixed << cause_intervened_reward_minimum <<
-                 "│" << std::setprecision(3) << std::fixed <<
-                 cause_effect_intervened_reward_minimum << "│" << std::endl;
+    std::cout << "│ ¬ C │" << std::setprecision(3) << std::fixed <<
+                 selected_cause_intervened_reward << "│" << std::setprecision(3) << std::fixed <<
+                 selected_cause_effect_intervened_reward << "│" << std::endl;
     std::cout << "└─────┴─────┴─────┘" << std::endl;
 #endif
 
 
-    FP_DATA_TYPE direct_causal_implication = original_reward_minimum -
-            effect_intervened_reward_minimum;
-    FP_DATA_TYPE reverse_causal_implication = cause_effect_intervened_reward_minimum -
-            cause_intervened_reward_minimum;
+    FP_DATA_TYPE direct_causal_implication = selected_original_reward -
+            selected_effect_intervened_reward;
+    FP_DATA_TYPE reverse_causal_implication = selected_cause_effect_intervened_reward -
+            selected_cause_intervened_reward;
     FP_DATA_TYPE combined_causal_implication = direct_causal_implication +
             reverse_causal_implication;
     bool causally_significant = combined_causal_implication >= reward_diff_threshold;
@@ -197,10 +226,10 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
 #endif
 
 
-    FP_DATA_TYPE effect_entity_impotus = original_reward_minimum -
-            cause_intervened_reward_minimum;
-    FP_DATA_TYPE cause_entity_impotus = cause_effect_intervened_reward_minimum -
-            effect_intervened_reward_minimum;
+    FP_DATA_TYPE effect_entity_impotus = selected_original_reward -
+            selected_cause_intervened_reward;
+    FP_DATA_TYPE cause_entity_impotus = selected_cause_effect_intervened_reward -
+            selected_effect_intervened_reward;
     bool facilitation_type = effect_entity_impotus >= reward_diff_threshold &&
             cause_entity_impotus <= -reward_diff_threshold;
 

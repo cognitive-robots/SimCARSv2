@@ -4,6 +4,7 @@
 #include <ori/simcars/agent/simulation_scene_factory_interface.hpp>
 #include <ori/simcars/agent/simulator_interface.hpp>
 #include <ori/simcars/agent/reward_calculator_interface.hpp>
+#include <ori/simcars/agent/agency_calculator_interface.hpp>
 #include <ori/simcars/agent/goal.hpp>
 #include <ori/simcars/causal/causal_link_tester_interface.hpp>
 
@@ -23,6 +24,7 @@ class NecessaryFPGoalCausalLinkTester
     agent::ISimulationSceneFactory const *simulation_scene_factory;
     agent::ISimulator const *simulator;
     agent::IRewardCalculator const *reward_calculator;
+    agent::IAgencyCalculator const *agency_calculator;
     FP_DATA_TYPE reward_diff_threshold;
 
 public:
@@ -30,6 +32,7 @@ public:
                                 agent::ISimulationSceneFactory const *simulation_scene_factory,
                                 agent::ISimulator const *simulator,
                                 agent::IRewardCalculator const *reward_calculator,
+                                agent::IAgencyCalculator const *agency_calculator,
                                 FP_DATA_TYPE reward_diff_threshol);
 
     bool test_causal_link(agent::IScene const *scene,

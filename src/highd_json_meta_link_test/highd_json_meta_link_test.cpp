@@ -7,6 +7,7 @@
 #include <ori/simcars/agent/basic_driving_agent_controller.hpp>
 #include <ori/simcars/agent/basic_driving_simulator.hpp>
 #include <ori/simcars/agent/safe_speedy_driving_agent_reward_calculator.hpp>
+#include <ori/simcars/agent/basic_driving_agent_agency_calculator.hpp>
 #include <ori/simcars/agent/driving_simulation_scene.hpp>
 #include <ori/simcars/agent/driving_simulation_scene_factory.hpp>
 #include <ori/simcars/agent/highd/highd_scene.hpp>
@@ -245,10 +246,12 @@ int main(int argc, char *argv[])
 
     agent::IRewardCalculator *reward_calculator = new agent::SafeSpeedyDrivingAgentRewardCalculator;
 
+    agent::IAgencyCalculator *agency_calculator = new agent::BasicDrivingAgentAgencyCalculator;
+
     causal::NecessaryFPGoalCausalLinkTester *causal_link_tester =
-            new causal::NecessaryFPGoalCausalLinkTester(
-                action_sampler, scene_factory, driving_simulator, reward_calculator,
-                REWARD_DIFF_THRESHOLD);
+            new causal::NecessaryFPGoalCausalLinkTester(action_sampler, scene_factory,
+                                                        driving_simulator, reward_calculator,
+                                                        agency_calculator, REWARD_DIFF_THRESHOLD);
 
 
     std::cout << "Beginning test" << std::endl;
@@ -275,6 +278,7 @@ int main(int argc, char *argv[])
 
     delete causal_link_tester;
 
+    delete agency_calculator;
     delete reward_calculator;
     delete driving_simulator;
     delete driving_agent_controller;

@@ -24,7 +24,7 @@ class TemporalRoundingDictionary : public virtual structures::IDictionary<Time, 
 
     std::deque<V> value_deque;
 
-    mutable std::mutex value_deque_mutex;
+    mutable std::recursive_mutex value_deque_mutex;
 
     mutable structures::IStackArray<Time> *keys_cache;
     mutable structures::IStackArray<V> *values_cache;
@@ -80,7 +80,7 @@ public:
     }
     structures::IArray<Time> const* get_keys() const override
     {
-        std::lock_guard<std::mutex> value_deque_guard(value_deque_mutex);
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
         if (keys_cache)
         {
@@ -119,7 +119,7 @@ public:
     }
     structures::IArray<V> const* get_values() const override
     {
-        std::lock_guard<std::mutex> value_deque_guard(value_deque_mutex);
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
         if (values_cache)
         {
@@ -201,7 +201,7 @@ public:
 
     void update(Time const &key, V const &val) override
     {
-        std::lock_guard<std::mutex> value_deque_guard(value_deque_mutex);
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
         if (value_deque.size() == 0)
         {
@@ -233,7 +233,7 @@ public:
     }
     void erase(Time const &key) override
     {
-        std::lock_guard<std::mutex> value_deque_guard(value_deque_mutex);
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
         size_t index = (key - time_window_start).count() / time_window_step.count();
         if (key >= time_window_start && index < 1)
@@ -304,7 +304,7 @@ public:
     }
     void propogate_values_forward()
     {
-        std::lock_guard<std::mutex> value_deque_guard(value_deque_mutex);
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
         V current_value = default_value;
         structures::stl::STLSet<V> previous_values;
@@ -332,7 +332,7 @@ public:
     }
     void propogate_values_forward(Time const &time_window_end)
     {
-        std::lock_guard<std::mutex> value_deque_guard(value_deque_mutex);
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
         V current_value = default_value;
         structures::stl::STLSet<V> previous_values;

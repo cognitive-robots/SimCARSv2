@@ -1,8 +1,6 @@
 
 #include <ori/simcars/agent/safe_speedy_driving_agent_reward_calculator.hpp>
 
-#include <iostream>
-
 namespace ori
 {
 namespace simcars

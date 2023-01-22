@@ -144,6 +144,18 @@ LyftDrivingAgent::LyftDrivingAgent(IDrivingScene const *driving_scene, rapidjson
         cumilative_collision_time_variable->set_value(timestamp, temporal::Duration(0));
     }
 
+    position_variable->propogate_events_forward(this->max_temporal_limit);
+    linear_velocity_variable->propogate_events_forward(this->max_temporal_limit);
+    linear_acceleration_variable->propogate_events_forward(this->max_temporal_limit);
+    rotation_variable->propogate_events_forward(this->max_temporal_limit);
+    aligned_linear_velocity_variable->propogate_events_forward(this->max_temporal_limit);
+    aligned_linear_acceleration_variable->propogate_events_forward(this->max_temporal_limit);
+    external_linear_acceleration_variable->propogate_events_forward(this->max_temporal_limit);
+    angular_velocity_variable->propogate_events_forward(this->max_temporal_limit);
+    steer_variable->propogate_events_forward(this->max_temporal_limit);
+    ttc_variable->propogate_events_forward(this->max_temporal_limit);
+    cumilative_collision_time_variable->propogate_events_forward(this->max_temporal_limit);
+
     this->min_spatial_limits = geometry::Vec(min_position_x, min_position_y);
     this->max_spatial_limits = geometry::Vec(max_position_x, max_position_y);
 }

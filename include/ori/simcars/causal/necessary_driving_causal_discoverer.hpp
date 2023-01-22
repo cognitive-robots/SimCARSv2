@@ -9,6 +9,7 @@
 #include <ori/simcars/agent/basic_driving_agent_controller.hpp>
 #include <ori/simcars/agent/basic_driving_simulator.hpp>
 #include <ori/simcars/agent/safe_speedy_driving_agent_reward_calculator.hpp>
+#include <ori/simcars/agent/basic_driving_agent_agency_calculator.hpp>
 #include <ori/simcars/causal/causal_discoverer_interface.hpp>
 #include <ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp>
 
@@ -53,6 +54,7 @@ class NecessaryDrivingCausalDiscoverer : public virtual ICausalDiscoverer
     agent::IDrivingAgentController const *controller;
     agent::IDrivingSimulator const *simulator;
     agent::IRewardCalculator const *reward_calculator;
+    agent::IAgencyCalculator const *agency_calculator;
 
     ICausalLinkTester<agent::Goal<FP_DATA_TYPE>, agent::Goal<FP_DATA_TYPE>> const *causal_link_tester;
 
@@ -66,9 +68,11 @@ public:
                                                                       controller_lookahead_steps)),
           simulator(new agent::BasicDrivingSimulator(controller)),
           reward_calculator(new agent::SafeSpeedyDrivingAgentRewardCalculator),
+          agency_calculator(new agent::BasicDrivingAgentAgencyCalculator),
           causal_link_tester(new NecessaryFPGoalCausalLinkTester(action_sampler,
                                                                  simulation_scene_factory, simulator,
                                                                  reward_calculator,
+                                                                 agency_calculator,
                                                                  reward_diff_threshold))
     {
     }
@@ -77,6 +81,7 @@ public:
     {
         delete causal_link_tester;
 
+        delete agency_calculator;
         delete reward_calculator;
         delete simulator;
         delete controller;

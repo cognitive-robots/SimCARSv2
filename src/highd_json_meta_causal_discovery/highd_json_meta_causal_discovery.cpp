@@ -25,7 +25,9 @@ int main(int argc, char *argv[])
 {
     if (argc < 4)
     {
-        std::cerr << "Usage: ./highd_json_meta_causal_discovery reward_diff_threshold input_json_meta_file_path trimmed_data_directory_path [output_json_meta_file_path]" << std::endl;
+        std::cerr << "Usage: ./highd_json_meta_causal_discovery reward_diff_threshold "
+                     "input_json_meta_file_path trimmed_data_directory_path "
+                     "[output_json_meta_file_path]" << std::endl;
         return -1;
     }
 

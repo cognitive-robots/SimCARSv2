@@ -21,7 +21,7 @@ class STLSet : public virtual ISet<T>
 protected:
     std::unordered_set<T, T_hash> data;
 
-    mutable std::mutex data_mutex;
+    mutable std::recursive_mutex data_mutex;
 
     mutable IStackArray<T> *values_cache;
 
@@ -55,7 +55,7 @@ public:
 
     IArray<T> const* get_array() const override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         if (values_cache != nullptr)
         {
@@ -88,7 +88,7 @@ public:
 
     void union_with(ISet<T> const *set) override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         IArray<T> const *array = set->get_array();
         size_t i;
@@ -99,7 +99,7 @@ public:
     }
     void intersect_with(ISet<T> const *set) override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         IArray<T> const *array = this->get_array();
         size_t i;
@@ -113,7 +113,7 @@ public:
     }
     void difference_with(ISet<T> const *set) override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         IArray<T> const *array;
         size_t i;
@@ -139,7 +139,7 @@ public:
     }
     void insert(T const &val) override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         data.insert(val);
 
@@ -150,7 +150,7 @@ public:
     }
     void erase(T const &val) override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         data.erase(val);
 

@@ -21,7 +21,7 @@ class STLOrderedDictionary : public virtual IDictionary<K, V>
 protected:
     std::map<K, V, K_compare> data;
 
-    mutable std::mutex data_mutex;
+    mutable std::recursive_mutex data_mutex;
 
     mutable IStackArray<K> *keys_cache;
     mutable IStackArray<V> *values_cache;
@@ -73,7 +73,7 @@ public:
     }
     IArray<K> const* get_keys() const override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         if (keys_cache)
         {
@@ -105,7 +105,7 @@ public:
     }
     IArray<V> const* get_values() const override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         if (values_cache)
         {
@@ -138,7 +138,7 @@ public:
 
     void update(K const &key, V const &val) override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         data[key] = val;
 
@@ -150,7 +150,7 @@ public:
     }
     void erase(K const &key) override
     {
-        std::lock_guard<std::mutex> data_guard(data_mutex);
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         data.erase(key);
 
