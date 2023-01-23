@@ -53,10 +53,12 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
             effect_entity->get_mutable_variable_parameter(effect->get_full_name());
     structures::IArray<agent::IValuelessEvent*> *effect_events =
             effect_variable->get_mutable_valueless_events();
+    effect_variable->propogate_events_forward(scene->get_max_temporal_limit());
 
     temporal::Time time_window_start = cause->get_time();
-    temporal::Time time_window_end = effect_entity->get_max_temporal_limit();
+    temporal::Time time_window_end = scene->get_max_temporal_limit();
 
+    /*
     size_t i;
     for (i = 0; i < cause_events->count(); ++i)
     {
@@ -76,50 +78,139 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
             break;
         }
     }
-
+    */
 
     structures::ISet<std::string> *relevant_agent_names = new structures::stl::STLSet<std::string>;
     relevant_agent_names->insert(cause->get_entity_name());
     relevant_agent_names->insert(effect->get_entity_name());
 
 
+    agent::IScene *simulated_original_scene =
+            simulation_scene_factory->create_simulation_scene(
+                original_scene, simulator, scene->get_time_step(),
+                std::min(cause_entity->get_max_temporal_limit(),
+                         effect_entity->get_max_temporal_limit()),
+                time_window_end, relevant_agent_names);
+
     agent::IScene *cause_intervened_scene = original_scene->scene_deep_copy();
     agent::IEntity *cause_intervened_entity =
             cause_intervened_scene->get_mutable_entity(cause->get_entity_name());
-    if (cause->get_time() == cause_intervened_entity->get_min_temporal_limit())
+    agent::IValuelessVariable *cause_intervened_variable =
+            cause_intervened_entity->get_mutable_variable_parameter(cause->get_full_name());
+    if (cause->get_time() == cause_intervened_variable->get_min_temporal_limit())
     {
         throw std::invalid_argument("Potential cause event cannot be an initialising event");
     }
-    agent::IValuelessVariable *cause_intervened_variable =
-            cause_intervened_entity->get_mutable_variable_parameter(cause->get_full_name());
     cause_intervened_variable->remove_value(cause->get_time());
     cause_intervened_variable->propogate_events_forward(scene->get_max_temporal_limit());
     agent::IScene *simulated_cause_intervened_scene =
             simulation_scene_factory->create_simulation_scene(cause_intervened_scene, simulator,
                                                               scene->get_time_step(),
-                                                              time_window_start,
-                                                              time_window_end,
+                                                              time_window_start, time_window_end,
                                                               relevant_agent_names);
+
+
+    FP_DATA_TYPE preeffect_min_original_effect_reward = 1.0f;
+    FP_DATA_TYPE preeffect_min_cause_intervened_effect_reward = 1.0f;
+
+    bool preeffect_original_cause_agency = true;
+    bool preeffect_cause_intervened_cause_agency = true;
+
+    bool preeffect_original_effect_agency = true;
+    bool preeffect_cause_intervened_effect_agency = true;
+
+    bool preeffect_original_linked_agency_loss = false;
+    bool preeffect_cause_intervened_linked_agency_loss = false;
+
+    FP_DATA_TYPE current_original_effect_reward;
+    FP_DATA_TYPE current_cause_intervened_effect_reward;
+
+    bool current_original_cause_agency = true;
+    bool current_cause_intervened_cause_agency = true;
+
+    bool current_original_effect_agency = true;
+    bool current_cause_intervened_effect_agency = true;
+
+    temporal::Time current_time;
+    agent::IReadOnlySceneState const *current_scene_state;
+    agent::IReadOnlyEntityState const *current_effect_entity_state;
+    agent::IReadOnlyEntityState const *current_cause_entity_state;
+    for (temporal::Time current_time = std::max(cause->get_time(),
+                                                effect_entity->get_min_temporal_limit());
+         current_time <= effect->get_time(); current_time += scene->get_time_step())
+    {
+        current_scene_state = simulated_original_scene->get_state(current_time);
+        current_effect_entity_state = current_scene_state->get_entity_state(
+                    effect->get_entity_name());
+        current_original_effect_reward = reward_calculator->calculate_state_reward(
+                    current_effect_entity_state);
+        preeffect_min_original_effect_reward = std::min(current_original_effect_reward,
+                                                 preeffect_min_original_effect_reward);
+        current_original_effect_agency = agency_calculator->calculate_state_agency(
+                    current_effect_entity_state);
+        current_cause_entity_state = current_scene_state->get_entity_state(
+                    cause->get_entity_name());
+        current_original_cause_agency = agency_calculator->calculate_state_agency(
+                    current_cause_entity_state);
+        delete current_scene_state;
+
+        current_scene_state = simulated_cause_intervened_scene->get_state(current_time);
+        current_effect_entity_state = current_scene_state->get_entity_state(
+                    effect->get_entity_name());
+        current_cause_intervened_effect_reward =
+                reward_calculator->calculate_state_reward(current_effect_entity_state);
+        preeffect_min_cause_intervened_effect_reward =
+                std::min(current_cause_intervened_effect_reward,
+                         preeffect_min_cause_intervened_effect_reward);
+        current_cause_intervened_effect_agency = agency_calculator->calculate_state_agency(
+                    current_effect_entity_state);
+        current_cause_entity_state = current_scene_state->get_entity_state(
+                    cause->get_entity_name());
+        current_cause_intervened_cause_agency = agency_calculator->calculate_state_agency(
+                    current_cause_entity_state);
+        delete current_scene_state;
+
+        preeffect_original_linked_agency_loss = preeffect_original_linked_agency_loss ||
+                ((preeffect_original_effect_agency && preeffect_original_cause_agency) &&
+                 (!current_original_effect_agency && !current_original_cause_agency));
+        preeffect_cause_intervened_linked_agency_loss =
+                preeffect_cause_intervened_linked_agency_loss ||
+                ((preeffect_cause_intervened_effect_agency &&
+                  preeffect_cause_intervened_cause_agency) &&
+                 (!current_cause_intervened_effect_agency &&
+                  !current_cause_intervened_cause_agency));
+
+        preeffect_original_cause_agency = preeffect_original_cause_agency &&
+                current_original_cause_agency;
+        preeffect_cause_intervened_cause_agency = preeffect_cause_intervened_cause_agency &&
+                current_cause_intervened_cause_agency;
+
+        preeffect_original_effect_agency = preeffect_original_effect_agency &&
+                current_original_effect_agency;
+        preeffect_cause_intervened_effect_agency = preeffect_cause_intervened_effect_agency &&
+                current_cause_intervened_effect_agency;
+    }
+
 
     agent::IScene *effect_intervened_scene = original_scene->scene_deep_copy();
     agent::IEntity *effect_intervened_entity =
             effect_intervened_scene->get_mutable_entity(effect->get_entity_name());
-    if (effect->get_time() == effect_intervened_entity->get_min_temporal_limit())
+    agent::IValuelessVariable *effect_intervened_variable =
+            effect_intervened_entity->get_mutable_variable_parameter(effect->get_full_name());
+    if (effect->get_time() == effect_intervened_variable->get_min_temporal_limit())
     {
         throw std::invalid_argument("Potential effect event cannot be an initialising event");
     }
-    agent::IValuelessVariable *effect_intervened_variable =
-            effect_intervened_entity->get_mutable_variable_parameter(effect->get_full_name());
     effect_intervened_variable->remove_value(effect->get_time());
     effect_intervened_variable->propogate_events_forward(scene->get_max_temporal_limit());
     agent::IScene *simulated_effect_intervened_scene =
             simulation_scene_factory->create_simulation_scene(effect_intervened_scene, simulator,
                                                               scene->get_time_step(),
-                                                              time_window_start,
-                                                              time_window_end,
+                                                              effect->get_time(), time_window_end,
                                                               relevant_agent_names);
 
-    agent::IScene *cause_effect_intervened_scene = cause_intervened_scene->scene_deep_copy();
+    agent::IScene *cause_effect_intervened_scene =
+            cause_intervened_scene->scene_deep_copy();
     agent::IEntity *cause_effect_intervened_entity =
             cause_effect_intervened_scene->get_mutable_entity(effect->get_entity_name());
     agent::IValuelessVariable *cause_effect_intervened_variable =
@@ -127,92 +218,177 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     cause_effect_intervened_variable->remove_value(effect->get_time());
     cause_effect_intervened_variable->propogate_events_forward(scene->get_max_temporal_limit());
     agent::IScene *simulated_cause_effect_intervened_scene =
-            simulation_scene_factory->create_simulation_scene(cause_effect_intervened_scene, simulator,
-                                                              scene->get_time_step(),
-                                                              time_window_start,
-                                                              time_window_end,
+            simulation_scene_factory->create_simulation_scene(cause_effect_intervened_scene,
+                                                              simulator, scene->get_time_step(),
+                                                              time_window_start, time_window_end,
                                                               relevant_agent_names);
 
     delete relevant_agent_names;
 
 
-    FP_DATA_TYPE selected_original_reward = 1.0f;
-    FP_DATA_TYPE selected_cause_intervened_reward = 1.0f;
-    FP_DATA_TYPE selected_effect_intervened_reward = 1.0f;
-    FP_DATA_TYPE selected_cause_effect_intervened_reward = 1.0f;
+    FP_DATA_TYPE posteffect_min_original_effect_reward = 1.0f;
+    FP_DATA_TYPE posteffect_min_cause_intervened_effect_reward = 1.0f;
+    FP_DATA_TYPE posteffect_min_effect_intervened_effect_reward = 1.0f;
+    FP_DATA_TYPE posteffect_min_cause_effect_intervened_effect_reward = 1.0f;
 
-    FP_DATA_TYPE current_original_reward;
-    FP_DATA_TYPE current_cause_intervened_reward;
-    FP_DATA_TYPE current_effect_intervened_reward;
-    FP_DATA_TYPE current_cause_effect_intervened_reward;
+    bool posteffect_original_cause_agency = true;
+    bool posteffect_cause_intervened_cause_agency = true;
+    bool posteffect_effect_intervened_cause_agency = true;
+    bool posteffect_cause_effect_intervened_cause_agency = true;
 
-    temporal::Time current_time;
-    agent::IReadOnlySceneState const *current_scene_state;
-    agent::IReadOnlyEntityState const *current_entity_state;
-    FP_DATA_TYPE current_reward;
-    for (temporal::Time current_time = effect->get_time();
-         current_time <= time_window_end;
-         current_time += scene->get_time_step())
+    bool posteffect_original_effect_agency = true;
+    bool posteffect_cause_intervened_effect_agency = true;
+    bool posteffect_effect_intervened_effect_agency = true;
+    bool posteffect_cause_effect_intervened_effect_agency = true;
+
+    bool posteffect_original_linked_agency_loss = false;
+    bool posteffect_cause_intervened_linked_agency_loss = false;
+    bool posteffect_effect_intervened_linked_agency_loss = false;
+    bool posteffect_cause_effect_intervened_linked_agency_loss = false;
+
+    FP_DATA_TYPE current_effect_intervened_effect_reward;
+    FP_DATA_TYPE current_cause_effect_intervened_effect_reward;
+
+    bool current_effect_intervened_cause_agency = true;
+    bool current_cause_effect_intervened_cause_agency = true;
+
+    bool current_effect_intervened_effect_agency = true;
+    bool current_cause_effect_intervened_effect_agency = true;
+
+    for (temporal::Time current_time = effect->get_time() + scene->get_time_step();
+         current_time <= time_window_end; current_time += scene->get_time_step())
     {
-        current_scene_state = original_scene->get_state(current_time);
-        current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_original_reward = reward_calculator->calculate_state_reward(current_entity_state);
+        current_scene_state = simulated_original_scene->get_state(current_time);
+        current_effect_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
+        current_original_effect_reward = reward_calculator->calculate_state_reward(current_effect_entity_state);
+        posteffect_min_original_effect_reward = std::min(current_original_effect_reward,
+                                                  posteffect_min_original_effect_reward);
+        current_original_effect_agency = agency_calculator->calculate_state_agency(
+                    current_effect_entity_state);
+        current_cause_entity_state = current_scene_state->get_entity_state(
+                    cause->get_entity_name());
+        current_original_cause_agency = agency_calculator->calculate_state_agency(
+                    current_cause_entity_state);
         delete current_scene_state;
 
         current_scene_state = simulated_cause_intervened_scene->get_state(current_time);
-        current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_cause_intervened_reward =
-                reward_calculator->calculate_state_reward(current_entity_state);
+        current_effect_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
+        current_cause_intervened_effect_reward =
+                reward_calculator->calculate_state_reward(current_effect_entity_state);
+        posteffect_min_cause_intervened_effect_reward = std::min(current_cause_intervened_effect_reward,
+                                                          posteffect_min_cause_intervened_effect_reward);
+        current_cause_intervened_effect_agency = agency_calculator->calculate_state_agency(
+                    current_effect_entity_state);
+        current_cause_entity_state = current_scene_state->get_entity_state(
+                    cause->get_entity_name());
+        current_cause_intervened_cause_agency = agency_calculator->calculate_state_agency(
+                    current_cause_entity_state);
         delete current_scene_state;
 
         current_scene_state = simulated_effect_intervened_scene->get_state(current_time);
-        current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_effect_intervened_reward =
-                reward_calculator->calculate_state_reward(current_entity_state);
+        current_effect_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
+        current_effect_intervened_effect_reward =
+                reward_calculator->calculate_state_reward(current_effect_entity_state);
+        posteffect_min_effect_intervened_effect_reward = std::min(current_effect_intervened_effect_reward,
+                                                           posteffect_min_effect_intervened_effect_reward);
+        current_effect_intervened_effect_agency = agency_calculator->calculate_state_agency(
+                    current_effect_entity_state);
+        current_cause_entity_state = current_scene_state->get_entity_state(
+                    cause->get_entity_name());
+        current_effect_intervened_cause_agency = agency_calculator->calculate_state_agency(
+                    current_cause_entity_state);
         delete current_scene_state;
 
         current_scene_state = simulated_cause_effect_intervened_scene->get_state(current_time);
-        current_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
-        current_cause_effect_intervened_reward =
-                reward_calculator->calculate_state_reward(current_entity_state);
+        current_effect_entity_state = current_scene_state->get_entity_state(effect->get_entity_name());
+        current_cause_effect_intervened_effect_reward =
+                reward_calculator->calculate_state_reward(current_effect_entity_state);
+        posteffect_min_cause_effect_intervened_effect_reward =
+                std::min(current_cause_effect_intervened_effect_reward,
+                         posteffect_min_cause_effect_intervened_effect_reward);
+        current_cause_effect_intervened_effect_agency = agency_calculator->calculate_state_agency(
+                    current_effect_entity_state);
+        current_cause_entity_state = current_scene_state->get_entity_state(
+                    cause->get_entity_name());
+        current_cause_effect_intervened_cause_agency = agency_calculator->calculate_state_agency(
+                    current_cause_entity_state);
         delete current_scene_state;
 
-        if (std::abs(current_original_reward - current_effect_intervened_reward) >
-                std::abs(selected_original_reward - selected_effect_intervened_reward))
-        {
-            selected_original_reward = current_original_reward;
-            selected_effect_intervened_reward = current_effect_intervened_reward;
-        }
+        posteffect_original_linked_agency_loss = posteffect_original_linked_agency_loss ||
+                ((posteffect_original_effect_agency && posteffect_original_cause_agency) &&
+                 (!current_original_effect_agency && !current_original_cause_agency));
+        posteffect_cause_intervened_linked_agency_loss =
+                posteffect_cause_intervened_linked_agency_loss ||
+                ((posteffect_cause_intervened_effect_agency &&
+                  posteffect_cause_intervened_cause_agency) &&
+                 (!current_cause_intervened_effect_agency &&
+                  !current_cause_intervened_cause_agency));
+        posteffect_effect_intervened_linked_agency_loss =
+                posteffect_effect_intervened_linked_agency_loss ||
+                ((posteffect_effect_intervened_effect_agency &&
+                  posteffect_effect_intervened_cause_agency) &&
+                 (!current_effect_intervened_effect_agency &&
+                  !current_effect_intervened_cause_agency));
+        posteffect_cause_effect_intervened_linked_agency_loss =
+                posteffect_cause_effect_intervened_linked_agency_loss ||
+                ((posteffect_cause_effect_intervened_effect_agency &&
+                  posteffect_cause_effect_intervened_cause_agency) &&
+                 (!current_cause_effect_intervened_effect_agency &&
+                  !current_cause_effect_intervened_cause_agency));
 
-        if (std::abs(current_cause_effect_intervened_reward - current_cause_intervened_reward) >
-                std::abs(selected_cause_effect_intervened_reward -
-                         selected_cause_intervened_reward))
-        {
-            selected_cause_effect_intervened_reward = current_cause_effect_intervened_reward;
-            selected_cause_intervened_reward = current_cause_intervened_reward;
-        }
+        posteffect_original_cause_agency = posteffect_original_cause_agency &&
+                current_original_cause_agency;
+        posteffect_cause_intervened_cause_agency = posteffect_cause_intervened_cause_agency &&
+                current_cause_intervened_cause_agency;
+        posteffect_effect_intervened_cause_agency = posteffect_effect_intervened_cause_agency &&
+                current_effect_intervened_cause_agency;
+        posteffect_cause_effect_intervened_cause_agency = posteffect_cause_effect_intervened_cause_agency &&
+                current_cause_effect_intervened_cause_agency;
+
+        posteffect_original_effect_agency = posteffect_original_effect_agency &&
+                current_original_effect_agency;
+        posteffect_cause_intervened_effect_agency = posteffect_cause_intervened_effect_agency &&
+                current_cause_intervened_effect_agency;
+        posteffect_effect_intervened_effect_agency = posteffect_effect_intervened_effect_agency &&
+                current_effect_intervened_effect_agency;
+        posteffect_cause_effect_intervened_effect_agency = posteffect_cause_effect_intervened_effect_agency &&
+                current_cause_effect_intervened_effect_agency;
     }
 
 
 #ifdef CD_DEBUG_PRINT
-    std::cout << "┌─────┬─────┬─────┐" << std::endl;
-    std::cout << "│     │  E  │ ¬ E │" << std::endl;
-    std::cout << "├─────┼─────┼─────┤" << std::endl;
+    std::cout << "┌─────┬─────┬─────┬─────┐" << std::endl;
+    std::cout << "│ Re. │  E  │ ¬ E │ PRE │" << std::endl;
+    std::cout << "├─────┼─────┼─────┬─────┤" << std::endl;
     std::cout << "│  C  │" << std::setprecision(3) << std::fixed <<
-                 selected_original_reward << "│" << std::setprecision(3) << std::fixed <<
-                 selected_effect_intervened_reward << "│" << std::endl;
-    std::cout << "├─────┼─────┼─────┤" << std::endl;
+                 posteffect_min_original_effect_reward << "│" << std::setprecision(3) << std::fixed <<
+                 posteffect_min_effect_intervened_effect_reward << "│" << std::setprecision(3) <<
+                 std::fixed << preeffect_min_original_effect_reward << "│" << std::endl;
+    std::cout << "├─────┼─────┼─────┼─────┤" << std::endl;
     std::cout << "│ ¬ C │" << std::setprecision(3) << std::fixed <<
-                 selected_cause_intervened_reward << "│" << std::setprecision(3) << std::fixed <<
-                 selected_cause_effect_intervened_reward << "│" << std::endl;
-    std::cout << "└─────┴─────┴─────┘" << std::endl;
+                 posteffect_min_cause_intervened_effect_reward << "│" << std::setprecision(3) <<
+                 std::fixed << posteffect_min_cause_effect_intervened_effect_reward << "│" <<
+                 std::setprecision(3) << std::fixed <<
+                 preeffect_min_cause_intervened_effect_reward << "│" << std::endl;
+    std::cout << "└─────┴─────┴─────┴─────┘" << std::endl;
+    std::cout << "┌─────┬─────┬─────┬─────┐" << std::endl;
+    std::cout << "│ Ag. │  E  │ ¬ E │ PRE │" << std::endl;
+    std::cout << "├─────┼─────┼─────┬─────┤" << std::endl;
+    std::cout << "│  C  │" << std::setw(5) << posteffect_original_linked_agency_loss << "│" <<
+                 std::setw(5) << posteffect_effect_intervened_linked_agency_loss << "│" <<
+                 std::setw(5) << preeffect_original_linked_agency_loss << "│" << std::endl;
+    std::cout << "├─────┼─────┼─────┼─────┤" << std::endl;
+    std::cout << "│ ¬ C │" << std::setw(5) << posteffect_cause_intervened_linked_agency_loss <<
+                 "│" << std::setw(5) << posteffect_cause_effect_intervened_linked_agency_loss <<
+                 "│" << std::setw(5) << preeffect_cause_intervened_linked_agency_loss << "│" <<
+                 std::endl;
+    std::cout << "└─────┴─────┴─────┴─────┘" << std::endl;
 #endif
 
-
-    FP_DATA_TYPE direct_causal_implication = selected_original_reward -
-            selected_effect_intervened_reward;
-    FP_DATA_TYPE reverse_causal_implication = selected_cause_effect_intervened_reward -
-            selected_cause_intervened_reward;
+    FP_DATA_TYPE direct_causal_implication = posteffect_min_original_effect_reward -
+            posteffect_min_effect_intervened_effect_reward;
+    FP_DATA_TYPE reverse_causal_implication = posteffect_min_cause_effect_intervened_effect_reward -
+            posteffect_min_cause_intervened_effect_reward;
     FP_DATA_TYPE combined_causal_implication = direct_causal_implication +
             reverse_causal_implication;
     bool causally_significant = combined_causal_implication >= reward_diff_threshold;
@@ -226,17 +402,11 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
 #endif
 
 
-    FP_DATA_TYPE effect_entity_impotus = selected_original_reward -
-            selected_cause_intervened_reward;
-    FP_DATA_TYPE cause_entity_impotus = selected_cause_effect_intervened_reward -
-            selected_effect_intervened_reward;
-    bool facilitation_type = effect_entity_impotus >= reward_diff_threshold &&
-            cause_entity_impotus <= -reward_diff_threshold;
+    bool facilitation_type = !posteffect_cause_intervened_linked_agency_loss &&
+            !posteffect_cause_effect_intervened_linked_agency_loss;
 
 
 #ifdef CD_DEBUG_PRINT
-    std::cout << "Effect Entity Impotus = " << effect_entity_impotus << std::endl;
-    std::cout << "Cause Entity Impotus = " << cause_entity_impotus << std::endl;
     std::cout << "Facilitation Type: " << (facilitation_type ? "Yes" : "No") << std::endl;
 #endif
 
@@ -247,6 +417,7 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     delete effect_intervened_scene;
     delete simulated_cause_intervened_scene;
     delete cause_intervened_scene;
+    delete simulated_original_scene;
     delete original_scene;
 
 

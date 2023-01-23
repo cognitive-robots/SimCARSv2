@@ -108,30 +108,31 @@ public:
 
 
 
-        structures::IArray<agent::IDrivingAgent const*> const *driving_agents_with_actions =
-                driving_scene_with_actions->get_driving_agents();
+        structures::IArray<agent::IDrivingAgent*> const *driving_agents_with_actions =
+                driving_scene_with_actions->get_mutable_driving_agents();
 
         structures::stl::STLStackArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*> aligned_linear_velocity_goal_events;
 
         size_t i, j;
         for (i = 0; i < driving_agents_with_actions->count(); ++i)
         {
-            agent::IDrivingAgent const *driving_agent_with_actions =
+            agent::IDrivingAgent *driving_agent_with_actions =
                     (*driving_agents_with_actions)[i];
             if (agents_of_interest == nullptr ||
                     agents_of_interest->contains(driving_agent_with_actions->get_name()))
             {
-                agent::IValuelessVariable const *driving_agent_aligned_linear_velocity_goal_valueless_variable =
-                        driving_agent_with_actions->get_variable_parameter(driving_agent_with_actions->get_name() +
-                                                                           ".aligned_linear_velocity.goal");
+                agent::IValuelessVariable *driving_agent_aligned_linear_velocity_goal_valueless_variable =
+                        driving_agent_with_actions->get_mutable_variable_parameter(
+                            driving_agent_with_actions->get_name() +
+                            ".aligned_linear_velocity.goal");
 
                 if (driving_agent_aligned_linear_velocity_goal_valueless_variable == nullptr)
                 {
                     throw std::runtime_error("No aligned linear velocity goal variable present on agent of interest");
                 }
 
-                agent::IVariable<agent::Goal<FP_DATA_TYPE>> const *driving_agent_aligned_linear_velocity_goal_variable =
-                        dynamic_cast<agent::IVariable<agent::Goal<FP_DATA_TYPE>> const*>(
+                agent::IVariable<agent::Goal<FP_DATA_TYPE>> *driving_agent_aligned_linear_velocity_goal_variable =
+                        dynamic_cast<agent::IVariable<agent::Goal<FP_DATA_TYPE>>*>(
                                 driving_agent_aligned_linear_velocity_goal_valueless_variable);
 
                 structures::IArray<agent::IEvent<agent::Goal<FP_DATA_TYPE>> const*> const *driving_agent_aligned_linear_velocity_goal_events =
@@ -142,15 +143,33 @@ public:
                     agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *driving_agent_aligned_linear_velocity_goal_event =
                             (*driving_agent_aligned_linear_velocity_goal_events)[j];
 
-                    if (driving_agent_aligned_linear_velocity_goal_event->get_time() >
-                            driving_agent_with_actions->get_min_temporal_limit())
-                    {
-                        aligned_linear_velocity_goal_events.push_back(
-                                    driving_agent_aligned_linear_velocity_goal_event);
-                    }
+                    aligned_linear_velocity_goal_events.push_back(
+                                driving_agent_aligned_linear_velocity_goal_event);
                 }
 
                 delete driving_agent_aligned_linear_velocity_goal_events;
+
+                agent::IVariable<FP_DATA_TYPE> *driving_agent_aligned_linear_velocity_variable =
+                        driving_agent_with_actions->get_mutable_aligned_linear_velocity_variable();
+
+                FP_DATA_TYPE driving_agent_initial_aligned_linear_velocity;
+
+                if (!driving_agent_aligned_linear_velocity_variable->get_value(
+                            driving_agent_with_actions->get_min_temporal_limit(),
+                            driving_agent_initial_aligned_linear_velocity))
+                {
+                    throw std::runtime_error("Could not get initial aligned linear velocity of "
+                                             "driving agent");
+                }
+
+                temporal::Time just_before_start =
+                        driving_agent_with_actions->get_min_temporal_limit() -
+                        scene->get_time_step();
+
+                driving_agent_aligned_linear_velocity_goal_variable->set_value(
+                            just_before_start,
+                            agent::Goal(driving_agent_initial_aligned_linear_velocity,
+                                        just_before_start));
             }
         }
 
