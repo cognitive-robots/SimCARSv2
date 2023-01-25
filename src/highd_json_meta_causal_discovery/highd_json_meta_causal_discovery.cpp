@@ -251,6 +251,11 @@ int main(int argc, char *argv[])
         json_meta_document.AddMember("causal_links", json_causal_links,
                                      json_meta_document.GetAllocator());
 
+        rapidjson::Value time_elapsed_in_microseconds;
+        time_elapsed_in_microseconds.SetInt64(time_elapsed.count());
+        json_meta_document.AddMember("time_elapsed_in_microseconds", time_elapsed_in_microseconds,
+                                     json_meta_document.GetAllocator());
+
         std::ofstream output_json_meta_filestream(output_json_meta_file_path);
         rapidjson::OStreamWrapper output_json_meta_stream(output_json_meta_filestream);
         rapidjson::Writer<rapidjson::OStreamWrapper> output_json_meta_writer(
