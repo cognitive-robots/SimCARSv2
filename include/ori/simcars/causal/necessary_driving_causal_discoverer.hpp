@@ -61,7 +61,8 @@ class NecessaryDrivingCausalDiscoverer : public virtual ICausalDiscoverer
 public:
     NecessaryDrivingCausalDiscoverer(map::IMap<T_map_id> const *map, temporal::Duration time_step,
                                      size_t controller_lookahead_steps,
-                                     FP_DATA_TYPE reward_diff_threshold)
+                                     FP_DATA_TYPE reward_diff_threshold,
+                                     temporal::Duration simulation_horizon)
         : map(map), action_sampler(new agent::BasicFPActionSampler),
           simulation_scene_factory(new agent::DrivingSimulationSceneFactory),
           controller(new agent::BasicDrivingAgentController<T_map_id>(map, time_step,
@@ -73,7 +74,8 @@ public:
                                                                  simulation_scene_factory, simulator,
                                                                  reward_calculator,
                                                                  agency_calculator,
-                                                                 reward_diff_threshold))
+                                                                 reward_diff_threshold,
+                                                                 simulation_horizon))
     {
     }
 

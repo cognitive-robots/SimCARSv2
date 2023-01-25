@@ -251,7 +251,8 @@ int main(int argc, char *argv[])
     causal::NecessaryFPGoalCausalLinkTester *causal_link_tester =
             new causal::NecessaryFPGoalCausalLinkTester(action_sampler, scene_factory,
                                                         driving_simulator, reward_calculator,
-                                                        agency_calculator, REWARD_DIFF_THRESHOLD);
+                                                        agency_calculator, REWARD_DIFF_THRESHOLD,
+                                                        temporal::Duration(0));
 
 
     std::cout << "Beginning test" << std::endl;

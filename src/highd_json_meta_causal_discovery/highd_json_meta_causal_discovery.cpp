@@ -161,7 +161,8 @@ int main(int argc, char *argv[])
     start_time = high_resolution_clock::now();
 
     causal::ICausalDiscoverer *causal_discoverer = new causal::NecessaryDrivingCausalDiscoverer(
-                map, scene->get_time_step(), CONTROLLER_LOOKAHEAD_STEPS, reward_diff_threshold);
+                map, scene->get_time_step(), CONTROLLER_LOOKAHEAD_STEPS, reward_diff_threshold,
+                temporal::Duration(0));
 
     structures::ISet<std::pair<std::string, std::string>> *entity_causal_links =
             causal_discoverer->discover_entity_causal_links(scene, agents_of_interest);

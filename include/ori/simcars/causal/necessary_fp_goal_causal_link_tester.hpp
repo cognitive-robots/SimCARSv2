@@ -8,7 +8,7 @@
 #include <ori/simcars/agent/goal.hpp>
 #include <ori/simcars/causal/causal_link_tester_interface.hpp>
 
-#define CD_DEBUG_PRINT
+//#define CD_DEBUG_PRINT
 
 namespace ori
 {
@@ -25,15 +25,18 @@ class NecessaryFPGoalCausalLinkTester
     agent::ISimulator const *simulator;
     agent::IRewardCalculator const *reward_calculator;
     agent::IAgencyCalculator const *agency_calculator;
+
     FP_DATA_TYPE reward_diff_threshold;
+    temporal::Duration simulation_horizon;
 
 public:
     NecessaryFPGoalCausalLinkTester(agent::IActionSampler<FP_DATA_TYPE> const *action_sampler,
-                                agent::ISimulationSceneFactory const *simulation_scene_factory,
-                                agent::ISimulator const *simulator,
-                                agent::IRewardCalculator const *reward_calculator,
-                                agent::IAgencyCalculator const *agency_calculator,
-                                FP_DATA_TYPE reward_diff_threshol);
+                                    agent::ISimulationSceneFactory const *simulation_scene_factory,
+                                    agent::ISimulator const *simulator,
+                                    agent::IRewardCalculator const *reward_calculator,
+                                    agent::IAgencyCalculator const *agency_calculator,
+                                    FP_DATA_TYPE reward_diff_threshold,
+                                    temporal::Duration simulation_horizon);
 
     bool test_causal_link(agent::IScene const *scene,
                           agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *cause,

@@ -25,8 +25,8 @@ HighDDrivingAgent::HighDDrivingAgent(IDrivingScene const *driving_scene,
                                      const rapidcsv::Document &tracks_csv_document)
     : driving_scene(driving_scene)
 {
-    size_t const start_frame = tracks_meta_csv_document.GetCell<size_t>("initialFrame", tracks_meta_row) - 1;
-    size_t const end_frame = tracks_meta_csv_document.GetCell<size_t>("finalFrame", tracks_meta_row) - 1;
+    size_t const start_frame = tracks_meta_csv_document.GetCell<size_t>("initialFrame", tracks_meta_row);
+    size_t const end_frame = tracks_meta_csv_document.GetCell<size_t>("finalFrame", tracks_meta_row);
 
     // WARNING: This doesn't actually set the min and max temporal limits to the real world time points, based upon ticks since
     // epoch, in theory this is possible, but unnecessary at this stage
