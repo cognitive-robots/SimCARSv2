@@ -259,18 +259,39 @@ int main(int argc, char *argv[])
 
     start_time = high_resolution_clock::now();
 
-    bool link_present = causal_link_tester->test_causal_link(
+    bool reward_link_present;
+    bool agency_link_present;
+    bool hybrid_link_present;
+
+    causal_link_tester->test_causal_link(
                 scene_with_actions,
                 convoy_head_aligned_linear_velocity_goal_event,
-                convoy_tail_aligned_linear_velocity_goal_event);
+                convoy_tail_aligned_linear_velocity_goal_event, reward_link_present,
+                agency_link_present, hybrid_link_present);
 
-    if (link_present)
+    if (reward_link_present)
     {
-        std::cout << "Test concluded link is present" << std::endl;
+        std::cout << "Reward-based test concluded link is present" << std::endl;
     }
     else
     {
-        std::cout << "Test concluded link is not present" << std::endl;
+        std::cout << "Reward-based test concluded link is not present" << std::endl;
+    }
+    if (agency_link_present)
+    {
+        std::cout << "Agency-based test concluded link is present" << std::endl;
+    }
+    else
+    {
+        std::cout << "Agency-based test concluded link is not present" << std::endl;
+    }
+    if (hybrid_link_present)
+    {
+        std::cout << "Hybrid test concluded link is present" << std::endl;
+    }
+    else
+    {
+        std::cout << "Hybrid test concluded link is not present" << std::endl;
     }
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);

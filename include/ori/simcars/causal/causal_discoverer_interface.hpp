@@ -15,8 +15,11 @@ class ICausalDiscoverer
 public:
     virtual ~ICausalDiscoverer() = default;
 
-    virtual structures::ISet<std::pair<std::string, std::string>>* discover_entity_causal_links(
+    virtual void discover_entity_causal_links(
             agent::IScene const *scene,
+            structures::ISet<std::pair<std::string, std::string>>* reward_discovered,
+            structures::ISet<std::pair<std::string, std::string>>* agency_discovered,
+            structures::ISet<std::pair<std::string, std::string>>* hybrid_discovered,
             structures::ISet<std::string> const *agents_of_interest = nullptr) const = 0;
 };
 

@@ -164,34 +164,60 @@ int main(int argc, char *argv[])
                 map, scene->get_time_step(), CONTROLLER_LOOKAHEAD_STEPS, reward_diff_threshold,
                 temporal::Duration(0));
 
-    structures::ISet<std::pair<std::string, std::string>> *entity_causal_links =
-            causal_discoverer->discover_entity_causal_links(scene, agents_of_interest);
+    structures::ISet<std::pair<std::string, std::string>> *reward_entity_causal_links =
+            new structures::stl::STLSet<std::pair<std::string, std::string>, causal::PairHasher<std::string, std::string>>;
+    structures::ISet<std::pair<std::string, std::string>> *agency_entity_causal_links =
+            new structures::stl::STLSet<std::pair<std::string, std::string>, causal::PairHasher<std::string, std::string>>;
+    structures::ISet<std::pair<std::string, std::string>> *hybrid_entity_causal_links =
+            new structures::stl::STLSet<std::pair<std::string, std::string>, causal::PairHasher<std::string, std::string>>;
+
+    causal_discoverer->discover_entity_causal_links(scene, reward_entity_causal_links,
+                                                    agency_entity_causal_links,
+                                                    hybrid_entity_causal_links, agents_of_interest);
 
     time_elapsed = duration_cast<microseconds>(high_resolution_clock::now() - start_time);
 
     std::cout << "Finished causal discovery (" << time_elapsed.count() << " μs)" << std::endl;
 
 
-    structures::IArray<std::pair<std::string, std::string>> const *entity_causal_link_array =
-            entity_causal_links->get_array();
+    structures::IArray<std::pair<std::string, std::string>> const *reward_entity_causal_link_array =
+            reward_entity_causal_links->get_array();
+    structures::IArray<std::pair<std::string, std::string>> const *agency_entity_causal_link_array =
+            agency_entity_causal_links->get_array();
+    structures::IArray<std::pair<std::string, std::string>> const *hybrid_entity_causal_link_array =
+            hybrid_entity_causal_links->get_array();
 
-    std::cout << "Discovered Causal Links: " << std::endl;
+    std::cout << "Reward Discovered Causal Links: " << std::endl;
     size_t i;
-    for (i = 0; i < entity_causal_link_array->count(); ++i)
+    for (i = 0; i < reward_entity_causal_link_array->count(); ++i)
     {
         std::pair<std::string, std::string> const &entity_causal_link =
-                (*entity_causal_link_array)[i];
+                (*reward_entity_causal_link_array)[i];
+        std::cout << entity_causal_link.first << " -> " << entity_causal_link.second << std::endl;
+    }
+    std::cout << "Agency Discovered Causal Links: " << std::endl;
+    for (i = 0; i < agency_entity_causal_link_array->count(); ++i)
+    {
+        std::pair<std::string, std::string> const &entity_causal_link =
+                (*agency_entity_causal_link_array)[i];
+        std::cout << entity_causal_link.first << " -> " << entity_causal_link.second << std::endl;
+    }
+    std::cout << "Hybrid Discovered Causal Links: " << std::endl;
+    for (i = 0; i < hybrid_entity_causal_link_array->count(); ++i)
+    {
+        std::pair<std::string, std::string> const &entity_causal_link =
+                (*hybrid_entity_causal_link_array)[i];
         std::cout << entity_causal_link.first << " -> " << entity_causal_link.second << std::endl;
     }
 
 
     if (argc > 4)
     {
-        rapidjson::Value json_causal_links(rapidjson::kObjectType);
-        for (i = 0; i < entity_causal_link_array->count(); ++i)
+        rapidjson::Value json_reward_causal_links(rapidjson::kObjectType);
+        for (i = 0; i < reward_entity_causal_link_array->count(); ++i)
         {
             std::pair<std::string, std::string> const &entity_causal_link =
-                    (*entity_causal_link_array)[i];
+                    (*reward_entity_causal_link_array)[i];
 
             uint32_t cause_id;
             if (entity_causal_link.first == convoy_head_str)
@@ -234,21 +260,149 @@ int main(int argc, char *argv[])
             cause_json_str.SetString(cause_str.c_str(), json_meta_document.GetAllocator());
             rapidjson::Value effect_json_uint;
             effect_json_uint.SetUint(effect_id);
-            if (!json_causal_links.HasMember(cause_json_str))
+            if (!json_reward_causal_links.HasMember(cause_json_str))
             {
                 rapidjson::Value json_causal_effects(rapidjson::kArrayType);
                 json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
-                json_causal_links.AddMember(cause_json_str, json_causal_effects,
+                json_reward_causal_links.AddMember(cause_json_str, json_causal_effects,
                                             json_meta_document.GetAllocator());
             }
             else
             {
                 rapidjson::Value::Array const &json_causal_effects =
-                        json_causal_links[cause_json_str].GetArray();
+                        json_reward_causal_links[cause_json_str].GetArray();
                 json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
             }
         }
-        json_meta_document.AddMember("causal_links", json_causal_links,
+        json_meta_document.AddMember("reward_causal_links", json_reward_causal_links,
+                                     json_meta_document.GetAllocator());
+
+        rapidjson::Value json_agency_causal_links(rapidjson::kObjectType);
+        for (i = 0; i < agency_entity_causal_link_array->count(); ++i)
+        {
+            std::pair<std::string, std::string> const &entity_causal_link =
+                    (*agency_entity_causal_link_array)[i];
+
+            uint32_t cause_id;
+            if (entity_causal_link.first == convoy_head_str)
+            {
+                cause_id = convoy_head_id;
+            }
+            else if (entity_causal_link.first == convoy_tail_str)
+            {
+                cause_id = convoy_tail_id;
+            }
+            else if (entity_causal_link.first == independent_str)
+            {
+                cause_id = independent_id;
+            }
+            else
+            {
+                throw std::runtime_error("Unknown entity string");
+            }
+
+            uint32_t effect_id;
+            if (entity_causal_link.second == convoy_head_str)
+            {
+                effect_id = convoy_head_id;
+            }
+            else if (entity_causal_link.second == convoy_tail_str)
+            {
+                effect_id = convoy_tail_id;
+            }
+            else if (entity_causal_link.second == independent_str)
+            {
+                effect_id = independent_id;
+            }
+            else
+            {
+                throw std::runtime_error("Unknown entity string");
+            }
+
+            std::string cause_str = std::to_string(cause_id);
+            rapidjson::Value cause_json_str;
+            cause_json_str.SetString(cause_str.c_str(), json_meta_document.GetAllocator());
+            rapidjson::Value effect_json_uint;
+            effect_json_uint.SetUint(effect_id);
+            if (!json_agency_causal_links.HasMember(cause_json_str))
+            {
+                rapidjson::Value json_causal_effects(rapidjson::kArrayType);
+                json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
+                json_agency_causal_links.AddMember(cause_json_str, json_causal_effects,
+                                            json_meta_document.GetAllocator());
+            }
+            else
+            {
+                rapidjson::Value::Array const &json_causal_effects =
+                        json_agency_causal_links[cause_json_str].GetArray();
+                json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
+            }
+        }
+        json_meta_document.AddMember("agency_causal_links", json_agency_causal_links,
+                                     json_meta_document.GetAllocator());
+
+        rapidjson::Value json_hybrid_causal_links(rapidjson::kObjectType);
+        for (i = 0; i < hybrid_entity_causal_link_array->count(); ++i)
+        {
+            std::pair<std::string, std::string> const &entity_causal_link =
+                    (*hybrid_entity_causal_link_array)[i];
+
+            uint32_t cause_id;
+            if (entity_causal_link.first == convoy_head_str)
+            {
+                cause_id = convoy_head_id;
+            }
+            else if (entity_causal_link.first == convoy_tail_str)
+            {
+                cause_id = convoy_tail_id;
+            }
+            else if (entity_causal_link.first == independent_str)
+            {
+                cause_id = independent_id;
+            }
+            else
+            {
+                throw std::runtime_error("Unknown entity string");
+            }
+
+            uint32_t effect_id;
+            if (entity_causal_link.second == convoy_head_str)
+            {
+                effect_id = convoy_head_id;
+            }
+            else if (entity_causal_link.second == convoy_tail_str)
+            {
+                effect_id = convoy_tail_id;
+            }
+            else if (entity_causal_link.second == independent_str)
+            {
+                effect_id = independent_id;
+            }
+            else
+            {
+                throw std::runtime_error("Unknown entity string");
+            }
+
+            std::string cause_str = std::to_string(cause_id);
+            rapidjson::Value cause_json_str;
+            cause_json_str.SetString(cause_str.c_str(), json_meta_document.GetAllocator());
+            rapidjson::Value effect_json_uint;
+            effect_json_uint.SetUint(effect_id);
+            if (!json_hybrid_causal_links.HasMember(cause_json_str))
+            {
+                rapidjson::Value json_causal_effects(rapidjson::kArrayType);
+                json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
+                json_hybrid_causal_links.AddMember(cause_json_str, json_causal_effects,
+                                            json_meta_document.GetAllocator());
+            }
+            else
+            {
+                rapidjson::Value::Array const &json_causal_effects =
+                        json_hybrid_causal_links[cause_json_str].GetArray();
+                json_causal_effects.PushBack(effect_json_uint, json_meta_document.GetAllocator());
+            }
+        }
+        json_meta_document.AddMember("hybrid_causal_links", json_hybrid_causal_links,
                                      json_meta_document.GetAllocator());
 
         rapidjson::Value time_elapsed_in_microseconds;
@@ -264,7 +418,9 @@ int main(int argc, char *argv[])
     }
 
 
-    delete entity_causal_links;
+    delete reward_entity_causal_links;
+    delete agency_entity_causal_links;
+    delete hybrid_entity_causal_links;
 
     delete agents_of_interest;
 

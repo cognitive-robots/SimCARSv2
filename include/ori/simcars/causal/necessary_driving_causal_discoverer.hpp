@@ -91,8 +91,11 @@ public:
         delete action_sampler;
     }
 
-    structures::ISet<std::pair<std::string, std::string>>* discover_entity_causal_links(
+    void discover_entity_causal_links(
             agent::IScene const *scene,
+            structures::ISet<std::pair<std::string, std::string>>* reward_discovered,
+            structures::ISet<std::pair<std::string, std::string>>* agency_discovered,
+            structures::ISet<std::pair<std::string, std::string>>* hybrid_discovered,
             structures::ISet<std::string> const *agents_of_interest) const override
     {
         agent::IDrivingScene const *driving_scene =
@@ -181,12 +184,13 @@ public:
 #ifndef CD_DEBUG_PRINT
         structures::stl::STLStackArray<std::thread*> threads(
                     std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
-        structures::stl::STLStackArray<std::pair<std::string, std::string>*> discovered_entity_causal_link_array(
+        structures::stl::STLStackArray<std::pair<std::string, std::string>*> reward_discovered_entity_causal_link_array(
+                    std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
+        structures::stl::STLStackArray<std::pair<std::string, std::string>*> agency_discovered_entity_causal_link_array(
+                    std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
+        structures::stl::STLStackArray<std::pair<std::string, std::string>*> hybrid_discovered_entity_causal_link_array(
                     std::pow(aligned_linear_velocity_goal_events.count(), 2), nullptr);
 #endif
-
-        structures::ISet<std::pair<std::string, std::string>> *discovered_entity_causal_links =
-                new structures::stl::STLSet<std::pair<std::string, std::string>, PairHasher<std::string, std::string>>;
 
         for (i = 0; i < aligned_linear_velocity_goal_events.count(); ++i)
         {
@@ -258,50 +262,128 @@ public:
                                  std::endl;
 #endif
 
-                    bool link_present = causal_link_tester->test_causal_link(
-                                driving_scene_with_actions, potential_cause, potential_effect);
+                    bool reward_link_present;
+                    bool agency_link_present;
+                    bool hybrid_link_present;
 
-                    if (link_present)
+                    causal_link_tester->test_causal_link(
+                                driving_scene_with_actions, potential_cause, potential_effect,
+                                reward_link_present, agency_link_present, hybrid_link_present);
+
+                    if (reward_link_present)
                     {
                         std::string cause_driving_agent = potential_cause->get_entity_name();
                         std::string effect_driving_agent = potential_effect->get_entity_name();
                         std::pair<std::string, std::string> entity_causal_link(
                                     cause_driving_agent, effect_driving_agent);
-                        discovered_entity_causal_links->insert(entity_causal_link);
+                        reward_discovered->insert(entity_causal_link);
 
 #ifdef _WIN32
-                        std::cout << "Link Accepted" << std::endl;
+                        std::cout << "Link Accepted for Reward-Based Approach" << std::endl;
 #else
-                        std::cout << "\x1B[36mLink Accepted\x1B[0m" << std::endl;
-#endif
-                        std::cout << "───────────────────────────────────────────────────" <<
+                        std::cout << "\x1B[36mLink Accepted for Reward-Based Approach\x1B[0m" <<
                                      std::endl;
+#endif
                     }
                     else
                     {
 #ifdef _WIN32
-                        std::cout << "Link Rejected" << std::endl;
+                        std::cout << "Link Rejected for Reward-Based Approach" << std::endl;
 #else
-                        std::cout << "\x1B[36mLink Rejected\x1B[0m" << std::endl;
-#endif
-                        std::cout << "───────────────────────────────────────────────────" <<
+                        std::cout << "\x1B[36mLink Rejected for Reward-Based Approach\x1B[0m" <<
                                      std::endl;
+#endif
                     }
+
+                    if (agency_link_present)
+                    {
+                        std::string cause_driving_agent = potential_cause->get_entity_name();
+                        std::string effect_driving_agent = potential_effect->get_entity_name();
+                        std::pair<std::string, std::string> entity_causal_link(
+                                    cause_driving_agent, effect_driving_agent);
+                        agency_discovered->insert(entity_causal_link);
+
+#ifdef _WIN32
+                        std::cout << "Link Accepted for Agency-Based Approach" << std::endl;
+#else
+                        std::cout << "\x1B[36mLink Accepted for Agency-Based Approach\x1B[0m" <<
+                                     std::endl;
+#endif
+                    }
+                    else
+                    {
+#ifdef _WIN32
+                        std::cout << "Link Rejected for Agency-Based Approach" << std::endl;
+#else
+                        std::cout << "\x1B[36mLink Rejected for Agency-Based Approach\x1B[0m" <<
+                                     std::endl;
+#endif
+                    }
+
+                    if (hybrid_link_present)
+                    {
+                        std::string cause_driving_agent = potential_cause->get_entity_name();
+                        std::string effect_driving_agent = potential_effect->get_entity_name();
+                        std::pair<std::string, std::string> entity_causal_link(
+                                    cause_driving_agent, effect_driving_agent);
+                        hybrid_discovered->insert(entity_causal_link);
+
+#ifdef _WIN32
+                        std::cout << "Link Accepted for Hybrid Approach" << std::endl;
+#else
+                        std::cout << "\x1B[36mLink Accepted for Hybrid Approach\x1B[0m" <<
+                                     std::endl;
+#endif
+                    }
+                    else
+                    {
+#ifdef _WIN32
+                        std::cout << "Link Rejected for Hybrid Approach" << std::endl;
+#else
+                        std::cout << "\x1B[36mLink Rejected for Hybrid Approach\x1B[0m" <<
+                                     std::endl;
+#endif
+                    }
+
+                    std::cout << "───────────────────────────────────────────────────" <<
+                                 std::endl;
 #else
                     threads[i * aligned_linear_velocity_goal_events.count() + j] =
                             new std::thread([&, i, j, potential_cause, potential_effect]()
                     {
-                        bool link_present = causal_link_tester->test_causal_link(
-                                    driving_scene_with_actions, potential_cause, potential_effect);
+                        bool reward_link_present;
+                        bool agency_link_present;
+                        bool hybrid_link_present;
 
-                        if (link_present)
+                        causal_link_tester->test_causal_link(
+                                    driving_scene_with_actions, potential_cause, potential_effect,
+                                    reward_link_present, agency_link_present, hybrid_link_present);
+
+                        std::string cause_driving_agent = potential_cause->get_entity_name();
+                        std::string effect_driving_agent = potential_effect->get_entity_name();
+
+                        if (reward_link_present)
                         {
-                            std::string cause_driving_agent = potential_cause->get_entity_name();
-                            std::string effect_driving_agent = potential_effect->get_entity_name();
                             std::pair<std::string, std::string> *entity_causal_link =
                                     new std::pair<std::string, std::string>(cause_driving_agent,
                                                                             effect_driving_agent);
-                            discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j] =
+                            reward_discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j] =
+                                    entity_causal_link;
+                        }
+                        if (agency_link_present)
+                        {
+                            std::pair<std::string, std::string> *entity_causal_link =
+                                    new std::pair<std::string, std::string>(cause_driving_agent,
+                                                                            effect_driving_agent);
+                            agency_discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j] =
+                                    entity_causal_link;
+                        }
+                        if (hybrid_link_present)
+                        {
+                            std::pair<std::string, std::string> *entity_causal_link =
+                                    new std::pair<std::string, std::string>(cause_driving_agent,
+                                                                            effect_driving_agent);
+                            hybrid_discovered_entity_causal_link_array[i * aligned_linear_velocity_goal_events.count() + j] =
                                     entity_causal_link;
                         }
                     });
@@ -321,10 +403,20 @@ public:
             {
                 thread->join();
                 delete thread;
-                if (discovered_entity_causal_link_array[i] != nullptr)
+                if (reward_discovered_entity_causal_link_array[i] != nullptr)
                 {
-                    discovered_entity_causal_links->insert(*(discovered_entity_causal_link_array[i]));
-                    delete discovered_entity_causal_link_array[i];
+                    reward_discovered->insert(*(reward_discovered_entity_causal_link_array[i]));
+                    delete reward_discovered_entity_causal_link_array[i];
+                }
+                if (agency_discovered_entity_causal_link_array[i] != nullptr)
+                {
+                    agency_discovered->insert(*(agency_discovered_entity_causal_link_array[i]));
+                    delete agency_discovered_entity_causal_link_array[i];
+                }
+                if (hybrid_discovered_entity_causal_link_array[i] != nullptr)
+                {
+                    hybrid_discovered->insert(*(hybrid_discovered_entity_causal_link_array[i]));
+                    delete hybrid_discovered_entity_causal_link_array[i];
                 }
             }
         }
@@ -335,8 +427,6 @@ public:
         delete driving_scene_with_actions;
 
         delete driving_scene_copy;
-
-        return discovered_entity_causal_links;
     }
 };
 

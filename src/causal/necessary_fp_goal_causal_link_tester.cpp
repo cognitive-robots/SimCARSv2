@@ -29,10 +29,11 @@ NecessaryFPGoalCausalLinkTester::NecessaryFPGoalCausalLinkTester(
       agency_calculator(agency_calculator), reward_diff_threshold(reward_diff_threshold),
       simulation_horizon(simulation_horizon) {}
 
-bool NecessaryFPGoalCausalLinkTester::test_causal_link(
+void NecessaryFPGoalCausalLinkTester::test_causal_link(
         agent::IScene const *scene,
         agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *cause,
-        agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect) const
+        agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect, bool &reward_found,
+        bool &agency_found, bool &hybrid_found) const
 {
     if (cause->get_time() >= effect->get_time())
     {
@@ -412,8 +413,9 @@ bool NecessaryFPGoalCausalLinkTester::test_causal_link(
     delete simulated_original_scene;
     delete original_scene;
 
-
-    return (causally_significant || active_type || passive_type) && !facilitation_type;
+    reward_found = causally_significant;
+    agency_found = (active_type || passive_type) && !facilitation_type;
+    hybrid_found = (causally_significant || active_type || passive_type) && !facilitation_type;
 }
 
 }

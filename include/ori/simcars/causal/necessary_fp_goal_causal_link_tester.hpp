@@ -38,9 +38,11 @@ public:
                                     FP_DATA_TYPE reward_diff_threshold,
                                     temporal::Duration simulation_horizon);
 
-    bool test_causal_link(agent::IScene const *scene,
+    void test_causal_link(agent::IScene const *scene,
                           agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *cause,
-                          agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect) const override;
+                          agent::IEvent<agent::Goal<FP_DATA_TYPE>> const *effect,
+                          bool &reward_found, bool &agency_found,
+                          bool &hybrid_found) const override;
 };
 
 }
