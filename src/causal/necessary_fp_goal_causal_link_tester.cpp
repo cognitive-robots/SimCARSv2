@@ -389,13 +389,16 @@ void NecessaryFPGoalCausalLinkTester::test_causal_link(
 
     bool active_type = !posteffect_original_linked_agency_loss &&
             posteffect_effect_intervened_linked_agency_loss &&
-            !posteffect_cause_intervened_linked_agency_loss &&
             !posteffect_cause_effect_intervened_linked_agency_loss;
     bool passive_type = !posteffect_original_linked_agency_loss &&
-            !posteffect_effect_intervened_linked_agency_loss &&
             posteffect_cause_intervened_linked_agency_loss &&
             !posteffect_cause_effect_intervened_linked_agency_loss;
-    bool facilitation_type = posteffect_cause_intervened_linked_agency_loss &&
+    bool facilitation_type = !posteffect_original_linked_agency_loss &&
+            posteffect_cause_intervened_linked_agency_loss &&
+            posteffect_cause_effect_intervened_linked_agency_loss;
+    bool mutual_effect_motive = !posteffect_original_linked_agency_loss &&
+            !posteffect_cause_intervened_linked_agency_loss &&
+            posteffect_effect_intervened_linked_agency_loss &&
             posteffect_cause_effect_intervened_linked_agency_loss;
 
 
@@ -414,8 +417,9 @@ void NecessaryFPGoalCausalLinkTester::test_causal_link(
     delete original_scene;
 
     reward_found = causally_significant;
-    agency_found = (active_type || passive_type) && !facilitation_type;
-    hybrid_found = (causally_significant || active_type || passive_type) && !facilitation_type;
+    agency_found = (active_type || passive_type) && !(facilitation_type || mutual_effect_motive);
+    hybrid_found = (causally_significant || active_type || passive_type) &&
+            !(facilitation_type || mutual_effect_motive);
 }
 
 }

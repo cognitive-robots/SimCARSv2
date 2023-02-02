@@ -56,6 +56,8 @@ reward_f1_scores = []
 agency_f1_scores = []
 hybrid_f1_scores = []
 
+execution_times = []
+
 for input_file_path in glob.glob(args.input_path_expr):
     input_file_basename = os.path.basename(input_file_path)
 
@@ -93,6 +95,8 @@ for input_file_path in glob.glob(args.input_path_expr):
         hybrid_recalls.append(recall)
         hybrid_f1_scores.append(f1_score)
 
+        execution_times.append(causal_discovery_json["time_elapsed_in_microseconds"] / 1.0e6)
+
 
 reward_precision_mean = statistics.mean(reward_precisions)
 reward_precision_stdev = statistics.stdev(reward_precisions)
@@ -122,6 +126,10 @@ agency_f1_score_stdev = statistics.stdev(agency_f1_scores)
 
 hybrid_f1_score_mean = statistics.mean(hybrid_f1_scores)
 hybrid_f1_score_stdev = statistics.stdev(hybrid_f1_scores)
+
+
+execution_times_mean = statistics.mean(execution_times)
+execution_times_stdev = statistics.stdev(execution_times)
 
 
 with open(args.output_file_path, "w") as output_file:
@@ -167,6 +175,10 @@ with open(args.output_file_path, "w") as output_file:
                 "mean": hybrid_f1_score_mean,
                 "stdev": hybrid_f1_score_stdev
             }
+        },
+        "execution_time": {
+            "mean": execution_times_mean,
+            "stdev": execution_times_stdev
         }
     }
     json.dump(performance_evaluation_json, output_file)
