@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 {
     if (argc < 3)
     {
-        std::cerr << "Usage: ./lyft_qmap_map_scene_widget_test map_file_path scene_file_path" << std::endl;
+        std::cerr << "Usage: ./lyft_qmap_scene_widget_test map_file_path scene_file_path" << std::endl;
         return -1;
     }
 
