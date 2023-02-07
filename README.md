@@ -1,6 +1,9 @@
 # Simulation-based Causal Analysis and Reasoning System (SimCARS)
 Provides a framework for carrying out causal discovery by utilising simulation to derive counterfactual data on the outcomes associated with different sets of autonomous agent decisions. As the name suggests, this framework was primarily designed with driving agents in mind, but is by no means limited to this.
 
+## Paper
+This framework was developed as part of research into counterfactual causal development. Currently the first paper associated with this work is under review. The other resources associated with this paper can be found at the following link: https://github.com/cognitive-robots/counterfactual-cd-paper-resources. This section will be updated with links/information in the future.
+
 ## Compilation
 While the system can be compiled and run on a variety of systems with a variety of libraries, for the purposes of reproduction, the framework was last compiled using the following set of software/libraries:
 
