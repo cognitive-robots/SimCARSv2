@@ -7,9 +7,12 @@ This framework was developed as part of research into counterfactual causal deve
 ## Compilation
 While the system can be compiled and run on a variety of systems with a variety of libraries, for the purposes of reproduction, the framework was last compiled using the following set of software/libraries:
 
-* Qt Creator 4.11.0
+* GCC 10.3.0
+* Eigen 3.3.7
+* RapidJSON 1.1.0
+* SFML 2.5.1
 * Qt 5.12.8
-* GCC 9.3.0
+* Qt Creator 4.11.0
 
 From there, the project can be imported as a CMake project and compiled using the Qt Creator interface.
 
