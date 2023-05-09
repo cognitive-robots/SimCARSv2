@@ -429,8 +429,8 @@ int main(int argc, char *argv[])
                         QSize(560, 560),
                         1.0f,
                         30.0f,
-                        0.2f,
-                        5.0f,
+                        1.0f,
+                        10.0f,
                         false);
         structures::IStackArray<std::string> *original_scene_focal_agents =
                 new structures::stl::STLStackArray(relevant_agent_names->get_array());
@@ -449,8 +449,8 @@ int main(int argc, char *argv[])
                         QSize(560, 560),
                         1.0f,
                         30.0f,
-                        0.2f,
-                        5.0f,
+                        1.0f,
+                        10.0f,
                         false);
         structures::IStackArray<std::string> *simulated_effect_intervened_scene_focal_agents =
                 new structures::stl::STLStackArray(relevant_agent_names->get_array());
@@ -470,8 +470,8 @@ int main(int argc, char *argv[])
                         QSize(560, 560),
                         1.0f,
                         30.0f,
-                        0.2f,
-                        5.0f,
+                        1.0f,
+                        10.0f,
                         false);
         structures::IStackArray<std::string> *simulated_cause_intervened_scene_focal_agents =
                 new structures::stl::STLStackArray(relevant_agent_names->get_array());
@@ -491,8 +491,8 @@ int main(int argc, char *argv[])
                         QSize(560, 560),
                         1.0f,
                         30.0f,
-                        0.2f,
-                        5.0f,
+                        1.0f,
+                        10.0f,
                         false);
         structures::IStackArray<std::string> *simulated_cause_effect_intervened_scene_focal_agents =
                 new structures::stl::STLStackArray(relevant_agent_names->get_array());
