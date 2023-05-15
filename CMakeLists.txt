@@ -126,6 +126,8 @@ add_library(simcars_map STATIC
   src/map/lyft/lyft_traffic_light.cpp
   src/map/highd/highd_lane.cpp
   src/map/highd/highd_map.cpp
+  src/map/plg/plg_lane.cpp
+  src/map/plg/plg_map.cpp
   include/ori/simcars/map/soul_interface.hpp
   include/ori/simcars/map/soul_abstract.hpp
   include/ori/simcars/map/declarations.hpp
@@ -159,6 +161,9 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/highd/highd_declarations.hpp
   include/ori/simcars/map/highd/highd_map.hpp
   include/ori/simcars/map/highd/highd_lane.hpp
+  include/ori/simcars/map/plg/plg_declarations.hpp
+  include/ori/simcars/map/plg/plg_map.hpp
+  include/ori/simcars/map/plg/plg_lane.hpp
 )
 target_include_directories(simcars_map
 PUBLIC
