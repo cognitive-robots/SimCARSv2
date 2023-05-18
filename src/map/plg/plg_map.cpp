@@ -26,25 +26,29 @@ void PLGMap::save_virt(std::ofstream &output_filestream) const
 
 void PLGMap::load_virt(std::ifstream &input_filestream)
 {
-    rapidcsv::Document csv_document(input_filestream, rapidcsv::LabelParams(-1, -1));
+    rapidcsv::Document csv_document(input_filestream, rapidcsv::LabelParams(-1, -1),
+                                    rapidcsv::SeparatorParams(' '));
 
     structures::stl::STLDictionary<uint8_t, uint32_t> id_to_vertex_count_dict;
 
     std::vector<FP_DATA_TYPE> x_values = csv_document.GetColumn<FP_DATA_TYPE>(0);
     std::vector<FP_DATA_TYPE> y_values = csv_document.GetColumn<FP_DATA_TYPE>(1);
-    std::vector<uint8_t> lane_ids = csv_document.GetColumn<uint8_t>(2);
+    std::vector<FP_DATA_TYPE> lane_ids = csv_document.GetColumn<FP_DATA_TYPE>(2);
 
+    uint8_t lane_id;
     size_t i;
     for (i = 0; i < lane_ids.size(); ++i)
     {
-        if (id_to_vertex_count_dict.contains(lane_ids[i]))
+        lane_id = uint8_t(lane_ids[i]);
+
+        if (id_to_vertex_count_dict.contains(lane_id))
         {
-            size_t current_vertex_count = id_to_vertex_count_dict[lane_ids[i]];
-            id_to_vertex_count_dict.update(lane_ids[i], current_vertex_count + 1);
+            size_t current_vertex_count = id_to_vertex_count_dict[lane_id];
+            id_to_vertex_count_dict.update(lane_id, current_vertex_count + 1);
         }
         else
         {
-            id_to_vertex_count_dict.update(lane_ids[i], 1);
+            id_to_vertex_count_dict.update(lane_id, 1);
         }
     }
 
@@ -52,7 +56,8 @@ void PLGMap::load_virt(std::ifstream &input_filestream)
 
     for (i = 0; i < lane_ids.size(); ++i)
     {
-        uint8_t const lane_id = lane_ids[i];
+        lane_id = uint8_t(lane_ids[i]);
+
         uint32_t const vertices_remaining = id_to_vertex_count_dict[lane_id];
 
         if (!id_to_vertices_dict.contains(lane_id))
@@ -70,17 +75,21 @@ void PLGMap::load_virt(std::ifstream &input_filestream)
         (*vertices)(1, current_vertex) = y_values[i];
     }
 
+    id_to_lane_dict = new structures::stl::STLDictionary<uint8_t, PLGLane*>;
+
+    stray_ghosts = new structures::stl::STLSet<IMapObject<uint8_t> const*>;
+
     structures::IArray<uint8_t> const *unique_lane_ids = id_to_vertices_dict.get_keys();
 
     for (i = 0; i < unique_lane_ids->count(); ++i)
     {
-        uint8_t const lane_id = (*unique_lane_ids)[i];
+        lane_id = (*unique_lane_ids)[i];
+        geometry::Vecs* const vertices = id_to_vertices_dict[lane_id];
 
-        id_to_lane_dict->update(lane_id,
-                                new PLGLane(lane_id, this, id_to_vertices_dict[lane_id]));
+        PLGLane *lane = new PLGLane(lane_id, this, vertices);
+
+        id_to_lane_dict->update(lane_id, lane);
     }
-
-    delete unique_lane_ids;
 }
 
 PLGMap::~PLGMap()

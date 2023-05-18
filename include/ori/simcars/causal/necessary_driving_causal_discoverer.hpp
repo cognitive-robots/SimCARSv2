@@ -395,7 +395,7 @@ public:
 
 
 #ifndef CD_DEBUG_PRINT
-        assert(threads.count() == discovered_entity_causal_link_array.count());
+        assert(threads.count() == hybrid_discovered_entity_causal_link_array.count());
         for (i = 0; i < threads.count(); ++i)
         {
             std::thread *thread = threads[i];
