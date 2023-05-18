@@ -149,9 +149,7 @@ ILaneArray<uint8_t> const* PLGMap::get_lanes(structures::IArray<uint8_t> const *
 
 ILaneArray<uint8_t> const* PLGMap::get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const
 {
-    // WARNING: This doesn't actually calculate which lanes are in range, it just returns them all,
-    // mainly because the primary use of this method is for rendering, and nearly all the High-D scenes
-    // are comprised of ~6 lanes which are always in view simultaneously
+    // WARNING: This doesn't actually calculate which lanes are in range, it just returns them all
     structures::IArray<PLGLane*> const *lane_array =
             id_to_lane_dict->get_values();
     ILaneArray<uint8_t> *lanes =

@@ -110,6 +110,9 @@ LyftLane::LyftLane(std::string const &id, IMap<std::string> const *map, rapidjso
     mean_steer = (left_mean_steer + right_mean_steer) / 2.0f;
 
 
+    point_count = left_boundary_size + right_boundary_size;
+
+
     tris = new structures::stl::STLStackArray<geometry::Tri>;
     i = 0;
     size_t j = 0;
