@@ -300,6 +300,8 @@ add_library(simcars_agent STATIC
   include/ori/simcars/agent/lyft/lyft_scene.hpp
   include/ori/simcars/agent/highd/highd_driving_agent.hpp
   include/ori/simcars/agent/highd/highd_scene.hpp
+  include/ori/simcars/agent/plg/plg_driving_agent.hpp
+  include/ori/simcars/agent/plg/plg_scene.hpp
   include/ori/simcars/agent/csv/csv_scene.hpp
 )
 target_include_directories(simcars_agent
