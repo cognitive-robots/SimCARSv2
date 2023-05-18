@@ -1,4 +1,5 @@
 
+#include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/map/ghost_lane.hpp>
 #include <ori/simcars/map/ghost_lane_array.hpp>
 #include <ori/simcars/map/ghost_traffic_light_array.hpp>
@@ -19,6 +20,8 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
     ALivingLane(id, map), point_count(2 * vertices->cols()),
     access_restriction(PLGLane::AccessRestriction::NO_RESTRICTION)
 {
+    geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
+
     left_boundary = geometry::Vecs::Zero(2, vertices->cols());
     right_boundary = geometry::Vecs::Zero(2, vertices->cols());
 
@@ -29,7 +32,10 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
     FP_DATA_TYPE min_y = (*vertices)(1, 0);
     FP_DATA_TYPE max_y = (*vertices)(1, 0);
 
+    mean_steer = 0.0f;
+
     geometry::Vec previous_translation;
+    geometry::Vec previous_vertex_diff;
     size_t i;
     for (i = 0; i < vertices->cols(); ++i)
     {
@@ -38,10 +44,10 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
         if (i < vertices->cols() - 1)
         {
             geometry::Vec const next_vertex = vertices->col(i + 1);
-            geometry::Vec const vertex_diff = next_vertex - current_vertex;
+            geometry::Vec const current_vertex_diff = next_vertex - current_vertex;
             geometry::RotMat rot_mat;
             rot_mat << 0.0f, -1.0f, 0.0f, 1.0f;
-            geometry::Vec const vertex_diff_tang = rot_mat * vertex_diff;
+            geometry::Vec const vertex_diff_tang = rot_mat * current_vertex_diff;
             geometry::Vec current_translation = (LANE_DILATION / 2.0f) * vertex_diff_tang.normalized();
 
             if (i == 0)
@@ -94,10 +100,42 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
 
                     right_boundary(0, i) = r_x_numer / r_common_denom;
                     right_boundary(1, i) = r_y_numer / r_common_denom;
+
+                    geometry::Vec const current_vertex_diff_normalised =
+                            current_vertex_diff.normalized();
+                    geometry::Vec const previous_vertex_diff_normalised =
+                            previous_vertex_diff.normalized();
+                    FP_DATA_TYPE vertex_diff_dot_prod =
+                            std::max(std::min(
+                                         previous_vertex_diff_normalised.dot(
+                                             current_vertex_diff_normalised),
+                                         1.0f), -1.0f);
+                    FP_DATA_TYPE angle_mag = std::acos(vertex_diff_dot_prod);
+                    FP_DATA_TYPE angle;
+                    if (current_vertex_diff_normalised.dot(
+                                trig_buff->get_rot_mat(angle_mag) *
+                                previous_vertex_diff_normalised) >=
+                            current_vertex_diff_normalised.dot(
+                                trig_buff->get_rot_mat(-angle_mag) *
+                                previous_vertex_diff_normalised))
+                    {
+                        angle = angle_mag;
+                    }
+                    else
+                    {
+                        angle = -angle_mag;
+                    }
+                    FP_DATA_TYPE distance_between_link_midpoints =
+                            (current_vertex_diff.norm() + previous_vertex_diff.norm()) /
+                            2.0f;
+                    FP_DATA_TYPE lane_midpoint_steer = angle /
+                            distance_between_link_midpoints;
+                    mean_steer += lane_midpoint_steer;
                 }
             }
 
             previous_translation = current_translation;
+            previous_vertex_diff = current_vertex_diff;
         }
         else
         {
@@ -115,6 +153,8 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
     }
 
     centroid /= vertices->cols() * 2.0f;
+
+    mean_steer /= vertices->cols() - 2.0f;
 
     bounding_box = geometry::Rect(min_x, min_y, max_x, max_y);
 
