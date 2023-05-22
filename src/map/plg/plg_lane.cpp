@@ -81,7 +81,7 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
                             (l1.y() - l2.y()) * (l3.x() * l4.y() - l3.y() * l4.x());
 
                     left_boundary(0, i) = l_x_numer / l_common_denom;
-                    left_boundary(1, i) = l_y_numer = l_common_denom;
+                    left_boundary(1, i) = l_y_numer / l_common_denom;
 
                     geometry::Vec const r1 = right_boundary.col(i);
                     geometry::Vec const r2 = current_vertex - previous_translation;

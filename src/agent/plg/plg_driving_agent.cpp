@@ -85,19 +85,6 @@ PLGDrivingAgent::PLGDrivingAgent(IDrivingScene const *driving_scene,
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
     size_t i;
-
-    for (i = 0; i < tracks_csv_document.GetRowCount(); ++i)
-    {
-        if (tracks_csv_document.GetCell<uint32_t>("id", i) == id)
-        {
-            break;
-        }
-    }
-    if (i == tracks_csv_document.GetRowCount())
-    {
-        throw std::runtime_error("Could not find agent id specified in tracks meta file in tracks file");
-    }
-
     for (i = tracks_start_index; i < tracks_end_index; ++i)
     {
         temporal::Time const timestamp(
