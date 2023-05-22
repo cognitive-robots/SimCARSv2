@@ -73,6 +73,8 @@ void PLGMap::load_virt(std::ifstream &input_filestream)
 
         (*vertices)(0, current_vertex) = x_values[i];
         (*vertices)(1, current_vertex) = y_values[i];
+
+        id_to_vertex_count_dict.update(lane_id, vertices_remaining - 1);
     }
 
     id_to_lane_dict = new structures::stl::STLDictionary<uint8_t, PLGLane*>;
@@ -89,6 +91,8 @@ void PLGMap::load_virt(std::ifstream &input_filestream)
         PLGLane *lane = new PLGLane(lane_id, this, vertices);
 
         id_to_lane_dict->update(lane_id, lane);
+
+        delete vertices;
     }
 }
 

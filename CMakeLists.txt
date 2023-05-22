@@ -216,6 +216,8 @@ add_library(simcars_agent STATIC
   src/agent/lyft/lyft_scene.cpp
   src/agent/highd/highd_driving_agent.cpp
   src/agent/highd/highd_scene.cpp
+  src/agent/plg/plg_driving_agent.cpp
+  src/agent/plg/plg_scene.cpp
   src/agent/csv/csv_scene.cpp
   include/ori/simcars/agent/defines.hpp
   include/ori/simcars/agent/declarations.hpp
@@ -462,3 +464,7 @@ add_dependencies(highd_json_meta_simcars_causal_discovery_demo simcars_utils sim
 add_executable(plg_map_test src/plg_map_test/plg_map_test.cpp)
 target_link_libraries(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
+
+add_executable(plg_scene_test src/plg_scene_test/plg_scene_test.cpp)
+target_link_libraries(plg_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
+add_dependencies(plg_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
