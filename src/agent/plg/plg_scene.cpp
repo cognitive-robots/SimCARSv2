@@ -79,10 +79,7 @@ void PLGScene::load_virt(std::ifstream &input_filestream, structures::ISet<std::
 
     size_t row_count = tracks_csv_document.GetRowCount();
 
-    this->time_step =
-            temporal::Duration(
-                int64_t(1000 * tracks_csv_document.GetCell<FP_DATA_TYPE>(1, row_count - 1))) /
-            (row_count - 1);
+    this->time_step = temporal::Duration(10);
 
     this->min_temporal_limit = temporal::Time::max();
     this->max_temporal_limit = temporal::Time::min();

@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
                 QPoint(20, 20),
                 QSize(960, 960),
                 1.0f,
-                10.0f);
+                30.0f);
     map_scene_widget->set_focus_mode(visualisation::QSceneWidget::FocusMode::ALL_AGENTS);
     map_scene_widget->show();
 

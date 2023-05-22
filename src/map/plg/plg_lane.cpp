@@ -46,7 +46,7 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
             geometry::Vec const next_vertex = vertices->col(i + 1);
             geometry::Vec const current_vertex_diff = next_vertex - current_vertex;
             geometry::RotMat rot_mat;
-            rot_mat << 0.0f, -1.0f, 0.0f, 1.0f;
+            rot_mat << 0.0f, -1.0f, 1.0f, 0.0f;
             geometry::Vec const vertex_diff_tang = rot_mat * current_vertex_diff;
             geometry::Vec current_translation = (LANE_DILATION / 2.0f) * vertex_diff_tang.normalized();
 
@@ -57,7 +57,7 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
             }
             else
             {
-                geometry::Vec const l1 = left_boundary.col(i);
+                geometry::Vec const l1 = left_boundary.col(i - 1);
                 geometry::Vec const l2 = current_vertex + previous_translation;
                 geometry::Vec const l3 = current_vertex + current_translation;
                 geometry::Vec const l4 = next_vertex + current_translation;
@@ -83,7 +83,7 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
                     left_boundary(0, i) = l_x_numer / l_common_denom;
                     left_boundary(1, i) = l_y_numer / l_common_denom;
 
-                    geometry::Vec const r1 = right_boundary.col(i);
+                    geometry::Vec const r1 = right_boundary.col(i - 1);
                     geometry::Vec const r2 = current_vertex - previous_translation;
                     geometry::Vec const r3 = current_vertex - current_translation;
                     geometry::Vec const r4 = next_vertex - current_translation;

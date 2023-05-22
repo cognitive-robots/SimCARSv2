@@ -35,11 +35,14 @@ void PLGMap::load_virt(std::ifstream &input_filestream)
     std::vector<FP_DATA_TYPE> y_values = csv_document.GetColumn<FP_DATA_TYPE>(1);
     std::vector<FP_DATA_TYPE> lane_ids = csv_document.GetColumn<FP_DATA_TYPE>(2);
 
-    uint8_t lane_id;
+    uint8_t lane_id = 0;
     size_t i;
     for (i = 0; i < lane_ids.size(); ++i)
     {
-        lane_id = uint8_t(lane_ids[i]);
+        if (i > 0 && lane_ids[i] != lane_ids[i - 1])
+        {
+            lane_id++;
+        }
 
         if (id_to_vertex_count_dict.contains(lane_id))
         {
@@ -54,17 +57,28 @@ void PLGMap::load_virt(std::ifstream &input_filestream)
 
     structures::stl::STLDictionary<uint8_t, geometry::Vecs*> id_to_vertices_dict;
 
+    lane_id = 0;
     for (i = 0; i < lane_ids.size(); ++i)
     {
-        lane_id = uint8_t(lane_ids[i]);
+        if (i > 0 && lane_ids[i] != lane_ids[i - 1])
+        {
+            lane_id++;
+        }
 
         uint32_t const vertices_remaining = id_to_vertex_count_dict[lane_id];
 
         if (!id_to_vertices_dict.contains(lane_id))
         {
-            id_to_vertices_dict.update(
-                        lane_id,
-                        new geometry::Vecs(2, vertices_remaining));
+            if (vertices_remaining < 2)
+            {
+                continue;
+            }
+            else
+            {
+                id_to_vertices_dict.update(
+                            lane_id,
+                            new geometry::Vecs(2, vertices_remaining));
+            }
         }
 
         geometry::Vecs* const vertices = id_to_vertices_dict[lane_id];

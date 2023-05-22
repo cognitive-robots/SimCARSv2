@@ -85,49 +85,27 @@ void QSceneWidget::on_update()
 
 void QSceneWidget::add_vehicle_to_render_stack(agent::IEntity const *vehicle)
 {
-    agent::IValuelessConstant const *ego_valueless_constant =
-            vehicle->get_constant_parameter(vehicle->get_name() + ".ego");
-    agent::IValuelessConstant const *id_valueless_constant =
-            vehicle->get_constant_parameter(vehicle->get_name() + ".id");
-    agent::IValuelessConstant const *driving_agent_class_valueless_constant =
-            vehicle->get_constant_parameter(vehicle->get_name() + ".driving_agent_class");
-    agent::IValuelessConstant const *bb_length_valueless_constant =
-            vehicle->get_constant_parameter(vehicle->get_name() + ".bb_length");
-    agent::IValuelessConstant const *bb_width_valueless_constant =
-            vehicle->get_constant_parameter(vehicle->get_name() + ".bb_width");
+    agent::IDrivingAgent const *driving_agent = dynamic_cast<agent::IDrivingAgent const*>(vehicle);
 
-    agent::IValuelessVariable const *position_valueless_variable =
-            vehicle->get_variable_parameter(vehicle->get_name() + ".position.base");
-    agent::IValuelessVariable const *rotation_valueless_variable =
-            vehicle->get_variable_parameter(vehicle->get_name() + ".rotation.base");
-
-    if (ego_valueless_constant == nullptr ||
-            id_valueless_constant == nullptr ||
-            driving_agent_class_valueless_constant == nullptr ||
-            bb_length_valueless_constant == nullptr ||
-            bb_width_valueless_constant == nullptr ||
-            position_valueless_variable == nullptr ||
-            rotation_valueless_variable == nullptr)
+    if (driving_agent == nullptr)
     {
-        std::cerr << "Vehicle entity missing a required parameter" << std::endl;
+        std::cerr << "Vehicle entity is not a driving agent" << std::endl;
         return;
     }
 
-    agent::IConstant<bool> const *ego_constant =
-            dynamic_cast<agent::IConstant<bool> const*>(ego_valueless_constant);
-    agent::IConstant<uint32_t> const *id_constant =
-            dynamic_cast<agent::IConstant<uint32_t> const*>(id_valueless_constant);
+    agent::IConstant<bool> const *ego_constant = driving_agent->get_ego_constant();
+    agent::IConstant<uint32_t> const *id_constant = driving_agent->get_id_constant();
     agent::IConstant<agent::DrivingAgentClass> const *driving_agent_class_constant =
-            dynamic_cast<agent::IConstant<agent::DrivingAgentClass> const*>(driving_agent_class_valueless_constant);
+            driving_agent->get_driving_agent_class_constant();
     agent::IConstant<FP_DATA_TYPE> const *bb_length_constant =
-            dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_length_valueless_constant);
+            driving_agent->get_bb_length_constant();
     agent::IConstant<FP_DATA_TYPE> const *bb_width_constant =
-            dynamic_cast<agent::IConstant<FP_DATA_TYPE> const*>(bb_width_valueless_constant);
+            driving_agent->get_bb_width_constant();
 
     agent::IVariable<geometry::Vec> const *position_variable =
-            dynamic_cast<agent::IVariable<geometry::Vec> const*>(position_valueless_variable);
+            driving_agent->get_position_variable();
     agent::IVariable<FP_DATA_TYPE> const *rotation_variable =
-            dynamic_cast<agent::IVariable<FP_DATA_TYPE> const*>(rotation_valueless_variable);
+            driving_agent->get_rotation_variable();
 
     temporal::Time current_time = this->get_time();
     agent::ViewReadOnlyDrivingAgentState state(
