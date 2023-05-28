@@ -103,16 +103,16 @@ PLGDrivingAgent::PLGDrivingAgent(IDrivingScene const *driving_scene,
         geometry::Vec const position(position_x, position_y);
         position_variable->set_value(timestamp, position);
 
-        FP_DATA_TYPE const rotation = tracks_csv_document.GetCell<FP_DATA_TYPE>(7, i);
+        FP_DATA_TYPE const rotation = tracks_csv_document.GetCell<FP_DATA_TYPE>(8, i);
         rotation_variable->set_value(timestamp, rotation);
 
         geometry::Vec const direction(trig_buff->get_cos(rotation), trig_buff->get_sin(rotation));
 
-        FP_DATA_TYPE const linear_speed = tracks_csv_document.GetCell<FP_DATA_TYPE>(4, i);
+        FP_DATA_TYPE const linear_speed = tracks_csv_document.GetCell<FP_DATA_TYPE>(5, i) * 1e-3f;
         geometry::Vec const linear_velocity = linear_speed * direction;
         linear_velocity_variable->set_value(timestamp, linear_velocity);
 
-        FP_DATA_TYPE const linear_acceleration_magnitude = tracks_csv_document.GetCell<FP_DATA_TYPE>(5, i);
+        FP_DATA_TYPE const linear_acceleration_magnitude = tracks_csv_document.GetCell<FP_DATA_TYPE>(6, i) * 1e-6f;
         geometry::Vec const linear_acceleration = linear_acceleration_magnitude * direction;
         linear_acceleration_variable->set_value(timestamp, linear_acceleration);
 
@@ -130,7 +130,7 @@ PLGDrivingAgent::PLGDrivingAgent(IDrivingScene const *driving_scene,
         FP_DATA_TYPE const steer = 0.0f;
         steer_variable->set_value(timestamp, steer);
 
-        temporal::Duration const ttc = temporal::Duration(int64_t(tracks_csv_document.GetCell<FP_DATA_TYPE>(6, i)));
+        temporal::Duration const ttc = temporal::Duration(1000 * int64_t(tracks_csv_document.GetCell<FP_DATA_TYPE>(7, i)));
         ttc_variable->set_value(timestamp, ttc);
 
         // WARNING: Assumes no collisions are present in the dataset
