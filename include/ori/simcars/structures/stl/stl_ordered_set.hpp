@@ -41,15 +41,21 @@ public:
 
     ~STLOrderedSet() override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         delete values_cache;
     }
 
     size_t count() const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.size();
     }
     bool contains(T const &val) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.contains(val);
     }
 
@@ -70,6 +76,8 @@ public:
     }
     void get_array(IStackArray<T> *array) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i = 0;
         for (T const &val : data)
         {

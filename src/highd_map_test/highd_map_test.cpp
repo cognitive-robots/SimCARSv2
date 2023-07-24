@@ -16,11 +16,11 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning map load" << std::endl;
 
-    map::IMap<uint8_t> const *map;
+    map::highd::HighDMap map;
 
     try
     {
-        map = map::highd::HighDMap::load(argv[1]);
+        map.load(argv[1]);
     }
     catch (std::exception const &e)
     {
@@ -29,6 +29,4 @@ int main(int argc, char *argv[])
     }
 
     std::cout << "Finished map load" << std::endl;
-
-    delete map;
 }

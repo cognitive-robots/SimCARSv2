@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ori/simcars/structures/stack_array_interface.hpp>
-#include <ori/simcars/map/living_lane_abstract.hpp>
+#include <ori/simcars/structures/stl/stl_stack_array.hpp>
+#include <ori/simcars/map/lane_abstract.hpp>
 
 #include <rapidjson/document.h>
 
@@ -14,19 +14,21 @@ namespace map
 namespace lyft
 {
 
-class LyftLane : public ALivingLane<std::string>
+class LyftLane : public virtual ALane
 {
     geometry::Vecs left_boundary, right_boundary;
+    structures::stl::STLStackArray<geometry::Tri> tris;
     geometry::Vec centroid;
-    structures::IStackArray<geometry::Tri> *tris;
     size_t point_count;
-    FP_DATA_TYPE mean_steer;
     geometry::Rect bounding_box;
+    FP_DATA_TYPE curvature;
     AccessRestriction access_restriction;
 
 public:
-    LyftLane(std::string const &id, IMap<std::string> const *map, rapidjson::Value::ConstObject const &json_lane_data);
-    ~LyftLane() override;
+    LyftLane(uint64_t id, uint64_t left_adjacent_lane_id, uint64_t right_adjacent_lane_id,
+             structures::IArray<uint64_t> *fore_lane_ids,
+             structures::IArray<uint64_t> *aft_lane_ids, IMap const *map,
+             rapidjson::Value::ConstObject const &json_lane_data);
 
     geometry::Vecs const& get_left_boundary() const override;
     geometry::Vecs const& get_right_boundary() const override;
@@ -35,7 +37,7 @@ public:
     geometry::Vec const& get_centroid() const override;
     size_t get_point_count() const override;
     geometry::Rect const& get_bounding_box() const override;
-    FP_DATA_TYPE get_mean_steer() const override;
+    FP_DATA_TYPE get_curvature() const override;
     ILane::AccessRestriction get_access_restriction() const override;
 };
 

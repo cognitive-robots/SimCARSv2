@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(simcars VERSION 0.0.1 LANGUAGES CXX)
+project(simcars VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,11 +15,10 @@ find_package(RapidJSON REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(SFML REQUIRED COMPONENTS graphics)
 
-add_subdirectory(extern/intelligent-driver-model)
 add_subdirectory(extern/magic_enum)
 add_subdirectory(extern/lz4_stream)
 if (NOT TARGET rapidcsv)
-    add_subdirectory(extern/rapidcsv)
+  add_subdirectory(extern/rapidcsv)
 endif()
 
 add_library(simcars_utils STATIC
@@ -61,6 +60,11 @@ PUBLIC
   $<INSTALL_INTERFACE:include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
+target_link_libraries(simcars_structures
+PUBLIC
+  simcars_utils
+)
+add_dependencies(simcars_structures simcars_utils)
 target_compile_options(simcars_structures PRIVATE -fPIC)
 set_target_properties(simcars_structures PROPERTIES VERSION ${PROJECT_VERSION})
 
@@ -99,12 +103,7 @@ set_target_properties(simcars_geometry PROPERTIES VERSION ${PROJECT_VERSION})
 add_library(simcars_temporal STATIC
   src/temporal/sanity_check.cpp
   include/ori/simcars/temporal/typedefs.hpp
-  include/ori/simcars/temporal/temporal_search_dictionary_abstract.hpp
-  include/ori/simcars/temporal/proximal_temporal_dictionary.hpp
-  include/ori/simcars/temporal/precedence_temporal_dictionary.hpp
   include/ori/simcars/temporal/temporal_rounding_dictionary.hpp
-  include/ori/simcars/temporal/stateful_interface.hpp
-  include/ori/simcars/temporal/living_interface.hpp
 )
 target_include_directories(simcars_temporal
 PUBLIC
@@ -121,43 +120,25 @@ target_compile_options(simcars_temporal PRIVATE -fPIC)
 set_target_properties(simcars_temporal PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_map STATIC
+  src/map/map_object_abstract.cpp
+  src/map/lane_abstract.cpp
+  src/map/map_grid_rect.cpp
   src/map/lyft/lyft_map.cpp
   src/map/lyft/lyft_lane.cpp
-  src/map/lyft/lyft_traffic_light.cpp
   src/map/highd/highd_lane.cpp
   src/map/highd/highd_map.cpp
   src/map/plg/plg_lane.cpp
   src/map/plg/plg_map.cpp
-  include/ori/simcars/map/soul_interface.hpp
-  include/ori/simcars/map/soul_abstract.hpp
   include/ori/simcars/map/declarations.hpp
   include/ori/simcars/map/map_interface.hpp
-  include/ori/simcars/map/file_based_map_interface.hpp
   include/ori/simcars/map/map_object_interface.hpp
-  include/ori/simcars/map/file_based_map_abstract.hpp
-  include/ori/simcars/map/map_object.hpp
   include/ori/simcars/map/lane_interface.hpp
-  include/ori/simcars/map/lane_array_interface.hpp
+  include/ori/simcars/map/map_object_abstract.hpp
   include/ori/simcars/map/lane_abstract.hpp
-  include/ori/simcars/map/lane_array_abstract.hpp
-  include/ori/simcars/map/living_lane_abstract.hpp
-  include/ori/simcars/map/living_lane_stack_array.hpp
-  include/ori/simcars/map/ghost_lane.hpp
-  include/ori/simcars/map/ghost_lane_array.hpp
-  include/ori/simcars/map/traffic_light_state_holder_interface.hpp
-  include/ori/simcars/map/traffic_light_interface.hpp
-  include/ori/simcars/map/traffic_light_array_interface.hpp
-  include/ori/simcars/map/traffic_light_abstract.hpp
-  include/ori/simcars/map/traffic_light_array_abstract.hpp
-  include/ori/simcars/map/living_traffic_light_abstract.hpp
-  include/ori/simcars/map/living_traffic_light_stack_array.hpp
-  include/ori/simcars/map/ghost_traffic_light.hpp
-  include/ori/simcars/map/ghost_traffic_light_array.hpp
   include/ori/simcars/map/map_grid_rect.hpp
   include/ori/simcars/map/lyft/lyft_declarations.hpp
   include/ori/simcars/map/lyft/lyft_map.hpp
   include/ori/simcars/map/lyft/lyft_lane.hpp
-  include/ori/simcars/map/lyft/lyft_traffic_light.hpp
   include/ori/simcars/map/highd/highd_declarations.hpp
   include/ori/simcars/map/highd/highd_map.hpp
   include/ori/simcars/map/highd/highd_lane.hpp
@@ -186,6 +167,7 @@ add_dependencies(simcars_map simcars_utils simcars_structures simcars_geometry s
 target_compile_options(simcars_map PRIVATE -fPIC)
 set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 
+#[[
 add_library(simcars_agent STATIC
   src/agent/valueless_constant_abstract.cpp
   src/agent/valueless_variable_abstract.cpp
@@ -319,10 +301,9 @@ PUBLIC
   simcars_geometry
   simcars_temporal
   simcars_map
+PRIVATE
   magic_enum::magic_enum
   rapidcsv
-  idm
-PRIVATE
   lz4_stream
 )
 add_dependencies(simcars_agent simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
@@ -349,6 +330,7 @@ PUBLIC
   simcars_temporal
   simcars_map
   simcars_agent
+PRIVATE
   pthread
 )
 add_dependencies(simcars_causal simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
@@ -384,6 +366,7 @@ PRIVATE
 add_dependencies(simcars_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 target_compile_options(simcars_visualisation PRIVATE -fPIC)
 set_target_properties(simcars_visualisation PROPERTIES VERSION ${PROJECT_VERSION})
+]]
 
 
 add_executable(trig_buff_test src/trig_buff_test/trig_buff_test.cpp)
@@ -395,6 +378,7 @@ add_executable(lyft_map_test src/lyft_map_test/lyft_map_test.cpp)
 target_link_libraries(lyft_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(lyft_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 
+#[[
 add_executable(lyft_scene_test src/lyft_scene_test/lyft_scene_test.cpp)
 target_link_libraries(lyft_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 add_dependencies(lyft_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
@@ -414,12 +398,14 @@ add_dependencies(lyft_qmap_scene_widget_test simcars_utils simcars_structures si
 add_executable(lyft_simcars_demo src/lyft_simcars_demo/lyft_simcars_demo.cpp)
 target_link_libraries(lyft_simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 add_dependencies(lyft_simcars_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+]]
 
 
 add_executable(highd_map_test src/highd_map_test/highd_map_test.cpp)
 target_link_libraries(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 
+#[[
 add_executable(highd_scene_test src/highd_scene_test/highd_scene_test.cpp)
 target_link_libraries(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 add_dependencies(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
@@ -459,12 +445,14 @@ add_dependencies(highd_json_meta_simcars_intervention_demo simcars_utils simcars
 add_executable(highd_json_meta_simcars_causal_discovery_demo src/highd_json_meta_simcars_causal_discovery_demo/highd_json_meta_simcars_causal_discovery_demo.cpp)
 target_link_libraries(highd_json_meta_simcars_causal_discovery_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 add_dependencies(highd_json_meta_simcars_causal_discovery_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+]]
 
 
 add_executable(plg_map_test src/plg_map_test/plg_map_test.cpp)
 target_link_libraries(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 
+#[[
 add_executable(plg_scene_test src/plg_scene_test/plg_scene_test.cpp)
 target_link_libraries(plg_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 add_dependencies(plg_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
@@ -472,3 +460,4 @@ add_dependencies(plg_scene_test simcars_utils simcars_structures simcars_geometr
 add_executable(plg_qmap_scene_widget_test src/plg_qmap_scene_widget_test/plg_qmap_scene_widget_test.cpp)
 target_link_libraries(plg_qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
 add_dependencies(plg_qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent simcars_visualisation)
+]]

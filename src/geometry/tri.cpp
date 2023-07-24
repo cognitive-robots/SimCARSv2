@@ -8,7 +8,8 @@ namespace simcars
 namespace geometry
 {
 
-Tri::Tri(Vec const &point_1, Vec const &point_2, Vec const &point_3) : points{point_1, point_2, point_3} {}
+Tri::Tri(Vec const &point_1, Vec const &point_2, Vec const &point_3) :
+    points{point_1, point_2, point_3} {}
 
 Tri::Tri() : Tri(geometry::Vec(0, 0), geometry::Vec(0,0), geometry::Vec(0,0)) {}
 

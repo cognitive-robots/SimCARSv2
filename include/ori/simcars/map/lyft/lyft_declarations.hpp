@@ -13,8 +13,6 @@ class LyftMap;
 
 class LyftLane;
 
-class LyftTrafficLight;
-
 }
 }
 }

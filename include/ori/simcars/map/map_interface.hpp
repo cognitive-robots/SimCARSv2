@@ -13,21 +13,15 @@ namespace simcars
 namespace map
 {
 
-template <typename T_id>
 class IMap
 {
 public:
     virtual ~IMap() = default;
 
-    virtual ILane<T_id> const* get_lane(T_id id) const = 0;
-    virtual ILaneArray<T_id> const* get_encapsulating_lanes(geometry::Vec point) const = 0;
-    virtual ILaneArray<T_id> const* get_lanes(structures::IArray<T_id> const *ids) const = 0;
-    virtual ILaneArray<T_id> const* get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
-    virtual ITrafficLight<T_id> const* get_traffic_light(T_id id) const = 0;
-    virtual ITrafficLightArray<T_id> const* get_traffic_lights(structures::IArray<T_id> const *ids) const = 0;
-    virtual ITrafficLightArray<T_id> const* get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
-    virtual void register_stray_ghost(IMapObject<T_id> const *ghost) const = 0;
-    virtual void unregister_stray_ghost(IMapObject<T_id> const *ghost) const = 0;
+    virtual ILane const* get_lane(uint64_t id) const = 0;
+    virtual structures::IArray<ILane const*>* get_lanes(structures::IArray<uint64_t> const *ids) const = 0;
+    virtual structures::IArray<ILane const*>* get_encapsulating_lanes(geometry::Vec point) const = 0;
+    virtual structures::IArray<ILane const*>* get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const = 0;
 };
 
 }

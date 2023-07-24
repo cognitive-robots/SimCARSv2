@@ -18,7 +18,7 @@ typedef std::chrono::time_point<std::chrono::steady_clock, Duration> Time;
 
 inline std::ostream& operator<<(std::ostream &output_stream, temporal::Duration const &duration)
 {
-    return output_stream << std::to_string(duration.count());
+    return output_stream << std::to_string(duration.count()) + " ms";
 }
 
 inline std::ostream& operator<<(std::ostream &output_stream, temporal::Time const &time)

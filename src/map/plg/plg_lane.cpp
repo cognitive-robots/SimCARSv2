@@ -1,8 +1,5 @@
 
 #include <ori/simcars/geometry/trig_buff.hpp>
-#include <ori/simcars/map/ghost_lane.hpp>
-#include <ori/simcars/map/ghost_lane_array.hpp>
-#include <ori/simcars/map/ghost_traffic_light_array.hpp>
 #include <ori/simcars/map/plg/plg_lane.hpp>
 
 #define LANE_DILATION 3.65
@@ -16,8 +13,10 @@ namespace map
 namespace plg
 {
 
-PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices) :
-    ALivingLane(id, map), point_count(2 * vertices->cols()),
+PLGLane::PLGLane(uint64_t id, IMap const *map, geometry::Vecs const *vertices) :
+    ALane(id, 0, 0, new structures::stl::STLStackArray<uint64_t>,
+          new structures::stl::STLStackArray<uint64_t>, map), AMapObject(id, map),
+    point_count(2 * vertices->cols()),
     access_restriction(PLGLane::AccessRestriction::NO_RESTRICTION)
 {
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
@@ -32,7 +31,7 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
     FP_DATA_TYPE min_y = (*vertices)(1, 0);
     FP_DATA_TYPE max_y = (*vertices)(1, 0);
 
-    mean_steer = 0.0f;
+    curvature = 0.0f;
 
     geometry::Vec previous_translation;
     geometry::Vec previous_vertex_diff;
@@ -48,7 +47,8 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
             geometry::RotMat rot_mat;
             rot_mat << 0.0f, -1.0f, 1.0f, 0.0f;
             geometry::Vec const vertex_diff_tang = rot_mat * current_vertex_diff;
-            geometry::Vec current_translation = (LANE_DILATION / 2.0f) * vertex_diff_tang.normalized();
+            geometry::Vec current_translation =
+                    (LANE_DILATION / 2.0f) * vertex_diff_tang.normalized();
 
             if (i == 0)
             {
@@ -109,7 +109,7 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
                             std::max(std::min(
                                          previous_vertex_diff_normalised.dot(
                                              current_vertex_diff_normalised),
-                                         1.0f), -1.0f);
+                                         1.0), -1.0);
                     FP_DATA_TYPE angle_mag = std::acos(vertex_diff_dot_prod);
                     FP_DATA_TYPE angle;
                     if (current_vertex_diff_normalised.dot(
@@ -128,9 +128,9 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
                     FP_DATA_TYPE distance_between_link_midpoints =
                             (current_vertex_diff.norm() + previous_vertex_diff.norm()) /
                             2.0f;
-                    FP_DATA_TYPE lane_midpoint_steer = angle /
+                    FP_DATA_TYPE lane_midpoint_curvature = angle /
                             distance_between_link_midpoints;
-                    mean_steer += lane_midpoint_steer;
+                    curvature += lane_midpoint_curvature;
                 }
             }
 
@@ -154,34 +154,30 @@ PLGLane::PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices)
 
     centroid /= vertices->cols() * 2.0f;
 
-    mean_steer /= vertices->cols() - 2.0f;
+    curvature /= vertices->cols() - 2.0f;
 
     bounding_box = geometry::Rect(min_x, min_y, max_x, max_y);
 
-    tris = new structures::stl::STLStackArray<geometry::Tri>;
     i = 0;
     size_t j = 0;
     while (i < left_boundary.cols() - 1 || j < right_boundary.cols() - 1)
     {
         if (i < left_boundary.cols() - 1)
         {
-            geometry::Tri tri(left_boundary.col(i), left_boundary.col(i + 1), right_boundary.col(j));
-            tris->push_back(tri);
+            geometry::Tri tri(left_boundary.col(i), left_boundary.col(i + 1),
+                              right_boundary.col(j));
+            tris.push_back(tri);
             ++i;
         }
 
         if (j < right_boundary.cols() - 1)
         {
-            geometry::Tri tri(right_boundary.col(j), right_boundary.col(j + 1), left_boundary.col(i));
-            tris->push_back(tri);
+            geometry::Tri tri(right_boundary.col(j), right_boundary.col(j + 1),
+                              left_boundary.col(i));
+            tris.push_back(tri);
             ++j;
         }
     }
-}
-
-PLGLane::~PLGLane()
-{
-    delete tris;
 }
 
 geometry::Vecs const& PLGLane::get_left_boundary() const
@@ -196,7 +192,7 @@ geometry::Vecs const& PLGLane::get_right_boundary() const
 
 structures::IArray<geometry::Tri> const* PLGLane::get_tris() const
 {
-    return tris;
+    return &tris;
 }
 
 bool PLGLane::check_encapsulation(geometry::Vec const &point) const
@@ -204,9 +200,9 @@ bool PLGLane::check_encapsulation(geometry::Vec const &point) const
     if (bounding_box.check_encapsulation(point))
     {
         size_t i;
-        for (i = 0; i < tris->count(); ++i)
+        for (i = 0; i < tris.count(); ++i)
         {
-            if ((*tris)[i].check_encapsulation(point))
+            if (tris[i].check_encapsulation(point))
             {
                 return true;
             }
@@ -230,9 +226,9 @@ geometry::Rect const& PLGLane::get_bounding_box() const
     return bounding_box;
 }
 
-FP_DATA_TYPE PLGLane::get_mean_steer() const
+FP_DATA_TYPE PLGLane::get_curvature() const
 {
-    return mean_steer;
+    return curvature;
 }
 
 PLGLane::AccessRestriction PLGLane::get_access_restriction() const

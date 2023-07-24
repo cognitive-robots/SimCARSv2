@@ -24,10 +24,13 @@ public:
     GridRect(Vecs points)
         : Rect(points) {}
     GridRect(GridRect<T_grid_rect> const &grid_rect)
-        : Rect(grid_rect), above(grid_rect.above), below(grid_rect.below), left(grid_rect.left), right(grid_rect.right) {}
+        : Rect(grid_rect), above(grid_rect.above), below(grid_rect.below), left(grid_rect.left),
+          right(grid_rect.right) {}
+
     ~GridRect() override
     {
-        static_assert(std::is_base_of<GridRect<T_grid_rect>, T_grid_rect>::value, "T_grid_rect is not derived from GridRect");
+        static_assert(std::is_base_of<GridRect<T_grid_rect>, T_grid_rect>::value,
+                "T_grid_rect is not derived from GridRect");
     }
 
     T_grid_rect const* get_above() const

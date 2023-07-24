@@ -3,6 +3,7 @@
 #include <ori/simcars/structures/array_interface.hpp>
 
 #include <vector>
+#include <mutex>
 
 namespace ori
 {
@@ -19,13 +20,17 @@ class STLConcatArray : public virtual IArray<T>
 protected:
     std::vector<IArray<T>*> data;
 
+    mutable std::recursive_mutex data_mutex;
+
 public:
     STLConcatArray(size_t size = 0) : data(size, nullptr) {}
     STLConcatArray(std::initializer_list<IArray<T> const*> init_list) : data(init_list) {}
     STLConcatArray(STLConcatArray<T> const &stl_concat_array) : data(stl_concat_array.data) {}
 
-    ~STLConcatArray()
+    ~STLConcatArray() override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         for (IArray<T> *array : data)
         {
             delete array;
@@ -34,6 +39,8 @@ public:
 
     size_t count() const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t cumil_count = 0;
 
         size_t i;
@@ -47,6 +54,8 @@ public:
     }
     bool contains(T const &val) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i;
         for (i = 0; i < data.size(); ++i)
         {
@@ -61,6 +70,8 @@ public:
 
     T const& operator [](size_t idx) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i = 0;
         while (true)
         {
@@ -78,6 +89,8 @@ public:
 
     T& operator [](size_t idx) override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i = 0;
         while (true)
         {
@@ -95,11 +108,14 @@ public:
 
     size_t array_count() const
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.size();
     }
-
     bool contains_array(IArray<T> const *val) const
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         for (IArray<T> *data_val : data)
         {
             if (data_val == val)
@@ -110,14 +126,17 @@ public:
 
         return false;
     }
-
     IArray<T>* const& get_array(size_t idx) const
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.at(idx);
     }
 
     IArray<T>* & get_array(size_t idx)
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.at(idx);
     }
 };

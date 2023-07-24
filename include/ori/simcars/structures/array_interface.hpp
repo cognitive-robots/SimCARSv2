@@ -30,7 +30,8 @@ void cast_array(IArray<T_old> const &old_array, IArray<T_new> &new_array)
 }
 
 template<typename T_old, typename T_new>
-void map_array(IArray<T_old> const &old_array, IArray<T_new> &new_array, std::function<T_new(T_old const&)> func)
+void map_array(IArray<T_old> const &old_array, IArray<T_new> &new_array,
+               std::function<T_new(T_old const&)> func)
 {
     size_t i;
     for (i = 0; i < old_array.count() || i < new_array.count(); ++i)

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <ori/simcars/map/living_lane_abstract.hpp>
+#include <ori/simcars/structures/stl/stl_stack_array.hpp>
+#include <ori/simcars/map/lane_abstract.hpp>
 
 namespace ori
 {
@@ -11,19 +12,18 @@ namespace map
 namespace plg
 {
 
-class PLGLane : public ALivingLane<uint8_t>
+class PLGLane : public virtual ALane
 {
     geometry::Vecs left_boundary, right_boundary;
+    structures::stl::STLStackArray<geometry::Tri> tris;
     geometry::Vec centroid;
-    structures::IStackArray<geometry::Tri> *tris;
     size_t point_count;
-    FP_DATA_TYPE mean_steer;
     geometry::Rect bounding_box;
+    FP_DATA_TYPE curvature;
     AccessRestriction access_restriction;
 
 public:
-    PLGLane(uint8_t id, IMap<uint8_t> const *map, geometry::Vecs *vertices);
-    ~PLGLane() override;
+    PLGLane(uint64_t id, IMap const *map, geometry::Vecs const *vertices);
 
     geometry::Vecs const& get_left_boundary() const override;
     geometry::Vecs const& get_right_boundary() const override;
@@ -32,7 +32,7 @@ public:
     geometry::Vec const& get_centroid() const override;
     size_t get_point_count() const override;
     geometry::Rect const& get_bounding_box() const override;
-    FP_DATA_TYPE get_mean_steer() const override;
+    FP_DATA_TYPE get_curvature() const override;
     ILane::AccessRestriction get_access_restriction() const override;
 };
 

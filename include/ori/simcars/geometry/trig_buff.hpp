@@ -22,6 +22,7 @@ class TrigBuff
     AngleType const default_angle_type;
     FP_DATA_TYPE const radian_multi;
     FP_DATA_TYPE const degree_multi;
+
     FP_DATA_TYPE *sin_bins;
     FP_DATA_TYPE *cos_bins;
     FP_DATA_TYPE *tan_bins;

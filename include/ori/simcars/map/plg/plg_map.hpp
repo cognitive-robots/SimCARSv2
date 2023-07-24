@@ -1,9 +1,8 @@
 #pragma once
 
-#include <ori/simcars/structures/set_interface.hpp>
-#include <ori/simcars/structures/dictionary_interface.hpp>
-#include <ori/simcars/map/file_based_map_abstract.hpp>
+#include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/map/plg/plg_declarations.hpp>
+#include <ori/simcars/map/plg/plg_lane.hpp>
 
 namespace ori
 {
@@ -14,30 +13,22 @@ namespace map
 namespace plg
 {
 
-class PLGMap : public virtual AFileBasedMap<uint8_t, PLGMap>
+class PLGMap : public virtual IMap
 {
-    structures::IDictionary<uint8_t, PLGLane*> *id_to_lane_dict;
-
-    structures::ISet<IMapObject<uint8_t> const*> *stray_ghosts;
-
-protected:
-    void save_virt(std::ofstream &output_filestream) const override;
-    void load_virt(std::ifstream &input_filestream) override;
+    structures::stl::STLDictionary<uint64_t, PLGLane*> id_to_lane_dict;
 
 public:
     ~PLGMap() override;
 
-    ILane<uint8_t> const* get_lane(uint8_t id) const override;
-    ILaneArray<uint8_t> const* get_encapsulating_lanes(geometry::Vec point) const override;
-    ILaneArray<uint8_t> const* get_lanes(structures::IArray<uint8_t> const *ids) const override;
-    ILaneArray<uint8_t> const* get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const override;
-    ITrafficLight<uint8_t> const* get_traffic_light(uint8_t id) const override;
-    ITrafficLightArray<uint8_t> const* get_traffic_lights(structures::IArray<uint8_t> const *ids) const override;
-    ITrafficLightArray<uint8_t> const* get_traffic_lights_in_range(geometry::Vec point, FP_DATA_TYPE distance) const override;
-    void register_stray_ghost(IMapObject<uint8_t> const *ghost) const override;
-    void unregister_stray_ghost(IMapObject<uint8_t> const *ghost) const override;
+    ILane const* get_lane(uint64_t id) const override;
+    structures::IArray<ILane const*>* get_lanes(structures::IArray<uint64_t> const *ids) const override;
+    structures::IArray<ILane const*>* get_encapsulating_lanes(geometry::Vec point) const override;
+    structures::IArray<ILane const*>* get_lanes_in_range(geometry::Vec point, FP_DATA_TYPE distance) const override;
 
-    PLGMap* shallow_copy() const override;
+    void save(std::string const &output_file_path_str) const;
+
+    void clear();
+    void load(std::string const &input_file_path_str);
 };
 
 }

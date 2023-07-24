@@ -1,7 +1,7 @@
 #pragma once
 
+#include <ori/simcars/structures/dictionary_interface.hpp>
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
-#include <ori/simcars/structures/stl/stl_deque_array.hpp>
 #include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/temporal/typedefs.hpp>
 
@@ -18,9 +18,10 @@ namespace temporal
 template <typename V>
 class TemporalRoundingDictionary : public virtual structures::IDictionary<Time, V>
 {
+    Duration const time_window_step;
+    V const default_value;
+
     Time time_window_start;
-    Duration time_window_step;
-    V default_value;
 
     std::deque<V> value_deque;
 
@@ -36,27 +37,27 @@ public:
 
     ~TemporalRoundingDictionary() override
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         delete keys_cache;
         delete values_cache;
     }
 
     size_t count() const override
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         return value_deque.size();
     }
     bool contains(Time const &key) const override
     {
-        size_t index = (key - time_window_start).count() / time_window_step.count();
-        if (key >= time_window_start && index >= 0 && index < value_deque.size())
-        {
-            return value_deque[index] != default_value;
-        }
-
-        return false;
+        return contains(key, false);
     }
 
     V const& operator [](Time const &key) const override
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         if (key < time_window_start)
         {
             return default_value;
@@ -68,6 +69,8 @@ public:
     }
     bool contains_value(V const &val) const override
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         for (V const &value : value_deque)
         {
             if (value == val)
@@ -95,14 +98,26 @@ public:
     }
     void get_keys(structures::IStackArray<Time> *keys) const override
     {
-        structures::stl::STLSet<V> previous_values;
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
+        V current_value = default_value;
         size_t i, j;
         for (i = 0, j = 0; i < value_deque.size(); ++i, ++j)
         {
-            if (previous_values.contains(value_deque[i]))
+            if (value_deque[i] == current_value)
             {
                 --j;
                 continue;
+            }
+            else
+            {
+                current_value = value_deque[i];
+
+                if (current_value == default_value)
+                {
+                    --j;
+                    continue;
+                }
             }
 
             if (j >= keys->count())
@@ -113,8 +128,6 @@ public:
             {
                 (*keys)[j] = time_window_start + i * time_window_step;
             }
-
-            previous_values.insert(value_deque[i]);
         }
     }
     structures::IArray<V> const* get_values() const override
@@ -134,6 +147,8 @@ public:
     }
     void get_values(structures::IStackArray<V> *values) const override
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         structures::stl::STLSet<V> previous_values;
         size_t i = 0;
         for (V const &value : value_deque)
@@ -141,6 +156,10 @@ public:
             if (previous_values.contains(value))
             {
                 continue;
+            }
+            else
+            {
+                previous_values.insert(value);
             }
 
             if (i >= values->count())
@@ -153,13 +172,13 @@ public:
                 (*values)[i] = value;
                 ++i;
             }
-
-            previous_values.insert(value);
         }
     }
 
     bool contains(Time const &key, bool exact) const
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         size_t index = (key - time_window_start).count() / time_window_step.count();
 
         if (key >= time_window_start &&
@@ -174,6 +193,8 @@ public:
 
     Time get_earliest_timestamp() const
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         if (value_deque.size() == 0)
         {
             throw std::out_of_range("Temporal dictionary is empty");
@@ -183,6 +204,8 @@ public:
     }
     Time get_latest_timestamp() const
     {
+        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
+
         if (value_deque.size() == 0)
         {
             throw std::out_of_range("Temporal dictionary is empty");
@@ -239,50 +262,31 @@ public:
         if (key >= time_window_start && index < 1)
         {
             V value_to_erase = value_deque[0];
-            bool encountered_other_value = false;
-            for (size_t i = 0; i < value_deque.size(); ++i)
+            while (value_deque[0] == value_to_erase)
             {
-                if (value_deque[i] == value_to_erase)
-                {
-                    if (encountered_other_value)
-                    {
-                        value_deque[i] = default_value;
-                    }
-                    else
-                    {
-                        value_deque.pop_front();
-                        time_window_start += time_window_step;
-                        --i;
-                    }
-                }
-                else
-                {
-                    encountered_other_value = true;
-                }
+                value_deque.pop_front();
+                time_window_start += time_window_step;
             }
+
+            delete keys_cache;
+            keys_cache = nullptr;
+
+            delete values_cache;
+            values_cache = nullptr;
         }
         else if (key >= time_window_start && index == value_deque.size() - 1)
         {
             V value_to_erase = value_deque[value_deque.size() - 1];
-            bool encountered_other_value = false;
-            for (size_t i = value_deque.size() - 1; i >= 0; --i)
+            while (value_deque[value_deque.size() - 1] == value_to_erase)
             {
-                if (value_deque[i] == value_to_erase)
-                {
-                    if (encountered_other_value)
-                    {
-                        value_deque[i] = default_value;
-                    }
-                    else
-                    {
-                        value_deque.pop_back();
-                    }
-                }
-                else
-                {
-                    encountered_other_value = true;
-                }
+                value_deque.pop_back();
             }
+
+            delete keys_cache;
+            keys_cache = nullptr;
+
+            delete values_cache;
+            values_cache = nullptr;
         }
         else if (index > 0 && index < value_deque.size() - 1)
         {
@@ -291,51 +295,38 @@ public:
             {
                 if (value_deque[i] == value_to_erase)
                 {
-                    value_deque[i] = default_value;
-                }
-            }
-        }
-
-        delete keys_cache;
-        keys_cache = nullptr;
-
-        delete values_cache;
-        values_cache = nullptr;
-    }
-    void propogate_values_forward()
-    {
-        std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
-
-        V current_value = default_value;
-        structures::stl::STLSet<V> previous_values;
-        for (size_t i = 0; i < value_deque.size(); ++i)
-        {
-            if (value_deque[i] != current_value)
-            {
-                if (previous_values.contains(value_deque[i]))
-                {
-                    value_deque[i] = current_value;
+                    if (i == value_deque.size() - 1)
+                    {
+                        value_deque.resize(index);
+                        break;
+                    }
+                    else
+                    {
+                        value_deque[i] = default_value;
+                    }
                 }
                 else
                 {
-                    previous_values.insert(current_value);
-                    current_value = value_deque[i];
+                    break;
                 }
             }
+
+            delete keys_cache;
+            keys_cache = nullptr;
+
+            delete values_cache;
+            values_cache = nullptr;
         }
-
-        delete keys_cache;
-        keys_cache = nullptr;
-
-        delete values_cache;
-        values_cache = nullptr;
+    }
+    void propogate_values_forward()
+    {
+        propogate_values_forward(get_latest_timestamp());
     }
     void propogate_values_forward(Time const &time_window_end)
     {
         std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
         V current_value = default_value;
-        structures::stl::STLSet<V> previous_values;
         Time current_time;
         size_t i;
         for (i = 0, current_time = time_window_start;
@@ -348,17 +339,13 @@ public:
             }
             else
             {
-                if (value_deque[i] != current_value)
+                if (value_deque[i] == default_value)
                 {
-                    if (previous_values.contains(value_deque[i]))
-                    {
-                        value_deque[i] = current_value;
-                    }
-                    else
-                    {
-                        previous_values.insert(current_value);
-                        current_value = value_deque[i];
-                    }
+                    value_deque[i] = current_value;
+                }
+                else
+                {
+                    current_value = value_deque[i];
                 }
             }
         }

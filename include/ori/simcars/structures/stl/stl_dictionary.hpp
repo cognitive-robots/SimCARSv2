@@ -27,7 +27,8 @@ protected:
     mutable IStackArray<V> *values_cache;
 
 public:
-    STLDictionary(size_t bin_count = 10000) : data(bin_count), keys_cache(nullptr), values_cache(nullptr) {}
+    STLDictionary(size_t bin_count = 10000) : data(bin_count), keys_cache(nullptr),
+        values_cache(nullptr) {}
     STLDictionary(STLDictionary<K, V, K_hash, K_equal> const &stl_dictionary) :
         data(stl_dictionary.data), keys_cache(nullptr), values_cache(nullptr) {}
     STLDictionary(IDictionary<K, V> const *dictionary, size_t bin_count = 10000) :
@@ -43,25 +44,35 @@ public:
 
     ~STLDictionary() override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         delete keys_cache;
         delete values_cache;
     }
 
     size_t count() const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.size();
     }
     bool contains(K const &key) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.contains(key);
     }
 
     V const& operator [](K const &key) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.at(key);
     }
     bool contains_value(V const &val) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         for (auto const &entry : data)
         {
             if (entry.second == val)
@@ -89,6 +100,8 @@ public:
     }
     void get_keys(IStackArray<K> *keys) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i = 0;
         for (auto const &entry : data)
         {
@@ -121,6 +134,8 @@ public:
     }
     void get_values(IStackArray<V> *values) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i = 0;
         for (auto const &entry : data)
         {

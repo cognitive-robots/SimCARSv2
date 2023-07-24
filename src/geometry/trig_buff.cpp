@@ -1,6 +1,7 @@
 
-#include <ori/simcars/utils/exceptions.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
+
+#include <ori/simcars/utils/exceptions.hpp>
 
 #include <magic_enum.hpp>
 
@@ -19,19 +20,22 @@ namespace geometry
 TrigBuff *TrigBuff::instance = nullptr;
 
 TrigBuff::TrigBuff(size_t num_bins, AngleType default_angle_type)
-    : num_bins(num_bins), default_angle_type(default_angle_type), radian_multi(num_bins / (2.0f * M_PI)), degree_multi(num_bins / 360.0f)
+    : num_bins(num_bins), default_angle_type(default_angle_type),
+      radian_multi(num_bins / (2.0f * M_PI)), degree_multi(num_bins / 360.0f)
 {
     if (num_bins < 1)
     {
-        throw std::invalid_argument("Number of bins for trigonometry buffer initialisation should be at least 1, "
-                                    "the value passed was '" + std::to_string(num_bins) + "'");
+        throw std::invalid_argument(
+                    "Number of bins for trigonometry buffer initialisation should be at least 1, "
+                    "the value passed was '" + std::to_string(num_bins) + "'");
     }
 
     if (!magic_enum::enum_contains(default_angle_type))
     {
-        throw std::invalid_argument("Default angle type for trigonometry buffer initialisation was invalid, "
-                                    "the value passed (in integer form) was '"
-                                    + std::to_string(magic_enum::enum_integer(default_angle_type)) + "'");
+        throw std::invalid_argument(
+                    "Default angle type for trigonometry buffer initialisation was invalid, "
+                    "the value passed (in integer form) was '"
+                    + std::to_string(magic_enum::enum_integer(default_angle_type)) + "'");
     }
 
     sin_bins = new FP_DATA_TYPE[num_bins];
@@ -77,22 +81,7 @@ void TrigBuff::destroy_instance()
 
 FP_DATA_TYPE TrigBuff::wrap(FP_DATA_TYPE angle) const
 {
-    if (std::isinf(angle))
-    {
-        throw std::invalid_argument("Angle is infinite");
-    }
-
-    switch (default_angle_type)
-    {
-    case AngleType::RADIANS:
-        return std::remainder(angle, 2.0f * M_PI);
-
-    case AngleType::DEGREES:
-        return std::remainder(angle, 360.0f);
-
-    default:
-        throw utils::NotImplementedException();
-    }
+    return wrap(angle, default_angle_type);
 }
 
 FP_DATA_TYPE TrigBuff::wrap(FP_DATA_TYPE angle, AngleType angle_type) const
@@ -117,24 +106,7 @@ FP_DATA_TYPE TrigBuff::wrap(FP_DATA_TYPE angle, AngleType angle_type) const
 
 FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle) const
 {
-    if (std::isinf(angle))
-    {
-        throw std::invalid_argument("Angle is infinite");
-    }
-
-    switch (default_angle_type)
-    {
-    case AngleType::RADIANS:
-        if (angle < 0.0f) return get_sin(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f));
-        return sin_bins[int(angle * radian_multi) % num_bins];
-
-    case AngleType::DEGREES:
-        if (angle < 0.0f) return get_sin(angle + 360.0f * (int(-angle / 360.0f) + 1.0f));
-        return sin_bins[int(angle * degree_multi) % num_bins];
-
-    default:
-        throw utils::NotImplementedException();
-    }
+    return get_sin(angle, default_angle_type);
 }
 
 FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle, AngleType angle_type) const
@@ -147,38 +119,24 @@ FP_DATA_TYPE TrigBuff::get_sin(FP_DATA_TYPE angle, AngleType angle_type) const
     switch (angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_sin(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f), angle_type);
-        return sin_bins[int(angle * radian_multi) % num_bins];
+        if (angle < 0.0f) return get_sin(angle + (2.0f * M_PI) * std::ceil(-angle / (2.0f * M_PI)),
+                                         angle_type);
+        return sin_bins[size_t(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_sin(angle + 360.0f * (int(-angle / 360.0f) + 1.0f), angle_type);
-        return sin_bins[int(angle * degree_multi) % num_bins];
+        if (angle < 0.0f) return get_sin(angle + 360.0f * std::ceil(-angle / 360.0f), angle_type);
+        return sin_bins[size_t(angle * degree_multi) % num_bins];
 
     default:
-        throw std::invalid_argument("Input angle type (in integer form) '" + std::to_string(magic_enum::enum_integer(angle_type)) + "' is not a valid angle type for a sine calculation");
+        throw std::invalid_argument("Input angle type (in integer form) '" +
+                                    std::to_string(magic_enum::enum_integer(angle_type)) +
+                                    "' is not a valid angle type for a sine calculation");
     }
 }
 
 FP_DATA_TYPE TrigBuff::get_cos(FP_DATA_TYPE angle) const
 {
-    if (std::isinf(angle))
-    {
-        throw std::invalid_argument("Angle is infinite");
-    }
-
-    switch (default_angle_type)
-    {
-    case AngleType::RADIANS:
-        if (angle < 0.0f) return get_cos(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f));
-        return cos_bins[int(angle * radian_multi) % num_bins];
-
-    case AngleType::DEGREES:
-        if (angle < 0.0f) return get_cos(angle + 360.0f * (int(-angle / 360.0f) + 1.0f));
-        return cos_bins[int(angle * degree_multi) % num_bins];
-
-    default:
-        throw utils::NotImplementedException();
-    }
+    return get_cos(angle, default_angle_type);
 }
 
 FP_DATA_TYPE TrigBuff::get_cos(FP_DATA_TYPE angle, AngleType angle_type) const
@@ -191,38 +149,24 @@ FP_DATA_TYPE TrigBuff::get_cos(FP_DATA_TYPE angle, AngleType angle_type) const
     switch (angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_cos(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f), angle_type);
-        return cos_bins[int(angle * radian_multi) % num_bins];
+        if (angle < 0.0f) return get_cos(angle + (2.0f * M_PI) * std::ceil(-angle / (2.0f * M_PI)),
+                                         angle_type);
+        return cos_bins[size_t(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_cos(angle + 360.0f * (int(-angle / 360.0f) + 1.0f), angle_type);
-        return cos_bins[int(angle * degree_multi) % num_bins];
+        if (angle < 0.0f) return get_cos(angle + 360.0f * std::ceil(-angle / 360.0f), angle_type);
+        return cos_bins[size_t(angle * degree_multi) % num_bins];
 
     default:
-        throw std::invalid_argument("Input angle type (in integer form) '" + std::to_string(magic_enum::enum_integer(angle_type)) + "' is not a valid angle type for a cosine calculation");
+        throw std::invalid_argument("Input angle type (in integer form) '" +
+                                    std::to_string(magic_enum::enum_integer(angle_type)) +
+                                    "' is not a valid angle type for a cosine calculation");
     }
 }
 
 FP_DATA_TYPE TrigBuff::get_tan(FP_DATA_TYPE angle) const
 {
-    if (std::isinf(angle))
-    {
-        throw std::invalid_argument("Angle is infinite");
-    }
-
-    switch (default_angle_type)
-    {
-    case AngleType::RADIANS:
-        if (angle < 0.0f) return get_tan(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f));
-        return tan_bins[int(angle * radian_multi) % num_bins];
-
-    case AngleType::DEGREES:
-        if (angle < 0.0f) return get_tan(angle + 360.0f * (int(-angle / 360.0f) + 1.0f));
-        return tan_bins[int(angle * degree_multi) % num_bins];
-
-    default:
-        throw utils::NotImplementedException();
-    }
+    return get_tan(angle, default_angle_type);
 }
 
 FP_DATA_TYPE TrigBuff::get_tan(FP_DATA_TYPE angle, AngleType angle_type) const
@@ -235,25 +179,24 @@ FP_DATA_TYPE TrigBuff::get_tan(FP_DATA_TYPE angle, AngleType angle_type) const
     switch (angle_type)
     {
     case AngleType::RADIANS:
-        if (angle < 0.0f) return get_tan(angle + (2.0f * M_PI) * (int(-angle / (2.0f * M_PI)) + 1.0f), angle_type);
-        return tan_bins[int(angle * radian_multi) % num_bins];
+        if (angle < 0.0f) return get_tan(angle + (2.0f * M_PI) * std::ceil(-angle / (2.0f * M_PI)),
+                                         angle_type);
+        return tan_bins[size_t(angle * radian_multi) % num_bins];
 
     case AngleType::DEGREES:
-        if (angle < 0.0f) return get_tan(angle + 360.0f * (int(-angle / 360.0f) + 1.0f), angle_type);
-        return tan_bins[int(angle * degree_multi) % num_bins];
+        if (angle < 0.0f) return get_tan(angle + 360.0f * std::ceil(-angle / 360.0f), angle_type);
+        return tan_bins[size_t(angle * degree_multi) % num_bins];
 
     default:
-        throw std::invalid_argument("Input angle type (in integer form) '" + std::to_string(magic_enum::enum_integer(angle_type)) + "' is not a valid angle type for a tangent calculation");
+        throw std::invalid_argument("Input angle type (in integer form) '" +
+                                    std::to_string(magic_enum::enum_integer(angle_type)) +
+                                    "' is not a valid angle type for a tangent calculation");
     }
 }
 
 RotMat TrigBuff::get_rot_mat(FP_DATA_TYPE angle) const
 {
-    RotMat rot_mat;
-    FP_DATA_TYPE sin_a = get_sin(angle);
-    FP_DATA_TYPE cos_a = get_cos(angle);
-    rot_mat << cos_a, -sin_a, sin_a, cos_a;
-    return rot_mat;
+    return get_rot_mat(angle, default_angle_type);
 }
 
 RotMat TrigBuff::get_rot_mat(FP_DATA_TYPE angle, AngleType angle_type) const

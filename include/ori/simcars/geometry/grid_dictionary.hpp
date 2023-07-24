@@ -32,8 +32,8 @@ public:
 template <typename V_grid_rect>
 class GridDictionary : public virtual structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>
 {
-    Vec origin;
-    FP_DATA_TYPE spacing;
+    Vec const origin;
+    FP_DATA_TYPE const spacing;
 
     Vec round(Vec const &point) const
     {
@@ -46,13 +46,16 @@ class GridDictionary : public virtual structures::stl::STLDictionary<Vec, V_grid
 
 public:
     GridDictionary(Vec origin, FP_DATA_TYPE spacing, size_t bin_count = 10000)
-        : structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>(bin_count), origin(origin), spacing(spacing) {}
+        : structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>(bin_count), origin(origin),
+          spacing(spacing) {}
     GridDictionary(GridDictionary const &grid_dictionary)
         : structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>(grid_dictionary),
           origin(grid_dictionary.origin), spacing(grid_dictionary.spacing) {}
+
     ~GridDictionary() override
     {
-        static_assert(std::is_base_of<GridRect<V_grid_rect>, V_grid_rect>::value, "V_grid_rect is not derived from GridRect");
+        static_assert(std::is_base_of<GridRect<V_grid_rect>, V_grid_rect>::value,
+                "V_grid_rect is not derived from GridRect");
 
         structures::IArray<V_grid_rect*> const* grid_rects = this->get_values();
 
@@ -69,14 +72,18 @@ public:
 
     V_grid_rect* const& operator [](Vec const &key) const override
     {
-        return structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::operator [](round(key));
+        return structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::operator [](
+                round(key));
     }
 
-    structures::IArray<geometry::Vec>* chebyshev_grid_points_in_range(Vec const &key, FP_DATA_TYPE distance) const
+    structures::IArray<geometry::Vec>* chebyshev_grid_points_in_range(Vec const &key,
+                                                                      FP_DATA_TYPE distance) const
     {
         return chebyshev_grid_points_in_range(key, distance, distance);
     }
-    structures::IArray<geometry::Vec>* chebyshev_grid_points_in_range(Vec const &key, FP_DATA_TYPE x_distance, FP_DATA_TYPE y_distance) const
+    structures::IArray<geometry::Vec>* chebyshev_grid_points_in_range(Vec const &key,
+                                                                      FP_DATA_TYPE x_distance,
+                                                                      FP_DATA_TYPE y_distance) const
     {
         Vec rounded_point = round(key);
         Vec rounded_top_right_point = round(key + Vec(x_distance, y_distance));
@@ -87,7 +94,9 @@ public:
         int j_min = (int)((rounded_bottom_left_point.y() - rounded_point.y()) / spacing);
         int j_max = (int)((rounded_top_right_point.y() - rounded_point.y()) / spacing);
 
-        structures::IArray<geometry::Vec> *grid_points = new structures::stl::STLStackArray<geometry::Vec>((1 + i_max - i_min) * (1 + j_max - j_min));
+        structures::IArray<geometry::Vec> *grid_points =
+                new structures::stl::STLStackArray<geometry::Vec>(
+                    (1 + i_max - i_min) * (1 + j_max - j_min));
 
         for (i = i_min; i <= i_max; ++i)
         {
@@ -102,20 +111,27 @@ public:
 
         return grid_points;
     }
-    structures::IArray<V_grid_rect*>* chebyshev_grid_rects_in_range(Vec const &key, FP_DATA_TYPE distance) const
+    structures::IArray<V_grid_rect*>* chebyshev_grid_rects_in_range(Vec const &key,
+                                                                    FP_DATA_TYPE distance) const
     {
         return chebyshev_grid_rects_in_range(key, distance, distance);
     }
-    structures::IArray<V_grid_rect*>* chebyshev_grid_rects_in_range(Vec const &key, FP_DATA_TYPE x_distance, FP_DATA_TYPE y_distance) const
+    structures::IArray<V_grid_rect*>* chebyshev_grid_rects_in_range(Vec const &key,
+                                                                    FP_DATA_TYPE x_distance,
+                                                                    FP_DATA_TYPE y_distance) const
     {
-        structures::IArray<geometry::Vec> *grid_points = chebyshev_grid_points_in_range(key, x_distance, y_distance);
+        structures::IArray<geometry::Vec> *grid_points = chebyshev_grid_points_in_range(key,
+                                                                                        x_distance,
+                                                                                        y_distance);
 
-        structures::stl::STLStackArray<V_grid_rect*> *grid_rects = new structures::stl::STLStackArray<V_grid_rect*>();
+        structures::stl::STLStackArray<V_grid_rect*> *grid_rects =
+                new structures::stl::STLStackArray<V_grid_rect*>();
 
         size_t i;
         for (i = 0; i < grid_points->count(); ++i)
         {
-            if (structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::contains((*grid_points)[i]))
+            if (structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::contains(
+                        (*grid_points)[i]))
             {
                 grid_rects->push_back(
                             structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::operator [](
@@ -143,12 +159,15 @@ public:
     }
     void chebyshev_proliferate(Vec const &key, FP_DATA_TYPE x_distance, FP_DATA_TYPE y_distance)
     {
-        structures::IArray<geometry::Vec> *grid_points = chebyshev_grid_points_in_range(key, x_distance, y_distance);
+        structures::IArray<geometry::Vec> *grid_points = chebyshev_grid_points_in_range(key,
+                                                                                        x_distance,
+                                                                                        y_distance);
 
         size_t i;
         for (i = 0; i < grid_points->count(); ++i)
         {
-            if (!structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::contains((*grid_points)[i]))
+            if (!structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::contains(
+                        (*grid_points)[i]))
             {
                 structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>::update(
                             (*grid_points)[i],

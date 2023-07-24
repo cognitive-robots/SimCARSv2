@@ -19,11 +19,11 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning map load" << std::endl;
 
-    map::IMap<uint8_t> const *map;
+    map::plg::PLGMap map;
 
     try
     {
-        map = map::plg::PLGMap::load(argv[1]);
+        map.load(argv[1]);
     }
     catch (std::exception const &e)
     {
@@ -32,8 +32,6 @@ int main(int argc, char *argv[])
     }
 
     std::cout << "Finished map load" << std::endl;
-
-    delete map;
 
     geometry::TrigBuff::destroy_instance();
 }

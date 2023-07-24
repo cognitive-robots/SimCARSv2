@@ -10,14 +10,20 @@ namespace simcars
 namespace map
 {
 
-template<typename T_id>
 class IMapObject
 {
 public:
+    enum class Type
+    {
+        UNKNOWN = 0,
+        LANE = 1
+    };
+
     virtual ~IMapObject() = default;
 
-    virtual T_id get_id() const = 0;
-    virtual IMap<T_id> const* get_map() const = 0;
+    virtual uint64_t get_id() const = 0;
+    virtual Type get_type() const = 0;
+    virtual IMap const* get_map() const = 0;
 };
 
 }

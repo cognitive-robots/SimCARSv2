@@ -30,7 +30,8 @@ public:
     STLOrderedDictionary() : keys_cache(nullptr), values_cache(nullptr) {}
     STLOrderedDictionary(STLOrderedDictionary<K, V, K_compare> const &stl_dictionary) :
         data(stl_dictionary.data), keys_cache(nullptr), values_cache(nullptr) {}
-    STLOrderedDictionary(IDictionary<K, V> const *dictionary) : keys_cache(nullptr), values_cache(nullptr)
+    STLOrderedDictionary(IDictionary<K, V> const *dictionary) : keys_cache(nullptr),
+        values_cache(nullptr)
     {
         IArray<K> const *keys = dictionary->get_keys();
         for (size_t i = 0; i < keys->count(); ++i)
@@ -42,25 +43,35 @@ public:
 
     ~STLOrderedDictionary() override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         delete keys_cache;
         delete values_cache;
     }
 
     size_t count() const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.size();
     }
     bool contains(K const &key) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.contains(key);
     }
 
     V const& operator [](K const &key) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         return data.at(key);
     }
     bool contains_value(V const &val) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         for (auto const &entry : data)
         {
             if (entry.second == val)
@@ -88,6 +99,8 @@ public:
     }
     void get_keys(IStackArray<K> *keys) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i = 0;
         for (auto const &entry : data)
         {
@@ -120,6 +133,8 @@ public:
     }
     void get_values(IStackArray<V> *values) const override
     {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
         size_t i = 0;
         for (auto const &entry : data)
         {
