@@ -2,6 +2,7 @@
 #include <ori/simcars/structures/container_interface.hpp>
 #include <ori/simcars/structures/array_interface.hpp>
 #include <ori/simcars/structures/list_interface.hpp>
+#include <ori/simcars/structures/ra_mod_list_interface.hpp>
 #include <ori/simcars/structures/stack_interface.hpp>
 #include <ori/simcars/structures/stack_array_interface.hpp>
 #include <ori/simcars/structures/queue_interface.hpp>

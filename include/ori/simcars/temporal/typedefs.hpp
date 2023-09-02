@@ -10,7 +10,7 @@ namespace simcars
 namespace temporal
 {
 
-typedef int64_t DurationRep;
+typedef double DurationRep;
 typedef std::chrono::duration<DurationRep, std::milli> Duration;
 typedef std::chrono::time_point<std::chrono::steady_clock, Duration> Time;
 

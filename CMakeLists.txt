@@ -39,6 +39,7 @@ add_library(simcars_structures STATIC
   include/ori/simcars/structures/container_interface.hpp
   include/ori/simcars/structures/array_interface.hpp
   include/ori/simcars/structures/list_interface.hpp
+  include/ori/simcars/structures/ra_mod_list_interface.hpp
   include/ori/simcars/structures/stack_interface.hpp
   include/ori/simcars/structures/stack_array_interface.hpp
   include/ori/simcars/structures/queue_interface.hpp
@@ -123,8 +124,7 @@ add_library(simcars_map STATIC
   src/map/map_object_abstract.cpp
   src/map/lane_abstract.cpp
   src/map/map_grid_rect.cpp
-  src/map/lyft/lyft_map.cpp
-  src/map/lyft/lyft_lane.cpp
+  src/map/lane_branch.cpp
   src/map/highd/highd_lane.cpp
   src/map/highd/highd_map.cpp
   src/map/plg/plg_lane.cpp
@@ -136,9 +136,7 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/map_object_abstract.hpp
   include/ori/simcars/map/lane_abstract.hpp
   include/ori/simcars/map/map_grid_rect.hpp
-  include/ori/simcars/map/lyft/lyft_declarations.hpp
-  include/ori/simcars/map/lyft/lyft_map.hpp
-  include/ori/simcars/map/lyft/lyft_lane.hpp
+  include/ori/simcars/map/lane_branch.hpp
   include/ori/simcars/map/highd/highd_declarations.hpp
   include/ori/simcars/map/highd/highd_map.hpp
   include/ori/simcars/map/highd/highd_lane.hpp
@@ -166,6 +164,172 @@ PRIVATE
 add_dependencies(simcars_map simcars_utils simcars_structures simcars_geometry simcars_temporal)
 target_compile_options(simcars_map PRIVATE -fPIC)
 set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
+
+add_library(simcars_causal STATIC
+  src/causal/variable_context.cpp
+  src/causal/variable_types/exogenous/id_socket.cpp
+  src/causal/variable_types/exogenous/scalar_fixed.cpp
+  src/causal/variable_types/exogenous/scalar_socket.cpp
+  src/causal/variable_types/exogenous/time_socket.cpp
+  src/causal/variable_types/exogenous/duration_fixed.cpp
+  src/causal/variable_types/exogenous/vector_fixed.cpp
+  src/causal/variable_types/exogenous/vector_socket.cpp
+  src/causal/variable_types/endogenous/id_proxy.cpp
+  src/causal/variable_types/endogenous/scalar_proxy.cpp
+  src/causal/variable_types/endogenous/scalar_proxy.cpp
+  src/causal/variable_types/endogenous/scalar_negation.cpp
+  src/causal/variable_types/endogenous/scalar_reciprocal.cpp
+  src/causal/variable_types/endogenous/scalar_max.cpp
+  src/causal/variable_types/endogenous/scalar_min.cpp
+  src/causal/variable_types/endogenous/scalar_sum.cpp
+  src/causal/variable_types/endogenous/scalar_binary_mean.cpp
+  src/causal/variable_types/endogenous/scalar_product.cpp
+  src/causal/variable_types/endogenous/scalar_time_step_size_product.cpp
+  src/causal/variable_types/endogenous/scalar_time_step_size_quotient.cpp
+  src/causal/variable_types/endogenous/scalar_conditional.cpp
+  src/causal/variable_types/endogenous/scalar_previous_time_step.cpp
+  src/causal/variable_types/endogenous/scalar_buffer.cpp
+  src/causal/variable_types/endogenous/scalar_set_sum.cpp
+  src/causal/variable_types/endogenous/time_current_time_difference.cpp
+  src/causal/variable_types/endogenous/duration_seconds_cast.cpp
+  src/causal/variable_types/endogenous/vector_angle_construction.cpp
+  src/causal/variable_types/endogenous/vector_xy_construction.cpp
+  src/causal/variable_types/endogenous/vector_proxy.cpp
+  src/causal/variable_types/endogenous/vector_x.cpp
+  src/causal/variable_types/endogenous/vector_y.cpp
+  src/causal/variable_types/endogenous/vector_negation.cpp
+  src/causal/variable_types/endogenous/vector_norm.cpp
+  src/causal/variable_types/endogenous/vector_normalisation.cpp
+  src/causal/variable_types/endogenous/vector_sum.cpp
+  src/causal/variable_types/endogenous/vector_binary_mean.cpp
+  src/causal/variable_types/endogenous/vector_scalar_product.cpp
+  src/causal/variable_types/endogenous/vector_time_step_size_product.cpp
+  src/causal/variable_types/endogenous/vector_time_step_size_quotient.cpp
+  src/causal/variable_types/endogenous/vector_dot_product.cpp
+  src/causal/variable_types/endogenous/vector_cross_product.cpp
+  src/causal/variable_types/endogenous/vector_conditional.cpp
+  src/causal/variable_types/endogenous/vector_previous_time_step.cpp
+  src/causal/variable_types/endogenous/vector_buffer.cpp
+  src/causal/variable_types/endogenous/vector_pair_first.cpp
+  src/causal/variable_types/endogenous/vector_pair_second.cpp
+  src/causal/variable_types/endogenous/vector_set_sum.cpp
+  src/causal/variable_types/endogenous/matrix_angle_construction.cpp
+  src/causal/variable_types/endogenous/matrix_vector_product.cpp
+  src/causal/variable_types/endogenous/o_rect_construction.cpp
+  src/causal/variable_types/endogenous/o_rect_collision.cpp
+  src/causal/variable_types/endogenous/o_rect_contact.cpp
+  src/causal/variable_types/endogenous/lane_encapsulation.cpp
+  src/causal/variable_types/endogenous/lane_map_point.cpp
+  include/ori/simcars/causal/variable_interface.hpp
+  include/ori/simcars/causal/exogenous_variable_interface.hpp
+  include/ori/simcars/causal/endogenous_variable_interface.hpp
+  include/ori/simcars/causal/unary_endogenous_variable_abstract.hpp
+  include/ori/simcars/causal/binary_endogenous_variable_abstract.hpp
+  include/ori/simcars/causal/ternary_endogenous_variable_abstract.hpp
+  include/ori/simcars/causal/quaternary_endogenous_variable_abstract.hpp
+  include/ori/simcars/causal/set_endogenous_variable_abstract.hpp
+  include/ori/simcars/causal/variable_context.hpp
+  include/ori/simcars/causal/variable_types/exogenous/id_socket.hpp
+  include/ori/simcars/causal/variable_types/exogenous/scalar_fixed.hpp
+  include/ori/simcars/causal/variable_types/exogenous/scalar_socket.hpp
+  include/ori/simcars/causal/variable_types/exogenous/time_socket.hpp
+  include/ori/simcars/causal/variable_types/exogenous/duration_fixed.hpp
+  include/ori/simcars/causal/variable_types/exogenous/vector_fixed.hpp
+  include/ori/simcars/causal/variable_types/exogenous/vector_socket.hpp
+  include/ori/simcars/causal/variable_types/endogenous/id_proxy.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_negation.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_reciprocal.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_max.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_min.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_sum.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_binary_mean.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_product.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_time_step_size_product.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_time_step_size_quotient.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_conditional.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_previous_time_step.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_buffer.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_set_sum.hpp
+  include/ori/simcars/causal/variable_types/endogenous/time_current_time_difference.hpp
+  include/ori/simcars/causal/variable_types/endogenous/duration_seconds_cast.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_angle_construction.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_xy_construction.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_proxy.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_x.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_y.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_negation.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_norm.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_normalisation.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_sum.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_binary_mean.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_scalar_product.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_time_step_size_product.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_time_step_size_quotient.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_dot_product.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_cross_product.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_conditional.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_previous_time_step.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_buffer.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_pair_first.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_pair_second.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_set_sum.hpp
+  include/ori/simcars/causal/variable_types/endogenous/matrix_angle_construction.hpp
+  include/ori/simcars/causal/variable_types/endogenous/matrix_vector_product.hpp
+  include/ori/simcars/causal/variable_types/endogenous/o_rect_construction.hpp
+  include/ori/simcars/causal/variable_types/endogenous/o_rect_collision.hpp
+  include/ori/simcars/causal/variable_types/endogenous/o_rect_contact.hpp
+  include/ori/simcars/causal/variable_types/endogenous/lane_encapsulation.hpp
+  include/ori/simcars/causal/variable_types/endogenous/lane_map_point.hpp
+)
+target_include_directories(simcars_causal
+PUBLIC
+  $<INSTALL_INTERFACE:include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(simcars_causal
+PUBLIC
+  simcars_utils
+  simcars_structures
+  simcars_geometry
+  simcars_temporal
+  simcars_map
+)
+add_dependencies(simcars_causal simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
+target_compile_options(simcars_causal PRIVATE -fPIC)
+set_target_properties(simcars_causal PROPERTIES VERSION ${PROJECT_VERSION})
+
+add_library(simcars_agent STATIC
+  src/agents/rect_rigid_body.cpp
+  src/agents/rect_rigid_body_env.cpp
+  src/agents/fwd_car.cpp
+  src/agents/motor_torque_control_fwd_car.cpp
+  src/agents/full_control_fwd_car.cpp
+  include/ori/simcars/agents/declarations.hpp
+  include/ori/simcars/agents/rect_rigid_body.hpp
+  include/ori/simcars/agents/rect_rigid_body_env.hpp
+  include/ori/simcars/agents/fwd_car.hpp
+  include/ori/simcars/agents/motor_torque_control_fwd_car.hpp
+  include/ori/simcars/agents/full_control_fwd_car.hpp
+)
+target_include_directories(simcars_agent
+PUBLIC
+  $<INSTALL_INTERFACE:include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  ${RAPIDJSON_INCLUDE_DIRS}
+)
+target_link_libraries(simcars_agent
+PUBLIC
+  simcars_utils
+  simcars_structures
+  simcars_geometry
+  simcars_temporal
+  simcars_map
+  simcars_causal
+)
+add_dependencies(simcars_agent simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_causal)
+target_compile_options(simcars_agent PRIVATE -fPIC)
+set_target_properties(simcars_agent PROPERTIES VERSION ${PROJECT_VERSION})
 
 #[[
 add_library(simcars_agent STATIC
@@ -374,11 +538,11 @@ target_link_libraries(trig_buff_test simcars_utils simcars_structures simcars_ge
 add_dependencies(trig_buff_test simcars_utils simcars_structures simcars_geometry)
 
 
+#[[
 add_executable(lyft_map_test src/lyft_map_test/lyft_map_test.cpp)
 target_link_libraries(lyft_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(lyft_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 
-#[[
 add_executable(lyft_scene_test src/lyft_scene_test/lyft_scene_test.cpp)
 target_link_libraries(lyft_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)
 add_dependencies(lyft_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agent)

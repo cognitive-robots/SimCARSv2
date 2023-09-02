@@ -1,6 +1,8 @@
 
-#include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/map/plg/plg_lane.hpp>
+
+#include <ori/simcars/utils/exceptions.hpp>
+#include <ori/simcars/geometry/trig_buff.hpp>
 
 #define LANE_DILATION 3.65
 
@@ -16,13 +18,13 @@ namespace plg
 PLGLane::PLGLane(uint64_t id, IMap const *map, geometry::Vecs const *vertices) :
     ALane(id, 0, 0, new structures::stl::STLStackArray<uint64_t>,
           new structures::stl::STLStackArray<uint64_t>, map), AMapObject(id, map),
-    point_count(2 * vertices->cols()),
     access_restriction(PLGLane::AccessRestriction::NO_RESTRICTION)
 {
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 
     left_boundary = geometry::Vecs::Zero(2, vertices->cols());
     right_boundary = geometry::Vecs::Zero(2, vertices->cols());
+    waypoints = geometry::Vecs::Zero(2, vertices->cols());
 
     centroid = geometry::Vec::Zero();
 
@@ -39,6 +41,8 @@ PLGLane::PLGLane(uint64_t id, IMap const *map, geometry::Vecs const *vertices) :
     for (i = 0; i < vertices->cols(); ++i)
     {
         geometry::Vec const current_vertex = vertices->col(i);
+
+        waypoints.col(i) = current_vertex;
 
         if (i < vertices->cols() - 1)
         {
@@ -190,6 +194,11 @@ geometry::Vecs const& PLGLane::get_right_boundary() const
     return right_boundary;
 }
 
+geometry::Vecs const& PLGLane::get_waypoints() const
+{
+    return waypoints;
+}
+
 structures::IArray<geometry::Tri> const* PLGLane::get_tris() const
 {
     return &tris;
@@ -211,14 +220,34 @@ bool PLGLane::check_encapsulation(geometry::Vec const &point) const
     return false;
 }
 
+geometry::Vec PLGLane::map_point(geometry::Vec const &point) const
+{
+    size_t min_dist_index = 0;
+    FP_DATA_TYPE min_dist = (point - waypoints.col(0)).norm();
+
+    size_t i;
+    for (i = 1; i < waypoints.cols() - 1; ++i)
+    {
+        FP_DATA_TYPE current_dist = (point - waypoints.col(i)).norm();
+        if (current_dist < min_dist)
+        {
+            min_dist_index = i;
+            min_dist = current_dist;
+        }
+    }
+
+    geometry::Vec min_waypoint = waypoints.col(min_dist_index);
+    geometry::Vec next_waypoint = waypoints.col(min_dist_index + 1);
+    geometry::Vec lane_dir = (next_waypoint - min_waypoint).normalized();
+    geometry::Vec to_point = point - min_waypoint;
+    FP_DATA_TYPE lane_dist = lane_dir.dot(to_point);
+
+    return min_waypoint + lane_dir * lane_dist;
+}
+
 geometry::Vec const& PLGLane::get_centroid() const
 {
     return centroid;
-}
-
-size_t PLGLane::get_point_count() const
-{
-    return point_count;
 }
 
 geometry::Rect const& PLGLane::get_bounding_box() const

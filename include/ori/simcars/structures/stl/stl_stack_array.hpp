@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/stack_array_interface.hpp>
+#include <ori/simcars/structures/ra_mod_list_interface.hpp>
 
 #include <vector>
 #include <mutex>
@@ -15,7 +16,7 @@ namespace stl
 {
 
 template <typename T>
-class STLStackArray : public virtual IStackArray<T>
+class STLStackArray : public virtual IStackArray<T>, public virtual IRAModList<T>
 {
 protected:
     std::vector<T> data;
@@ -108,6 +109,19 @@ public:
         std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         return data.at(idx);
+    }
+
+    void push_at(size_t idx, T const &val) override
+    {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
+        data.insert(std::next(data.begin(), idx), val);
+    }
+    void erase_at(size_t idx) override
+    {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
+        data.erase(std::next(data.begin(), idx));
     }
 };
 

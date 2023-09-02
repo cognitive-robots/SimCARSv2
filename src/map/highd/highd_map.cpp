@@ -175,7 +175,7 @@ void HighDMap::load(std::string const &input_file_path_str)
 
     for (size_t i = 0; i < lower_lane_markings.count() - 1; ++i)
     {
-        uint64_t const lane_id = i + upper_lane_markings.count();
+        uint64_t const lane_id = i + upper_lane_markings.count() + 1;
 
         uint64_t left_adjacent_lane_id;
         if (i != 0)

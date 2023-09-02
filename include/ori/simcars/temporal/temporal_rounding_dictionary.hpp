@@ -18,7 +18,7 @@ namespace temporal
 template <typename V>
 class TemporalRoundingDictionary : public virtual structures::IDictionary<Time, V>
 {
-    Duration const time_window_step;
+    Duration const time_window_step_size;
     V const default_value;
 
     Time time_window_start;
@@ -31,8 +31,8 @@ class TemporalRoundingDictionary : public virtual structures::IDictionary<Time, 
     mutable structures::IStackArray<V> *values_cache;
 
 public:
-    TemporalRoundingDictionary(Duration time_window_step, V const &default_value)
-        : time_window_step(time_window_step), default_value(default_value),
+    TemporalRoundingDictionary(Duration time_window_step_size, V const &default_value)
+        : time_window_step_size(time_window_step_size), default_value(default_value),
           keys_cache(nullptr), values_cache(nullptr) {}
 
     ~TemporalRoundingDictionary() override
@@ -64,7 +64,8 @@ public:
         }
         else
         {
-            return value_deque[(key - time_window_start).count() / time_window_step.count()];
+            return value_deque[size_t((key - time_window_start).count() /
+                                      time_window_step_size.count())];
         }
     }
     bool contains_value(V const &val) const override
@@ -122,11 +123,11 @@ public:
 
             if (j >= keys->count())
             {
-                keys->push_back(time_window_start + i * time_window_step);
+                keys->push_back(time_window_start + i * time_window_step_size);
             }
             else
             {
-                (*keys)[j] = time_window_start + i * time_window_step;
+                (*keys)[j] = time_window_start + i * time_window_step_size;
             }
         }
     }
@@ -149,29 +150,16 @@ public:
     {
         std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
-        structures::stl::STLSet<V> previous_values;
-        size_t i = 0;
+        values->clear();
+
         for (V const &value : value_deque)
         {
-            if (previous_values.contains(value))
+            if (values->contains(value))
             {
                 continue;
             }
-            else
-            {
-                previous_values.insert(value);
-            }
 
-            if (i >= values->count())
-            {
-                values->push_back(value);
-                ++i;
-            }
-            else
-            {
-                (*values)[i] = value;
-                ++i;
-            }
+            values->push_back(value);
         }
     }
 
@@ -179,10 +167,10 @@ public:
     {
         std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
-        size_t index = (key - time_window_start).count() / time_window_step.count();
+        size_t index = size_t((key - time_window_start).count() / time_window_step_size.count());
 
         if (key >= time_window_start &&
-                (!exact || time_window_start + time_window_step * index == key) &&
+                (!exact || time_window_start + time_window_step_size * index == key) &&
                 index >= 0 && index < value_deque.size())
         {
             return value_deque[index] != default_value;
@@ -211,11 +199,11 @@ public:
             throw std::out_of_range("Temporal dictionary is empty");
         }
 
-        return time_window_start + time_window_step * (value_deque.size() - 1);
+        return time_window_start + time_window_step_size * (value_deque.size() - 1);
     }
-    Duration get_time_window_step() const
+    Duration get_time_window_step_size() const
     {
-        return time_window_step;
+        return time_window_step_size;
     }
     V get_default_value() const
     {
@@ -236,15 +224,16 @@ public:
             while (key < time_window_start)
             {
                 value_deque.push_front(default_value);
-                time_window_start -= time_window_step;
+                time_window_start -= time_window_step_size;
             }
 
-            while (key >= time_window_start + time_window_step * value_deque.size())
+            while (key >= time_window_start + time_window_step_size * value_deque.size())
             {
                 value_deque.push_back(default_value);
             }
 
-            size_t index = (key - time_window_start).count() / time_window_step.count();
+            size_t index = size_t((key - time_window_start).count() /
+                                  time_window_step_size.count());
             value_deque[index] = val;
         }
 
@@ -258,14 +247,14 @@ public:
     {
         std::lock_guard<std::recursive_mutex> value_deque_guard(value_deque_mutex);
 
-        size_t index = (key - time_window_start).count() / time_window_step.count();
+        size_t index = size_t((key - time_window_start).count() / time_window_step_size.count());
         if (key >= time_window_start && index < 1)
         {
             V value_to_erase = value_deque[0];
             while (value_deque[0] == value_to_erase)
             {
                 value_deque.pop_front();
-                time_window_start += time_window_step;
+                time_window_start += time_window_step_size;
             }
 
             delete keys_cache;
@@ -331,7 +320,7 @@ public:
         size_t i;
         for (i = 0, current_time = time_window_start;
              current_time <= time_window_end;
-             current_time += time_window_step, ++i)
+             current_time += time_window_step_size, ++i)
         {
             if (i >= value_deque.size())
             {

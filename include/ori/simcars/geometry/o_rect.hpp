@@ -12,13 +12,14 @@ namespace geometry
 
 class ORect : public Rect
 {
+    TrigBuff const* trig_buff;
+
     FP_DATA_TYPE orientation = NAN;
 
 protected:
-    TrigBuff const* trig_buff;
-
     bool check_collision_virt(Rect const &rect) const override;
     void calc_bounds_virt() const override;
+    void calc_points_virt() const override;
 
     bool align_and_check_bounds(Vec const &point) const;
     bool align_and_check_bounds(ORect const &o_rect) const;

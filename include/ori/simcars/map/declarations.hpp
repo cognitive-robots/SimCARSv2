@@ -13,6 +13,8 @@ class IMapObject;
 
 class ILane;
 
+class LaneBranch;
+
 }
 }
 }

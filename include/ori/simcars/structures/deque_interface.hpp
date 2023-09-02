@@ -13,6 +13,8 @@ namespace structures
 template <typename T>
 class IDeque : public virtual IStack<T>, public virtual IQueue<T>
 {
+public:
+    virtual void push_front(T const &val) = 0;
 };
 
 }

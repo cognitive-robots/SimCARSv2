@@ -27,11 +27,11 @@ protected:
     mutable IStackArray<V> *values_cache;
 
 public:
-    STLDictionary(size_t bin_count = 10000) : data(bin_count), keys_cache(nullptr),
+    STLDictionary(size_t bin_count = 1) : data(bin_count), keys_cache(nullptr),
         values_cache(nullptr) {}
     STLDictionary(STLDictionary<K, V, K_hash, K_equal> const &stl_dictionary) :
         data(stl_dictionary.data), keys_cache(nullptr), values_cache(nullptr) {}
-    STLDictionary(IDictionary<K, V> const *dictionary, size_t bin_count = 10000) :
+    STLDictionary(IDictionary<K, V> const *dictionary, size_t bin_count = 1) :
         data(bin_count), keys_cache(nullptr), values_cache(nullptr)
     {
         IArray<K> const *keys = dictionary->get_keys();

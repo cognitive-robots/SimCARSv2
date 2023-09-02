@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/deque_array_interface.hpp>
+#include <ori/simcars/structures/ra_mod_list_interface.hpp>
 
 #include <deque>
 #include <mutex>
@@ -15,7 +16,7 @@ namespace stl
 {
 
 template <typename T>
-class STLDequeArray : public virtual IDequeArray<T>
+class STLDequeArray : public virtual IDequeArray<T>, public virtual IRAModList<T>
 {
 protected:
     std::deque<T> data;
@@ -125,11 +126,31 @@ public:
         return val;
     }
 
+    void push_front(T const &val) override
+    {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
+        data.push_front(val);
+    }
+
     T& operator [](size_t idx) override
     {
         std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
 
         return data[idx];
+    }
+
+    void push_at(size_t idx, T const &val) override
+    {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
+        data.insert(std::next(data.begin(), idx), val);
+    }
+    void erase_at(size_t idx) override
+    {
+        std::lock_guard<std::recursive_mutex> data_guard(data_mutex);
+
+        data.erase(std::next(data.begin(), idx));
     }
 };
 

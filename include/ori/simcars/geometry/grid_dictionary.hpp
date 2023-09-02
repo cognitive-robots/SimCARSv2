@@ -7,27 +7,12 @@
 
 #include <cmath>
 
-#define GOLDEN_RATIO_MAGIC_NUM 0x9e3779b9
-
 namespace ori
 {
 namespace simcars
 {
 namespace geometry
 {
-
-class VecHasher
-{
-    std::hash<FP_DATA_TYPE> hasher;
-
-public:
-    std::size_t operator()(Vec const &key) const
-    {
-        size_t key_hash = hasher(key.x());
-        key_hash ^= hasher(key.y()) + GOLDEN_RATIO_MAGIC_NUM + (key_hash << 6) + (key_hash >> 2);
-        return key_hash;
-    }
-};
 
 template <typename V_grid_rect>
 class GridDictionary : public virtual structures::stl::STLDictionary<Vec, V_grid_rect*, VecHasher>

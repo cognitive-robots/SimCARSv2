@@ -26,11 +26,11 @@ protected:
     mutable IStackArray<T> *values_cache;
 
 public:
-    STLSet(size_t bin_count = 10000) : data(bin_count), values_cache(nullptr) {}
-    STLSet(std::initializer_list<T> init_list, size_t bin_count = 10000) :
+    STLSet(size_t bin_count = 1) : data(bin_count), values_cache(nullptr) {}
+    STLSet(std::initializer_list<T> init_list, size_t bin_count = 1) :
         data(init_list, bin_count), values_cache(nullptr) {}
     STLSet(STLSet<T> const &stl_set) : data(stl_set.data), values_cache(nullptr) {}
-    STLSet(ISet<T> const *set, size_t bin_count = 10000) : data(bin_count), values_cache(nullptr)
+    STLSet(ISet<T> const *set, size_t bin_count = 1) : data(bin_count), values_cache(nullptr)
     {
         IArray<T> const *array = set->get_array();
         for (size_t i; i < array->count(); ++i)

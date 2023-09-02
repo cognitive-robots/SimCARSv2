@@ -13,15 +13,15 @@ namespace geometry
 ORect::ORect() : orientation(0.0f) {}
 
 ORect::ORect(Vec origin, FP_DATA_TYPE width, FP_DATA_TYPE height, FP_DATA_TYPE orientation)
-    : Rect(origin, width, height), orientation(orientation), trig_buff(TrigBuff::get_instance()) {}
+    : Rect(origin, width, height), trig_buff(TrigBuff::get_instance()), orientation(orientation) {}
 
 ORect::ORect(Rect const &rect) : ORect(rect, 0.0f) {}
 
 ORect::ORect(Rect const &rect, FP_DATA_TYPE orientation)
-    : Rect(rect), orientation(orientation), trig_buff(TrigBuff::get_instance()) {}
+    : Rect(rect), trig_buff(TrigBuff::get_instance()), orientation(orientation) {}
 
 ORect::ORect(ORect const &o_rect)
-    : Rect(o_rect), orientation(o_rect.orientation), trig_buff(o_rect.trig_buff) {}
+    : Rect(o_rect), trig_buff(o_rect.trig_buff), orientation(o_rect.orientation) {}
 
 bool ORect::check_collision_virt(Rect const &rect) const
 {
@@ -40,6 +40,20 @@ void ORect::calc_bounds_virt() const
     set_min_y(get_origin().y() - aligned_half_height);
     set_max_x(get_origin().x() + aligned_half_width);
     set_max_y(get_origin().y() + aligned_half_height);
+}
+
+void ORect::calc_points_virt() const
+{
+    FP_DATA_TYPE sin_o = trig_buff->get_sin(orientation);
+    FP_DATA_TYPE cos_o = trig_buff->get_cos(orientation);
+    set_points(get_origin() + Vec(get_half_width() * cos_o - get_half_height() * sin_o,
+                                  get_half_height() * cos_o + get_half_width() * sin_o),
+               get_origin() + Vec(-get_half_width() * cos_o - get_half_height() * sin_o,
+                                  get_half_height() * cos_o - get_half_width() * sin_o),
+               get_origin() + Vec(-get_half_width() * cos_o + get_half_height() * sin_o,
+                                  -get_half_height() * cos_o - get_half_width() * sin_o),
+               get_origin() + Vec(get_half_width() * cos_o + get_half_height() * sin_o,
+                                  -get_half_height() * cos_o + get_half_width() * sin_o));
 }
 
 bool ORect::align_and_check_bounds(Vec const &point) const
