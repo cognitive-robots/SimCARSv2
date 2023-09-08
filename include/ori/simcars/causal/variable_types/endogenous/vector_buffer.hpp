@@ -13,12 +13,15 @@ namespace causal
 
 class VectorBufferVariable : public AUnaryEndogenousVariable<geometry::Vec, geometry::Vec>
 {
-    temporal::TemporalRoundingDictionary<geometry::Vec>* const temporal_dictionary;
+    temporal::TemporalRoundingDictionary<geometry::Vec>* temporal_dictionary;
+
+    bool axiomatic;
 
 public:
-    VectorBufferVariable(IVariable<geometry::Vec> const *parent);
-    VectorBufferVariable(IVariable<geometry::Vec> const *parent,
-                         temporal::TemporalRoundingDictionary<geometry::Vec> *temporal_dictionary);
+    VectorBufferVariable(
+            IVariable<geometry::Vec> const *parent,
+            temporal::TemporalRoundingDictionary<geometry::Vec> *temporal_dictionary = nullptr,
+            bool axiomatic = false);
 
     ~VectorBufferVariable();
 

@@ -9,18 +9,22 @@ namespace simcars
 namespace causal
 {
 
-VectorBufferVariable::VectorBufferVariable(IVariable<geometry::Vec> const *parent) :
-    VectorBufferVariable(parent, new temporal::TemporalRoundingDictionary<geometry::Vec>(
-                             VariableContext::get_time_step_size(),
-                             geometry::Vec(std::numeric_limits<FP_DATA_TYPE>::quiet_NaN(),
-                                           std::numeric_limits<FP_DATA_TYPE>::quiet_NaN()))) {}
-
 VectorBufferVariable::VectorBufferVariable(
         IVariable<geometry::Vec> const *parent,
-        temporal::TemporalRoundingDictionary<geometry::Vec> *temporal_dictionary) :
-    AUnaryEndogenousVariable(parent), temporal_dictionary(temporal_dictionary)
+        temporal::TemporalRoundingDictionary<geometry::Vec> *temporal_dictionary, bool axiomatic) :
+    AUnaryEndogenousVariable(parent), axiomatic(axiomatic)
 {
-    assert(temporal_dictionary != nullptr);
+    if (temporal_dictionary != nullptr)
+    {
+        this->temporal_dictionary = temporal_dictionary;
+    }
+    else
+    {
+        this->temporal_dictionary = new temporal::TemporalRoundingDictionary<geometry::Vec>(
+                    VariableContext::get_time_step_size(),
+                    geometry::Vec(std::numeric_limits<FP_DATA_TYPE>::quiet_NaN(),
+                                  std::numeric_limits<FP_DATA_TYPE>::quiet_NaN()));
+    }
 }
 
 VectorBufferVariable::~VectorBufferVariable()
@@ -33,6 +37,11 @@ geometry::Vec VectorBufferVariable::get_value() const
     if (temporal_dictionary->contains(VariableContext::get_current_time()))
     {
         return (*temporal_dictionary)[VariableContext::get_current_time()];
+    }
+    else if (axiomatic &&
+             VariableContext::get_current_time() < temporal_dictionary->get_earliest_timestamp())
+    {
+        return temporal_dictionary->get_default_value();
     }
     else
     {

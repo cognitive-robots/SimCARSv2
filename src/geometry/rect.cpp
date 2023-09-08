@@ -195,6 +195,13 @@ FP_DATA_TYPE Rect::get_max_y() const
     return max_y;
 }
 
+Vec const& Rect::operator [](size_t idx) const
+{
+    if (calc_points_flag) calc_points();
+
+    return points[idx];
+}
+
 bool Rect::check_vicinity(Vec const &point) const
 {
     return (point - origin).norm() <= half_span;

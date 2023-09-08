@@ -57,6 +57,7 @@ public:
     FP_DATA_TYPE get_min_y() const;
     FP_DATA_TYPE get_max_x() const;
     FP_DATA_TYPE get_max_y() const;
+    Vec const& operator [](size_t idx) const;
     bool check_vicinity(Vec const &point) const;
     bool map_point(Vec const &point, Vec &mapped_point) const;
     bool check_vicinity(Rect const &rect) const;
