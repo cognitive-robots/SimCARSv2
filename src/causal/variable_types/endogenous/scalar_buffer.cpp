@@ -11,7 +11,7 @@ namespace causal
 
 ScalarBufferVariable::ScalarBufferVariable(
         IVariable<FP_DATA_TYPE> const *parent,
-        temporal::TemporalRoundingDictionary<FP_DATA_TYPE> *temporal_dictionary, bool axiomatic) :
+        temporal::TemporalDictionary<FP_DATA_TYPE> *temporal_dictionary, bool axiomatic) :
     AUnaryEndogenousVariable(parent), axiomatic(axiomatic)
 {
     if (temporal_dictionary != nullptr)
@@ -20,9 +20,7 @@ ScalarBufferVariable::ScalarBufferVariable(
     }
     else
     {
-        this->temporal_dictionary = new temporal::TemporalRoundingDictionary<FP_DATA_TYPE>(
-                    VariableContext::get_time_step_size(),
-                    std::numeric_limits<FP_DATA_TYPE>::quiet_NaN());
+        this->temporal_dictionary = new temporal::TemporalDictionary<FP_DATA_TYPE>;
     }
 }
 
@@ -38,9 +36,9 @@ FP_DATA_TYPE ScalarBufferVariable::get_value() const
         return (*temporal_dictionary)[VariableContext::get_current_time()];
     }
     else if (axiomatic &&
-             VariableContext::get_current_time() < temporal_dictionary->get_earliest_timestamp())
+             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
     {
-        return temporal_dictionary->get_default_value();
+        return std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
     }
     else
     {

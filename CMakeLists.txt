@@ -104,7 +104,7 @@ set_target_properties(simcars_geometry PROPERTIES VERSION ${PROJECT_VERSION})
 add_library(simcars_temporal STATIC
   src/temporal/sanity_check.cpp
   include/ori/simcars/temporal/typedefs.hpp
-  include/ori/simcars/temporal/temporal_rounding_dictionary.hpp
+  include/ori/simcars/temporal/temporal_dictionary.hpp
 )
 target_include_directories(simcars_temporal
 PUBLIC
@@ -503,11 +503,9 @@ set_target_properties(simcars_causal PROPERTIES VERSION ${PROJECT_VERSION})
 ]]
 
 add_library(simcars_visualisation STATIC
-  #src/visualisation/utils.cpp
   src/visualisation/qsfml_canvas_abstract.cpp
   src/visualisation/qagents_widget.cpp
   src/visualisation/qmap_agents_widget.cpp
-  #include/ori/simcars/visualisation/utils.hpp
   include/ori/simcars/visualisation/qsfml_canvas_abstract.hpp
   include/ori/simcars/visualisation/qagents_widget.hpp
   include/ori/simcars/visualisation/qmap_agents_widget.hpp

@@ -11,7 +11,7 @@ namespace causal
 
 VectorBufferVariable::VectorBufferVariable(
         IVariable<geometry::Vec> const *parent,
-        temporal::TemporalRoundingDictionary<geometry::Vec> *temporal_dictionary, bool axiomatic) :
+        temporal::TemporalDictionary<geometry::Vec> *temporal_dictionary, bool axiomatic) :
     AUnaryEndogenousVariable(parent), axiomatic(axiomatic)
 {
     if (temporal_dictionary != nullptr)
@@ -20,10 +20,7 @@ VectorBufferVariable::VectorBufferVariable(
     }
     else
     {
-        this->temporal_dictionary = new temporal::TemporalRoundingDictionary<geometry::Vec>(
-                    VariableContext::get_time_step_size(),
-                    geometry::Vec(std::numeric_limits<FP_DATA_TYPE>::quiet_NaN(),
-                                  std::numeric_limits<FP_DATA_TYPE>::quiet_NaN()));
+        this->temporal_dictionary = new temporal::TemporalDictionary<geometry::Vec>;
     }
 }
 
@@ -39,9 +36,10 @@ geometry::Vec VectorBufferVariable::get_value() const
         return (*temporal_dictionary)[VariableContext::get_current_time()];
     }
     else if (axiomatic &&
-             VariableContext::get_current_time() < temporal_dictionary->get_earliest_timestamp())
+             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
     {
-        return temporal_dictionary->get_default_value();
+        return geometry::Vec(std::numeric_limits<FP_DATA_TYPE>::quiet_NaN(),
+                             std::numeric_limits<FP_DATA_TYPE>::quiet_NaN());
     }
     else
     {
