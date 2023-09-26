@@ -80,13 +80,11 @@ protected:
     causal::VectorPreviousTimeStepVariable prev_lin_vel;
     causal::VectorSumVariable lin_vel;
     causal::VectorBufferVariable lin_vel_buff;
-    causal::VectorBinaryMeanVariable lin_vel_mean;
 
     causal::ScalarTimeStepSizeProductVariable ang_vel_diff;
     causal::ScalarPreviousTimeStepVariable prev_ang_vel;
     causal::ScalarSumVariable ang_vel;
     causal::ScalarBufferVariable ang_vel_buff;
-    causal::ScalarBinaryMeanVariable ang_vel_mean;
 
     causal::VectorTimeStepSizeProductVariable pos_diff;
     causal::VectorPreviousTimeStepVariable prev_pos;
