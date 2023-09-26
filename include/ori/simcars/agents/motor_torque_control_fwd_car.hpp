@@ -15,7 +15,7 @@ namespace simcars
 namespace agents
 {
 
-class MotorTorqueControlFWDCar : public FWDCar
+class MotorTorqueControlFWDCar : public virtual FWDCar
 {
 protected:
     causal::ScalarFixedVariable max_motor_torque;
