@@ -41,7 +41,7 @@ MotorTorqueControlFWDCar::MotorTorqueControlFWDCar(FP_DATA_TYPE mass_value,
     lon_env_force(&dir, &env_force),
     neg_lon_env_force(&lon_env_force),
     needed_lon_force(&needed_lon_force_plus_lon_env_force, &neg_lon_env_force),
-    needed_motor_torque(&needed_lon_force, &wheel_radius_recip),
+    needed_motor_torque(&needed_lon_force, &wheel_radius),
 
     max_lim_motor_torque(&needed_motor_torque, &max_motor_torque),
     actual_motor_torque(&max_lim_motor_torque, &min_motor_torque)
