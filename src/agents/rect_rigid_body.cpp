@@ -109,6 +109,11 @@ causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_drag_area_va
     return &drag_area_proxy;
 }
 
+causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_env_force_variable() const
+{
+    return &env_force_proxy;
+}
+
 causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_lin_vel_variable() const
 {
     return &lin_vel_buff;

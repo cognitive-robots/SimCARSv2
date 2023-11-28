@@ -7,6 +7,7 @@
 #include <ori/simcars/causal/variable_types/endogenous/matrix_angle_construction.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/matrix_vector_product.hpp>
 #include <ori/simcars/agents/rect_rigid_body.hpp>
+#include <ori/simcars/agents/control_fwd_car.hpp>
 
 namespace ori
 {
@@ -19,9 +20,11 @@ class FWDCar : public RectRigidBody
 {
 protected:
     causal::ScalarFixedVariable wheel_radius;
+    causal::ScalarProxyVariable wheel_radius_proxy;
     causal::ScalarReciprocalVariable wheel_radius_recip;
 
     causal::ScalarFixedVariable axel_dist;
+    causal::ScalarProxyVariable axel_dist_proxy;
     causal::ScalarNegationVariable neg_axel_dist;
 
     causal::ScalarFixedVariable cornering_stiffness;
@@ -82,6 +85,16 @@ public:
            FP_DATA_TYPE height_value, FP_DATA_TYPE wheel_radius_value,
            FP_DATA_TYPE axel_dist_value, FP_DATA_TYPE drag_area_value = 0.631,
            FP_DATA_TYPE cornering_stiffness_value = 49675.0);
+
+    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_wheel_radius_variable() const;
+    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_axel_dist_variable() const;
+    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_lon_lin_vel_variable() const;
+    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_lon_lin_vel_recip_variable() const;
+    causal::IEndogenousVariable<geometry::Vec> const* get_dir_variable() const;
+
+    friend void ControlFWDCar::set_motor_torque_control(
+            causal::IEndogenousVariable<FP_DATA_TYPE> *motor_torque);
+    friend void ControlFWDCar::set_steer_control(causal::IEndogenousVariable<FP_DATA_TYPE> *steer);
 };
 
 }

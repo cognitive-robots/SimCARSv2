@@ -303,6 +303,7 @@ add_library(simcars_agents STATIC
   src/agents/rect_rigid_body.cpp
   src/agents/rect_rigid_body_env.cpp
   src/agents/fwd_car.cpp
+  src/agents/control_fwd_car.cpp
   src/agents/motor_torque_control_fwd_car.cpp
   src/agents/steer_control_fwd_car.cpp
   src/agents/full_control_fwd_car.cpp
@@ -310,6 +311,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/rect_rigid_body.hpp
   include/ori/simcars/agents/rect_rigid_body_env.hpp
   include/ori/simcars/agents/fwd_car.hpp
+  include/ori/simcars/agents/control_fwd_car.hpp
   include/ori/simcars/agents/motor_torque_control_fwd_car.hpp
   include/ori/simcars/agents/steer_control_fwd_car.hpp
   include/ori/simcars/agents/full_control_fwd_car.hpp

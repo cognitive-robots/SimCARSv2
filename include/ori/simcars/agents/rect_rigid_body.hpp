@@ -107,6 +107,7 @@ public:
     causal::IEndogenousVariable<FP_DATA_TYPE> const* get_width_variable() const;
     causal::IEndogenousVariable<FP_DATA_TYPE> const* get_height_variable() const;
     causal::IEndogenousVariable<FP_DATA_TYPE> const* get_drag_area_variable() const;
+    causal::IEndogenousVariable<geometry::Vec> const* get_env_force_variable() const;
     causal::IEndogenousVariable<geometry::Vec> const* get_lin_vel_variable() const;
     causal::IEndogenousVariable<geometry::Vec> const* get_pos_variable() const;
     causal::IEndogenousVariable<geometry::ORect> const* get_rect_variable() const;

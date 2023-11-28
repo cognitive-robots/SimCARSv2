@@ -8,16 +8,7 @@ namespace simcars
 namespace agents
 {
 
-SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE mass_value,
-                                       FP_DATA_TYPE length_value, FP_DATA_TYPE width_value,
-                                       FP_DATA_TYPE height_value, FP_DATA_TYPE wheel_radius_value,
-                                       FP_DATA_TYPE axel_dist_value,
-                                       FP_DATA_TYPE max_abs_steer_value,
-                                       FP_DATA_TYPE drag_area_value,
-                                       FP_DATA_TYPE cornering_stiffness_value) :
-    FWDCar(mass_value, length_value, width_value, height_value, wheel_radius_value, axel_dist_value,
-           drag_area_value, cornering_stiffness_value),
-
+SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_abs_steer_value) :
     max_steer(max_abs_steer_value),
     min_steer(&max_steer),
 
@@ -31,10 +22,14 @@ SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE mass_v
     actual_act_horizon_secs(&time_error_secs, &min_act_horizon_secs),
     actual_act_horizon_secs_recip(&actual_act_horizon_secs),
 
-    act_horizon_expected_pos_diff(&lin_vel_buff, &actual_act_horizon_secs),
-    act_horizon_expected_pos(&pos_buff, &act_horizon_expected_pos_diff),
+    pos(),
+    pos_proxy(&pos),
+    lin_vel(),
+    lin_vel_proxy(&lin_vel),
+    act_horizon_expected_pos_diff(&lin_vel_proxy, &actual_act_horizon_secs),
+    act_horizon_expected_pos(&pos_proxy, &act_horizon_expected_pos_diff),
     act_horizon_target_pos(&lane_val_goal_proxy, &act_horizon_expected_pos, map),
-    neg_pos(&pos_buff),
+    neg_pos(&pos),
     act_horizon_target_pos_diff(&act_horizon_target_pos, &neg_pos),
 
     act_horizon_ang_sin(&act_horizon_expected_pos_diff, &act_horizon_target_pos_diff),
@@ -44,10 +39,12 @@ SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE mass_v
 
     needed_ang_vel(&act_horizon_ang, &actual_act_horizon_secs_recip),
 
+    axel_dist(),
     double_scale_factor(2.0),
     double_scale_factor_proxy(&double_scale_factor),
     double_axel_dist(&double_scale_factor_proxy, &axel_dist),
 
+    lon_lin_vel_recip(),
     needed_ang_vel_double_axel_dist_prod(&needed_ang_vel, &double_axel_dist),
     needed_steer(&needed_ang_vel_double_axel_dist_prod, &lon_lin_vel_recip),
 
@@ -55,8 +52,18 @@ SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE mass_v
     actual_steer(&max_lim_steer, &min_steer)
 {
     assert(max_abs_steer_value >= 0.0);
+}
 
-    FWDCar::steer.set_parent(&actual_steer);
+void SteerControlFWDCar::set_fwd_car(FWDCar *fwd_car)
+{
+    ControlFWDCar::set_fwd_car(fwd_car);
+
+    set_steer_control(&actual_steer);
+
+    pos.set_parent(fwd_car->get_pos_variable());
+    lin_vel.set_parent(fwd_car->get_lin_vel_variable());
+    axel_dist.set_parent(fwd_car->get_axel_dist_variable());
+    lon_lin_vel_recip.set_parent(fwd_car->get_lon_lin_vel_recip_variable());
 }
 
 }

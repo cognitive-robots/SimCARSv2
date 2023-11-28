@@ -15,9 +15,11 @@ FWDCar::FWDCar(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value, FP_DATA_TYPE 
     RectRigidBody(mass_value, length_value, width_value, height_value, drag_area_value),
 
     wheel_radius(wheel_radius_value),
+    wheel_radius_proxy(&wheel_radius),
     wheel_radius_recip(&wheel_radius),
 
     axel_dist(axel_dist_value),
+    axel_dist_proxy(&axel_dist),
     neg_axel_dist(&axel_dist),
 
     cornering_stiffness(cornering_stiffness_value),
@@ -80,6 +82,31 @@ FWDCar::FWDCar(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value, FP_DATA_TYPE 
 
     RectRigidBody::other_force.set_parent(&total_wheel_force);
     RectRigidBody::other_torque.set_parent(&total_wheel_torque);
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE> const* FWDCar::get_wheel_radius_variable() const
+{
+    return &wheel_radius_proxy;
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE> const* FWDCar::get_axel_dist_variable() const
+{
+    return &axel_dist_proxy;
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE> const* FWDCar::get_lon_lin_vel_variable() const
+{
+    return &lon_lin_vel;
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE> const* FWDCar::get_lon_lin_vel_recip_variable() const
+{
+    return &lon_lin_vel_recip;
+}
+
+causal::IEndogenousVariable<geometry::Vec> const* FWDCar::get_dir_variable() const
+{
+    return &dir;
 }
 
 }

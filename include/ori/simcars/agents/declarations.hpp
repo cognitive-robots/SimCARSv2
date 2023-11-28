@@ -11,6 +11,10 @@ class RectRigidBody;
 
 class RectRigidBodyEnv;
 
+class FWDCar;
+
+class ControlFWDCar;
+
 }
 }
 }
