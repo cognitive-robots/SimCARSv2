@@ -65,10 +65,10 @@ causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBodyEnv::Entity::Link:
 
 RectRigidBodyEnv::Entity::Entity(RectRigidBody const *rigid_body) :
     half_scale_factor(0.5),
-    drag_scale_factor_proxy(&half_scale_factor),
+    half_scale_factor_proxy(&half_scale_factor),
 
     air_mass_density(1.2578),
-    drag_scaled_air_mass_density(&drag_scale_factor_proxy, &air_mass_density),
+    drag_scaled_air_mass_density(&half_scale_factor_proxy, &air_mass_density),
 
     lin_vel_dir(rigid_body->get_lin_vel_variable()),
     drag_force_dir(&lin_vel_dir),

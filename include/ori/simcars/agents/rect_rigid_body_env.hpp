@@ -91,7 +91,7 @@ class RectRigidBodyEnv
 
     protected:
         causal::ScalarFixedVariable half_scale_factor;
-        causal::ScalarProxyVariable drag_scale_factor_proxy;
+        causal::ScalarProxyVariable half_scale_factor_proxy;
 
         causal::ScalarFixedVariable air_mass_density;
         causal::ScalarProductVariable drag_scaled_air_mass_density;
