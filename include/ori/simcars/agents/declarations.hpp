@@ -15,6 +15,12 @@ class FWDCar;
 
 class ControlFWDCar;
 
+class PlanFWDCar;
+
+struct FWDCarAction;
+
+struct FWDCarOutcome;
+
 }
 }
 }

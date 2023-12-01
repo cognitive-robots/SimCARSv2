@@ -1,6 +1,8 @@
 
 #include <ori/simcars/agents/steer_control_fwd_car.hpp>
 
+#include <ori/simcars/agents/fwd_car.hpp>
+
 namespace ori
 {
 namespace simcars
@@ -8,12 +10,20 @@ namespace simcars
 namespace agents
 {
 
+void SteerControlFWDCar::init_links()
+{
+    pos.set_parent(fwd_car->get_pos_variable());
+    lin_vel.set_parent(fwd_car->get_lin_vel_variable());
+    axel_dist.set_parent(fwd_car->get_axel_dist_variable());
+    lon_lin_vel_recip.set_parent(fwd_car->get_lon_lin_vel_recip_variable());
+
+    steer.set_parent(&actual_steer);
+}
+
 SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_abs_steer_value) :
     max_steer(max_abs_steer_value),
     min_steer(&max_steer),
 
-    lane_time_goal(),
-    lane_val_goal(),
     lane_val_goal_proxy(&lane_val_goal),
 
     time_error(&lane_time_goal),
@@ -52,18 +62,6 @@ SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_ab
     actual_steer(&max_lim_steer, &min_steer)
 {
     assert(max_abs_steer_value >= 0.0);
-}
-
-void SteerControlFWDCar::set_fwd_car(FWDCar *fwd_car)
-{
-    ControlFWDCar::set_fwd_car(fwd_car);
-
-    set_steer_control(&actual_steer);
-
-    pos.set_parent(fwd_car->get_pos_variable());
-    lin_vel.set_parent(fwd_car->get_lin_vel_variable());
-    axel_dist.set_parent(fwd_car->get_axel_dist_variable());
-    lon_lin_vel_recip.set_parent(fwd_car->get_lon_lin_vel_recip_variable());
 }
 
 }

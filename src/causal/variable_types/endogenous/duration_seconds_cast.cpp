@@ -10,7 +10,7 @@ namespace causal
 
 FP_DATA_TYPE DurationSecondsCastVariable::get_value() const
 {
-    return std::chrono::duration_cast<std::chrono::seconds>(get_parent()->get_value()).count();
+    return std::chrono::duration_cast<std::chrono::duration<FP_DATA_TYPE>>(get_parent()->get_value()).count();
 }
 
 }

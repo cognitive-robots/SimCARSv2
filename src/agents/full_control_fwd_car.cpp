@@ -8,18 +8,18 @@ namespace simcars
 namespace agents
 {
 
+void FullControlFWDCar::init_links()
+{
+    MotorTorqueControlFWDCar::init_links();
+    SteerControlFWDCar::init_links();
+}
+
 FullControlFWDCar::FullControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_motor_torque_value,
                                      FP_DATA_TYPE min_motor_torque_value,
                                      FP_DATA_TYPE max_abs_steer_value) :
     MotorTorqueControlFWDCar(max_motor_torque_value, min_motor_torque_value),
     SteerControlFWDCar(map, max_abs_steer_value)
 {
-}
-
-void FullControlFWDCar::set_fwd_car(FWDCar *fwd_car)
-{
-    MotorTorqueControlFWDCar::set_fwd_car(fwd_car);
-    SteerControlFWDCar::set_fwd_car(fwd_car);
 }
 
 }

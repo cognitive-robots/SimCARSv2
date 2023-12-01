@@ -20,7 +20,7 @@ class ATernaryEndogenousVariable : public IEndogenousVariable<R>
 
 public:
     ATernaryEndogenousVariable(IEndogenousVariable<P1> const *endogenous_parent_1,
-                               IEndogenousVariable<P1> const *endogenous_parent_2,
+                               IEndogenousVariable<P2> const *endogenous_parent_2,
                                IVariable<P3> const *other_parent) :
         endogenous_parent_1(endogenous_parent_1), endogenous_parent_2(endogenous_parent_2),
         other_parent(other_parent)

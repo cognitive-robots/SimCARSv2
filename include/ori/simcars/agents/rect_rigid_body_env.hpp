@@ -40,83 +40,83 @@ class RectRigidBodyEnv
         class Link
         {
         protected:
-            causal::ScalarSumVariable mass_sum;
-            causal::ScalarReciprocalVariable mass_sum_recip;
+            simcars::causal::ScalarSumVariable mass_sum;
+            simcars::causal::ScalarReciprocalVariable mass_sum_recip;
 
-            causal::ORectCollisionVariable coll;
+            simcars::causal::ORectCollisionVariable coll;
 
-            causal::ORectContactVariable coll_contact;
-            causal::VectorPairFirstVariable coll_contact_pos;
-            causal::VectorPairSecondVariable coll_contact_dir;
+            simcars::causal::ORectContactVariable coll_contact;
+            simcars::causal::VectorPairFirstVariable coll_contact_pos;
+            simcars::causal::VectorPairSecondVariable coll_contact_dir;
 
-            causal::VectorDotProductVariable ali_lin_vel_mag;
-            causal::VectorDotProductVariable other_ali_lin_vel_mag;
+            simcars::causal::VectorDotProductVariable ali_lin_vel_mag;
+            simcars::causal::VectorDotProductVariable other_ali_lin_vel_mag;
 
-            causal::ScalarProductVariable ali_lin_mom_mag;
-            causal::ScalarProductVariable other_ali_lin_mom_mag;
-            causal::ScalarSumVariable ali_lin_mom_mag_sum;
-            causal::ScalarProductVariable coll_lin_vel_mag;
+            simcars::causal::ScalarProductVariable ali_lin_mom_mag;
+            simcars::causal::ScalarProductVariable other_ali_lin_mom_mag;
+            simcars::causal::ScalarSumVariable ali_lin_mom_mag_sum;
+            simcars::causal::ScalarProductVariable coll_lin_vel_mag;
 
-            causal::ScalarNegationVariable neg_ali_lin_vel_mag;
+            simcars::causal::ScalarNegationVariable neg_ali_lin_vel_mag;
 
-            causal::ScalarSumVariable coll_lin_vel_mag_diff;
-            causal::ScalarTimeStepSizeQuotientVariable coll_lin_acc_mag;
-            causal::ScalarProductVariable coll_force_mag;
-            causal::VectorScalarProductVariable coll_force;
+            simcars::causal::ScalarSumVariable coll_lin_vel_mag_diff;
+            simcars::causal::ScalarTimeStepSizeQuotientVariable coll_lin_acc_mag;
+            simcars::causal::ScalarProductVariable coll_force_mag;
+            simcars::causal::VectorScalarProductVariable coll_force;
 
-            causal::VectorFixedVariable no_coll_force;
-            causal::VectorProxyVariable no_coll_force_proxy;
+            simcars::causal::VectorFixedVariable no_coll_force;
+            simcars::causal::VectorProxyVariable no_coll_force_proxy;
 
-            causal::VectorConditionalVariable actual_coll_force;
+            simcars::causal::VectorConditionalVariable actual_coll_force;
 
-            causal::VectorNegationVariable neg_pos;
-            causal::VectorSumVariable coll_contact_rel_pos;
+            simcars::causal::VectorNegationVariable neg_pos;
+            simcars::causal::VectorSumVariable coll_contact_rel_pos;
 
-            causal::VectorCrossProductVariable coll_torque;
+            simcars::causal::VectorCrossProductVariable coll_torque;
 
-            causal::ScalarFixedVariable no_coll_torque;
-            causal::ScalarProxyVariable no_coll_torque_proxy;
+            simcars::causal::ScalarFixedVariable no_coll_torque;
+            simcars::causal::ScalarProxyVariable no_coll_torque_proxy;
 
-            causal::ScalarConditionalVariable actual_coll_torque;
+            simcars::causal::ScalarConditionalVariable actual_coll_torque;
 
         public:
             Link(RectRigidBody const *rigid_body, RectRigidBody const *other_rigid_body);
 
-            causal::IEndogenousVariable<geometry::Vec> const* get_coll_force() const;
-            causal::IEndogenousVariable<FP_DATA_TYPE> const* get_coll_torque() const;
+            simcars::causal::IEndogenousVariable<geometry::Vec> const* get_coll_force() const;
+            simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_coll_torque() const;
         };
 
         RectRigidBody const *rigid_body;
         structures::stl::STLDictionary<RectRigidBody const*, Link*> other_rigid_body_link_dict;
 
     protected:
-        causal::ScalarFixedVariable half_scale_factor;
-        causal::ScalarProxyVariable half_scale_factor_proxy;
+        simcars::causal::ScalarFixedVariable half_scale_factor;
+        simcars::causal::ScalarProxyVariable half_scale_factor_proxy;
 
-        causal::ScalarFixedVariable air_mass_density;
-        causal::ScalarProductVariable drag_scaled_air_mass_density;
+        simcars::causal::ScalarFixedVariable air_mass_density;
+        simcars::causal::ScalarProductVariable drag_scaled_air_mass_density;
 
-        causal::VectorNormalisationVariable lin_vel_dir;
-        causal::VectorNegationVariable drag_force_dir;
+        simcars::causal::VectorNormalisationVariable lin_vel_dir;
+        simcars::causal::VectorNegationVariable drag_force_dir;
 
-        causal::VectorDotProductVariable lin_spd_squared;
-        causal::ScalarProductVariable dynamic_pressure;
-        causal::ScalarProductVariable drag_force_mag;
+        simcars::causal::VectorDotProductVariable lin_spd_squared;
+        simcars::causal::ScalarProductVariable dynamic_pressure;
+        simcars::causal::ScalarProductVariable drag_force_mag;
 
-        causal::VectorScalarProductVariable drag_force;
-        causal::ScalarFixedVariable drag_torque;
-        causal::ScalarProxyVariable drag_torque_proxy;
+        simcars::causal::VectorScalarProductVariable drag_force;
+        simcars::causal::ScalarFixedVariable drag_torque;
+        simcars::causal::ScalarProxyVariable drag_torque_proxy;
 
-        causal::VectorSetSumVariable env_force;
-        causal::ScalarSetSumVariable env_torque;
+        simcars::causal::VectorSetSumVariable env_force;
+        simcars::causal::ScalarSetSumVariable env_torque;
 
     public:
         Entity(RectRigidBody const *rigid_body);
 
         virtual ~Entity();
 
-        causal::IEndogenousVariable<geometry::Vec> const* get_env_force() const;
-        causal::IEndogenousVariable<FP_DATA_TYPE> const* get_env_torque() const;
+        simcars::causal::IEndogenousVariable<geometry::Vec> const* get_env_force() const;
+        simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_env_torque() const;
 
         bool add_link(RectRigidBody const *other_rigid_body);
         bool remove_link(RectRigidBody const *other_rigid_body);

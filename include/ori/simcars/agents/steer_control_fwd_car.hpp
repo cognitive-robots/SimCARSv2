@@ -1,9 +1,12 @@
 #pragma once
 
-#include <ori/simcars/causal/variable_types/exogenous/id_socket.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/id_proxy.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/lane_map_point.hpp>
-#include <ori/simcars/agents/control_fwd_car.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/vector_negation.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/vector_sum.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/vector_scalar_product.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/vector_cross_product.hpp>
 #include <ori/simcars/agents/motor_torque_control_fwd_car.hpp>
 
 namespace ori
@@ -15,14 +18,12 @@ namespace agents
 
 class SteerControlFWDCar : public virtual ControlFWDCar
 {
-    FWDCar *fwd_car;
-
 protected:
+    void init_links() override;
+
     causal::ScalarFixedVariable max_steer;
     causal::ScalarNegationVariable min_steer;
 
-    causal::TimeSocketVariable lane_time_goal;
-    causal::IdSocketVariable lane_val_goal;
     causal::IdProxyVariable lane_val_goal_proxy;
 
     causal::TimeCurrentTimeDifferenceVariable time_error;
@@ -63,7 +64,7 @@ protected:
 public:
     SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_abs_steer_value);
 
-    void set_fwd_car(FWDCar *fwd_car) override;
+    void set_fwd_car(FWDCar *fwd_car);
 };
 
 }

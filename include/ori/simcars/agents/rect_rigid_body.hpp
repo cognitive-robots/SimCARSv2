@@ -32,85 +32,85 @@ namespace agents
 class RectRigidBody
 {
 protected:
-    causal::ScalarFixedVariable mass;
-    causal::ScalarProxyVariable mass_proxy;
-    causal::ScalarReciprocalVariable mass_recip;
+    simcars::causal::ScalarFixedVariable mass;
+    simcars::causal::ScalarProxyVariable mass_proxy;
+    simcars::causal::ScalarReciprocalVariable mass_recip;
 
-    causal::ScalarFixedVariable length;
-    causal::ScalarProxyVariable length_proxy;
-    causal::ScalarProductVariable length_squared;
+    simcars::causal::ScalarFixedVariable length;
+    simcars::causal::ScalarProxyVariable length_proxy;
+    simcars::causal::ScalarProductVariable length_squared;
 
-    causal::ScalarFixedVariable width;
-    causal::ScalarProxyVariable width_proxy;
-    causal::ScalarProductVariable width_squared;
+    simcars::causal::ScalarFixedVariable width;
+    simcars::causal::ScalarProxyVariable width_proxy;
+    simcars::causal::ScalarProductVariable width_squared;
 
-    causal::ScalarFixedVariable height;
-    causal::ScalarProxyVariable height_proxy;
+    simcars::causal::ScalarFixedVariable height;
+    simcars::causal::ScalarProxyVariable height_proxy;
 
-    causal::ScalarFixedVariable drag_area;
-    causal::ScalarProxyVariable drag_area_proxy;
+    simcars::causal::ScalarFixedVariable drag_area;
+    simcars::causal::ScalarProxyVariable drag_area_proxy;
 
-    causal::ScalarFixedVariable moi_scale_factor;
-    causal::ScalarProductVariable moi_scaled_mass;
+    simcars::causal::ScalarFixedVariable moi_scale_factor;
+    simcars::causal::ScalarProductVariable moi_scaled_mass;
 
-    causal::ScalarSumVariable span_squared;
+    simcars::causal::ScalarSumVariable span_squared;
 
-    causal::ScalarProductVariable moi;
-    causal::ScalarReciprocalVariable moi_recip;
+    simcars::causal::ScalarProductVariable moi;
+    simcars::causal::ScalarReciprocalVariable moi_recip;
 
-    causal::VectorSocketVariable env_force;
-    causal::VectorProxyVariable env_force_proxy;
-    causal::VectorSocketVariable other_force;
-    causal::VectorSumVariable total_force;
+    simcars::causal::VectorSocketVariable env_force;
+    simcars::causal::VectorProxyVariable env_force_proxy;
+    simcars::causal::VectorSocketVariable other_force;
+    simcars::causal::VectorSumVariable total_force;
 
-    causal::ScalarSocketVariable env_torque;
-    causal::ScalarProxyVariable env_torque_proxy;
-    causal::ScalarSocketVariable other_torque;
-    causal::ScalarSumVariable total_torque;
+    simcars::causal::ScalarSocketVariable env_torque;
+    simcars::causal::ScalarProxyVariable env_torque_proxy;
+    simcars::causal::ScalarSocketVariable other_torque;
+    simcars::causal::ScalarSumVariable total_torque;
 
-    causal::VectorScalarProductVariable lin_acc;
-    causal::VectorBufferVariable lin_acc_buff;
-    causal::VectorPreviousTimeStepVariable prev_lin_acc;
+    simcars::causal::VectorScalarProductVariable lin_acc;
+    simcars::causal::VectorBufferVariable lin_acc_buff;
+    simcars::causal::VectorPreviousTimeStepVariable prev_lin_acc;
 
-    causal::ScalarProductVariable ang_acc;
-    causal::ScalarBufferVariable ang_acc_buff;
-    causal::ScalarPreviousTimeStepVariable prev_ang_acc;
+    simcars::causal::ScalarProductVariable ang_acc;
+    simcars::causal::ScalarBufferVariable ang_acc_buff;
+    simcars::causal::ScalarPreviousTimeStepVariable prev_ang_acc;
 
-    causal::VectorTimeStepSizeProductVariable lin_vel_diff;
-    causal::VectorPreviousTimeStepVariable prev_lin_vel;
-    causal::VectorSumVariable lin_vel;
-    causal::VectorBufferVariable lin_vel_buff;
+    simcars::causal::VectorTimeStepSizeProductVariable lin_vel_diff;
+    simcars::causal::VectorPreviousTimeStepVariable prev_lin_vel;
+    simcars::causal::VectorSumVariable lin_vel;
+    simcars::causal::VectorBufferVariable lin_vel_buff;
 
-    causal::ScalarTimeStepSizeProductVariable ang_vel_diff;
-    causal::ScalarPreviousTimeStepVariable prev_ang_vel;
-    causal::ScalarSumVariable ang_vel;
-    causal::ScalarBufferVariable ang_vel_buff;
+    simcars::causal::ScalarTimeStepSizeProductVariable ang_vel_diff;
+    simcars::causal::ScalarPreviousTimeStepVariable prev_ang_vel;
+    simcars::causal::ScalarSumVariable ang_vel;
+    simcars::causal::ScalarBufferVariable ang_vel_buff;
 
-    causal::VectorTimeStepSizeProductVariable pos_diff;
-    causal::VectorPreviousTimeStepVariable prev_pos;
-    causal::VectorSumVariable pos;
-    causal::VectorBufferVariable pos_buff;
+    simcars::causal::VectorTimeStepSizeProductVariable pos_diff;
+    simcars::causal::VectorPreviousTimeStepVariable prev_pos;
+    simcars::causal::VectorSumVariable pos;
+    simcars::causal::VectorBufferVariable pos_buff;
 
-    causal::ScalarTimeStepSizeProductVariable rot_diff;
-    causal::ScalarPreviousTimeStepVariable prev_rot;
-    causal::ScalarSumVariable rot;
-    causal::ScalarBufferVariable rot_buff;
+    simcars::causal::ScalarTimeStepSizeProductVariable rot_diff;
+    simcars::causal::ScalarPreviousTimeStepVariable prev_rot;
+    simcars::causal::ScalarSumVariable rot;
+    simcars::causal::ScalarBufferVariable rot_buff;
 
-    causal::ORectConstructionVariable rect;
+    simcars::causal::ORectConstructionVariable rect;
 
 public:
     RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value, FP_DATA_TYPE width_value,
                   FP_DATA_TYPE height_value, FP_DATA_TYPE drag_area_value = 0.631);
 
-    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_mass_variable() const;
-    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_length_variable() const;
-    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_width_variable() const;
-    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_height_variable() const;
-    causal::IEndogenousVariable<FP_DATA_TYPE> const* get_drag_area_variable() const;
-    causal::IEndogenousVariable<geometry::Vec> const* get_env_force_variable() const;
-    causal::IEndogenousVariable<geometry::Vec> const* get_lin_vel_variable() const;
-    causal::IEndogenousVariable<geometry::Vec> const* get_pos_variable() const;
-    causal::IEndogenousVariable<geometry::ORect> const* get_rect_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_mass_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_length_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_width_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_height_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_drag_area_variable() const;
+    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_env_force_variable() const;
+    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_lin_vel_variable() const;
+    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_pos_variable() const;
+    simcars::causal::IEndogenousVariable<geometry::ORect> const* get_rect_variable() const;
 
     friend bool RectRigidBodyEnv::add_entity(RectRigidBody *rigid_body);
     friend bool RectRigidBodyEnv::remove_entity(RectRigidBody *rigid_body);

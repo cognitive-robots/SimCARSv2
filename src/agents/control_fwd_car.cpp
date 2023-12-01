@@ -10,20 +10,19 @@ namespace simcars
 namespace agents
 {
 
-void ControlFWDCar::set_motor_torque_control(
-        causal::IEndogenousVariable<FP_DATA_TYPE> *motor_torque)
+FWDCar const* ControlFWDCar::get_fwd_car() const
 {
-    fwd_car->motor_torque.set_parent(motor_torque);
-}
-
-void ControlFWDCar::set_steer_control(causal::IEndogenousVariable<FP_DATA_TYPE> *steer)
-{
-    fwd_car->steer.set_parent(steer);
+    return fwd_car;
 }
 
 void ControlFWDCar::set_fwd_car(FWDCar *fwd_car)
 {
     this->fwd_car = fwd_car;
+
+    fwd_car->motor_torque.set_parent(&motor_torque);
+    fwd_car->steer.set_parent(&steer);
+
+    init_links();
 }
 
 }

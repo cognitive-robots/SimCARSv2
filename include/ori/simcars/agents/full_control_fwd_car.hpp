@@ -15,11 +15,12 @@ namespace agents
 
 class FullControlFWDCar : public virtual MotorTorqueControlFWDCar, public virtual SteerControlFWDCar
 {
+protected:
+    void init_links() override;
+
 public:
     FullControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_motor_torque_value,
                       FP_DATA_TYPE min_motor_torque_value, FP_DATA_TYPE max_abs_steer_value);
-
-    void set_fwd_car(FWDCar *fwd_car) override;
 };
 
 }

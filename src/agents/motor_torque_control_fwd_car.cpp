@@ -1,6 +1,8 @@
 
 #include <ori/simcars/agents/motor_torque_control_fwd_car.hpp>
 
+#include <ori/simcars/agents/fwd_car.hpp>
+
 namespace ori
 {
 namespace simcars
@@ -8,13 +10,21 @@ namespace simcars
 namespace agents
 {
 
+void MotorTorqueControlFWDCar::init_links()
+{
+    lon_lin_vel.set_parent(fwd_car->get_lon_lin_vel_variable());
+    mass.set_parent(fwd_car->get_mass_variable());
+    wheel_radius.set_parent(fwd_car->get_wheel_radius_variable());
+    dir.set_parent(fwd_car->get_dir_variable());
+    env_force.set_parent(fwd_car->get_env_force_variable());
+
+    motor_torque.set_parent(&actual_motor_torque);
+}
+
 MotorTorqueControlFWDCar::MotorTorqueControlFWDCar(FP_DATA_TYPE max_motor_torque_value,
                                                    FP_DATA_TYPE min_motor_torque_value) :
     max_motor_torque(max_motor_torque_value),
     min_motor_torque(min_motor_torque_value),
-
-    lon_lin_vel_time_goal(),
-    lon_lin_vel_val_goal(),
 
     time_error(&lon_lin_vel_time_goal),
     time_error_secs(&time_error),
@@ -43,19 +53,6 @@ MotorTorqueControlFWDCar::MotorTorqueControlFWDCar(FP_DATA_TYPE max_motor_torque
 {
     assert(max_motor_torque_value >= 0.0);
     assert(min_motor_torque_value <= 0.0);
-}
-
-void MotorTorqueControlFWDCar::set_fwd_car(FWDCar *fwd_car)
-{
-    ControlFWDCar::set_fwd_car(fwd_car);
-
-    set_motor_torque_control(&actual_motor_torque);
-
-    lon_lin_vel.set_parent(fwd_car->get_lon_lin_vel_variable());
-    mass.set_parent(fwd_car->get_mass_variable());
-    wheel_radius.set_parent(fwd_car->get_wheel_radius_variable());
-    dir.set_parent(fwd_car->get_dir_variable());
-    env_force.set_parent(fwd_car->get_env_force_variable());
 }
 
 }
