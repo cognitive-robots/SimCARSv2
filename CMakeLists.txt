@@ -315,6 +315,7 @@ add_library(simcars_agents STATIC
   src/agents/full_control_fwd_car.cpp
   src/agents/plan_fwd_car.cpp
   src/agents/greedy_plan_fwd_car.cpp
+  src/agents/default_fwd_car_reward_calc.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.cpp
   src/agents/causal/variable_types/endogenous/id_goal_val_part.cpp
@@ -345,6 +346,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/full_control_fwd_car.hpp
   include/ori/simcars/agents/plan_fwd_car.hpp
   include/ori/simcars/agents/greedy_plan_fwd_car.hpp
+  include/ori/simcars/agents/default_fwd_car_reward_calc.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/id_goal_val_part.hpp
