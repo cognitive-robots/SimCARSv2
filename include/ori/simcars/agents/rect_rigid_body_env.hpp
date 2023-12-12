@@ -127,8 +127,10 @@ class RectRigidBodyEnv
 public:
     virtual ~RectRigidBodyEnv();
 
-    bool add_entity(RectRigidBody *rigid_body);
-    bool remove_entity(RectRigidBody *rigid_body);
+    structures::IArray<RectRigidBody const*> const* get_rigid_bodies() const;
+
+    bool add_rigid_body(RectRigidBody *rigid_body);
+    bool remove_rigid_body(RectRigidBody *rigid_body);
 };
 
 }

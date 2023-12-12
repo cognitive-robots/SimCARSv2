@@ -102,18 +102,24 @@ public:
     RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value, FP_DATA_TYPE width_value,
                   FP_DATA_TYPE height_value, FP_DATA_TYPE drag_area_value = 0.631);
 
+    virtual ~RectRigidBody() = default;
+
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_mass_variable() const;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_length_variable() const;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_width_variable() const;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_height_variable() const;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_drag_area_variable() const;
     simcars::causal::IEndogenousVariable<geometry::Vec> const* get_env_force_variable() const;
+    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_lin_acc_variable() const;
     simcars::causal::IEndogenousVariable<geometry::Vec> const* get_lin_vel_variable() const;
     simcars::causal::IEndogenousVariable<geometry::Vec> const* get_pos_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_ang_acc_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_ang_vel_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_rot_variable() const;
     simcars::causal::IEndogenousVariable<geometry::ORect> const* get_rect_variable() const;
 
-    friend bool RectRigidBodyEnv::add_entity(RectRigidBody *rigid_body);
-    friend bool RectRigidBodyEnv::remove_entity(RectRigidBody *rigid_body);
+    friend bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body);
+    friend bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body);
 };
 
 }

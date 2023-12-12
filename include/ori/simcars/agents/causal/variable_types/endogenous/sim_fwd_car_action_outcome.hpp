@@ -17,7 +17,7 @@ namespace agents
 namespace causal
 {
 
-class SimFWDCarActionOutcome :
+class SimFWDCarActionOutcomeVariable :
         public simcars::causal::ABinaryEndogenousVariable<
         structures::stl::STLStackArray<FWDCarOutcomeActionPair>,
         structures::stl::STLStackArray<FWDCarAction>, FWDCarSimParameters>
@@ -25,7 +25,7 @@ class SimFWDCarActionOutcome :
     IFWDCarOutcomeSim const *fwd_car_outcome_sim;
 
 public:
-    SimFWDCarActionOutcome(simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarAction>> const *endogenous_parent,
+    SimFWDCarActionOutcomeVariable(simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarAction>> const *endogenous_parent,
                            simcars::causal::IVariable<FWDCarSimParameters> const *other_parent,
                            IFWDCarOutcomeSim const *fwd_car_outcome_sim);
 

@@ -152,7 +152,12 @@ RectRigidBodyEnv::~RectRigidBodyEnv()
     }
 }
 
-bool RectRigidBodyEnv::add_entity(RectRigidBody *rigid_body)
+structures::IArray<RectRigidBody const*> const* RectRigidBodyEnv::get_rigid_bodies() const
+{
+    return rigid_body_entity_dict.get_keys();
+}
+
+bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body)
 {
     if (rigid_body_entity_dict.contains(rigid_body))
     {
@@ -177,7 +182,7 @@ bool RectRigidBodyEnv::add_entity(RectRigidBody *rigid_body)
     }
 }
 
-bool RectRigidBodyEnv::remove_entity(RectRigidBody *rigid_body)
+bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body)
 {
     if (!rigid_body_entity_dict.contains(rigid_body))
     {

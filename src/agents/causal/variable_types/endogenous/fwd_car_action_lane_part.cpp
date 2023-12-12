@@ -10,7 +10,7 @@ namespace agents
 namespace causal
 {
 
-Goal<uint64_t> FWDCarActionLanePart::get_value() const
+Goal<uint64_t> FWDCarActionLanePartVariable::get_value() const
 {
     return get_parent()->get_value().lane_goal;
 }

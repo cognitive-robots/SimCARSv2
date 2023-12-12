@@ -50,21 +50,21 @@ protected:
     simcars::causal::VectorSocketVariable pos;
     simcars::causal::LaneSelectVariable lane_options;
 
-    causal::GenerateFWDCarAction actions;
+    causal::GenerateFWDCarActionsVariable actions;
 
     causal::FWDCarSimParametersFixedVariable sim_params;
-    causal::SimFWDCarActionOutcome sim_action_outcomes;
+    causal::SimFWDCarActionOutcomeVariable sim_action_outcomes;
 
     causal::FWDCarRewardParametersFixedVariable reward_params;
-    causal::CalcFWDCarActionOutcomeReward action_outcome_rewards;
+    causal::CalcFWDCarActionOutcomeRewardVariable action_outcome_rewards;
 
-    causal::MaxRewardFWDCarAction best_action;
+    causal::MaxRewardFWDCarActionVariable best_action;
 
-    causal::FWDCarActionSpeedPart best_action_speed_goal;
+    causal::FWDCarActionSpeedPartVariable best_action_speed_goal;
     causal::ScalarGoalValPartVariable best_action_speed_goal_val;
     causal::ScalarGoalTimePartVariable best_action_speed_goal_time;
 
-    causal::FWDCarActionLanePart best_action_lane_goal;
+    causal::FWDCarActionLanePartVariable best_action_lane_goal;
     causal::IdGoalValPartVariable best_action_lane_goal_val;
     causal::IdGoalTimePartVariable best_action_lane_goal_time;
 

@@ -12,7 +12,7 @@ namespace agents
 namespace causal
 {
 
-class FWDCarActionLanePart :
+class FWDCarActionLanePartVariable :
         public simcars::causal::AUnaryEndogenousVariable<Goal<uint64_t>, FWDCarAction>
 {
 public:

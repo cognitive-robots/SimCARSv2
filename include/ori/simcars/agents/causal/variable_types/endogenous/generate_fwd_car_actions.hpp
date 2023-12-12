@@ -15,7 +15,7 @@ namespace agents
 namespace causal
 {
 
-class GenerateFWDCarAction : public simcars::causal::ATernaryEndogenousVariable<
+class GenerateFWDCarActionsVariable : public simcars::causal::ATernaryEndogenousVariable<
         structures::stl::STLStackArray<FWDCarAction>,
         structures::stl::STLStackArray<temporal::Time>,
         structures::stl::STLStackArray<FP_DATA_TYPE>, structures::stl::STLStackArray<uint64_t>>

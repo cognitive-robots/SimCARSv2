@@ -10,7 +10,7 @@ namespace agents
 namespace causal
 {
 
-FWDCarAction MaxRewardFWDCarAction::get_value() const
+FWDCarAction MaxRewardFWDCarActionVariable::get_value() const
 {
     structures::stl::STLStackArray<RewardFWDCarActionPair> reward_action_pairs =
             get_parent()->get_value();

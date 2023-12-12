@@ -167,9 +167,11 @@ set_target_properties(simcars_map PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_causal STATIC
   src/causal/variable_context.cpp
+  src/causal/variable_types/exogenous/id_fixed.cpp
   src/causal/variable_types/exogenous/id_socket.cpp
   src/causal/variable_types/exogenous/scalar_fixed.cpp
   src/causal/variable_types/exogenous/scalar_socket.cpp
+  src/causal/variable_types/exogenous/time_fixed.cpp
   src/causal/variable_types/exogenous/time_socket.cpp
   src/causal/variable_types/exogenous/duration_fixed.cpp
   src/causal/variable_types/exogenous/vector_fixed.cpp
@@ -187,6 +189,7 @@ add_library(simcars_causal STATIC
   src/causal/variable_types/endogenous/scalar_time_step_size_product.cpp
   src/causal/variable_types/endogenous/scalar_time_step_size_quotient.cpp
   src/causal/variable_types/endogenous/scalar_conditional.cpp
+  src/causal/variable_types/endogenous/scalar_time_conditional.cpp
   src/causal/variable_types/endogenous/scalar_previous_time_step.cpp
   src/causal/variable_types/endogenous/scalar_buffer.cpp
   src/causal/variable_types/endogenous/scalar_set_sum.cpp
@@ -210,6 +213,7 @@ add_library(simcars_causal STATIC
   src/causal/variable_types/endogenous/vector_dot_product.cpp
   src/causal/variable_types/endogenous/vector_cross_product.cpp
   src/causal/variable_types/endogenous/vector_conditional.cpp
+  src/causal/variable_types/endogenous/vector_time_conditional.cpp
   src/causal/variable_types/endogenous/vector_previous_time_step.cpp
   src/causal/variable_types/endogenous/vector_buffer.cpp
   src/causal/variable_types/endogenous/vector_pair_first.cpp
@@ -232,9 +236,11 @@ add_library(simcars_causal STATIC
   include/ori/simcars/causal/quaternary_endogenous_variable_abstract.hpp
   include/ori/simcars/causal/set_endogenous_variable_abstract.hpp
   include/ori/simcars/causal/variable_context.hpp
+  include/ori/simcars/causal/variable_types/exogenous/id_fixed.hpp
   include/ori/simcars/causal/variable_types/exogenous/id_socket.hpp
   include/ori/simcars/causal/variable_types/exogenous/scalar_fixed.hpp
   include/ori/simcars/causal/variable_types/exogenous/scalar_socket.hpp
+  include/ori/simcars/causal/variable_types/exogenous/time_fixed.hpp
   include/ori/simcars/causal/variable_types/exogenous/time_socket.hpp
   include/ori/simcars/causal/variable_types/exogenous/duration_fixed.hpp
   include/ori/simcars/causal/variable_types/exogenous/vector_fixed.hpp
@@ -251,6 +257,7 @@ add_library(simcars_causal STATIC
   include/ori/simcars/causal/variable_types/endogenous/scalar_time_step_size_product.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_time_step_size_quotient.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_conditional.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_time_conditional.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_previous_time_step.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_buffer.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_set_sum.hpp
@@ -274,6 +281,7 @@ add_library(simcars_causal STATIC
   include/ori/simcars/causal/variable_types/endogenous/vector_dot_product.hpp
   include/ori/simcars/causal/variable_types/endogenous/vector_cross_product.hpp
   include/ori/simcars/causal/variable_types/endogenous/vector_conditional.hpp
+  include/ori/simcars/causal/variable_types/endogenous/vector_time_conditional.hpp
   include/ori/simcars/causal/variable_types/endogenous/vector_previous_time_step.hpp
   include/ori/simcars/causal/variable_types/endogenous/vector_buffer.hpp
   include/ori/simcars/causal/variable_types/endogenous/vector_pair_first.hpp
@@ -307,14 +315,19 @@ set_target_properties(simcars_causal PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_agents STATIC
   src/agents/rect_rigid_body.cpp
+  src/agents/rect_rigid_body_sim.cpp
   src/agents/rect_rigid_body_env.cpp
   src/agents/fwd_car.cpp
+  src/agents/fwd_car_sim.cpp
   src/agents/control_fwd_car.cpp
   src/agents/motor_torque_control_fwd_car.cpp
   src/agents/steer_control_fwd_car.cpp
   src/agents/full_control_fwd_car.cpp
+  src/agents/full_control_fwd_car_sim.cpp
   src/agents/plan_fwd_car.cpp
   src/agents/greedy_plan_fwd_car.cpp
+  src/agents/action_intervention_fwd_car.cpp
+  src/agents/default_fwd_car_outcome_sim.cpp
   src/agents/default_fwd_car_reward_calc.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.cpp
@@ -326,6 +339,7 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.cpp
   src/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.cpp
   src/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.cpp
+  src/agents/causal/variable_types/endogenous/fwd_car_outcome_construction.cpp
   src/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.cpp
   src/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.cpp
   include/ori/simcars/agents/declarations.hpp
@@ -334,8 +348,10 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/fwd_car_reward_calc_interface.hpp
   include/ori/simcars/agents/goal.hpp
   include/ori/simcars/agents/rect_rigid_body.hpp
+  include/ori/simcars/agents/rect_rigid_body_sim.hpp
   include/ori/simcars/agents/rect_rigid_body_env.hpp
   include/ori/simcars/agents/fwd_car.hpp
+  include/ori/simcars/agents/fwd_car_sim.hpp
   include/ori/simcars/agents/fwd_car_action.hpp
   include/ori/simcars/agents/fwd_car_outcome.hpp
   include/ori/simcars/agents/fwd_car_sim_parameters.hpp
@@ -344,8 +360,11 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/motor_torque_control_fwd_car.hpp
   include/ori/simcars/agents/steer_control_fwd_car.hpp
   include/ori/simcars/agents/full_control_fwd_car.hpp
+  include/ori/simcars/agents/full_control_fwd_car_sim.hpp
   include/ori/simcars/agents/plan_fwd_car.hpp
   include/ori/simcars/agents/greedy_plan_fwd_car.hpp
+  include/ori/simcars/agents/action_intervention_fwd_car.hpp
+  include/ori/simcars/agents/default_fwd_car_outcome_sim.hpp
   include/ori/simcars/agents/default_fwd_car_reward_calc.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp
@@ -357,6 +376,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.hpp
+  include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_outcome_construction.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp
 )

@@ -17,13 +17,13 @@ namespace agents
 namespace causal
 {
 
-class CalcFWDCarActionOutcomeReward :
+class CalcFWDCarActionOutcomeRewardVariable :
         public simcars::causal::ABinaryEndogenousVariable<structures::stl::STLStackArray<RewardFWDCarActionPair>, structures::stl::STLStackArray<FWDCarOutcomeActionPair>, FWDCarRewardParameters>
 {
     IFWDCarRewardCalc const *fwd_car_reward_calculator;
 
 public:
-    CalcFWDCarActionOutcomeReward(simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarOutcomeActionPair>> const *endogenous_parent,
+    CalcFWDCarActionOutcomeRewardVariable(simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarOutcomeActionPair>> const *endogenous_parent,
                                   simcars::causal::IVariable<FWDCarRewardParameters> const *other_parent,
                                   IFWDCarRewardCalc const *fwd_car_reward_calculator);
 

@@ -10,7 +10,7 @@ namespace agents
 namespace causal
 {
 
-structures::stl::STLStackArray<FWDCarAction> GenerateFWDCarAction::get_value() const
+structures::stl::STLStackArray<FWDCarAction> GenerateFWDCarActionsVariable::get_value() const
 {
     structures::stl::STLStackArray<temporal::Time> time_range =
             get_endogenous_parent_1()->get_value();

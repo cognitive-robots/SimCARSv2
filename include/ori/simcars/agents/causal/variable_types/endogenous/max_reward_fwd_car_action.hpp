@@ -14,7 +14,7 @@ namespace agents
 namespace causal
 {
 
-class MaxRewardFWDCarAction :
+class MaxRewardFWDCarActionVariable :
         public simcars::causal::AUnaryEndogenousVariable<FWDCarAction, structures::stl::STLStackArray<RewardFWDCarActionPair>>
 {
 public:

@@ -17,7 +17,7 @@ namespace simcars
 namespace agents
 {
 
-class FWDCar : public RectRigidBody
+class FWDCar : public virtual RectRigidBody
 {
 protected:
     simcars::causal::ScalarFixedVariable wheel_radius;

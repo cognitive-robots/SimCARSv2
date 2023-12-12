@@ -114,6 +114,11 @@ causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_env_force_v
     return &env_force_proxy;
 }
 
+causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_lin_acc_variable() const
+{
+    return &lin_acc_buff;
+}
+
 causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_lin_vel_variable() const
 {
     return &lin_vel_buff;
@@ -122,6 +127,21 @@ causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_lin_vel_var
 causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_pos_variable() const
 {
     return &pos_buff;
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_ang_acc_variable() const
+{
+    return &ang_acc_buff;
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_ang_vel_variable() const
+{
+    return &ang_vel_buff;
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_rot_variable() const
+{
+    return &rot_buff;
 }
 
 causal::IEndogenousVariable<geometry::ORect> const* RectRigidBody::get_rect_variable() const
