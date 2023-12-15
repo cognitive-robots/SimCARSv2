@@ -177,6 +177,7 @@ add_library(simcars_causal STATIC
   src/causal/variable_types/exogenous/vector_fixed.cpp
   src/causal/variable_types/exogenous/vector_socket.cpp
   src/causal/variable_types/endogenous/id_proxy.cpp
+  src/causal/variable_types/endogenous/ids_previous_time_step.cpp
   src/causal/variable_types/endogenous/scalar_proxy.cpp
   src/causal/variable_types/endogenous/scalar_proxy.cpp
   src/causal/variable_types/endogenous/scalar_negation.cpp
@@ -225,8 +226,10 @@ add_library(simcars_causal STATIC
   src/causal/variable_types/endogenous/o_rect_collision.cpp
   src/causal/variable_types/endogenous/o_rect_contact.cpp
   src/causal/variable_types/endogenous/lane_encapsulation.cpp
-  src/causal/variable_types/endogenous/lane_select.cpp
+  src/causal/variable_types/endogenous/lane_encapsulating.cpp
+  src/causal/variable_types/endogenous/lane_selectable.cpp
   src/causal/variable_types/endogenous/lane_map_point.cpp
+  src/causal/variable_types/endogenous/lane_transitions_calc.cpp
   include/ori/simcars/causal/variable_interface.hpp
   include/ori/simcars/causal/exogenous_variable_interface.hpp
   include/ori/simcars/causal/endogenous_variable_interface.hpp
@@ -246,6 +249,7 @@ add_library(simcars_causal STATIC
   include/ori/simcars/causal/variable_types/exogenous/vector_fixed.hpp
   include/ori/simcars/causal/variable_types/exogenous/vector_socket.hpp
   include/ori/simcars/causal/variable_types/endogenous/id_proxy.hpp
+  include/ori/simcars/causal/variable_types/endogenous/ids_previous_time_step.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_negation.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_reciprocal.hpp
@@ -293,8 +297,10 @@ add_library(simcars_causal STATIC
   include/ori/simcars/causal/variable_types/endogenous/o_rect_collision.hpp
   include/ori/simcars/causal/variable_types/endogenous/o_rect_contact.hpp
   include/ori/simcars/causal/variable_types/endogenous/lane_encapsulation.hpp
-  include/ori/simcars/causal/variable_types/endogenous/lane_select.hpp
+  include/ori/simcars/causal/variable_types/endogenous/lane_encapsulating.hpp
+  include/ori/simcars/causal/variable_types/endogenous/lane_selectable.hpp
   include/ori/simcars/causal/variable_types/endogenous/lane_map_point.hpp
+  include/ori/simcars/causal/variable_types/endogenous/lane_transitions_calc.hpp
 )
 target_include_directories(simcars_causal
 PUBLIC

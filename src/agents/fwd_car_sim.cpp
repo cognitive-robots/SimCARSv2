@@ -11,7 +11,9 @@ namespace agents
 {
 
 FWDCarSim::FWDCarSim(FWDCar const *fwd_car, temporal::Time start_time) :
-    FWDCar(*fwd_car), RectRigidBody(RectRigidBodySim(fwd_car, start_time))
+    FWDCar(*fwd_car),
+    RectRigidBody(*fwd_car),
+    RectRigidBodySim(fwd_car, start_time)
 {
 }
 

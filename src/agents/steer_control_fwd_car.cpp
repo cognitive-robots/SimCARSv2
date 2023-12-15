@@ -21,6 +21,8 @@ void SteerControlFWDCar::init_links()
 }
 
 SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_abs_steer_value) :
+    map(map),
+
     max_steer(max_abs_steer_value),
     min_steer(&max_steer),
 

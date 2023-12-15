@@ -11,14 +11,14 @@ namespace simcars
 namespace causal
 {
 
-class LaneSelectVariable : public AUnaryEndogenousVariable<
+class LaneEncapsulatingVariable : public AUnaryEndogenousVariable<
         structures::stl::STLStackArray<uint64_t>,
         geometry::Vec>
 {
     map::IMap const *map;
 
 public:
-    LaneSelectVariable(IVariable<geometry::Vec> const *parent, map::IMap const *map);
+    LaneEncapsulatingVariable(IVariable<geometry::Vec> const *parent, map::IMap const *map);
 
     structures::stl::STLStackArray<uint64_t> get_value() const override;
 };

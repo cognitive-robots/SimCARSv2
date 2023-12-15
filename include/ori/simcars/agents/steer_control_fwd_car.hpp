@@ -21,6 +21,8 @@ class SteerControlFWDCar : public virtual ControlFWDCar
 protected:
     void init_links() override;
 
+    map::IMap const *map;
+
     causal::ScalarFixedVariable max_steer;
     causal::ScalarNegationVariable min_steer;
 

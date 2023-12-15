@@ -6,7 +6,7 @@
 #include <ori/simcars/causal/variable_types/endogenous/calc_scalar_range.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/calc_time_range.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_proxy.hpp>
-#include <ori/simcars/causal/variable_types/endogenous/lane_select.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/lane_selectable.hpp>
 #include <ori/simcars/agents/fwd_car_sim_parameters.hpp>
 #include <ori/simcars/agents/fwd_car_reward_parameters.hpp>
 #include <ori/simcars/agents/plan_fwd_car.hpp>
@@ -48,7 +48,7 @@ protected:
     simcars::causal::CalcScalarRange speed_options;
 
     simcars::causal::VectorSocketVariable pos;
-    simcars::causal::LaneSelectVariable lane_options;
+    simcars::causal::LaneSelectableVariable lane_options;
 
     causal::GenerateFWDCarActionsVariable actions;
 

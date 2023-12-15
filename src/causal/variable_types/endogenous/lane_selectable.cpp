@@ -1,5 +1,5 @@
 
-#include <ori/simcars/causal/variable_types/endogenous/lane_select.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/lane_selectable.hpp>
 
 #include <ori/simcars/structures/stl/stl_set.hpp>
 
@@ -10,14 +10,14 @@ namespace simcars
 namespace causal
 {
 
-LaneSelectVariable::LaneSelectVariable(IVariable<geometry::Vec> const *parent,
+LaneSelectableVariable::LaneSelectableVariable(IVariable<geometry::Vec> const *parent,
                                        map::IMap const *map) :
     AUnaryEndogenousVariable(parent), map(map)
 {
     assert(map != nullptr);
 }
 
-structures::stl::STLStackArray<uint64_t> LaneSelectVariable::get_value() const
+structures::stl::STLStackArray<uint64_t> LaneSelectableVariable::get_value() const
 {
     structures::IArray<map::ILane const*> *encapsulating_lanes =
             map->get_encapsulating_lanes(get_parent()->get_value());
