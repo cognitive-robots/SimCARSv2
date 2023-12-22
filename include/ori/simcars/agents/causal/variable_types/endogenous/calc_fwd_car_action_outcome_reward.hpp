@@ -27,7 +27,7 @@ public:
                                   simcars::causal::IVariable<FWDCarRewardParameters> const *other_parent,
                                   IFWDCarRewardCalc const *fwd_car_reward_calculator);
 
-    structures::stl::STLStackArray<RewardFWDCarActionPair> get_value() const override;
+    bool get_value(structures::stl::STLStackArray<RewardFWDCarActionPair> &val) const override;
 };
 
 }

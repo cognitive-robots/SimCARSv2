@@ -27,7 +27,7 @@ public:
     structures::stl::STLStackArray<FP_DATA_TYPE>, structures::stl::STLStackArray<uint64_t>
     >::ATernaryEndogenousVariable;
 
-    structures::stl::STLStackArray<FWDCarAction> get_value() const override;
+    bool get_value(structures::stl::STLStackArray<FWDCarAction> &val) const override;
 };
 
 }

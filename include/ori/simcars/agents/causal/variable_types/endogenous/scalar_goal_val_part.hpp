@@ -19,7 +19,7 @@ class ScalarGoalValPartVariable :
 public:
     using simcars::causal::AUnaryEndogenousVariable<FP_DATA_TYPE, Goal<FP_DATA_TYPE>>::AUnaryEndogenousVariable;
 
-    FP_DATA_TYPE get_value() const override;
+    bool get_value(FP_DATA_TYPE &val) const override;
 };
 
 }

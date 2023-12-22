@@ -19,7 +19,7 @@ class ScalarGoalTimePartVariable :
 public:
     using simcars::causal::AUnaryEndogenousVariable<temporal::Time, Goal<FP_DATA_TYPE>>::AUnaryEndogenousVariable;
 
-    temporal::Time get_value() const override;
+    bool get_value(temporal::Time &val) const override;
 };
 
 }

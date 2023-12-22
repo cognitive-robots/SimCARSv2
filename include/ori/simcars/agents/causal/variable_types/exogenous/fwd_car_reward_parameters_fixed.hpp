@@ -19,7 +19,7 @@ class FWDCarRewardParametersFixedVariable : public simcars::causal::IExogenousVa
 public:
     FWDCarRewardParametersFixedVariable(FWDCarRewardParameters value);
 
-    FWDCarRewardParameters get_value() const override;
+    bool get_value(FWDCarRewardParameters &val) const override;
 };
 
 }

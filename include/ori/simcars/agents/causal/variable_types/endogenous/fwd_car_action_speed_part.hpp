@@ -18,7 +18,7 @@ class FWDCarActionSpeedPartVariable :
 public:
     using simcars::causal::AUnaryEndogenousVariable<Goal<FP_DATA_TYPE>, FWDCarAction>::AUnaryEndogenousVariable;
 
-    Goal<FP_DATA_TYPE> get_value() const override;
+    bool get_value(Goal<FP_DATA_TYPE> &val) const override;
 };
 
 }

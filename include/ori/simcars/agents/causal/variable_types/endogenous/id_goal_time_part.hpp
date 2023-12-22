@@ -18,7 +18,7 @@ class IdGoalTimePartVariable :
 public:
     using simcars::causal::AUnaryEndogenousVariable<temporal::Time, Goal<uint64_t>>::AUnaryEndogenousVariable;
 
-    temporal::Time get_value() const override;
+    bool get_value(temporal::Time &val) const override;
 };
 
 }

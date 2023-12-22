@@ -38,14 +38,14 @@ protected:
     simcars::causal::ScalarFixedVariable time_horizon;
     simcars::causal::ScalarProxyVariable time_horizon_proxy;
     simcars::causal::ScalarFixedVariable time_interval;
-    simcars::causal::CalcTimeRange time_options;
+    simcars::causal::TimeRangeCalc time_options;
 
     simcars::causal::ScalarFixedVariable speed_min;
     simcars::causal::ScalarProxyVariable speed_min_proxy;
     simcars::causal::ScalarFixedVariable speed_max;
     simcars::causal::ScalarProxyVariable speed_max_proxy;
     simcars::causal::ScalarFixedVariable speed_interval;
-    simcars::causal::CalcScalarRange speed_options;
+    simcars::causal::ScalarRangeCalc speed_options;
 
     simcars::causal::VectorSocketVariable pos;
     simcars::causal::LaneSelectableVariable lane_options;

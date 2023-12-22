@@ -29,7 +29,7 @@ public:
                            simcars::causal::IVariable<FWDCarSimParameters> const *other_parent,
                            IFWDCarOutcomeSim const *fwd_car_outcome_sim);
 
-    structures::stl::STLStackArray<FWDCarOutcomeActionPair> get_value() const override;
+    bool get_value(structures::stl::STLStackArray<FWDCarOutcomeActionPair> &val) const override;
 };
 
 }

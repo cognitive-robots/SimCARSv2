@@ -20,7 +20,7 @@ class MaxRewardFWDCarActionVariable :
 public:
     using simcars::causal::AUnaryEndogenousVariable<FWDCarAction, structures::stl::STLStackArray<RewardFWDCarActionPair>>::AUnaryEndogenousVariable;
 
-    FWDCarAction get_value() const override;
+    bool get_value(FWDCarAction &val) const override;
 };
 
 }

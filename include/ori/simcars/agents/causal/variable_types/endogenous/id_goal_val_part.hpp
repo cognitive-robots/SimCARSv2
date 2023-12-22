@@ -18,7 +18,7 @@ class IdGoalValPartVariable :
 public:
     using simcars::causal::AUnaryEndogenousVariable<uint64_t, Goal<uint64_t>>::AUnaryEndogenousVariable;
 
-    uint64_t get_value() const override;
+    bool get_value(uint64_t &val) const override;
 };
 
 }

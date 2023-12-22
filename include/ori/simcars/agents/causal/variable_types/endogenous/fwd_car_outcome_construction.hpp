@@ -20,7 +20,7 @@ public:
     using ori::simcars::causal::ATernaryEndogenousVariable<FWDCarOutcome, int8_t, FP_DATA_TYPE,
     FP_DATA_TYPE>::ATernaryEndogenousVariable;
 
-    FWDCarOutcome get_value() const override;
+    bool get_value(FWDCarOutcome &val) const override;
 };
 
 }

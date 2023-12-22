@@ -18,7 +18,7 @@ class FWDCarActionLanePartVariable :
 public:
     using simcars::causal::AUnaryEndogenousVariable<Goal<uint64_t>, FWDCarAction>::AUnaryEndogenousVariable;
 
-    Goal<uint64_t> get_value() const override;
+    bool get_value(Goal<uint64_t> &val) const override;
 };
 
 }

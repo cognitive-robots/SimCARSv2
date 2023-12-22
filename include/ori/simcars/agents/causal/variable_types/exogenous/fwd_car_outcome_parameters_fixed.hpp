@@ -19,7 +19,7 @@ class FWDCarSimParametersFixedVariable : public simcars::causal::IExogenousVaria
 public:
     FWDCarSimParametersFixedVariable(FWDCarSimParameters value);
 
-    FWDCarSimParameters get_value() const override;
+    bool get_value(FWDCarSimParameters &val) const override;
 };
 
 }
