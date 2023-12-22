@@ -10,10 +10,24 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE ScalarTimeStepSizeQuotientVariable::get_value() const
+bool ScalarTimeStepSizeQuotientVariable::get_value(FP_DATA_TYPE &val) const
 {
-    return get_parent()->get_value() / std::chrono::duration_cast<std::chrono::seconds>(
-                VariableContext::get_time_step_size()).count();
+    if (get_parent()->get_value(val))
+    {
+        val = val / std::chrono::duration_cast<std::chrono::seconds>(
+                    VariableContext::get_time_step_size()).count();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ScalarTimeStepSizeQuotientVariable::set_value(FP_DATA_TYPE const &val)
+{
+    return get_parent()->set_value(val * std::chrono::duration_cast<std::chrono::seconds>(
+                                       VariableContext::get_time_step_size()).count());
 }
 
 }

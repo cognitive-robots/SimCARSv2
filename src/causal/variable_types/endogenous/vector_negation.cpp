@@ -8,9 +8,22 @@ namespace simcars
 namespace causal
 {
 
-geometry::Vec VectorNegationVariable::get_value() const
+bool VectorNegationVariable::get_value(geometry::Vec &val) const
 {
-    return -get_parent()->get_value();
+    if (get_parent()->get_value(val))
+    {
+        val = -val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool VectorNegationVariable::set_value(geometry::Vec const &val)
+{
+    return get_parent()->set_value(-val);
 }
 
 }

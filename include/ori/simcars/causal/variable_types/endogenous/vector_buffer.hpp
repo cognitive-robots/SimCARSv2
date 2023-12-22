@@ -19,13 +19,15 @@ class VectorBufferVariable : public AUnaryEndogenousVariable<geometry::Vec, geom
 
 public:
     VectorBufferVariable(
-            IVariable<geometry::Vec> const *parent,
+            IVariable<geometry::Vec> *parent,
             temporal::TemporalDictionary<geometry::Vec> *temporal_dictionary = nullptr,
             bool axiomatic = false);
 
     ~VectorBufferVariable();
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

@@ -10,9 +10,16 @@ namespace causal
 
 DurationFixedVariable::DurationFixedVariable(temporal::Duration value) : value(value) {}
 
-temporal::Duration DurationFixedVariable::get_value() const
+bool DurationFixedVariable::get_value(temporal::Duration &val) const
 {
-    return value;
+    val = value;
+    return true;
+}
+
+bool DurationFixedVariable::set_value(temporal::Duration const &val)
+{
+    value = val;
+    return true;
 }
 
 }

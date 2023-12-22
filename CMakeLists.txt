@@ -194,9 +194,9 @@ add_library(simcars_causal STATIC
   src/causal/variable_types/endogenous/scalar_previous_time_step.cpp
   src/causal/variable_types/endogenous/scalar_buffer.cpp
   src/causal/variable_types/endogenous/scalar_set_sum.cpp
-  src/causal/variable_types/endogenous/calc_scalar_range.cpp
+  src/causal/variable_types/endogenous/scalar_range_calc.cpp
   src/causal/variable_types/endogenous/time_current_time_difference.cpp
-  src/causal/variable_types/endogenous/calc_time_range.cpp
+  src/causal/variable_types/endogenous/time_range_calc.cpp
   src/causal/variable_types/endogenous/duration_seconds_cast.cpp
   src/causal/variable_types/endogenous/vector_angle_construction.cpp
   src/causal/variable_types/endogenous/vector_xy_construction.cpp
@@ -265,9 +265,9 @@ add_library(simcars_causal STATIC
   include/ori/simcars/causal/variable_types/endogenous/scalar_previous_time_step.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_buffer.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_set_sum.hpp
-  include/ori/simcars/causal/variable_types/endogenous/calc_scalar_range.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_range_calc.hpp
   include/ori/simcars/causal/variable_types/endogenous/time_current_time_difference.hpp
-  include/ori/simcars/causal/variable_types/endogenous/calc_time_range.hpp
+  include/ori/simcars/causal/variable_types/endogenous/time_range_calc.hpp
   include/ori/simcars/causal/variable_types/endogenous/duration_seconds_cast.hpp
   include/ori/simcars/causal/variable_types/endogenous/vector_angle_construction.hpp
   include/ori/simcars/causal/variable_types/endogenous/vector_xy_construction.hpp

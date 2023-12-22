@@ -8,12 +8,28 @@ namespace simcars
 namespace causal
 {
 
-geometry::ORect ORectConstructionVariable::get_value() const
+bool ORectConstructionVariable::get_value(geometry::ORect &val) const
 {
-    return geometry::ORect(get_endogenous_parent_1()->get_value(),
-                           get_endogenous_parent_2()->get_value(),
-                           get_endogenous_parent_3()->get_value(),
-                           get_other_parent()->get_value());
+    geometry::Vec pos;
+    FP_DATA_TYPE width, height, rot;
+    if (get_endogenous_parent_1()->get_value(pos) && get_endogenous_parent_2()->get_value(width) &&
+            get_endogenous_parent_3()->get_value(height) && get_other_parent()->get_value(rot))
+    {
+        val = geometry::ORect(pos, width, height, rot);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ORectConstructionVariable::set_value(geometry::ORect const &val)
+{
+    return get_endogenous_parent_1()->set_value(val.get_origin()) &&
+            get_endogenous_parent_2()->set_value(val.get_width()) &&
+            get_endogenous_parent_3()->set_value(val.get_height()) &&
+            get_other_parent()->set_value(val.get_orientation());
 }
 
 }

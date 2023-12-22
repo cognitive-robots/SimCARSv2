@@ -8,13 +8,27 @@ namespace simcars
 namespace causal
 {
 
-MatrixAngleConstructionVariable::MatrixAngleConstructionVariable(
-        IVariable<FP_DATA_TYPE> const *parent) : AUnaryEndogenousVariable(parent),
-    trig_buff(geometry::TrigBuff::get_instance()) {}
+MatrixAngleConstructionVariable::MatrixAngleConstructionVariable(IVariable<FP_DATA_TYPE> *parent) :
+    AUnaryEndogenousVariable(parent), trig_buff(geometry::TrigBuff::get_instance()) {}
 
-geometry::RotMat MatrixAngleConstructionVariable::get_value() const
+bool MatrixAngleConstructionVariable::get_value(geometry::RotMat &val) const
 {
-    return trig_buff->get_rot_mat(get_parent()->get_value());
+    FP_DATA_TYPE angle;
+    if (get_parent()->get_value(angle))
+    {
+        val = trig_buff->get_rot_mat(angle);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool MatrixAngleConstructionVariable::set_value(geometry::RotMat const &val)
+{
+    FP_DATA_TYPE angle = std::atan2(val(1,0), val(0,0));
+    return get_parent()->set_value(angle);
 }
 
 }

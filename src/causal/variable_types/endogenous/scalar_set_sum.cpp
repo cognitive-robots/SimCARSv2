@@ -8,15 +8,43 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE ScalarSetSumVariable::get_value() const
+bool ScalarSetSumVariable::get_value(FP_DATA_TYPE &val) const
 {
-    structures::IArray<IEndogenousVariable<FP_DATA_TYPE> const*> const *parents = get_array();
-    FP_DATA_TYPE value;
+    structures::IArray<IEndogenousVariable<FP_DATA_TYPE>*> const *parents = get_array();
+    FP_DATA_TYPE current_val, total_val = 0.0;
     for (size_t i = 0; i < count(); ++i)
     {
-        value += (*parents)[i]->get_value();
+        if ((*parents)[i]->get_value(current_val))
+        {
+            total_val += current_val;
+        }
+        else
+        {
+            return false;
+        }
     }
-    return value;
+
+    val = total_val;
+    return true;
+}
+
+bool ScalarSetSumVariable::set_value(FP_DATA_TYPE const &val)
+{
+    structures::IArray<IEndogenousVariable<FP_DATA_TYPE>*> const *parents = get_array();
+    FP_DATA_TYPE current_val, total_val = 0.0;
+    for (size_t i = 0; i < count(); ++i)
+    {
+        if ((*parents)[i]->get_value(current_val))
+        {
+            total_val += current_val;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return val == total_val;
 }
 
 }

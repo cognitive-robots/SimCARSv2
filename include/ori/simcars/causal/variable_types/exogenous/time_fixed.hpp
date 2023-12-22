@@ -12,12 +12,14 @@ namespace causal
 
 class TimeFixedVariable : public IExogenousVariable<temporal::Time>
 {
-    temporal::Time const value;
+    temporal::Time value;
 
 public:
     TimeFixedVariable(temporal::Time value);
 
-    temporal::Time get_value() const override;
+    bool get_value(temporal::Time &val) const override;
+
+    bool set_value(temporal::Time const &val) override;
 };
 
 }

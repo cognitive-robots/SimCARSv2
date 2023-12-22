@@ -15,10 +15,12 @@ class LaneEncapsulationVariable : public ABinaryEndogenousVariable<bool, uint64_
     map::IMap const *map;
 
 public:
-    LaneEncapsulationVariable(IEndogenousVariable<uint64_t> const *endogenous_parent,
-                              IVariable<geometry::Vec> const *other_parent, map::IMap const *map);
+    LaneEncapsulationVariable(IEndogenousVariable<uint64_t> *endogenous_parent,
+                              IVariable<geometry::Vec> *other_parent, map::IMap const *map);
 
-    bool get_value() const override;
+    bool get_value(bool &val) const override;
+
+    bool set_value(bool const &val) override;
 };
 
 }

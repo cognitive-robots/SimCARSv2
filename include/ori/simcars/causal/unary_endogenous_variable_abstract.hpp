@@ -14,15 +14,15 @@ namespace causal
 template <typename R, typename P1>
 class AUnaryEndogenousVariable : public IEndogenousVariable<R>
 {
-    IVariable<P1> const *parent;
+    IVariable<P1> *parent;
 
 public:
-    AUnaryEndogenousVariable(IVariable<P1> const *parent) : parent(parent)
+    AUnaryEndogenousVariable(IVariable<P1> *parent) : parent(parent)
     {
         assert(parent != nullptr);
     }
 
-    IVariable<P1> const* get_parent() const
+    IVariable<P1>* get_parent() const
     {
         return parent;
     }

@@ -15,7 +15,9 @@ class VectorPairFirstVariable : public AUnaryEndogenousVariable<geometry::Vec, g
 public:
     using AUnaryEndogenousVariable<geometry::Vec, geometry::VecPair>::AUnaryEndogenousVariable;
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

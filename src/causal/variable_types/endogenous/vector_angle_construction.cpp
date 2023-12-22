@@ -9,15 +9,28 @@ namespace causal
 {
 
 VectorAngleConstructionVariable::VectorAngleConstructionVariable(
-        IVariable<FP_DATA_TYPE> const *parent) : AUnaryEndogenousVariable(parent),
+        IVariable<FP_DATA_TYPE> *parent) : AUnaryEndogenousVariable(parent),
     trig_buff(geometry::TrigBuff::get_instance()) {}
 
-geometry::Vec VectorAngleConstructionVariable::get_value() const
+bool VectorAngleConstructionVariable::get_value(geometry::Vec &val) const
 {
-    FP_DATA_TYPE value = get_parent()->get_value();
-    FP_DATA_TYPE sin_o = trig_buff->get_sin(value);
-    FP_DATA_TYPE cos_o = trig_buff->get_cos(value);
-    return geometry::Vec(cos_o, sin_o);
+    FP_DATA_TYPE angle;
+    if (get_parent()->get_value(angle))
+    {
+        FP_DATA_TYPE sin_o = trig_buff->get_sin(angle);
+        FP_DATA_TYPE cos_o = trig_buff->get_cos(angle);
+        val = geometry::Vec(cos_o, sin_o);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool VectorAngleConstructionVariable::set_value(geometry::Vec const &val)
+{
+    return get_parent()->set_value(std::atan2(val.y(), val.x()));
 }
 
 }

@@ -12,12 +12,14 @@ namespace causal
 
 class ScalarFixedVariable : public IExogenousVariable<FP_DATA_TYPE>
 {
-    FP_DATA_TYPE const value;
+    FP_DATA_TYPE value;
 
 public:
     ScalarFixedVariable(FP_DATA_TYPE value);
 
-    FP_DATA_TYPE get_value() const override;
+    bool get_value(FP_DATA_TYPE &val) const override;
+
+    bool set_value(FP_DATA_TYPE const &val) override;
 };
 
 }

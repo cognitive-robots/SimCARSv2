@@ -70,6 +70,21 @@ public:
         return data.at(idx);
     }
 
+    STLStackArray<T>& operator =(STLStackArray<T> const &array)
+    {
+        std::lock_guard<std::recursive_mutex> this_data_guard(this->data_mutex);
+        std::lock_guard<std::recursive_mutex> array_data_guard(array.data_mutex);
+
+        this->data.resize(array.data.size());
+
+        for (size_t i = 0; i < data.size(); ++i)
+        {
+            this->data[i] = array.data[i];
+        }
+
+        return *this;
+    }
+
     void push_back(T const &val) override
     {
         std::lock_guard<std::recursive_mutex> data_guard(data_mutex);

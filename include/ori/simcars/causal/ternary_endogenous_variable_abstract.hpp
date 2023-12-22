@@ -14,14 +14,14 @@ namespace causal
 template <typename R, typename P1, typename P2, typename P3>
 class ATernaryEndogenousVariable : public IEndogenousVariable<R>
 {
-    IEndogenousVariable<P1> const *endogenous_parent_1;
-    IEndogenousVariable<P2> const *endogenous_parent_2;
-    IVariable<P3> const *other_parent;
+    IEndogenousVariable<P1> *endogenous_parent_1;
+    IEndogenousVariable<P2> *endogenous_parent_2;
+    IVariable<P3> *other_parent;
 
 public:
-    ATernaryEndogenousVariable(IEndogenousVariable<P1> const *endogenous_parent_1,
-                               IEndogenousVariable<P2> const *endogenous_parent_2,
-                               IVariable<P3> const *other_parent) :
+    ATernaryEndogenousVariable(IEndogenousVariable<P1> *endogenous_parent_1,
+                               IEndogenousVariable<P2> *endogenous_parent_2,
+                               IVariable<P3> *other_parent) :
         endogenous_parent_1(endogenous_parent_1), endogenous_parent_2(endogenous_parent_2),
         other_parent(other_parent)
     {
@@ -30,15 +30,15 @@ public:
         assert(other_parent != nullptr);
     }
 
-    IEndogenousVariable<P1> const* get_endogenous_parent_1() const
+    IEndogenousVariable<P1>* get_endogenous_parent_1() const
     {
         return endogenous_parent_1;
     }
-    IEndogenousVariable<P2> const* get_endogenous_parent_2() const
+    IEndogenousVariable<P2>* get_endogenous_parent_2() const
     {
         return endogenous_parent_2;
     }
-    IVariable<P3> const* get_other_parent() const
+    IVariable<P3>* get_other_parent() const
     {
         return other_parent;
     }

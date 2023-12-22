@@ -14,17 +14,19 @@ class VectorSocketVariable : public IExogenousVariable<geometry::Vec>
 {
     geometry::Vec default_value;
 
-    IVariable<geometry::Vec> const *parent;
+    IVariable<geometry::Vec> *parent;
 
 public:
     VectorSocketVariable(geometry::Vec default_value = geometry::Vec::Zero(),
-                         IVariable<geometry::Vec> const *parent = nullptr);
+                         IVariable<geometry::Vec> *parent = nullptr);
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
 
     IVariable<geometry::Vec> const* get_parent() const;
 
-    void set_parent(IVariable<geometry::Vec> const *parent);
+    bool set_value(geometry::Vec const &val) override;
+
+    void set_parent(IVariable<geometry::Vec> *parent);
 };
 
 }

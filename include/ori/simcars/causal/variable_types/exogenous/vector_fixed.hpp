@@ -12,12 +12,14 @@ namespace causal
 
 class VectorFixedVariable : public IExogenousVariable<geometry::Vec>
 {
-    geometry::Vec const value;
+    geometry::Vec value;
 
 public:
     VectorFixedVariable(geometry::Vec value);
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

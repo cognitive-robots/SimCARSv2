@@ -8,9 +8,31 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE VectorNormVariable::get_value() const
+bool VectorNormVariable::get_value(FP_DATA_TYPE &val) const
 {
-    return get_parent()->get_value().norm();
+    geometry::Vec vec;
+    if (get_parent()->get_value(vec))
+    {
+        val = vec.norm();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool VectorNormVariable::set_value(FP_DATA_TYPE const &val)
+{
+    geometry::Vec vec;
+    if (get_parent()->get_value(vec))
+    {
+        return val == vec.norm();
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

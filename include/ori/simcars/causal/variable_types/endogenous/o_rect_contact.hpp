@@ -16,7 +16,9 @@ class ORectContactVariable :
 public:
     using ABinaryEndogenousVariable<geometry::VecPair, geometry::ORect, geometry::ORect>::ABinaryEndogenousVariable;
 
-    geometry::VecPair get_value() const override;
+    bool get_value(geometry::VecPair &val) const override;
+
+    bool set_value(geometry::VecPair const &val) override;
 };
 
 }

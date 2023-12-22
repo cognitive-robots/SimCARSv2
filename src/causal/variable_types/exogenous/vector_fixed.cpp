@@ -10,9 +10,16 @@ namespace causal
 
 VectorFixedVariable::VectorFixedVariable(geometry::Vec value) : value(value) {}
 
-geometry::Vec VectorFixedVariable::get_value() const
+bool VectorFixedVariable::get_value(geometry::Vec &val) const
 {
-    return value;
+    val = value;
+    return true;
+}
+
+bool VectorFixedVariable::set_value(geometry::Vec const &val)
+{
+    value = val;
+    return true;
 }
 
 }

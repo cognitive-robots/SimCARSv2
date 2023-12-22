@@ -10,9 +10,16 @@ namespace causal
 
 IdFixedVariable::IdFixedVariable(uint64_t value) : value(value) {}
 
-uint64_t IdFixedVariable::get_value() const
+bool IdFixedVariable::get_value(uint64_t &val) const
 {
-    return value;
+    val = value;
+    return true;
+}
+
+bool IdFixedVariable::set_value(uint64_t const &val)
+{
+    value = val;
+    return true;
 }
 
 }

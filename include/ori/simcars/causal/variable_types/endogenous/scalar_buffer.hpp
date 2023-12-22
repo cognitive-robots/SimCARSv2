@@ -19,13 +19,15 @@ class ScalarBufferVariable : public AUnaryEndogenousVariable<FP_DATA_TYPE, FP_DA
 
 public:
     ScalarBufferVariable(
-            IVariable<FP_DATA_TYPE> const *parent,
+            IVariable<FP_DATA_TYPE> *parent,
             temporal::TemporalDictionary<FP_DATA_TYPE> *temporal_dictionary = nullptr,
             bool axiomatic = false);
 
     ~ScalarBufferVariable();
 
-    FP_DATA_TYPE get_value() const override;
+    bool get_value(FP_DATA_TYPE &val) const override;
+
+    bool set_value(FP_DATA_TYPE const &val) override;
 };
 
 }

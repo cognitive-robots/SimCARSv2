@@ -82,6 +82,11 @@ bool ORect::operator ==(ORect const &o_rect) const
     return Rect::operator ==(o_rect) && this->orientation == o_rect.orientation;
 }
 
+FP_DATA_TYPE ORect::get_orientation() const
+{
+    return orientation;
+}
+
 bool ORect::check_collision(ORect const &o_rect) const
 {
     return check_vicinity(o_rect) && check_bounds(o_rect) &&

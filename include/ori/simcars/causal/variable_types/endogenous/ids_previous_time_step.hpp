@@ -18,7 +18,9 @@ public:
     using AUnaryEndogenousVariable<structures::stl::STLStackArray<uint64_t>,
     structures::stl::STLStackArray<uint64_t>>::AUnaryEndogenousVariable;
 
-    structures::stl::STLStackArray<uint64_t> get_value() const override;
+    bool get_value(structures::stl::STLStackArray<uint64_t> &val) const override;
+
+    bool set_value(structures::stl::STLStackArray<uint64_t> const &val) override;
 };
 
 }

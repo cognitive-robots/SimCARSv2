@@ -10,10 +10,26 @@ namespace simcars
 namespace causal
 {
 
-temporal::Duration TimeCurrentTimeDifferenceVariable::get_value() const
+bool TimeCurrentTimeDifferenceVariable::get_value(temporal::Duration &val) const
 {
-    return get_parent()->get_value() - VariableContext::get_current_time();
+    temporal::Time time;
+    if (get_parent()->get_value(time))
+    {
+        val = time - VariableContext::get_current_time();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
+
+bool TimeCurrentTimeDifferenceVariable::set_value(temporal::Duration const &val)
+{
+    return get_parent()->set_value(val + VariableContext::get_current_time());
+}
+
+
 
 }
 }

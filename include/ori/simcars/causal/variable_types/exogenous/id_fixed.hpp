@@ -13,12 +13,14 @@ namespace causal
 
 class IdFixedVariable : public IExogenousVariable<uint64_t>
 {
-    uint64_t const value;
+    uint64_t value;
 
 public:
     IdFixedVariable(uint64_t value);
 
-    uint64_t get_value() const override;
+    bool get_value(uint64_t &val) const override;
+
+    bool set_value(uint64_t const &val) override;
 };
 
 }

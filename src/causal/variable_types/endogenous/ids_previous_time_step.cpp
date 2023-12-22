@@ -10,12 +10,20 @@ namespace simcars
 namespace causal
 {
 
-structures::stl::STLStackArray<uint64_t> IdsPreviousTimeStepVariable::get_value() const
+bool IdsPreviousTimeStepVariable::get_value(structures::stl::STLStackArray<uint64_t> &val) const
 {
     VariableContext::decrement_time_step();
-    structures::stl::STLStackArray<uint64_t> value = get_parent()->get_value();
+    bool res = get_parent()->get_value(val);
     VariableContext::increment_time_step();
-    return value;
+    return res;
+}
+
+bool IdsPreviousTimeStepVariable::set_value(structures::stl::STLStackArray<uint64_t> const &val)
+{
+    VariableContext::decrement_time_step();
+    bool res = get_parent()->set_value(val);
+    VariableContext::increment_time_step();
+    return res;
 }
 
 }

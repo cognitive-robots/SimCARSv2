@@ -10,7 +10,7 @@ namespace causal
 {
 
 VectorBufferVariable::VectorBufferVariable(
-        IVariable<geometry::Vec> const *parent,
+        IVariable<geometry::Vec> *parent,
         temporal::TemporalDictionary<geometry::Vec> *temporal_dictionary, bool axiomatic) :
     AUnaryEndogenousVariable(parent), axiomatic(axiomatic)
 {
@@ -29,23 +29,63 @@ VectorBufferVariable::~VectorBufferVariable()
     delete temporal_dictionary;
 }
 
-geometry::Vec VectorBufferVariable::get_value() const
+bool VectorBufferVariable::get_value(geometry::Vec &val) const
 {
     if (temporal_dictionary->contains(VariableContext::get_current_time()))
     {
-        return (*temporal_dictionary)[VariableContext::get_current_time()];
+        val = (*temporal_dictionary)[VariableContext::get_current_time()];
+        return true;
     }
     else if (axiomatic &&
              VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
     {
-        return geometry::Vec(std::numeric_limits<FP_DATA_TYPE>::quiet_NaN(),
-                             std::numeric_limits<FP_DATA_TYPE>::quiet_NaN());
+        return false;
     }
     else
     {
-        geometry::Vec value = get_parent()->get_value();
-        temporal_dictionary->update(VariableContext::get_current_time(), value);
-        return value;
+        if (get_parent()->get_value(val))
+        {
+            temporal_dictionary->update(VariableContext::get_current_time(), val);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
+
+bool VectorBufferVariable::set_value(geometry::Vec const &val)
+{
+    if (temporal_dictionary->contains(VariableContext::get_current_time()))
+    {
+        if (get_parent()->set_value(val))
+        {
+            temporal_dictionary->update(VariableContext::get_current_time(), val);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else if (axiomatic &&
+             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
+    {
+        temporal_dictionary->update(VariableContext::get_current_time(), val);
+        return true;
+    }
+    else
+    {
+        if (get_parent()->set_value(val))
+        {
+            temporal_dictionary->update(VariableContext::get_current_time(), val);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 

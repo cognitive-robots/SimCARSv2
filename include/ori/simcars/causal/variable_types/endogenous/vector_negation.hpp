@@ -15,7 +15,9 @@ class VectorNegationVariable : public AUnaryEndogenousVariable<geometry::Vec, ge
 public:
     using AUnaryEndogenousVariable<geometry::Vec, geometry::Vec>::AUnaryEndogenousVariable;
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

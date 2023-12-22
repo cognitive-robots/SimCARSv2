@@ -16,7 +16,9 @@ class MatrixVectorProductVariable :
 public:
     using ABinaryEndogenousVariable<geometry::Vec, geometry::RotMat, geometry::Vec>::ABinaryEndogenousVariable;
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

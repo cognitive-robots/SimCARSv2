@@ -8,9 +8,14 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE ScalarProxyVariable::get_value() const
+bool ScalarProxyVariable::get_value(FP_DATA_TYPE &val) const
 {
-    return get_parent()->get_value();
+    return get_parent()->get_value(val);
+}
+
+bool ScalarProxyVariable::set_value(FP_DATA_TYPE const &val)
+{
+    return get_parent()->set_value(val);
 }
 
 }

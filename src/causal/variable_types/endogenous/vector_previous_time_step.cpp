@@ -10,12 +10,20 @@ namespace simcars
 namespace causal
 {
 
-geometry::Vec VectorPreviousTimeStepVariable::get_value() const
+bool VectorPreviousTimeStepVariable::get_value(geometry::Vec &val) const
 {
     VariableContext::decrement_time_step();
-    geometry::Vec value = get_parent()->get_value();
+    bool res = get_parent()->get_value(val);
     VariableContext::increment_time_step();
-    return value;
+    return res;
+}
+
+bool VectorPreviousTimeStepVariable::set_value(geometry::Vec const &val)
+{
+    VariableContext::decrement_time_step();
+    bool res = get_parent()->set_value(val);
+    VariableContext::increment_time_step();
+    return res;
 }
 
 }

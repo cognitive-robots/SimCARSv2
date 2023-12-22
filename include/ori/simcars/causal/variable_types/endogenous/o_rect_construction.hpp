@@ -17,7 +17,9 @@ class ORectConstructionVariable :
 public:
     using AQuaternaryEndogenousVariable<geometry::ORect, geometry::Vec, FP_DATA_TYPE, FP_DATA_TYPE, FP_DATA_TYPE>::AQuaternaryEndogenousVariable;
 
-    geometry::ORect get_value() const override;
+    bool get_value(geometry::ORect &val) const override;
+
+    bool set_value(geometry::ORect const &val) override;
 };
 
 }

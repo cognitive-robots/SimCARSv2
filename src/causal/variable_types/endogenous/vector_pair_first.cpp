@@ -8,9 +8,32 @@ namespace simcars
 namespace causal
 {
 
-geometry::Vec VectorPairFirstVariable::get_value() const
+bool VectorPairFirstVariable::get_value(geometry::Vec &val) const
 {
-    return get_parent()->get_value().first;
+    geometry::VecPair vec_pair;
+    if (get_parent()->get_value(vec_pair))
+    {
+        val = vec_pair.first;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool VectorPairFirstVariable::set_value(geometry::Vec const &val)
+{
+    geometry::VecPair vec_pair;
+    if (get_parent()->get_value(vec_pair))
+    {
+        vec_pair.first = val;
+        return get_parent()->set_value(vec_pair);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

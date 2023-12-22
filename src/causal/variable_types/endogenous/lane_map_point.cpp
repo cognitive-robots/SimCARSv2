@@ -9,20 +9,39 @@ namespace causal
 {
 
 LaneMapPointVariable::LaneMapPointVariable(
-        IEndogenousVariable<uint64_t> const *endogenous_parent,
-        IVariable<geometry::Vec> const *other_parent, map::IMap const *map) :
+        IEndogenousVariable<uint64_t> *endogenous_parent,
+        IVariable<geometry::Vec> *other_parent, map::IMap const *map) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent), map(map) {}
 
-geometry::Vec LaneMapPointVariable::get_value() const
+bool LaneMapPointVariable::get_value(geometry::Vec &val) const
 {
-    map::ILane const *lane = map->get_lane(get_endogenous_parent()->get_value());
-    if (lane != nullptr)
+    uint64_t lane_id;
+    if (get_endogenous_parent()->get_value(lane_id) && get_other_parent()->get_value(val))
     {
-        return lane->map_point(get_other_parent()->get_value());
+        map::ILane const *lane = map->get_lane(lane_id);
+        if (lane != nullptr)
+        {
+            val = lane->map_point(val);
+        }
+
+        return true;
     }
     else
     {
-        return get_other_parent()->get_value();
+        return false;
+    }
+}
+
+bool LaneMapPointVariable::set_value(geometry::Vec const &val)
+{
+    geometry::Vec map_point;
+    if(get_value(map_point))
+    {
+        return val == map_point;
+    }
+    else
+    {
+        return false;
     }
 }
 

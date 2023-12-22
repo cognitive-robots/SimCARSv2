@@ -15,16 +15,18 @@ class IdSocketVariable : public IExogenousVariable<uint64_t>
 {
     uint64_t default_value;
 
-    IVariable<uint64_t> const *parent;
+    IVariable<uint64_t> *parent;
 
 public:
-    IdSocketVariable(uint64_t default_value = 0.0, IVariable<uint64_t> const *parent = nullptr);
+    IdSocketVariable(uint64_t default_value = 0.0, IVariable<uint64_t> *parent = nullptr);
 
-    uint64_t get_value() const override;
+    bool get_value(uint64_t &val) const override;
 
     IVariable<uint64_t> const* get_parent() const;
 
-    void set_parent(IVariable<uint64_t> const *parent);
+    bool set_value(uint64_t const &val) override;
+
+    void set_parent(IVariable<uint64_t> *parent);
 };
 
 }

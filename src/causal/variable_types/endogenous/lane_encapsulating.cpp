@@ -8,32 +8,71 @@ namespace simcars
 namespace causal
 {
 
-LaneEncapsulatingVariable::LaneEncapsulatingVariable(IVariable<geometry::Vec> const *parent,
+LaneEncapsulatingVariable::LaneEncapsulatingVariable(IVariable<geometry::Vec> *parent,
                                        map::IMap const *map) :
     AUnaryEndogenousVariable(parent), map(map)
 {
     assert(map != nullptr);
 }
 
-structures::stl::STLStackArray<uint64_t> LaneEncapsulatingVariable::get_value() const
+bool LaneEncapsulatingVariable::get_value(structures::stl::STLStackArray<uint64_t> &val) const
 {
-    structures::IArray<map::ILane const*> *encapsulating_lanes =
-            map->get_encapsulating_lanes(get_parent()->get_value());
-
-    structures::stl::STLStackArray<uint64_t> selected_lanes;
-
-    size_t i;
-
-    for (i = 0; i < encapsulating_lanes->count(); ++i)
+    geometry::Vec pos;
+    if (get_parent()->get_value(pos))
     {
-        map::ILane const *encapsulating_lane = (*encapsulating_lanes)[i];
+        structures::IArray<map::ILane const*> *encapsulating_lanes =
+                map->get_encapsulating_lanes(pos);
 
-        selected_lanes.push_back(encapsulating_lane->get_id());
+        size_t i;
+
+        for (i = 0; i < encapsulating_lanes->count(); ++i)
+        {
+            map::ILane const *encapsulating_lane = (*encapsulating_lanes)[i];
+
+            val.push_back(encapsulating_lane->get_id());
+        }
+
+        delete encapsulating_lanes;
+
+        return true;
     }
+    else
+    {
+        return false;
+    }
+}
 
-    delete encapsulating_lanes;
+bool LaneEncapsulatingVariable::set_value(structures::stl::STLStackArray<uint64_t> const &val)
+{
+    geometry::Vec pos;
+    if (get_parent()->get_value(pos))
+    {
+        structures::IArray<map::ILane const*> *encapsulating_lanes =
+                map->get_encapsulating_lanes(pos);
 
-    return selected_lanes;
+        if (encapsulating_lanes->count() != val.count()) return false;
+
+        size_t i, j;
+
+        for (i = 0; i < encapsulating_lanes->count(); ++i)
+        {
+            for (j = 0; j < val.count(); ++i)
+            {
+                if ((*encapsulating_lanes)[i]->get_id() == val[j])
+                {
+                    break;
+                }
+            }
+
+            if (j == val.count()) return false;
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

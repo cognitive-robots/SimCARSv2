@@ -10,9 +10,16 @@ namespace causal
 
 TimeFixedVariable::TimeFixedVariable(temporal::Time value) : value(value) {}
 
-temporal::Time TimeFixedVariable::get_value() const
+bool TimeFixedVariable::get_value(temporal::Time &val) const
 {
-    return value;
+    val = value;
+    return true;
+}
+
+bool TimeFixedVariable::set_value(temporal::Time const &val)
+{
+    value = val;
+    return true;
 }
 
 }

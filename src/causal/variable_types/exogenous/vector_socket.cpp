@@ -9,18 +9,20 @@ namespace causal
 {
 
 VectorSocketVariable::VectorSocketVariable(geometry::Vec default_value,
-                                           IVariable<geometry::Vec> const *parent) :
+                                           IVariable<geometry::Vec> *parent) :
     default_value(default_value), parent(parent) {}
 
-geometry::Vec VectorSocketVariable::get_value() const
+
+bool VectorSocketVariable::get_value(geometry::Vec &val) const
 {
     if (parent != nullptr)
     {
-        return parent->get_value();
+        return parent->get_value(val);
     }
     else
     {
-        return default_value;
+        val = default_value;
+        return true;
     }
 }
 
@@ -29,7 +31,20 @@ IVariable<geometry::Vec> const* VectorSocketVariable::get_parent() const
     return parent;
 }
 
-void VectorSocketVariable::set_parent(const IVariable<geometry::Vec> *parent)
+bool VectorSocketVariable::set_value(geometry::Vec const &val)
+{
+    if (parent != nullptr)
+    {
+        return parent->set_value(val);
+    }
+    else
+    {
+        default_value = val;
+        return true;
+    }
+}
+
+void VectorSocketVariable::set_parent(IVariable<geometry::Vec> *parent)
 {
     this->parent = parent;
 }

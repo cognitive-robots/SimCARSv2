@@ -16,7 +16,9 @@ class TimeCurrentTimeDifferenceVariable :
 public:
     using AUnaryEndogenousVariable<temporal::Duration, temporal::Time>::AUnaryEndogenousVariable;
 
-    temporal::Duration get_value() const override;
+    bool get_value(temporal::Duration &val) const override;
+
+    bool set_value(temporal::Duration const &val) override;
 };
 
 }

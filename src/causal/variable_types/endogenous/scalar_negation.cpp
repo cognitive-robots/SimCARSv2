@@ -8,9 +8,22 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE ScalarNegationVariable::get_value() const
+bool ScalarNegationVariable::get_value(FP_DATA_TYPE &val) const
 {
-    return -get_parent()->get_value();
+    if (get_parent()->get_value(val))
+    {
+        val = -val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ScalarNegationVariable::set_value(FP_DATA_TYPE const &val)
+{
+    return get_parent()->set_value(-val);
 }
 
 }

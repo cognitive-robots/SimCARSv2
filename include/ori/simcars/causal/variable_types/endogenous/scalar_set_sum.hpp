@@ -15,7 +15,9 @@ class ScalarSetSumVariable : public ASetEndogenousVariable<FP_DATA_TYPE, FP_DATA
 public:
     using ASetEndogenousVariable<FP_DATA_TYPE, FP_DATA_TYPE>::ASetEndogenousVariable;
 
-    FP_DATA_TYPE get_value() const override;
+    bool get_value(FP_DATA_TYPE &val) const override;
+
+    bool set_value(FP_DATA_TYPE const &val) override;
 };
 
 }

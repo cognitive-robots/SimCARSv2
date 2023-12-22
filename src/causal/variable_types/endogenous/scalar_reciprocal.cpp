@@ -8,11 +8,23 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE ScalarReciprocalVariable::get_value() const
+bool ScalarReciprocalVariable::get_value(FP_DATA_TYPE &val) const
 {
-    return 1.0 / get_parent()->get_value();
+    if (get_parent()->get_value(val))
+    {
+        val = 1.0 / val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
+bool ScalarReciprocalVariable::set_value(FP_DATA_TYPE const &val)
+{
+    return get_parent()->set_value(1.0 / val);
+}
 }
 }
 }

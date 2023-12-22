@@ -9,19 +9,42 @@ namespace causal
 {
 
 LaneEncapsulationVariable::LaneEncapsulationVariable(
-        IEndogenousVariable<uint64_t> const *endogenous_parent,
-        IVariable<geometry::Vec> const *other_parent, map::IMap const *map) :
+        IEndogenousVariable<uint64_t> *endogenous_parent,
+        IVariable<geometry::Vec> *other_parent, map::IMap const *map) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent), map(map)
 {
     assert(map != nullptr);
 }
 
-bool LaneEncapsulationVariable::get_value() const
+bool LaneEncapsulationVariable::get_value(bool &val) const
 {
-    map::ILane const *lane = map->get_lane(get_endogenous_parent()->get_value());
-    if (lane != nullptr)
+    uint64_t lane_id;
+    geometry::Vec pos;
+    if (get_endogenous_parent()->get_value(lane_id) && get_other_parent()->get_value(pos))
     {
-        return lane->check_encapsulation(get_other_parent()->get_value());
+        map::ILane const *lane = map->get_lane(lane_id);
+        if (lane != nullptr)
+        {
+            val = lane->check_encapsulation(pos);
+        }
+        else
+        {
+            val = false;
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool LaneEncapsulationVariable::set_value(bool const &val)
+{
+    bool encapsulation;
+    if (get_value(encapsulation))
+    {
+        return val == encapsulation;
     }
     else
     {

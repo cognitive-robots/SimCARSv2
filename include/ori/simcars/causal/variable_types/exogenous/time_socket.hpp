@@ -14,17 +14,19 @@ class TimeSocketVariable : public IExogenousVariable<temporal::Time>
 {
     temporal::Time default_value;
 
-    IVariable<temporal::Time> const *parent;
+    IVariable<temporal::Time> *parent;
 
 public:
     TimeSocketVariable(temporal::Time default_value = temporal::Time(temporal::Duration(0.0)),
-                       IVariable<temporal::Time> const *parent = nullptr);
+                       IVariable<temporal::Time> *parent = nullptr);
 
-    temporal::Time get_value() const override;
+    bool get_value(temporal::Time &val) const override;
 
     IVariable<temporal::Time> const* get_parent() const;
 
-    void set_parent(IVariable<temporal::Time> const *parent);
+    bool set_value(temporal::Time const &val) override;
+
+    void set_parent(IVariable<temporal::Time> *parent);
 };
 
 }

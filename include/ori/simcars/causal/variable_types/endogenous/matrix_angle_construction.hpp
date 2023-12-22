@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ori/simcars/geometry/typedefs.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
 #include <ori/simcars/causal/unary_endogenous_variable_abstract.hpp>
 
@@ -16,9 +15,11 @@ class MatrixAngleConstructionVariable : public AUnaryEndogenousVariable<geometry
     geometry::TrigBuff const* trig_buff;
 
 public:
-    MatrixAngleConstructionVariable(IVariable<FP_DATA_TYPE> const *parent);
+    MatrixAngleConstructionVariable(IVariable<FP_DATA_TYPE> *parent);
 
-    geometry::RotMat get_value() const override;
+    bool get_value(geometry::RotMat &val) const override;
+
+    bool set_value(geometry::RotMat const &val) override;
 };
 
 }

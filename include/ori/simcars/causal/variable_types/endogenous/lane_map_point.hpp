@@ -16,11 +16,13 @@ class LaneMapPointVariable :
     map::IMap const *map;
 
 public:
-    LaneMapPointVariable(IEndogenousVariable<uint64_t> const *endogenous_parent,
-                                    IVariable<geometry::Vec> const *other_parent,
+    LaneMapPointVariable(IEndogenousVariable<uint64_t> *endogenous_parent,
+                                    IVariable<geometry::Vec> *other_parent,
                                     map::IMap const *map);
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

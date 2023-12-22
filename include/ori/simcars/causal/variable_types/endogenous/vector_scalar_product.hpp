@@ -16,7 +16,9 @@ class VectorScalarProductVariable :
 public:
     using ABinaryEndogenousVariable<geometry::Vec, geometry::Vec, FP_DATA_TYPE>::ABinaryEndogenousVariable;
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

@@ -34,6 +34,7 @@ public:
     ORect(ORect const &o_rect);
 
     bool operator ==(ORect const &o_rect) const;
+    FP_DATA_TYPE get_orientation() const;
     bool check_collision(ORect const &o_rect) const;
 
     void rotate(FP_DATA_TYPE rotation);

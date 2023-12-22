@@ -9,18 +9,19 @@ namespace causal
 {
 
 ScalarSocketVariable::ScalarSocketVariable(FP_DATA_TYPE default_value,
-                                           IVariable<FP_DATA_TYPE> const *parent) :
+                                           IVariable<FP_DATA_TYPE> *parent) :
     default_value(default_value), parent(parent) {}
 
-FP_DATA_TYPE ScalarSocketVariable::get_value() const
+bool ScalarSocketVariable::get_value(FP_DATA_TYPE &val) const
 {
     if (parent != nullptr)
     {
-        return parent->get_value();
+        return parent->get_value(val);
     }
     else
     {
-        return default_value;
+        val = default_value;
+        return true;
     }
 }
 
@@ -29,7 +30,20 @@ IVariable<FP_DATA_TYPE> const* ScalarSocketVariable::get_parent() const
     return parent;
 }
 
-void ScalarSocketVariable::set_parent(const IVariable<FP_DATA_TYPE> *parent)
+bool ScalarSocketVariable::set_value(FP_DATA_TYPE const &val)
+{
+    if (parent != nullptr)
+    {
+        return parent->set_value(val);
+    }
+    else
+    {
+        default_value = val;
+        return true;
+    }
+}
+
+void ScalarSocketVariable::set_parent(IVariable<FP_DATA_TYPE> *parent)
 {
     this->parent = parent;
 }

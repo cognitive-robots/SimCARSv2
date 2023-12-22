@@ -16,7 +16,9 @@ class VectorCrossProductVariable :
 public:
     using ABinaryEndogenousVariable<FP_DATA_TYPE, geometry::Vec, geometry::Vec>::ABinaryEndogenousVariable;
 
-    FP_DATA_TYPE get_value() const override;
+    bool get_value(FP_DATA_TYPE &val) const override;
+
+    bool set_value(FP_DATA_TYPE const &val) override;
 };
 
 }

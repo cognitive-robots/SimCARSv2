@@ -10,7 +10,7 @@ namespace causal
 {
 
 ScalarBufferVariable::ScalarBufferVariable(
-        IVariable<FP_DATA_TYPE> const *parent,
+        IVariable<FP_DATA_TYPE> *parent,
         temporal::TemporalDictionary<FP_DATA_TYPE> *temporal_dictionary, bool axiomatic) :
     AUnaryEndogenousVariable(parent), axiomatic(axiomatic)
 {
@@ -29,22 +29,63 @@ ScalarBufferVariable::~ScalarBufferVariable()
     delete temporal_dictionary;
 }
 
-FP_DATA_TYPE ScalarBufferVariable::get_value() const
+bool ScalarBufferVariable::get_value(FP_DATA_TYPE &val) const
 {
     if (temporal_dictionary->contains(VariableContext::get_current_time()))
     {
-        return (*temporal_dictionary)[VariableContext::get_current_time()];
+        val = (*temporal_dictionary)[VariableContext::get_current_time()];
+        return true;
     }
     else if (axiomatic &&
              VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
     {
-        return std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
+        return false;
     }
     else
     {
-        FP_DATA_TYPE value = get_parent()->get_value();
-        temporal_dictionary->update(VariableContext::get_current_time(), value);
-        return value;
+        if (get_parent()->get_value(val))
+        {
+            temporal_dictionary->update(VariableContext::get_current_time(), val);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
+
+bool ScalarBufferVariable::set_value(FP_DATA_TYPE const &val)
+{
+    if (temporal_dictionary->contains(VariableContext::get_current_time()))
+    {
+        if (get_parent()->set_value(val))
+        {
+            temporal_dictionary->update(VariableContext::get_current_time(), val);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else if (axiomatic &&
+             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
+    {
+        temporal_dictionary->update(VariableContext::get_current_time(), val);
+        return true;
+    }
+    else
+    {
+        if (get_parent()->set_value(val))
+        {
+            temporal_dictionary->update(VariableContext::get_current_time(), val);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 

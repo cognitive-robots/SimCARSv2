@@ -11,13 +11,15 @@ namespace simcars
 namespace causal
 {
 
-class CalcScalarRange :
+class ScalarRangeCalc :
         public ATernaryEndogenousVariable<structures::stl::STLStackArray<FP_DATA_TYPE>, FP_DATA_TYPE, FP_DATA_TYPE, FP_DATA_TYPE>
 {
 public:
     using ATernaryEndogenousVariable<structures::stl::STLStackArray<FP_DATA_TYPE>, FP_DATA_TYPE, FP_DATA_TYPE, FP_DATA_TYPE>::ATernaryEndogenousVariable;
 
-    structures::stl::STLStackArray<FP_DATA_TYPE> get_value() const override;
+    bool get_value(structures::stl::STLStackArray<FP_DATA_TYPE> &val) const override;
+
+    bool set_value(structures::stl::STLStackArray<FP_DATA_TYPE> const &val) override;
 };
 
 }

@@ -8,10 +8,45 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE ScalarConditionalVariable::get_value() const
+bool ScalarConditionalVariable::get_value(FP_DATA_TYPE &val) const
 {
-    return get_other_parent()->get_value() ? get_endogenous_parent_1()->get_value() :
-                                             get_endogenous_parent_2()->get_value();
+    bool condition;
+    if (get_other_parent()->get_value(condition))
+    {
+        if (condition)
+        {
+            return get_endogenous_parent_1()->get_value(val);
+        }
+        else
+        {
+            return get_endogenous_parent_2()->get_value(val);
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool ScalarConditionalVariable::set_value(FP_DATA_TYPE const &val)
+{
+    // TODO: Allow set to change condition variable
+    bool condition;
+    if (get_other_parent()->get_value(condition))
+    {
+        if (condition)
+        {
+            return get_endogenous_parent_1()->set_value(val);
+        }
+        else
+        {
+            return get_endogenous_parent_2()->set_value(val);
+        }
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

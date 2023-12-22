@@ -11,15 +11,15 @@ namespace causal
 {
 
 template <typename R, typename P>
-class ASetEndogenousVariable : public structures::stl::STLSet<IEndogenousVariable<P> const*>,
+class ASetEndogenousVariable : public structures::stl::STLSet<IEndogenousVariable<P>*>,
         public IEndogenousVariable<R>
 {
 public:
-    ASetEndogenousVariable(std::initializer_list<IEndogenousVariable<P> const*> init_list) :
-        structures::stl::STLSet<IEndogenousVariable<P> const*>(init_list)
+    ASetEndogenousVariable(std::initializer_list<IEndogenousVariable<P>*> init_list) :
+        structures::stl::STLSet<IEndogenousVariable<P>*>(init_list)
     {
         assert(this->count() > 0);
-        structures::IArray<IEndogenousVariable<P> const*> const *parents = this->get_array();
+        structures::IArray<IEndogenousVariable<P>*> const *parents = this->get_array();
         for (size_t i = 0; i < this->count(); ++i)
         {
             assert((*parents)[i] != nullptr);

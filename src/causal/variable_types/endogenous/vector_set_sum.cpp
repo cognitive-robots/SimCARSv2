@@ -8,15 +8,43 @@ namespace simcars
 namespace causal
 {
 
-geometry::Vec VectorSetSumVariable::get_value() const
+bool VectorSetSumVariable::get_value(geometry::Vec &val) const
 {
-    structures::IArray<IEndogenousVariable<geometry::Vec> const*> const *parents = get_array();
-    geometry::Vec value;
+    structures::IArray<IEndogenousVariable<geometry::Vec>*> const *parents = get_array();
+    geometry::Vec current_val, total_val = geometry::Vec::Zero();
     for (size_t i = 0; i < count(); ++i)
     {
-        value += (*parents)[i]->get_value();
+        if ((*parents)[i]->get_value(current_val))
+        {
+            total_val += current_val;
+        }
+        else
+        {
+            return false;
+        }
     }
-    return value;
+
+    val = total_val;
+    return true;
+}
+
+bool VectorSetSumVariable::set_value(geometry::Vec const &val)
+{
+    structures::IArray<IEndogenousVariable<geometry::Vec>*> const *parents = get_array();
+    geometry::Vec current_val, total_val = geometry::Vec::Zero();
+    for (size_t i = 0; i < count(); ++i)
+    {
+        if ((*parents)[i]->get_value(current_val))
+        {
+            total_val += current_val;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return val == total_val;
 }
 
 }

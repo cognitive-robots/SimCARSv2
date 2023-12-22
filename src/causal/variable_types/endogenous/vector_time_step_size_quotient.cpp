@@ -10,9 +10,24 @@ namespace simcars
 namespace causal
 {
 
-geometry::Vec VectorTimeStepSizeQuotientVariable::get_value() const
+bool VectorTimeStepSizeQuotientVariable::get_value(geometry::Vec &val) const
 {
-    return get_parent()->get_value() / VariableContext::get_time_step_size().count();
+    if (get_parent()->get_value(val))
+    {
+        val = val / std::chrono::duration_cast<std::chrono::seconds>(
+                    VariableContext::get_time_step_size()).count();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool VectorTimeStepSizeQuotientVariable::set_value(geometry::Vec const &val)
+{
+    return get_parent()->set_value(val * std::chrono::duration_cast<std::chrono::seconds>(
+                                       VariableContext::get_time_step_size()).count());
 }
 
 }

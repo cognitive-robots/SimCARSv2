@@ -16,7 +16,9 @@ class DurationSecondsCastVariable : public AUnaryEndogenousVariable<FP_DATA_TYPE
 public:
     using AUnaryEndogenousVariable<FP_DATA_TYPE, temporal::Duration>::AUnaryEndogenousVariable;
 
-    FP_DATA_TYPE get_value() const override;
+    bool get_value(FP_DATA_TYPE &val) const override;
+
+    bool set_value(FP_DATA_TYPE const &val) override;
 };
 
 }

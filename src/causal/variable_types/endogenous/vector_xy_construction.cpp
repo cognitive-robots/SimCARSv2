@@ -8,9 +8,23 @@ namespace simcars
 namespace causal
 {
 
-geometry::Vec VectorXYConstructionVariable::get_value() const
+bool VectorXYConstructionVariable::get_value(geometry::Vec &val) const
 {
-    return geometry::Vec(get_endogenous_parent()->get_value(), get_other_parent()->get_value());
+    FP_DATA_TYPE val_1, val_2;
+    if (get_endogenous_parent()->get_value(val_1) && get_other_parent()->get_value(val_2))
+    {
+        val = geometry::Vec(val_1, val_2);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool VectorXYConstructionVariable::set_value(geometry::Vec const &val)
+{
+    return get_endogenous_parent()->set_value(val.x()) && get_other_parent()->set_value(val.y());
 }
 
 }

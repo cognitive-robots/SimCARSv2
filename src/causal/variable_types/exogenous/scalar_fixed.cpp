@@ -10,9 +10,16 @@ namespace causal
 
 ScalarFixedVariable::ScalarFixedVariable(FP_DATA_TYPE value) : value(value) {}
 
-FP_DATA_TYPE ScalarFixedVariable::get_value() const
+bool ScalarFixedVariable::get_value(FP_DATA_TYPE &val) const
 {
-    return value;
+    val = value;
+    return true;
+}
+
+bool ScalarFixedVariable::set_value(FP_DATA_TYPE const &val)
+{
+    value = val;
+    return true;
 }
 
 }

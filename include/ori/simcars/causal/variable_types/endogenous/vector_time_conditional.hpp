@@ -18,7 +18,9 @@ public:
     using ATernaryEndogenousVariable<geometry::Vec, geometry::Vec, geometry::Vec,
     temporal::Time>::ATernaryEndogenousVariable;
 
-    geometry::Vec get_value() const override;
+    bool get_value(geometry::Vec &val) const override;
+
+    bool set_value(geometry::Vec const &val) override;
 };
 
 }

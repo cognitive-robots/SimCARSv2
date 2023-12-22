@@ -14,17 +14,19 @@ class ScalarSocketVariable : public IExogenousVariable<FP_DATA_TYPE>
 {
     FP_DATA_TYPE default_value;
 
-    IVariable<FP_DATA_TYPE> const *parent;
+    IVariable<FP_DATA_TYPE> *parent;
 
 public:
     ScalarSocketVariable(FP_DATA_TYPE default_value = 0.0,
-                         IVariable<FP_DATA_TYPE> const *parent = nullptr);
+                         IVariable<FP_DATA_TYPE> *parent = nullptr);
 
-    FP_DATA_TYPE get_value() const override;
+    bool get_value(FP_DATA_TYPE &val) const override;
 
     IVariable<FP_DATA_TYPE> const* get_parent() const;
 
-    void set_parent(IVariable<FP_DATA_TYPE> const *parent);
+    bool set_value(FP_DATA_TYPE const &val) override;
+
+    void set_parent(IVariable<FP_DATA_TYPE> *parent);
 };
 
 }

@@ -16,7 +16,9 @@ class IdProxyVariable : public AUnaryEndogenousVariable<uint64_t, uint64_t>
 public:
     using AUnaryEndogenousVariable<uint64_t, uint64_t>::AUnaryEndogenousVariable;
 
-    uint64_t get_value() const override;
+    bool get_value(uint64_t &val) const override;
+
+    bool set_value(uint64_t const &val) override;
 };
 
 }

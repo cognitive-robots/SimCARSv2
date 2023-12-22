@@ -8,9 +8,14 @@ namespace simcars
 namespace causal
 {
 
-uint64_t IdProxyVariable::get_value() const
+bool IdProxyVariable::get_value(uint64_t &val) const
 {
-    return get_parent()->get_value();
+    return get_parent()->get_value(val);
+}
+
+bool IdProxyVariable::set_value(uint64_t const &val)
+{
+    return get_parent()->set_value(val);
 }
 
 }

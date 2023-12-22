@@ -10,12 +10,20 @@ namespace simcars
 namespace causal
 {
 
-FP_DATA_TYPE ScalarPreviousTimeStepVariable::get_value() const
+bool ScalarPreviousTimeStepVariable::get_value(FP_DATA_TYPE &val) const
 {
     VariableContext::decrement_time_step();
-    FP_DATA_TYPE value = get_parent()->get_value();
+    bool res = get_parent()->get_value(val);
     VariableContext::increment_time_step();
-    return value;
+    return res;
+}
+
+bool ScalarPreviousTimeStepVariable::set_value(FP_DATA_TYPE const &val)
+{
+    VariableContext::decrement_time_step();
+    bool res = get_parent()->set_value(val);
+    VariableContext::increment_time_step();
+    return res;
 }
 
 }

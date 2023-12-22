@@ -16,7 +16,9 @@ class ORectCollisionVariable :
 public:
     using ABinaryEndogenousVariable<bool, geometry::ORect, geometry::ORect>::ABinaryEndogenousVariable;
 
-    bool get_value() const override;
+    bool get_value(bool &val) const override;
+
+    bool set_value(bool const &val) override;
 };
 
 }

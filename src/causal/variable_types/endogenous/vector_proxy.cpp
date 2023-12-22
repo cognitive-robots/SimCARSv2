@@ -8,9 +8,14 @@ namespace simcars
 namespace causal
 {
 
-geometry::Vec VectorProxyVariable::get_value() const
+bool VectorProxyVariable::get_value(geometry::Vec &val) const
 {
-    return get_parent()->get_value();
+    return get_parent()->get_value(val);
+}
+
+bool VectorProxyVariable::set_value(geometry::Vec const &val)
+{
+    return get_parent()->set_value(val);
 }
 
 }

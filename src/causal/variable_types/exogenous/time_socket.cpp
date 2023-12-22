@@ -9,18 +9,19 @@ namespace causal
 {
 
 TimeSocketVariable::TimeSocketVariable(temporal::Time default_value,
-                                       IVariable<temporal::Time> const *parent) :
+                                       IVariable<temporal::Time> *parent) :
     default_value(default_value), parent(parent) {}
 
-temporal::Time TimeSocketVariable::get_value() const
+bool TimeSocketVariable::get_value(temporal::Time &val) const
 {
     if (parent != nullptr)
     {
-        return parent->get_value();
+        return parent->get_value(val);
     }
     else
     {
-        return default_value;
+        val = default_value;
+        return true;
     }
 }
 
@@ -29,7 +30,20 @@ IVariable<temporal::Time> const* TimeSocketVariable::get_parent() const
     return parent;
 }
 
-void TimeSocketVariable::set_parent(const IVariable<temporal::Time> *parent)
+bool TimeSocketVariable::set_value(temporal::Time const &val)
+{
+    if (parent != nullptr)
+    {
+        return parent->set_value(val);
+    }
+    else
+    {
+        default_value = val;
+        return true;
+    }
+}
+
+void TimeSocketVariable::set_parent(IVariable<temporal::Time> *parent)
 {
     this->parent = parent;
 }

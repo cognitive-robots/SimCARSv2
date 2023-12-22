@@ -14,16 +14,16 @@ namespace causal
 template <typename R, typename P1, typename P2, typename P3, typename P4>
 class AQuaternaryEndogenousVariable : public IEndogenousVariable<R>
 {
-    IEndogenousVariable<P1> const *endogenous_parent_1;
-    IEndogenousVariable<P2> const *endogenous_parent_2;
-    IEndogenousVariable<P3> const *endogenous_parent_3;
-    IVariable<P4> const *other_parent;
+    IEndogenousVariable<P1> *endogenous_parent_1;
+    IEndogenousVariable<P2> *endogenous_parent_2;
+    IEndogenousVariable<P3> *endogenous_parent_3;
+    IVariable<P4> *other_parent;
 
 public:
-    AQuaternaryEndogenousVariable(IEndogenousVariable<P1> const *endogenous_parent_1,
-                                  IEndogenousVariable<P2> const *endogenous_parent_2,
-                                  IEndogenousVariable<P3> const *endogenous_parent_3,
-                                  IVariable<P4> const *other_parent) :
+    AQuaternaryEndogenousVariable(IEndogenousVariable<P1> *endogenous_parent_1,
+                                  IEndogenousVariable<P2> *endogenous_parent_2,
+                                  IEndogenousVariable<P3> *endogenous_parent_3,
+                                  IVariable<P4> *other_parent) :
         endogenous_parent_1(endogenous_parent_1), endogenous_parent_2(endogenous_parent_2),
         endogenous_parent_3(endogenous_parent_3), other_parent(other_parent)
     {
@@ -33,19 +33,19 @@ public:
         assert(other_parent != nullptr);
     }
 
-    IEndogenousVariable<P1> const* get_endogenous_parent_1() const
+    IEndogenousVariable<P1>* get_endogenous_parent_1() const
     {
         return endogenous_parent_1;
     }
-    IEndogenousVariable<P2> const* get_endogenous_parent_2() const
+    IEndogenousVariable<P2>* get_endogenous_parent_2() const
     {
         return endogenous_parent_2;
     }
-    IEndogenousVariable<P3> const* get_endogenous_parent_3() const
+    IEndogenousVariable<P3>* get_endogenous_parent_3() const
     {
         return endogenous_parent_3;
     }
-    IVariable<P4> const* get_other_parent() const
+    IVariable<P4>* get_other_parent() const
     {
         return other_parent;
     }
