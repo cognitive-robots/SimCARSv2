@@ -19,6 +19,8 @@ public:
     using simcars::causal::AUnaryEndogenousVariable<uint64_t, Goal<uint64_t>>::AUnaryEndogenousVariable;
 
     bool get_value(uint64_t &val) const override;
+
+    bool set_value(uint64_t const &val) override;
 };
 
 }

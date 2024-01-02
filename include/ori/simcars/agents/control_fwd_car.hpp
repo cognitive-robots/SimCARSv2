@@ -31,7 +31,7 @@ protected:
     simcars::causal::ScalarSocketVariable steer;
 
 public:
-    FWDCar const* get_fwd_car() const;
+    FWDCar* get_fwd_car();
 
     void set_fwd_car(FWDCar *fwd_car);
 

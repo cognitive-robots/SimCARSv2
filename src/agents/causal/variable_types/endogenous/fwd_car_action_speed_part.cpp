@@ -10,9 +10,32 @@ namespace agents
 namespace causal
 {
 
-Goal<FP_DATA_TYPE> FWDCarActionSpeedPartVariable::get_value() const
+bool FWDCarActionSpeedPartVariable::get_value(Goal<FP_DATA_TYPE> &val) const
 {
-    return get_parent()->get_value().speed_goal;
+    FWDCarAction action;
+    if (get_parent()->get_value(action))
+    {
+        val = action.speed_goal;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool FWDCarActionSpeedPartVariable::set_value(Goal<FP_DATA_TYPE> const &val)
+{
+    FWDCarAction action;
+    if (get_parent()->get_value(action))
+    {
+        action.speed_goal = val;
+        return get_parent()->set_value(action);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

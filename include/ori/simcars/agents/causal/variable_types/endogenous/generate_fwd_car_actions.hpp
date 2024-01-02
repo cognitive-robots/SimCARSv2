@@ -28,6 +28,8 @@ public:
     >::ATernaryEndogenousVariable;
 
     bool get_value(structures::stl::STLStackArray<FWDCarAction> &val) const override;
+
+    bool set_value(structures::stl::STLStackArray<FWDCarAction> const &val) override;
 };
 
 }

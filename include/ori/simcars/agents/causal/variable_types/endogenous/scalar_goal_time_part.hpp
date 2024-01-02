@@ -20,6 +20,8 @@ public:
     using simcars::causal::AUnaryEndogenousVariable<temporal::Time, Goal<FP_DATA_TYPE>>::AUnaryEndogenousVariable;
 
     bool get_value(temporal::Time &val) const override;
+
+    bool set_value(temporal::Time const &val) override;
 };
 
 }

@@ -104,19 +104,19 @@ public:
 
     virtual ~RectRigidBody() = default;
 
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_mass_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_length_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_width_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_height_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_drag_area_variable() const;
-    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_env_force_variable() const;
-    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_lin_acc_variable() const;
-    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_lin_vel_variable() const;
-    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_pos_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_ang_acc_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_ang_vel_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_rot_variable() const;
-    simcars::causal::IEndogenousVariable<geometry::ORect> const* get_rect_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_mass_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_length_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_width_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_height_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_drag_area_variable();
+    simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force_variable();
+    simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_acc_variable();
+    simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_vel_variable();
+    simcars::causal::IEndogenousVariable<geometry::Vec>* get_pos_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_ang_acc_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_ang_vel_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_rot_variable();
+    simcars::causal::IEndogenousVariable<geometry::ORect>* get_rect_variable();
 
     friend bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body);
     friend bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body);

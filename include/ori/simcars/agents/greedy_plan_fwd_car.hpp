@@ -3,8 +3,8 @@
 #include <ori/simcars/causal/variable_types/exogenous/scalar_fixed.hpp>
 #include <ori/simcars/causal/variable_types/exogenous/vector_socket.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp>
-#include <ori/simcars/causal/variable_types/endogenous/calc_scalar_range.hpp>
-#include <ori/simcars/causal/variable_types/endogenous/calc_time_range.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_range_calc.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/time_range_calc.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_proxy.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/lane_selectable.hpp>
 #include <ori/simcars/agents/fwd_car_sim_parameters.hpp>

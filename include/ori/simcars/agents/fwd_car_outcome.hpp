@@ -13,7 +13,7 @@ namespace agents
 
 struct FWDCarOutcome
 {
-    int8_t lane_transitions;
+    FP_DATA_TYPE lane_transitions;
     FP_DATA_TYPE final_speed;
     FP_DATA_TYPE max_env_force_mag;
 };

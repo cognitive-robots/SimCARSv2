@@ -16,7 +16,7 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(SFML REQUIRED COMPONENTS graphics)
 
 add_subdirectory(extern/magic_enum)
-add_subdirectory(extern/lz4_stream)
+#add_subdirectory(extern/lz4_stream)
 if (NOT TARGET rapidcsv)
   add_subdirectory(extern/rapidcsv)
 endif()
@@ -158,7 +158,7 @@ PUBLIC
   simcars_geometry
   simcars_temporal
 PRIVATE
-  lz4_stream
+#  lz4_stream
   rapidcsv
 )
 add_dependencies(simcars_map simcars_utils simcars_structures simcars_geometry simcars_temporal)
@@ -542,7 +542,7 @@ PUBLIC
 PRIVATE
   magic_enum::magic_enum
   rapidcsv
-  lz4_stream
+#  lz4_stream
 )
 add_dependencies(simcars_agents simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 target_compile_options(simcars_agents PRIVATE -fPIC)

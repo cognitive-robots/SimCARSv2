@@ -13,14 +13,16 @@ namespace causal
 {
 
 class FWDCarOutcomeConstructionVariable :
-        public ori::simcars::causal::ATernaryEndogenousVariable<FWDCarOutcome, int8_t,
+        public ori::simcars::causal::ATernaryEndogenousVariable<FWDCarOutcome, FP_DATA_TYPE,
         FP_DATA_TYPE, FP_DATA_TYPE>
 {
 public:
-    using ori::simcars::causal::ATernaryEndogenousVariable<FWDCarOutcome, int8_t, FP_DATA_TYPE,
+    using ori::simcars::causal::ATernaryEndogenousVariable<FWDCarOutcome, FP_DATA_TYPE, FP_DATA_TYPE,
     FP_DATA_TYPE>::ATernaryEndogenousVariable;
 
     bool get_value(FWDCarOutcome &val) const override;
+
+    bool set_value(FWDCarOutcome const &val) override;
 };
 
 }

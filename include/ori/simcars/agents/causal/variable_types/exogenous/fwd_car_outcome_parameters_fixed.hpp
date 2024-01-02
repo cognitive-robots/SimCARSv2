@@ -14,12 +14,14 @@ namespace causal
 
 class FWDCarSimParametersFixedVariable : public simcars::causal::IExogenousVariable<FWDCarSimParameters>
 {
-    FWDCarSimParameters const value;
+    FWDCarSimParameters value;
 
 public:
     FWDCarSimParametersFixedVariable(FWDCarSimParameters value);
 
     bool get_value(FWDCarSimParameters &val) const override;
+
+    bool set_value(FWDCarSimParameters const &val) override;
 };
 
 }

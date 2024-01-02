@@ -13,7 +13,7 @@ namespace agents
 class FWDCarSim : public virtual FWDCar, public virtual RectRigidBodySim
 {
 public:
-    FWDCarSim(FWDCar const *fwd_car, temporal::Time start_time);
+    FWDCarSim(FWDCar *fwd_car, temporal::Time start_time);
 };
 
 }

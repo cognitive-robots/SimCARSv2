@@ -33,9 +33,9 @@ protected:
     simcars::causal::ScalarSumVariable cumil_lane_trans;
 
 public:
-    FullControlFWDCarSim(FullControlFWDCar const *full_control_fwd_car, temporal::Time start_time);
+    FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_car, temporal::Time start_time);
 
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_cumil_lane_trans_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_cumil_lane_trans_variable();
 };
 
 }

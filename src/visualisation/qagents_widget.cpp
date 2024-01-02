@@ -62,7 +62,8 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
     rectangle->setRotation(-180.0f * rotation / M_PI);
     */
 
-    geometry::ORect agent_rect = agent->get_rect_variable()->get_value();
+    geometry::ORect agent_rect;
+    agent->get_rect_variable()->get_value(agent_rect);
 
     sf::VertexArray *agent_shape = new sf::VertexArray(sf::PrimitiveType::TriangleStrip, 4);
     for (size_t i = 0; i < 4; ++i)

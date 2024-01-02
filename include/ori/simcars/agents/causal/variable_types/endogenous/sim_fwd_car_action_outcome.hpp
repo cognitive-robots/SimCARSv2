@@ -25,11 +25,14 @@ class SimFWDCarActionOutcomeVariable :
     IFWDCarOutcomeSim const *fwd_car_outcome_sim;
 
 public:
-    SimFWDCarActionOutcomeVariable(simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarAction>> const *endogenous_parent,
-                           simcars::causal::IVariable<FWDCarSimParameters> const *other_parent,
-                           IFWDCarOutcomeSim const *fwd_car_outcome_sim);
+    SimFWDCarActionOutcomeVariable(
+            simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarAction>> *endogenous_parent,
+            simcars::causal::IVariable<FWDCarSimParameters> *other_parent,
+            IFWDCarOutcomeSim const *fwd_car_outcome_sim);
 
     bool get_value(structures::stl::STLStackArray<FWDCarOutcomeActionPair> &val) const override;
+
+    bool set_value(structures::stl::STLStackArray<FWDCarOutcomeActionPair> const &val) override;
 };
 
 }

@@ -13,12 +13,12 @@ namespace agents
 
 class DefaultFWDCarOutcomeSim : public virtual IFWDCarOutcomeSim
 {
-    FullControlFWDCar const *control_fwd_car;
-    RectRigidBodyEnv const *rigid_body_env;
+    FullControlFWDCar *control_fwd_car;
+    RectRigidBodyEnv *rigid_body_env;
 
 public:
-    DefaultFWDCarOutcomeSim(FullControlFWDCar const *control_fwd_car,
-                            RectRigidBodyEnv const *rigid_body_env);
+    DefaultFWDCarOutcomeSim(FullControlFWDCar *control_fwd_car,
+                            RectRigidBodyEnv *rigid_body_env);
 
     FWDCarOutcome sim_outcome(FWDCarAction const *action,
                               FWDCarSimParameters const *parameters) const override;

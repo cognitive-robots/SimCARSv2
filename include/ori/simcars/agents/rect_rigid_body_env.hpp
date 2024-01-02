@@ -80,13 +80,13 @@ class RectRigidBodyEnv
             simcars::causal::ScalarConditionalVariable actual_coll_torque;
 
         public:
-            Link(RectRigidBody const *rigid_body, RectRigidBody const *other_rigid_body);
+            Link(RectRigidBody *rigid_body, RectRigidBody *other_rigid_body);
 
-            simcars::causal::IEndogenousVariable<geometry::Vec> const* get_coll_force() const;
-            simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_coll_torque() const;
+            simcars::causal::IEndogenousVariable<geometry::Vec>* get_coll_force();
+            simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_coll_torque();
         };
 
-        RectRigidBody const *rigid_body;
+        RectRigidBody *rigid_body;
         structures::stl::STLDictionary<RectRigidBody const*, Link*> other_rigid_body_link_dict;
 
     protected:
@@ -111,23 +111,23 @@ class RectRigidBodyEnv
         simcars::causal::ScalarSetSumVariable env_torque;
 
     public:
-        Entity(RectRigidBody const *rigid_body);
+        Entity(RectRigidBody *rigid_body);
 
         virtual ~Entity();
 
-        simcars::causal::IEndogenousVariable<geometry::Vec> const* get_env_force() const;
-        simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_env_torque() const;
+        simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force();
+        simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_env_torque();
 
-        bool add_link(RectRigidBody const *other_rigid_body);
-        bool remove_link(RectRigidBody const *other_rigid_body);
+        bool add_link(RectRigidBody *other_rigid_body);
+        bool remove_link(RectRigidBody *other_rigid_body);
     };
 
-    structures::stl::STLDictionary<RectRigidBody const*, Entity*> rigid_body_entity_dict;
+    structures::stl::STLDictionary<RectRigidBody*, Entity*> rigid_body_entity_dict;
 
 public:
     virtual ~RectRigidBodyEnv();
 
-    structures::IArray<RectRigidBody const*> const* get_rigid_bodies() const;
+    structures::IArray<RectRigidBody*> const* get_rigid_bodies() const;
 
     bool add_rigid_body(RectRigidBody *rigid_body);
     bool remove_rigid_body(RectRigidBody *rigid_body);

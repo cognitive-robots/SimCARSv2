@@ -11,28 +11,58 @@ namespace causal
 {
 
 SimFWDCarActionOutcomeVariable::SimFWDCarActionOutcomeVariable(
-        simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarAction>> const *endogenous_parent,
-        simcars::causal::IVariable<FWDCarSimParameters> const *other_parent,
+        simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarAction>> *endogenous_parent,
+        simcars::causal::IVariable<FWDCarSimParameters> *other_parent,
         IFWDCarOutcomeSim const *fwd_car_outcome_sim) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent),
     fwd_car_outcome_sim(fwd_car_outcome_sim) {}
 
-structures::stl::STLStackArray<FWDCarOutcomeActionPair> SimFWDCarActionOutcomeVariable::get_value() const
+bool SimFWDCarActionOutcomeVariable::get_value(structures::stl::STLStackArray<FWDCarOutcomeActionPair> &val) const
 {
-    structures::stl::STLStackArray<FWDCarAction> actions = get_endogenous_parent()->get_value();
-    FWDCarSimParameters sim_parameters = get_other_parent()->get_value();
-
-    structures::stl::STLStackArray<FWDCarOutcomeActionPair> outcome_action_pairs;
-
-    for (size_t i = 0; i < actions.count(); ++i)
+    structures::stl::STLStackArray<FWDCarAction> actions;
+    FWDCarSimParameters sim_parameters;
+    if (get_endogenous_parent()->get_value(actions) && get_other_parent()->get_value(sim_parameters))
     {
-        outcome_action_pairs.push_back(
-                    FWDCarOutcomeActionPair(fwd_car_outcome_sim->sim_outcome(&(actions[i]),
-                                                                             &sim_parameters),
-                                            actions[i]));
-    }
+        val.clear();
 
-    return outcome_action_pairs;
+        for (size_t i = 0; i < actions.count(); ++i)
+        {
+            val.push_back(FWDCarOutcomeActionPair(fwd_car_outcome_sim->sim_outcome(&(actions[i]),
+                                                                                 &sim_parameters),
+                                                  actions[i]));
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool SimFWDCarActionOutcomeVariable::set_value(structures::stl::STLStackArray<FWDCarOutcomeActionPair> const &val)
+{
+    structures::stl::STLStackArray<FWDCarAction> actions;
+    FWDCarSimParameters sim_parameters;
+    if (get_endogenous_parent()->get_value(actions) && get_other_parent()->get_value(sim_parameters))
+    {
+        for (size_t i = 0; i < actions.count(); ++i)
+        {
+            FWDCarOutcomeActionPair outcome_action_pair(
+                        fwd_car_outcome_sim->sim_outcome(&(actions[i]), &sim_parameters),
+                        actions[i]);
+            if (outcome_action_pair != val[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

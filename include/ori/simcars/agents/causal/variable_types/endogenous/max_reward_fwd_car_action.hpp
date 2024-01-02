@@ -21,6 +21,8 @@ public:
     using simcars::causal::AUnaryEndogenousVariable<FWDCarAction, structures::stl::STLStackArray<RewardFWDCarActionPair>>::AUnaryEndogenousVariable;
 
     bool get_value(FWDCarAction &val) const override;
+
+    bool set_value(FWDCarAction const &val) override;
 };
 
 }

@@ -19,6 +19,8 @@ public:
     using simcars::causal::AUnaryEndogenousVariable<Goal<uint64_t>, FWDCarAction>::AUnaryEndogenousVariable;
 
     bool get_value(Goal<uint64_t> &val) const override;
+
+    bool set_value(Goal<uint64_t> const &val) override;
 };
 
 }

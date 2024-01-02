@@ -13,9 +13,16 @@ namespace causal
 FWDCarSimParametersFixedVariable::FWDCarSimParametersFixedVariable(FWDCarSimParameters value) :
     value(value) {}
 
-FWDCarSimParameters FWDCarSimParametersFixedVariable::get_value() const
+bool FWDCarSimParametersFixedVariable::get_value(FWDCarSimParameters &val) const
 {
-    return value;
+    val = value;
+    return true;
+}
+
+bool FWDCarSimParametersFixedVariable::set_value(FWDCarSimParameters const &val)
+{
+    value = val;
+    return true;
 }
 
 }

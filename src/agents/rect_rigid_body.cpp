@@ -84,67 +84,67 @@ RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
     assert(drag_area_value > 0.0);
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_mass_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_mass_variable()
 {
     return &mass_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_length_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_length_variable()
 {
     return &length_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_width_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_width_variable()
 {
     return &width_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_height_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_height_variable()
 {
     return &height_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_drag_area_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_drag_area_variable()
 {
     return &drag_area_proxy;
 }
 
-causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_env_force_variable() const
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_env_force_variable()
 {
     return &env_force_proxy;
 }
 
-causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_lin_acc_variable() const
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_acc_variable()
 {
     return &lin_acc_buff;
 }
 
-causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_lin_vel_variable() const
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_vel_variable()
 {
     return &lin_vel_buff;
 }
 
-causal::IEndogenousVariable<geometry::Vec> const* RectRigidBody::get_pos_variable() const
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_pos_variable()
 {
     return &pos_buff;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_ang_acc_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_ang_acc_variable()
 {
     return &ang_acc_buff;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_ang_vel_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_ang_vel_variable()
 {
     return &ang_vel_buff;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBody::get_rot_variable() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_rot_variable()
 {
     return &rot_buff;
 }
 
-causal::IEndogenousVariable<geometry::ORect> const* RectRigidBody::get_rect_variable() const
+causal::IEndogenousVariable<geometry::ORect>* RectRigidBody::get_rect_variable()
 {
     return &rect;
 }

@@ -13,9 +13,16 @@ namespace causal
 FWDCarRewardParametersFixedVariable::FWDCarRewardParametersFixedVariable(FWDCarRewardParameters value) :
     value(value) {}
 
-FWDCarRewardParameters FWDCarRewardParametersFixedVariable::get_value() const
+bool FWDCarRewardParametersFixedVariable::get_value(FWDCarRewardParameters &val) const
 {
-    return value;
+    val = value;
+    return true;
+}
+
+bool FWDCarRewardParametersFixedVariable::set_value(FWDCarRewardParameters const &val)
+{
+    value = val;
+    return true;
 }
 
 }

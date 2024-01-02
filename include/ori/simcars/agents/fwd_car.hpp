@@ -87,11 +87,11 @@ public:
            FP_DATA_TYPE axel_dist_value, FP_DATA_TYPE drag_area_value = 0.631,
            FP_DATA_TYPE cornering_stiffness_value = 49675.0);
 
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_wheel_radius_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_axel_dist_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_lon_lin_vel_variable() const;
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_lon_lin_vel_recip_variable() const;
-    simcars::causal::IEndogenousVariable<geometry::Vec> const* get_dir_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_wheel_radius_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_axel_dist_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_recip_variable();
+    simcars::causal::IEndogenousVariable<geometry::Vec>* get_dir_variable();
 
     friend void ControlFWDCar::set_fwd_car(FWDCar *fwd_car);
 };

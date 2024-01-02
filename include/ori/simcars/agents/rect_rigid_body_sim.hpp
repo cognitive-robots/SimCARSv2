@@ -38,9 +38,9 @@ protected:
     simcars::causal::ScalarMaxVariable max_env_force_mag;
 
 public:
-    RectRigidBodySim(RectRigidBody const *rect_rigid_body, temporal::Time start_time);
+    RectRigidBodySim(RectRigidBody *rect_rigid_body, temporal::Time start_time);
 
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* get_max_env_force_mag_variable() const;
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_max_env_force_mag_variable();
 };
 
 }

@@ -10,9 +10,32 @@ namespace agents
 namespace causal
 {
 
-temporal::Time IdGoalTimePartVariable::get_value() const
+bool IdGoalTimePartVariable::get_value(temporal::Time &val) const
 {
-    return get_parent()->get_value().time;
+    Goal<uint64_t> goal;
+    if (get_parent()->get_value(goal))
+    {
+        val = goal.time;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool IdGoalTimePartVariable::set_value(temporal::Time const &val)
+{
+    Goal<uint64_t> goal;
+    if (get_parent()->get_value(goal))
+    {
+        goal.time = val;
+        return get_parent()->set_value(goal);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

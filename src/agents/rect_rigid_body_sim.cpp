@@ -8,7 +8,7 @@ namespace simcars
 namespace agents
 {
 
-RectRigidBodySim::RectRigidBodySim(RectRigidBody const *rect_rigid_body,
+RectRigidBodySim::RectRigidBodySim(RectRigidBody *rect_rigid_body,
                                    temporal::Time start_time) :
     RectRigidBody(*rect_rigid_body),
 
@@ -41,7 +41,7 @@ RectRigidBodySim::RectRigidBodySim(RectRigidBody const *rect_rigid_body,
     prev_rot = simcars::causal::ScalarPreviousTimeStepVariable(&sim_rot);
 }
 
-simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBodySim::get_max_env_force_mag_variable() const
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodySim::get_max_env_force_mag_variable()
 {
     return &max_env_force_mag;
 }

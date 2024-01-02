@@ -19,6 +19,8 @@ public:
     using simcars::causal::AUnaryEndogenousVariable<Goal<FP_DATA_TYPE>, FWDCarAction>::AUnaryEndogenousVariable;
 
     bool get_value(Goal<FP_DATA_TYPE> &val) const override;
+
+    bool set_value(Goal<FP_DATA_TYPE> const &val) override;
 };
 
 }

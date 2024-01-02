@@ -10,7 +10,7 @@ namespace simcars
 namespace agents
 {
 
-ControlFWDCar const* PlanFWDCar::get_control_fwd_car() const
+ControlFWDCar* PlanFWDCar::get_control_fwd_car()
 {
     return control_fwd_car;
 }

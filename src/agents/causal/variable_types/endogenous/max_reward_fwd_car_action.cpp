@@ -10,21 +10,54 @@ namespace agents
 namespace causal
 {
 
-FWDCarAction MaxRewardFWDCarActionVariable::get_value() const
+bool MaxRewardFWDCarActionVariable::get_value(FWDCarAction &val) const
 {
-    structures::stl::STLStackArray<RewardFWDCarActionPair> reward_action_pairs =
-            get_parent()->get_value();
-
-    size_t max_reward_index = 0;
-    for (size_t i = 1; i < reward_action_pairs.count(); ++i)
+    structures::stl::STLStackArray<RewardFWDCarActionPair> reward_action_pairs;
+    if (get_parent()->get_value(reward_action_pairs))
     {
-        if (reward_action_pairs[i].first > reward_action_pairs[max_reward_index].first)
+        size_t max_reward_index = 0;
+        for (size_t i = 1; i < reward_action_pairs.count(); ++i)
         {
-            max_reward_index = i;
+            if (reward_action_pairs[i].first > reward_action_pairs[max_reward_index].first)
+            {
+                max_reward_index = i;
+            }
         }
-    }
 
-    return reward_action_pairs[max_reward_index].second;
+        val = reward_action_pairs[max_reward_index].second;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool MaxRewardFWDCarActionVariable::set_value(FWDCarAction const &val)
+{
+    structures::stl::STLStackArray<RewardFWDCarActionPair> reward_action_pairs;
+    if (get_parent()->get_value(reward_action_pairs))
+    {
+        size_t max_reward_index = 0;
+        size_t val_index = -1;
+        for (size_t i = 0; i < reward_action_pairs.count(); ++i)
+        {
+            if (reward_action_pairs[i].first > reward_action_pairs[max_reward_index].first)
+            {
+                max_reward_index = i;
+            }
+            if (reward_action_pairs[i].second == val)
+            {
+                val_index = i;
+            }
+        }
+
+        return max_reward_index == val_index;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 }

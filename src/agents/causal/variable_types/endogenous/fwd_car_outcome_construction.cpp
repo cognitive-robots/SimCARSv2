@@ -10,15 +10,32 @@ namespace agents
 namespace causal
 {
 
-FWDCarOutcome FWDCarOutcomeConstructionVariable::get_value() const
+bool FWDCarOutcomeConstructionVariable::get_value(FWDCarOutcome &val) const
 {
-    FWDCarOutcome outcome;
+    FP_DATA_TYPE lane_transitions;
+    FP_DATA_TYPE final_speed;
+    FP_DATA_TYPE max_env_force_mag;
+    if (get_endogenous_parent_1()->get_value(lane_transitions) &&
+            get_endogenous_parent_2()->get_value(final_speed) &&
+            get_other_parent()->get_value(max_env_force_mag))
+    {
+        val.lane_transitions = lane_transitions;
+        val.final_speed = final_speed;
+        val.max_env_force_mag = max_env_force_mag;
 
-    outcome.lane_transitions = get_endogenous_parent_1()->get_value();
-    outcome.final_speed = get_endogenous_parent_2()->get_value();
-    outcome.max_env_force_mag = get_other_parent()->get_value();
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
-    return outcome;
+bool FWDCarOutcomeConstructionVariable::set_value(FWDCarOutcome const &val)
+{
+    return get_endogenous_parent_1()->set_value(val.lane_transitions) &&
+            get_endogenous_parent_2()->set_value(val.final_speed) &&
+            get_other_parent()->set_value(val.max_env_force_mag);
 }
 
 }

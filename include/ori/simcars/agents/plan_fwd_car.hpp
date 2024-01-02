@@ -25,7 +25,7 @@ protected:
     causal::TimeSocketVariable lane_time_goal;
 
 public:
-    ControlFWDCar const* get_control_fwd_car() const;
+    ControlFWDCar* get_control_fwd_car();
 
     void set_control_fwd_car(ControlFWDCar *control_fwd_car);
 };

@@ -10,7 +10,7 @@ namespace simcars
 namespace agents
 {
 
-FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar const *full_control_fwd_car,
+FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_car,
                                            temporal::Time start_time) :
     FullControlFWDCar(*full_control_fwd_car),
     MotorTorqueControlFWDCar(*full_control_fwd_car),
@@ -32,7 +32,7 @@ FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar const *full_control
 {
 }
 
-simcars::causal::IEndogenousVariable<FP_DATA_TYPE> const* FullControlFWDCarSim::get_cumil_lane_trans_variable() const
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FullControlFWDCarSim::get_cumil_lane_trans_variable()
 {
     return &cumil_lane_trans;
 }

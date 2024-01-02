@@ -19,6 +19,8 @@ public:
     using simcars::causal::AUnaryEndogenousVariable<temporal::Time, Goal<uint64_t>>::AUnaryEndogenousVariable;
 
     bool get_value(temporal::Time &val) const override;
+
+    bool set_value(temporal::Time const &val) override;
 };
 
 }

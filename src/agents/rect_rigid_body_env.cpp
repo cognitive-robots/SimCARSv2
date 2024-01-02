@@ -10,8 +10,8 @@ namespace simcars
 namespace agents
 {
 
-RectRigidBodyEnv::Entity::Link::Link(RectRigidBody const *rigid_body,
-                                     RectRigidBody const *other_rigid_body) :
+RectRigidBodyEnv::Entity::Link::Link(RectRigidBody *rigid_body,
+                                     RectRigidBody *other_rigid_body) :
     mass_sum(rigid_body->get_mass_variable(), other_rigid_body->get_mass_variable()),
     mass_sum_recip(&mass_sum),
 
@@ -53,17 +53,17 @@ RectRigidBodyEnv::Entity::Link::Link(RectRigidBody const *rigid_body,
 {
 }
 
-causal::IEndogenousVariable<geometry::Vec> const* RectRigidBodyEnv::Entity::Link::get_coll_force() const
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBodyEnv::Entity::Link::get_coll_force()
 {
     return &actual_coll_force;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBodyEnv::Entity::Link::get_coll_torque() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::Link::get_coll_torque()
 {
     return &actual_coll_torque;
 }
 
-RectRigidBodyEnv::Entity::Entity(RectRigidBody const *rigid_body) :
+RectRigidBodyEnv::Entity::Entity(RectRigidBody *rigid_body) :
     half_scale_factor(0.5),
     half_scale_factor_proxy(&half_scale_factor),
 
@@ -95,17 +95,17 @@ RectRigidBodyEnv::Entity::~Entity()
     }
 }
 
-causal::IEndogenousVariable<geometry::Vec> const* RectRigidBodyEnv::Entity::get_env_force() const
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBodyEnv::Entity::get_env_force()
 {
     return &env_force;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE> const* RectRigidBodyEnv::Entity::get_env_torque() const
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::get_env_torque()
 {
     return &env_torque;
 }
 
-bool RectRigidBodyEnv::Entity::add_link(RectRigidBody const *other_rigid_body)
+bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
 {
     if (other_rigid_body == rigid_body || other_rigid_body_link_dict.contains(other_rigid_body))
     {
@@ -124,7 +124,7 @@ bool RectRigidBodyEnv::Entity::add_link(RectRigidBody const *other_rigid_body)
     }
 }
 
-bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody const *other_rigid_body)
+bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
 {
     if (other_rigid_body == rigid_body || !other_rigid_body_link_dict.contains(other_rigid_body))
     {
@@ -152,7 +152,7 @@ RectRigidBodyEnv::~RectRigidBodyEnv()
     }
 }
 
-structures::IArray<RectRigidBody const*> const* RectRigidBodyEnv::get_rigid_bodies() const
+structures::IArray<RectRigidBody*> const* RectRigidBodyEnv::get_rigid_bodies() const
 {
     return rigid_body_entity_dict.get_keys();
 }

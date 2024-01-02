@@ -23,11 +23,14 @@ class CalcFWDCarActionOutcomeRewardVariable :
     IFWDCarRewardCalc const *fwd_car_reward_calculator;
 
 public:
-    CalcFWDCarActionOutcomeRewardVariable(simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarOutcomeActionPair>> const *endogenous_parent,
-                                  simcars::causal::IVariable<FWDCarRewardParameters> const *other_parent,
-                                  IFWDCarRewardCalc const *fwd_car_reward_calculator);
+    CalcFWDCarActionOutcomeRewardVariable(
+            simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarOutcomeActionPair>> *endogenous_parent,
+            simcars::causal::IVariable<FWDCarRewardParameters> *other_parent,
+            IFWDCarRewardCalc const *fwd_car_reward_calculator);
 
     bool get_value(structures::stl::STLStackArray<RewardFWDCarActionPair> &val) const override;
+
+    bool set_value(structures::stl::STLStackArray<RewardFWDCarActionPair> const &val) override;
 };
 
 }

@@ -13,8 +13,8 @@ namespace simcars
 namespace agents
 {
 
-DefaultFWDCarOutcomeSim::DefaultFWDCarOutcomeSim(FullControlFWDCar const *control_fwd_car,
-                                                 RectRigidBodyEnv const *rigid_body_env) :
+DefaultFWDCarOutcomeSim::DefaultFWDCarOutcomeSim(FullControlFWDCar *control_fwd_car,
+                                                 RectRigidBodyEnv *rigid_body_env) :
     control_fwd_car(control_fwd_car), rigid_body_env(rigid_body_env)
 {
 }
@@ -30,7 +30,7 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
 
     RectRigidBodyEnv rigid_body_sim_env;
 
-    structures::IArray<RectRigidBody const*> const *env_rigid_body_array =
+    structures::IArray<RectRigidBody*> const *env_rigid_body_array =
             rigid_body_env->get_rigid_bodies();
 
     size_t i;
@@ -52,15 +52,15 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
                 std::chrono::duration<FP_DATA_TYPE>(parameters->sim_horizon_secs));
     simcars::causal::VariableContext::set_current_time(start_time + sim_horizon);
 
+    // TODO: Either utilise the FWD Car Outcome construction variable or remove it from the codebase
     FWDCarOutcome outcome;
 
-    outcome.lane_transitions =
-            int8_t(control_fwd_car_sim->get_cumil_lane_trans_variable()->get_value());
-    outcome.final_speed = fwd_car_sim->get_lon_lin_vel_variable()->get_value();
-    outcome.max_env_force_mag = fwd_car_sim->get_max_env_force_mag_variable()->get_value();
+    control_fwd_car_sim->get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
+    fwd_car_sim->get_lon_lin_vel_variable()->get_value(outcome.final_speed);
+    fwd_car_sim->get_max_env_force_mag_variable()->get_value(outcome.max_env_force_mag);
 
 
-    structures::IArray<RectRigidBody const*> const *sim_env_rigid_body_array =
+    structures::IArray<RectRigidBody*> const *sim_env_rigid_body_array =
             rigid_body_sim_env.get_rigid_bodies();
 
     for (i = 0; i < sim_env_rigid_body_array->count(); ++i)
