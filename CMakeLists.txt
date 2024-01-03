@@ -345,7 +345,6 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.cpp
   src/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.cpp
   src/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.cpp
-  src/agents/causal/variable_types/endogenous/fwd_car_outcome_construction.cpp
   src/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.cpp
   src/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.cpp
   include/ori/simcars/agents/declarations.hpp
@@ -382,7 +381,6 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.hpp
-  include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_outcome_construction.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp
 )
