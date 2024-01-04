@@ -40,7 +40,8 @@ bool VectorSetSumVariable::set_value(geometry::Vec const &val)
         }
         else
         {
-            return false;
+            // TODO: Potentially look at a better way of handling this, e.g. propogating remaining sum to undefined variable
+            return true;
         }
     }
 

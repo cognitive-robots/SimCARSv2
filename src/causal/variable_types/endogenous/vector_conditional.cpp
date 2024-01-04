@@ -45,7 +45,19 @@ bool VectorConditionalVariable::set_value(geometry::Vec const &val)
     }
     else
     {
-        return false;
+        // WARNING: Cannot undo endogenous parent setting if other parent setting fails
+        if (get_endogenous_parent_1()->set_value(val))
+        {
+            return get_other_parent()->set_value(true);
+        }
+        else if (get_endogenous_parent_2()->set_value(val))
+        {
+            return get_other_parent()->set_value(false);
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 

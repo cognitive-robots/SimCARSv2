@@ -66,13 +66,8 @@ bool LaneEncapsulatingVariable::set_value(structures::stl::STLStackArray<uint64_
 
             if (j == val.count()) return false;
         }
-
-        return true;
     }
-    else
-    {
-        return false;
-    }
+    return true;
 }
 
 }

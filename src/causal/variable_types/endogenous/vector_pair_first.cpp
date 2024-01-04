@@ -32,7 +32,7 @@ bool VectorPairFirstVariable::set_value(geometry::Vec const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

@@ -56,7 +56,7 @@ bool MaxRewardFWDCarActionVariable::set_value(FWDCarAction const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

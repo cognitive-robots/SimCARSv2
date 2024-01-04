@@ -58,13 +58,8 @@ bool CalcFWDCarActionOutcomeRewardVariable::set_value(structures::stl::STLStackA
                 return false;
             }
         }
-
-        return true;
     }
-    else
-    {
-        return false;
-    }
+    return true;
 }
 
 }

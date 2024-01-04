@@ -34,7 +34,7 @@ bool IdGoalTimePartVariable::set_value(temporal::Time const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

@@ -34,7 +34,7 @@ bool FWDCarActionSpeedPartVariable::set_value(Goal<FP_DATA_TYPE> const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

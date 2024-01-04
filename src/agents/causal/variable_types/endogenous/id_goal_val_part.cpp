@@ -34,7 +34,7 @@ bool IdGoalValPartVariable::set_value(uint64_t const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

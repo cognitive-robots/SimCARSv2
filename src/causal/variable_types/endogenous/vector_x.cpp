@@ -32,7 +32,7 @@ bool VectorXVariable::set_value(FP_DATA_TYPE const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

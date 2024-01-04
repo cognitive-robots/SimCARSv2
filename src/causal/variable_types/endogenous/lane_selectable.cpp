@@ -189,13 +189,8 @@ bool LaneSelectableVariable::set_value(structures::stl::STLStackArray<uint64_t> 
         {
             if (!selected_lanes.contains(val[i])) return false;
         }
-
-        return true;
     }
-    else
-    {
-        return false;
-    }
+    return true;
 }
 
 }

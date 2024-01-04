@@ -26,6 +26,7 @@ bool ORectConstructionVariable::get_value(geometry::ORect &val) const
 
 bool ORectConstructionVariable::set_value(geometry::ORect const &val)
 {
+    // WARNING: Cannot undo setting of earlier variables in the chain
     return get_endogenous_parent_1()->set_value(val.get_origin()) &&
             get_endogenous_parent_2()->set_value(val.get_width()) &&
             get_endogenous_parent_3()->set_value(val.get_height()) &&

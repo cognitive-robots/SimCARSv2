@@ -34,7 +34,7 @@ bool FWDCarActionLanePartVariable::set_value(Goal<uint64_t> const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

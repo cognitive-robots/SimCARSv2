@@ -31,7 +31,7 @@ bool ORectCollisionVariable::set_value(bool const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

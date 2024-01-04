@@ -48,7 +48,7 @@ bool LaneEncapsulationVariable::set_value(bool const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 

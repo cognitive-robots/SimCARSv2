@@ -56,13 +56,8 @@ bool SimFWDCarActionOutcomeVariable::set_value(structures::stl::STLStackArray<FW
                 return false;
             }
         }
-
-        return true;
     }
-    else
-    {
-        return false;
-    }
+    return true;
 }
 
 }

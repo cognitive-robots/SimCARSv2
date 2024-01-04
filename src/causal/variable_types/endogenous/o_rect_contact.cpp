@@ -31,7 +31,7 @@ bool ORectContactVariable::set_value(geometry::VecPair const &val)
     }
     else
     {
-        return false;
+        return true;
     }
 }
 
