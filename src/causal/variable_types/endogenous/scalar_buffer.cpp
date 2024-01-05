@@ -37,7 +37,8 @@ bool ScalarBufferVariable::get_value(FP_DATA_TYPE &val) const
         return true;
     }
     else if (axiomatic &&
-             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
+             (temporal_dictionary->count() == 0 ||
+              VariableContext::get_current_time() < temporal_dictionary->get_earliest_time()))
     {
         return false;
     }
@@ -57,7 +58,9 @@ bool ScalarBufferVariable::get_value(FP_DATA_TYPE &val) const
 
 bool ScalarBufferVariable::set_value(FP_DATA_TYPE const &val)
 {
-    if (axiomatic && VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
+    if (axiomatic &&
+            (temporal_dictionary->count() == 0 ||
+             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time()))
     {
         temporal_dictionary->update(VariableContext::get_current_time(), val);
         return true;

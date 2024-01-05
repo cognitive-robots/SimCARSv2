@@ -1,6 +1,8 @@
 
 #include <ori/simcars/causal/variable_types/endogenous/matrix_vector_product.hpp>
 
+#include <Eigen/LU>
+
 namespace ori
 {
 namespace simcars

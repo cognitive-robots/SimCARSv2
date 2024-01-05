@@ -18,7 +18,7 @@ struct FWDCarOutcome
     FP_DATA_TYPE max_env_force_mag;
 };
 
-bool operator==(FWDCarOutcome const &outcome_1, FWDCarOutcome const &outcome_2)
+bool operator ==(FWDCarOutcome const &outcome_1, FWDCarOutcome const &outcome_2)
 {
     return outcome_1.lane_transitions == outcome_2.lane_transitions &&
             outcome_1.final_speed == outcome_2.final_speed &&

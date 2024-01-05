@@ -37,7 +37,8 @@ bool VectorBufferVariable::get_value(geometry::Vec &val) const
         return true;
     }
     else if (axiomatic &&
-             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
+             (temporal_dictionary->count() == 0 ||
+              VariableContext::get_current_time() < temporal_dictionary->get_earliest_time()))
     {
         return false;
     }
@@ -57,7 +58,9 @@ bool VectorBufferVariable::get_value(geometry::Vec &val) const
 
 bool VectorBufferVariable::set_value(geometry::Vec const &val)
 {
-    if (axiomatic && VariableContext::get_current_time() < temporal_dictionary->get_earliest_time())
+    if (axiomatic &&
+            (temporal_dictionary->count() == 0 ||
+             VariableContext::get_current_time() < temporal_dictionary->get_earliest_time()))
     {
         temporal_dictionary->update(VariableContext::get_current_time(), val);
         return true;

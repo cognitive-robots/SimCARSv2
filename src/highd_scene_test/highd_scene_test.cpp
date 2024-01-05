@@ -1,9 +1,6 @@
 
-#include <ori/simcars/structures/stl/stl_set.hpp>
-#include <ori/simcars/geometry/trig_buff.hpp>
-#include <ori/simcars/agent/highd/highd_scene.hpp>
+#include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
 
-#include <iostream>
 #include <exception>
 
 using namespace ori::simcars;
@@ -20,24 +17,11 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning scene load" << std::endl;
 
-    structures::ISet<std::string> *agent_names = new structures::stl::STLSet<std::string>(
-                {
-                    "non_ego_vehicle_1",
-                    "non_ego_vehicle_2",
-                    "non_ego_vehicle_3",
-                    "non_ego_vehicle_4",
-                    "non_ego_vehicle_5",
-                    "non_ego_vehicle_6",
-                    "non_ego_vehicle_7",
-                    "non_ego_vehicle_8",
-                    "non_ego_vehicle_9"
-                });
-
-    agent::IScene const *scene;
+    agents::IFWDCarScene const *scene;
 
     try
     {
-        scene = agent::highd::HighDScene::load(argv[1], argv[2], agent_names);
+        scene = new agents::highd::HighDFWDCarScene(argv[1], argv[2]);
     }
     catch (std::exception const &e)
     {
@@ -46,8 +30,6 @@ int main(int argc, char *argv[])
     }
 
     std::cout << "Finished scene load" << std::endl;
-
-    delete agent_names;
 
     delete scene;
 

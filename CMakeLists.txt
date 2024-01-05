@@ -347,10 +347,12 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.cpp
   src/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.cpp
   src/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.cpp
+  src/agents/highd/highd_fwd_car_scene.cpp
   include/ori/simcars/agents/declarations.hpp
   include/ori/simcars/agents/typedefs.hpp
   include/ori/simcars/agents/fwd_car_outcome_sim_interface.hpp
   include/ori/simcars/agents/fwd_car_reward_calc_interface.hpp
+  include/ori/simcars/agents/fwd_car_scene_interface.hpp
   include/ori/simcars/agents/goal.hpp
   include/ori/simcars/agents/rect_rigid_body.hpp
   include/ori/simcars/agents/rect_rigid_body_sim.hpp
@@ -383,6 +385,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp
+  include/ori/simcars/agents/highd/highd_fwd_car_scene.hpp
 )
 target_include_directories(simcars_agents
 PUBLIC
@@ -398,6 +401,7 @@ PUBLIC
   simcars_temporal
   simcars_map
   simcars_causal
+  rapidcsv
 )
 add_dependencies(simcars_agents simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_causal)
 target_compile_options(simcars_agents PRIVATE -fPIC)
@@ -614,11 +618,11 @@ add_executable(highd_map_test src/highd_map_test/highd_map_test.cpp)
 target_link_libraries(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(highd_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 
-#[[
 add_executable(highd_scene_test src/highd_scene_test/highd_scene_test.cpp)
 target_link_libraries(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 add_dependencies(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 
+#[[
 add_executable(highd_simulation_test src/highd_simulation_test/highd_simulation_test.cpp)
 target_link_libraries(highd_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 add_dependencies(highd_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)

@@ -48,32 +48,32 @@ RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
     total_torque(&env_torque_proxy, &other_torque),
 
     lin_acc(&total_force, &mass_recip),
-    lin_acc_buff(&lin_acc),
+    lin_acc_buff(&lin_acc, nullptr, true),
     prev_lin_acc(&lin_acc_buff),
 
     ang_acc(&total_torque, &moi_recip),
-    ang_acc_buff(&ang_acc),
+    ang_acc_buff(&ang_acc, nullptr, true),
     prev_ang_acc(&ang_acc_buff),
 
     lin_vel_diff(&prev_lin_acc),
     prev_lin_vel(&lin_vel_buff),
     lin_vel(&prev_lin_vel, &lin_vel_diff),
-    lin_vel_buff(&lin_vel),
+    lin_vel_buff(&lin_vel, nullptr, true),
 
     ang_vel_diff(&prev_ang_acc),
     prev_ang_vel(&ang_vel_buff),
     ang_vel(&prev_ang_vel, &ang_vel_diff),
-    ang_vel_buff(&ang_vel),
+    ang_vel_buff(&ang_vel, nullptr, true),
 
     pos_diff(&lin_vel),
     prev_pos(&pos_buff),
     pos(&prev_pos, &pos_diff),
-    pos_buff(&pos),
+    pos_buff(&pos, nullptr, true),
 
     rot_diff(&ang_vel),
     prev_rot(&rot_buff),
     rot(&prev_rot, &rot_diff),
-    rot_buff(&rot),
+    rot_buff(&rot, nullptr, true),
 
     rect(&pos_buff, &rot_buff, &length_proxy, &width_proxy)
 {
