@@ -88,7 +88,7 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc, ra
 
 HighDFWDCarScene::~HighDFWDCarScene()
 {
-    structures::IArray<FWDCar*> const *cars;
+    structures::IArray<FWDCar*> const *cars = id_car_dict.get_values();
     for (size_t i = 0; i < cars->count(); ++i)
     {
         delete (*cars)[i];

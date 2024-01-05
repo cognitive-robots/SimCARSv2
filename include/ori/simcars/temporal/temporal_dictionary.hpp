@@ -20,7 +20,7 @@ public:
     {
         std::lock_guard<std::recursive_mutex> data_guard(this->data_mutex);
 
-        return key >= get_earliest_time();
+        return this->data.size() > 0 && key >= get_earliest_time();
     }
 
     V const& operator [](Time const &key) const override
