@@ -22,6 +22,13 @@ public:
 
         return this->data.size() > 0 && key >= get_earliest_time();
     }
+    bool contains(Time const &key, temporal::Duration time_step_size) const
+    {
+        std::lock_guard<std::recursive_mutex> data_guard(this->data_mutex);
+
+        return this->data.size() > 0 && key >= get_earliest_time() &&
+                key < get_latest_time() + time_step_size;
+    }
 
     V const& operator [](Time const &key) const override
     {

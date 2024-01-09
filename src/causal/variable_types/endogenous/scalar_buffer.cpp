@@ -31,7 +31,8 @@ ScalarBufferVariable::~ScalarBufferVariable()
 
 bool ScalarBufferVariable::get_value(FP_DATA_TYPE &val) const
 {
-    if (temporal_dictionary->contains(VariableContext::get_current_time()))
+    if (temporal_dictionary->contains(VariableContext::get_current_time(),
+                                      VariableContext::get_time_step_size()))
     {
         val = (*temporal_dictionary)[VariableContext::get_current_time()];
         return true;

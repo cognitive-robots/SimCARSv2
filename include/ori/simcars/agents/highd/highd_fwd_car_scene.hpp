@@ -31,6 +31,7 @@ public:
     temporal::Duration get_time_step_size() const override;
     temporal::Time get_min_time() const override;
     temporal::Time get_max_time() const override;
+    structures::IArray<FWDCar*> const* get_fwd_cars() const override;
 };
 
 }

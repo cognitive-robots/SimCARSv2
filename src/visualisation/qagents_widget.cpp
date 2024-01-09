@@ -13,71 +13,35 @@ namespace visualisation
 
 void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
 {
-    /*
-    agent::IConstant<bool> const *ego_constant = driving_agent->get_ego_constant();
-    agent::IConstant<uint32_t> const *id_constant = driving_agent->get_id_constant();
-    agent::IConstant<agent::DrivingAgentClass> const *driving_agent_class_constant =
-            driving_agent->get_driving_agent_class_constant();
-    agent::IConstant<FP_DATA_TYPE> const *bb_length_constant =
-            driving_agent->get_bb_length_constant();
-    agent::IConstant<FP_DATA_TYPE> const *bb_width_constant =
-            driving_agent->get_bb_width_constant();
-
-    agent::IVariable<geometry::Vec> const *position_variable =
-            driving_agent->get_position_variable();
-    agent::IVariable<FP_DATA_TYPE> const *rotation_variable =
-            driving_agent->get_rotation_variable();
-
-    temporal::Time current_time = this->get_time();
-    agent::ViewReadOnlyDrivingAgentState state(
-                dynamic_cast<agent::IDrivingAgent const*>(vehicle), current_time);
-
-    sf::RectangleShape *rectangle = nullptr;
-    sf::CircleShape *circle = nullptr;
-    sf::Text *text = nullptr;
-
-    geometry::Vec position;
-    if (!position_variable->get_value(current_time, position))
-    {
-        return;
-    }
-
-    FP_DATA_TYPE rotation;
-    if (!rotation_variable->get_value(current_time, rotation))
-    {
-        return;
-    }
-
-    sf::Vector2f agent_base_shape_position = to_sfml_vec(get_pixels_per_metre() * position, false, this->get_flip_y());
-
-    FP_DATA_TYPE agent_rectangle_length = get_pixels_per_metre() * bb_length_constant->get_value();
-    FP_DATA_TYPE agent_rectangle_width = get_pixels_per_metre() * bb_width_constant->get_value();
-    FP_DATA_TYPE agent_rectangle_min_side = std::min(agent_rectangle_length, agent_rectangle_width);
-    FP_DATA_TYPE reward = reward_calculator.calculate_state_reward(&state);
-    rectangle = new sf::RectangleShape(sf::Vector2f(agent_rectangle_length, agent_rectangle_width));
-    sf::Vector2f agent_rectangle_position = agent_base_shape_position
-            - to_sfml_vec(0.5f * trig_buff->get_rot_mat(-rotation)
-                          * geometry::Vec(agent_rectangle_length, agent_rectangle_width));
-    rectangle->setPosition(agent_rectangle_position);
-    rectangle->setRotation(-180.0f * rotation / M_PI);
-    */
-
     geometry::ORect agent_rect;
-    agent->get_rect_variable()->get_value(agent_rect);
+    bool res = agent->get_rect_variable()->get_value(agent_rect);
+
+    if (!res)
+    {
+        return;
+    }
 
     sf::VertexArray *agent_shape = new sf::VertexArray(sf::PrimitiveType::TriangleStrip, 4);
-    for (size_t i = 0; i < 4; ++i)
-    {
-        geometry::Vec rect_point = agent_rect[i];
-        (*agent_shape)[i].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
-                                               -get_pixels_per_metre() * rect_point.y());
-        (*agent_shape)[i].color = sf::Color::Green;
-    }
-    //shape->setFillColor(to_sfml_colour(driving_agent_class_constant->get_value()));
-    //shape->setOutlineThickness(agent_rectangle_min_side * 0.2f);
-    //shape->setOutlineColor(sf::Color(
-    //                           uint8_t(std::min(255.0f * 2.0f * (1.0f - reward), 255.0f)),
-    //                           uint8_t(std::min(255.0f * 2.0f * reward, 255.0f)), 0));
+
+    geometry::Vec rect_point = agent_rect[0];
+    (*agent_shape)[0].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
+                                           -get_pixels_per_metre() * rect_point.y());
+    (*agent_shape)[0].color = sf::Color::Green;
+
+    rect_point = agent_rect[3];
+    (*agent_shape)[1].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
+                                           -get_pixels_per_metre() * rect_point.y());
+    (*agent_shape)[1].color = sf::Color::Green;
+
+    rect_point = agent_rect[1];
+    (*agent_shape)[2].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
+                                           -get_pixels_per_metre() * rect_point.y());
+    (*agent_shape)[2].color = sf::Color::Green;
+
+    rect_point = agent_rect[2];
+    (*agent_shape)[3].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
+                                           -get_pixels_per_metre() * rect_point.y());
+    (*agent_shape)[3].color = sf::Color::Green;
 
     if (focus_mode == FocusMode::ALL_AGENTS || focus_mode == FocusMode::FOCAL_AGENTS)
     {
@@ -85,47 +49,13 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
         focal_agent_count++;
     }
 
-    /*
-    FP_DATA_TYPE agent_circle_radius = 0.25f * agent_rectangle_min_side;
-    circle = new sf::CircleShape(agent_circle_radius);
-    sf::Vector2f agent_circle_position = agent_base_shape_position - sf::Vector2f(agent_circle_radius, agent_circle_radius);
-    circle->setPosition(agent_circle_position);
-    circle->setOutlineThickness(agent_circle_radius * 0.4f);
-    if (focal_entities->contains(vehicle->get_name()))
-    {
-        circle->setOutlineColor(sf::Color(255, 255, 255));
-    }
-    else
-    {
-        circle->setOutlineColor(sf::Color(0, 0, 0));
-    }
-
-    FP_DATA_TYPE agent_text_size = 0.4f * agent_rectangle_min_side;
-    text = new sf::Text(std::to_string(id_constant->get_value()), text_font, agent_text_size);
-    sf::FloatRect text_bounds = text->getGlobalBounds();
-    sf::Vector2f agent_text_position = agent_base_shape_position
-            - 0.5f * sf::Vector2f(text_bounds.width, agent_text_size);
-    text->setPosition(agent_text_position);
-    text->setFillColor(sf::Color(0, 0, 0));
-    */
-
     add_to_render_stack(agent_shape);
-    //render_stack.push_back(circle);
-    //render_stack.push_back(text);
 }
 
 void QAgentsWidget::on_init()
 {
     causal::VariableContext::set_time_step_size(
                 std::chrono::duration_cast<temporal::Duration>(frame_interval));
-
-    /*
-    // TODO: Make this non-OS specific
-    if(!text_font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-M.ttf"))
-    {
-        text_enabled = false;
-    }
-    */
 
     on_update();
 }
@@ -203,7 +133,9 @@ QAgentsWidget::QAgentsWidget(
         FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre, FocusMode focus_mode) :
     AQSFMLCanvas(parent, position, size, frame_interval), frame_interval(frame_interval),
     realtime_factor(realtime_factor), pixels_per_metre(pixels_per_metre), focus_mode(focus_mode),
-    start_time(start_time), end_time(end_time), current_time(start_time), update_required(false) {}
+    start_time(start_time), end_time(end_time), current_time(start_time),
+    last_realtime(std::chrono::time_point<std::chrono::steady_clock>::min()),
+    update_required(false) {}
 
 QAgentsWidget::~QAgentsWidget()
 {
@@ -336,7 +268,7 @@ void QAgentsWidget::tick_forwards()
     std::chrono::time_point<std::chrono::steady_clock> current_realtime =
             std::chrono::steady_clock::now();
 
-    if (last_realtime != temporal::Time::min())
+    if (last_realtime != std::chrono::time_point<std::chrono::steady_clock>::min())
     {
         std::chrono::steady_clock::duration realtime_diff =
                 current_realtime - last_realtime;
@@ -364,7 +296,7 @@ void QAgentsWidget::tick_backwards()
     std::chrono::time_point<std::chrono::steady_clock> current_realtime =
             std::chrono::steady_clock::now();
 
-    if (last_realtime != temporal::Time::min())
+    if (last_realtime != std::chrono::time_point<std::chrono::steady_clock>::min())
     {
         std::chrono::steady_clock::duration realtime_diff =
                 current_realtime - last_realtime;

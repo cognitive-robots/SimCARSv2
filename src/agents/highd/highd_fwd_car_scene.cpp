@@ -26,8 +26,8 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc, ra
         uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("id", i);
 
         // Note: Length/width in local frame vs width/height in global frame
-        FP_DATA_TYPE length = tracks_meta_doc.GetCell<uint32_t>("width", i);
-        FP_DATA_TYPE width = tracks_meta_doc.GetCell<uint32_t>("height", i);
+        FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("width", i);
+        FP_DATA_TYPE width = tracks_meta_doc.GetCell<FP_DATA_TYPE>("height", i);
 
         // Several big approximations here based off Toyota Ascent Sport (Hybrid), 1.8L
         FP_DATA_TYPE approx_height = 0.806 * width;
@@ -38,8 +38,10 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc, ra
         uint32_t initial_frame = tracks_meta_doc.GetCell<uint32_t>("initialFrame", i);
         uint32_t final_frame = tracks_meta_doc.GetCell<uint32_t>("finalFrame", i);
 
-        min_time = temporal::Time(temporal::Duration(((initial_frame - 1) * get_time_step_size())));
-        max_time = temporal::Time(temporal::Duration(((final_frame - 1) * get_time_step_size())));
+        min_time = std::min(temporal::Time(temporal::Duration(((initial_frame - 1) *
+                                                               get_time_step_size()))), min_time);
+        max_time = std::max(temporal::Time(temporal::Duration(((final_frame - 1) *
+                                                               get_time_step_size()))), max_time);
 
         for (; j < tracks_doc.GetRowCount(); ++j)
         {
@@ -66,6 +68,7 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc, ra
 
         size_t const tracks_start_row = j;
         size_t const tracks_end_row = tracks_start_row + (final_frame - initial_frame);
+        j = tracks_end_row + 1;
         for (k = tracks_start_row; k <= tracks_end_row; ++k)
         {
             uint32_t current_frame = tracks_doc.GetCell<uint32_t>("frame", k);
@@ -74,8 +77,8 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc, ra
 
             simcars::causal::VariableContext::set_current_time(current_time);
 
-            FP_DATA_TYPE const position_x = tracks_doc.GetCell<FP_DATA_TYPE>("x", i) + length / 2.0f;
-            FP_DATA_TYPE const position_y = tracks_doc.GetCell<FP_DATA_TYPE>("y", i) + width / 2.0f;
+            FP_DATA_TYPE const position_x = tracks_doc.GetCell<FP_DATA_TYPE>("x", k) + length / 2.0f;
+            FP_DATA_TYPE const position_y = tracks_doc.GetCell<FP_DATA_TYPE>("y", k) + width / 2.0f;
             geometry::Vec const position(position_x, position_y);
 
             position_variable->set_value(position);
@@ -108,6 +111,11 @@ temporal::Time HighDFWDCarScene::get_min_time() const
 temporal::Time HighDFWDCarScene::get_max_time() const
 {
     return max_time;
+}
+
+structures::IArray<FWDCar*> const* HighDFWDCarScene::get_fwd_cars() const
+{
+    return id_car_dict.get_values();
 }
 
 }

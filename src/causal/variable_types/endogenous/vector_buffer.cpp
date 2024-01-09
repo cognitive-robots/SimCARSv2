@@ -31,7 +31,8 @@ VectorBufferVariable::~VectorBufferVariable()
 
 bool VectorBufferVariable::get_value(geometry::Vec &val) const
 {
-    if (temporal_dictionary->contains(VariableContext::get_current_time()))
+    if (temporal_dictionary->contains(VariableContext::get_current_time(),
+                                      VariableContext::get_time_step_size()))
     {
         val = (*temporal_dictionary)[VariableContext::get_current_time()];
         return true;
