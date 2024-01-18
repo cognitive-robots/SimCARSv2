@@ -1,9 +1,6 @@
 [submodule "extern/magic_enum"]
 	path = extern/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
-[submodule "extern/lz4_stream"]
-	path = extern/lz4_stream
-	url = https://github.com/laudrup/lz4_stream.git
 [submodule "extern/rapidcsv"]
 	path = extern/rapidcsv
 	url = https://github.com/d99kris/rapidcsv.git

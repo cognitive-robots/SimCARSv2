@@ -16,7 +16,6 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(SFML REQUIRED COMPONENTS graphics)
 
 add_subdirectory(extern/magic_enum)
-#add_subdirectory(extern/lz4_stream)
 if (NOT TARGET rapidcsv)
   add_subdirectory(extern/rapidcsv)
 endif()
