@@ -12,12 +12,6 @@
 #include <ori/simcars/agents/plan_fwd_car.hpp>
 #include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp>
 #include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/scalar_goal_val_part.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/scalar_goal_time_part.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/id_goal_val_part.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/id_goal_time_part.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/generate_fwd_car_actions.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp>
@@ -34,6 +28,10 @@ class GreedyPlanFWDCar : public virtual PlanFWDCar
 {
 protected:
     void init_links() override;
+
+    map::IMap const *map;
+    agents::IFWDCarOutcomeSim const *outcome_sim;
+    agents::IFWDCarRewardCalc const *reward_calc;
 
     simcars::causal::ScalarFixedVariable time_horizon;
     simcars::causal::ScalarProxyVariable time_horizon_proxy;
@@ -60,14 +58,6 @@ protected:
 
     causal::MaxRewardFWDCarActionVariable best_action;
 
-    causal::FWDCarActionSpeedPartVariable best_action_speed_goal;
-    causal::ScalarGoalValPartVariable best_action_speed_goal_val;
-    causal::ScalarGoalTimePartVariable best_action_speed_goal_time;
-
-    causal::FWDCarActionLanePartVariable best_action_lane_goal;
-    causal::IdGoalValPartVariable best_action_lane_goal_val;
-    causal::IdGoalTimePartVariable best_action_lane_goal_time;
-
 public:
     GreedyPlanFWDCar(map::IMap const *map, IFWDCarOutcomeSim const *fwd_car_outcome_sim,
                      FWDCarSimParameters fwd_car_sim_parameters,
@@ -76,6 +66,7 @@ public:
                      FP_DATA_TYPE speed_min_value, FP_DATA_TYPE speed_max_value,
                      FP_DATA_TYPE speed_interval_value, FP_DATA_TYPE time_horizon_value,
                      FP_DATA_TYPE time_interval_value);
+    GreedyPlanFWDCar(GreedyPlanFWDCar const &plan_fwd_car);
 };
 
 }

@@ -18,11 +18,15 @@ using namespace ori::simcars;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    if (argc < 6)
     {
-        std::cerr << "Usage: ./highd_simcars_demo recording_meta_file_path tracks_meta_file_path tracks_file_path" << std::endl;
+        std::cerr << "Usage: ./highd_simcars_demo recording_meta_file_path tracks_meta_file_path "
+                     "tracks_file_path start_frame end_frame" << std::endl;
         return -1;
     }
+
+    size_t start_frame = atoi(argv[4]);
+    size_t end_frame = atoi(argv[5]);
 
     geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
@@ -32,15 +36,7 @@ int main(int argc, char *argv[])
 
     map::highd::HighDMap map;
 
-    try
-    {
-        map.load(argv[1]);
-    }
-    catch (std::exception const &e)
-    {
-        std::cerr << "Exception occured during map load:" << std::endl << e.what() << std::endl;
-        return -1;
-    }
+    map.load(argv[1]);
 
     std::cout << "Finished map load" << std::endl;
 
@@ -48,15 +44,7 @@ int main(int argc, char *argv[])
 
     agents::IFWDCarScene const *scene;
 
-    try
-    {
-        scene = new agents::highd::HighDFWDCarScene(argv[2], argv[3]);
-    }
-    catch (std::exception const &e)
-    {
-        std::cerr << "Exception occured during scene load:" << std::endl << e.what() << std::endl;
-        return -1;
-    }
+    scene = new agents::highd::HighDFWDCarScene(argv[2], argv[3], start_frame, end_frame);
 
     structures::IArray<agents::FWDCar*> const *fwd_cars = scene->get_fwd_cars();
 

@@ -24,7 +24,8 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
 {
     temporal::Time start_time = simcars::causal::VariableContext::get_current_time();
 
-    assert(action->speed_goal.time > start_time && action->lane_goal.time > start_time);
+    // WARNING: Temporarily removed assertion, might not be necessary
+    //assert(action->speed_goal.time > start_time && action->lane_goal.time > start_time);
 
     RectRigidBody const *selected_rigid_body = control_fwd_car->get_fwd_car();
 

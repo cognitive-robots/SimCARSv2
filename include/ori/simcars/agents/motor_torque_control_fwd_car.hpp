@@ -27,37 +27,38 @@ class MotorTorqueControlFWDCar : public virtual ControlFWDCar
 protected:
     void init_links() override;
 
-    causal::ScalarFixedVariable max_motor_torque;
-    causal::ScalarFixedVariable min_motor_torque;
+    simcars::causal::ScalarFixedVariable max_motor_torque;
+    simcars::causal::ScalarFixedVariable min_motor_torque;
 
-    causal::TimeCurrentTimeDifferenceVariable time_error;
-    causal::DurationSecondsCastVariable time_error_secs;
-    causal::ScalarFixedVariable min_act_horizon_secs;
-    causal::ScalarMaxVariable actual_act_horizon_secs;
-    causal::ScalarReciprocalVariable actual_act_horizon_secs_recip;
+    simcars::causal::TimeCurrentTimeDifferenceVariable time_error;
+    simcars::causal::DurationSecondsCastVariable time_error_secs;
+    simcars::causal::ScalarFixedVariable min_act_horizon_secs;
+    simcars::causal::ScalarMaxVariable actual_act_horizon_secs;
+    simcars::causal::ScalarReciprocalVariable actual_act_horizon_secs_recip;
 
-    causal::ScalarSocketVariable lon_lin_vel;
-    causal::ScalarNegationVariable neg_lon_lin_vel;
-    causal::ScalarSumVariable lon_lin_vel_error;
+    simcars::causal::ScalarSocketVariable speed;
+    simcars::causal::ScalarNegationVariable neg_speed;
+    simcars::causal::ScalarSumVariable speed_error;
 
-    causal::ScalarSocketVariable mass;
-    causal::ScalarSocketVariable wheel_radius;
-    causal::VectorSocketVariable dir;
-    causal::VectorProxyVariable dir_proxy;
-    causal::VectorSocketVariable env_force;
-    causal::ScalarProductVariable needed_lon_lin_acc;
-    causal::ScalarProductVariable needed_lon_force_plus_lon_env_force;
-    causal::VectorDotProductVariable lon_env_force;
-    causal::ScalarNegationVariable neg_lon_env_force;
-    causal::ScalarSumVariable needed_lon_force;
-    causal::ScalarProductVariable needed_motor_torque;
+    simcars::causal::ScalarSocketVariable mass;
+    simcars::causal::ScalarSocketVariable wheel_radius;
+    simcars::causal::VectorSocketVariable dir;
+    simcars::causal::VectorProxyVariable dir_proxy;
+    simcars::causal::VectorSocketVariable env_force;
+    simcars::causal::ScalarProductVariable needed_acc;
+    simcars::causal::ScalarProductVariable needed_force_plus_lon_env_force;
+    simcars::causal::VectorDotProductVariable lon_env_force;
+    simcars::causal::ScalarNegationVariable neg_lon_env_force;
+    simcars::causal::ScalarSumVariable needed_force;
+    simcars::causal::ScalarProductVariable needed_motor_torque;
 
-    causal::ScalarMinVariable max_lim_motor_torque;
-    causal::ScalarMaxVariable actual_motor_torque;
+    simcars::causal::ScalarMinVariable max_lim_motor_torque;
+    simcars::causal::ScalarMaxVariable actual_motor_torque;
 
 public:
     MotorTorqueControlFWDCar(FP_DATA_TYPE max_motor_torque_value,
                              FP_DATA_TYPE min_motor_torque_value);
+    MotorTorqueControlFWDCar(MotorTorqueControlFWDCar const &control_fwd_car);
 };
 
 }

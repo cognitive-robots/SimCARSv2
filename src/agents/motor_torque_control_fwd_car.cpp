@@ -12,7 +12,7 @@ namespace agents
 
 void MotorTorqueControlFWDCar::init_links()
 {
-    lon_lin_vel.set_parent(fwd_car->get_lon_lin_vel_variable());
+    speed.set_parent(fwd_car->get_lon_lin_vel_variable());
     mass.set_parent(fwd_car->get_mass_variable());
     wheel_radius.set_parent(fwd_car->get_wheel_radius_variable());
     dir.set_parent(fwd_car->get_dir_variable());
@@ -26,33 +26,64 @@ MotorTorqueControlFWDCar::MotorTorqueControlFWDCar(FP_DATA_TYPE max_motor_torque
     max_motor_torque(max_motor_torque_value),
     min_motor_torque(min_motor_torque_value),
 
-    time_error(&lon_lin_vel_time_goal),
+    time_error(&speed_time_goal),
     time_error_secs(&time_error),
     min_act_horizon_secs(1.0),
     actual_act_horizon_secs(&time_error_secs, &min_act_horizon_secs),
     actual_act_horizon_secs_recip(&actual_act_horizon_secs),
 
-    lon_lin_vel(),
-    neg_lon_lin_vel(&lon_lin_vel),
-    lon_lin_vel_error(&neg_lon_lin_vel, &lon_lin_vel_val_goal),
+    speed(),
+    neg_speed(&speed),
+    speed_error(&neg_speed, &speed_val_goal),
 
     mass(),
     wheel_radius(),
     dir(),
     dir_proxy(&dir),
     env_force(),
-    needed_lon_lin_acc(&lon_lin_vel_error, &actual_act_horizon_secs_recip),
-    needed_lon_force_plus_lon_env_force(&needed_lon_lin_acc, &mass),
+    needed_acc(&speed_error, &actual_act_horizon_secs_recip),
+    needed_force_plus_lon_env_force(&needed_acc, &mass),
     lon_env_force(&dir_proxy, &env_force),
     neg_lon_env_force(&lon_env_force),
-    needed_lon_force(&needed_lon_force_plus_lon_env_force, &neg_lon_env_force),
-    needed_motor_torque(&needed_lon_force, &wheel_radius),
+    needed_force(&needed_force_plus_lon_env_force, &neg_lon_env_force),
+    needed_motor_torque(&needed_force, &wheel_radius),
 
     max_lim_motor_torque(&needed_motor_torque, &max_motor_torque),
     actual_motor_torque(&max_lim_motor_torque, &min_motor_torque)
 {
     assert(max_motor_torque_value >= 0.0);
     assert(min_motor_torque_value <= 0.0);
+}
+
+MotorTorqueControlFWDCar::MotorTorqueControlFWDCar(MotorTorqueControlFWDCar const &control_fwd_car) :
+    max_motor_torque(control_fwd_car.max_motor_torque),
+    min_motor_torque(control_fwd_car.min_motor_torque),
+
+    time_error(&speed_time_goal),
+    time_error_secs(&time_error),
+    min_act_horizon_secs(1.0),
+    actual_act_horizon_secs(&time_error_secs, &min_act_horizon_secs),
+    actual_act_horizon_secs_recip(&actual_act_horizon_secs),
+
+    speed(),
+    neg_speed(&speed),
+    speed_error(&neg_speed, &speed_val_goal),
+
+    mass(),
+    wheel_radius(),
+    dir(),
+    dir_proxy(&dir),
+    env_force(),
+    needed_acc(&speed_error, &actual_act_horizon_secs_recip),
+    needed_force_plus_lon_env_force(&needed_acc, &mass),
+    lon_env_force(&dir_proxy, &env_force),
+    neg_lon_env_force(&lon_env_force),
+    needed_force(&needed_force_plus_lon_env_force, &neg_lon_env_force),
+    needed_motor_torque(&needed_force, &wheel_radius),
+
+    max_lim_motor_torque(&needed_motor_torque, &max_motor_torque),
+    actual_motor_torque(&max_lim_motor_torque, &min_motor_torque)
+{
 }
 
 }

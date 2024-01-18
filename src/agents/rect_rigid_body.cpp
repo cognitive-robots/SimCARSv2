@@ -38,14 +38,16 @@ RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
     moi_recip(&moi),
 
     env_force(),
-    env_force_proxy(&env_force),
+    env_force_buffer(&env_force, nullptr, true),
     other_force(),
-    total_force(&env_force_proxy, &other_force),
+    other_force_buffer(&other_force, nullptr, true),
+    total_force(&env_force_buffer, &other_force_buffer),
 
     env_torque(),
-    env_torque_proxy(&env_torque),
+    env_torque_buffer(&env_torque, nullptr, true),
     other_torque(),
-    total_torque(&env_torque_proxy, &other_torque),
+    other_torque_buffer(&other_torque, nullptr, true),
+    total_torque(&env_torque_buffer, &other_torque_buffer),
 
     lin_acc(&total_force, &mass_recip),
     lin_acc_buff(&lin_acc, nullptr, true),
@@ -65,12 +67,12 @@ RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
     ang_vel(&prev_ang_vel, &ang_vel_diff),
     ang_vel_buff(&ang_vel, nullptr, true),
 
-    pos_diff(&lin_vel),
+    pos_diff(&lin_vel_buff),
     prev_pos(&pos_buff),
     pos(&prev_pos, &pos_diff),
     pos_buff(&pos, nullptr, true),
 
-    rot_diff(&ang_vel),
+    rot_diff(&ang_vel_buff),
     prev_rot(&rot_buff),
     rot(&prev_rot, &rot_diff),
     rot_buff(&rot, nullptr, true),
@@ -83,6 +85,76 @@ RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
     assert(height_value > 0.0);
     assert(drag_area_value > 0.0);
 }
+
+RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
+    mass(rect_rigid_body.mass),
+    mass_proxy(&mass),
+    mass_recip(&mass),
+
+    length(rect_rigid_body.length),
+    length_proxy(&length),
+    length_squared(&length_proxy, &length),
+
+    width(rect_rigid_body.width),
+    width_proxy(&width),
+    width_squared(&width_proxy, &width),
+
+    height(rect_rigid_body.height),
+    height_proxy(&height),
+
+    drag_area(rect_rigid_body.drag_area),
+    drag_area_proxy(&drag_area),
+
+    moi_scale_factor(0.0833),
+    moi_scaled_mass(&mass_proxy, &moi_scale_factor),
+
+    span_squared(&length_squared, &width_squared),
+
+    moi(&moi_scaled_mass, &span_squared),
+    moi_recip(&moi),
+
+    env_force(),
+    env_force_buffer(&env_force, nullptr, true),
+    other_force(),
+    other_force_buffer(&other_force, nullptr, true),
+    total_force(&env_force_buffer, &other_force_buffer),
+
+    env_torque(),
+    env_torque_buffer(&env_torque, nullptr, true),
+    other_torque(),
+    other_torque_buffer(&other_torque, nullptr, true),
+    total_torque(&env_torque_buffer, &other_torque_buffer),
+
+    lin_acc(&total_force, &mass_recip),
+    lin_acc_buff(&lin_acc, nullptr, true),
+    prev_lin_acc(&lin_acc_buff),
+
+    ang_acc(&total_torque, &moi_recip),
+    ang_acc_buff(&ang_acc, nullptr, true),
+    prev_ang_acc(&ang_acc_buff),
+
+    lin_vel_diff(&prev_lin_acc),
+    prev_lin_vel(&lin_vel_buff),
+    lin_vel(&prev_lin_vel, &lin_vel_diff),
+    lin_vel_buff(&lin_vel, nullptr, true),
+
+    ang_vel_diff(&prev_ang_acc),
+    prev_ang_vel(&ang_vel_buff),
+    ang_vel(&prev_ang_vel, &ang_vel_diff),
+    ang_vel_buff(&ang_vel, nullptr, true),
+
+    pos_diff(&lin_vel_buff),
+    prev_pos(&pos_buff),
+    pos(&prev_pos, &pos_diff),
+    pos_buff(&pos, nullptr, true),
+
+    rot_diff(&ang_vel_buff),
+    prev_rot(&rot_buff),
+    rot(&prev_rot, &rot_diff),
+    rot_buff(&rot, nullptr, true),
+
+    rect(&pos_buff, &rot_buff, &length_proxy, &width_proxy)
+{}
 
 causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_mass_variable()
 {
@@ -111,7 +183,7 @@ causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_drag_area_variable
 
 causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_env_force_variable()
 {
-    return &env_force_proxy;
+    return &env_force_buffer;
 }
 
 causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_acc_variable()

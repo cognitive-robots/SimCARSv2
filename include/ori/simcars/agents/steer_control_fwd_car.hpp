@@ -23,50 +23,49 @@ protected:
 
     map::IMap const *map;
 
-    causal::ScalarFixedVariable max_steer;
-    causal::ScalarNegationVariable min_steer;
+    simcars::causal::ScalarFixedVariable max_steer;
+    simcars::causal::ScalarNegationVariable min_steer;
 
-    causal::IdProxyVariable lane_val_goal_proxy;
+    simcars::causal::IdProxyVariable lane_val_goal_proxy;
 
-    causal::TimeCurrentTimeDifferenceVariable time_error;
-    causal::DurationSecondsCastVariable time_error_secs;
-    causal::ScalarFixedVariable min_act_horizon_secs;
-    causal::ScalarMaxVariable actual_act_horizon_secs;
-    causal::ScalarReciprocalVariable actual_act_horizon_secs_recip;
+    simcars::causal::TimeCurrentTimeDifferenceVariable time_error;
+    simcars::causal::DurationSecondsCastVariable time_error_secs;
+    simcars::causal::ScalarFixedVariable min_act_horizon_secs;
+    simcars::causal::ScalarMaxVariable actual_act_horizon_secs;
+    simcars::causal::ScalarReciprocalVariable actual_act_horizon_secs_recip;
 
-    causal::VectorSocketVariable pos;
-    causal::VectorProxyVariable pos_proxy;
-    causal::VectorSocketVariable lin_vel;
-    causal::VectorProxyVariable lin_vel_proxy;
-    causal::VectorScalarProductVariable act_horizon_expected_pos_diff;
-    causal::VectorSumVariable act_horizon_expected_pos;
-    causal::LaneMapPointVariable act_horizon_target_pos;
-    causal::VectorNegationVariable neg_pos;
-    causal::VectorSumVariable act_horizon_target_pos_diff;
+    simcars::causal::VectorSocketVariable pos;
+    simcars::causal::VectorProxyVariable pos_proxy;
+    simcars::causal::VectorSocketVariable lin_vel;
+    simcars::causal::VectorProxyVariable lin_vel_proxy;
+    simcars::causal::VectorScalarProductVariable act_horizon_expected_pos_diff;
+    simcars::causal::VectorSumVariable act_horizon_expected_pos;
+    simcars::causal::LaneMapPointVariable act_horizon_target_pos;
+    simcars::causal::VectorNegationVariable neg_pos;
+    simcars::causal::VectorSumVariable act_horizon_target_pos_diff;
 
-    causal::VectorCrossProductVariable act_horizon_ang_sin;
-    causal::VectorDotProductVariable act_horizon_ang_cos;
-    causal::ScalarReciprocalVariable act_horizon_ang_cos_recip;
-    causal::ScalarProductVariable act_horizon_ang;
+    simcars::causal::VectorCrossProductVariable act_horizon_ang_sin;
+    simcars::causal::VectorDotProductVariable act_horizon_ang_cos;
+    simcars::causal::ScalarReciprocalVariable act_horizon_ang_cos_recip;
+    simcars::causal::ScalarProductVariable act_horizon_ang;
 
-    causal::ScalarProductVariable needed_ang_vel;
+    simcars::causal::ScalarProductVariable needed_ang_vel;
 
-    causal::ScalarSocketVariable axel_dist;
-    causal::ScalarFixedVariable double_scale_factor;
-    causal::ScalarProxyVariable double_scale_factor_proxy;
-    causal::ScalarProductVariable double_axel_dist;
+    simcars::causal::ScalarSocketVariable axel_dist;
+    simcars::causal::ScalarFixedVariable double_scale_factor;
+    simcars::causal::ScalarProxyVariable double_scale_factor_proxy;
+    simcars::causal::ScalarProductVariable double_axel_dist;
 
-    causal::ScalarSocketVariable lon_lin_vel_recip;
-    causal::ScalarProductVariable needed_ang_vel_double_axel_dist_prod;
-    causal::ScalarProductVariable needed_steer;
+    simcars::causal::ScalarSocketVariable lon_lin_vel_recip;
+    simcars::causal::ScalarProductVariable needed_ang_vel_double_axel_dist_prod;
+    simcars::causal::ScalarProductVariable needed_steer;
 
-    causal::ScalarMinVariable max_lim_steer;
-    causal::ScalarMaxVariable actual_steer;
+    simcars::causal::ScalarMinVariable max_lim_steer;
+    simcars::causal::ScalarMaxVariable actual_steer;
 
 public:
     SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_abs_steer_value);
-
-    void set_fwd_car(FWDCar *fwd_car);
+    SteerControlFWDCar(SteerControlFWDCar const &control_fwd_car);
 };
 
 }

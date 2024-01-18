@@ -21,6 +21,7 @@ protected:
 public:
     FullControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_motor_torque_value,
                       FP_DATA_TYPE min_motor_torque_value, FP_DATA_TYPE max_abs_steer_value);
+    FullControlFWDCar(FullControlFWDCar const &control_fwd_car);
 };
 
 }

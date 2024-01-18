@@ -22,6 +22,12 @@ FullControlFWDCar::FullControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_moto
 {
 }
 
+FullControlFWDCar::FullControlFWDCar(FullControlFWDCar const &control_fwd_car) :
+    MotorTorqueControlFWDCar(control_fwd_car),
+    SteerControlFWDCar(control_fwd_car)
+{
+}
+
 }
 }
 }

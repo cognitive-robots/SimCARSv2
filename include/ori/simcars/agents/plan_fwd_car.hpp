@@ -1,9 +1,7 @@
 #pragma once
 
-#include <ori/simcars/causal/variable_types/exogenous/id_socket.hpp>
-#include <ori/simcars/causal/variable_types/exogenous/scalar_socket.hpp>
-#include <ori/simcars/causal/variable_types/exogenous/time_socket.hpp>
 #include <ori/simcars/agents/declarations.hpp>
+#include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_action_socket.hpp>
 
 namespace ori
 {
@@ -15,16 +13,15 @@ namespace agents
 class PlanFWDCar
 {
 protected:
-    virtual void init_links();
+    virtual void init_links() = 0;
 
     ControlFWDCar *control_fwd_car;
 
-    causal::ScalarSocketVariable speed_val_goal;
-    causal::TimeSocketVariable speed_time_goal;
-    causal::IdSocketVariable lane_val_goal;
-    causal::TimeSocketVariable lane_time_goal;
+    causal::FWDCarActionSocketVariable action;
 
 public:
+    PlanFWDCar();
+
     ControlFWDCar* get_control_fwd_car();
 
     void set_control_fwd_car(ControlFWDCar *control_fwd_car);

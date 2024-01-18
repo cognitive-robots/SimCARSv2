@@ -38,6 +38,7 @@ protected:
     simcars::causal::VectorCrossProductVariable lat_lin_vel;
 
     simcars::causal::ScalarSocketVariable motor_torque;
+    simcars::causal::ScalarBufferVariable motor_torque_buff;
     simcars::causal::ScalarProductVariable front_wheel_lon_force_mag;
 
     simcars::causal::ScalarFixedVariable rear_wheel_lon_force_mag;
@@ -48,6 +49,7 @@ protected:
     simcars::causal::ScalarProductVariable neg_front_wheel_slip_ang_minus_steer;
     simcars::causal::ScalarNegationVariable front_wheel_slip_ang_minus_steer;
     simcars::causal::ScalarSocketVariable steer;
+    simcars::causal::ScalarBufferVariable steer_buff;
     simcars::causal::ScalarSumVariable front_wheel_slip_ang;
     simcars::causal::ScalarProductVariable front_wheel_lat_force_mag;
 
@@ -75,17 +77,12 @@ protected:
 
     simcars::causal::ScalarSumVariable combined_wheel_torque;
 
-    simcars::causal::VectorSocketVariable other_force;
-    simcars::causal::ScalarSocketVariable other_torque;
-
-    simcars::causal::VectorSumVariable total_wheel_force;
-    simcars::causal::ScalarSumVariable total_wheel_torque;
-
 public:
     FWDCar(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value, FP_DATA_TYPE width_value,
            FP_DATA_TYPE height_value, FP_DATA_TYPE wheel_radius_value,
            FP_DATA_TYPE axel_dist_value, FP_DATA_TYPE drag_area_value = 0.631,
            FP_DATA_TYPE cornering_stiffness_value = 49675.0);
+    FWDCar(FWDCar const &fwd_car);
 
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_wheel_radius_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_axel_dist_variable();

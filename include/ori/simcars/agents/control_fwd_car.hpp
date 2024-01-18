@@ -7,6 +7,14 @@
 #include <ori/simcars/causal/variable_types/exogenous/time_socket.hpp>
 #include <ori/simcars/agents/declarations.hpp>
 #include <ori/simcars/agents/plan_fwd_car.hpp>
+#include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_action_socket.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/scalar_goal_val_part.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/scalar_goal_time_part.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/id_goal_val_part.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/id_goal_time_part.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_buffer.hpp>
 
 namespace ori
 {
@@ -18,19 +26,28 @@ namespace agents
 class ControlFWDCar
 {
 protected:
-    virtual void init_links();
+    virtual void init_links() = 0;
 
     FWDCar *fwd_car;
 
-    simcars::causal::TimeSocketVariable lon_lin_vel_time_goal;
-    simcars::causal::ScalarSocketVariable lon_lin_vel_val_goal;
-    simcars::causal::IdSocketVariable lane_val_goal;
-    simcars::causal::TimeSocketVariable lane_time_goal;
+    causal::FWDCarActionSocketVariable action;
+    causal::FWDCarActionBufferVariable action_buff;
+
+    causal::FWDCarActionSpeedPartVariable speed_goal;
+    causal::ScalarGoalValPartVariable speed_val_goal;
+    causal::ScalarGoalTimePartVariable speed_time_goal;
+
+    causal::FWDCarActionLanePartVariable lane_goal;
+    causal::IdGoalValPartVariable lane_val_goal;
+    causal::IdGoalTimePartVariable lane_time_goal;
+
 
     simcars::causal::ScalarSocketVariable motor_torque;
     simcars::causal::ScalarSocketVariable steer;
 
 public:
+    ControlFWDCar();
+
     FWDCar* get_fwd_car();
 
     void set_fwd_car(FWDCar *fwd_car);

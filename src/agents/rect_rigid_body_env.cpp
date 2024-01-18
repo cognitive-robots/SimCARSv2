@@ -64,6 +64,8 @@ causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::Link::get_c
 }
 
 RectRigidBodyEnv::Entity::Entity(RectRigidBody *rigid_body) :
+    rigid_body(rigid_body),
+
     half_scale_factor(0.5),
     half_scale_factor_proxy(&half_scale_factor),
 
@@ -165,13 +167,15 @@ bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body)
     }
     else
     {
-        structures::IArray<Entity*> const *entity_array = rigid_body_entity_dict.get_values();
-        for (size_t i = 0; i < entity_array->count(); ++i)
-        {
-            (*entity_array)[i]->add_link(rigid_body);
-        }
-
         Entity *entity = new Entity(rigid_body);
+
+        structures::IArray<RectRigidBody*> const *rigid_body_array =
+                rigid_body_entity_dict.get_keys();
+        for (size_t i = 0; i < rigid_body_array->count(); ++i)
+        {
+            rigid_body_entity_dict[(*rigid_body_array)[i]]->add_link(rigid_body);
+            entity->add_link((*rigid_body_array)[i]);
+        }
 
         rigid_body_entity_dict.update(rigid_body, entity);
 
@@ -190,20 +194,21 @@ bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body)
     }
     else
     {
+        Entity *entity = rigid_body_entity_dict[rigid_body];
+
         rigid_body->env_force.set_parent(nullptr);
         rigid_body->env_torque.set_parent(nullptr);
 
-        Entity *entity = rigid_body_entity_dict[rigid_body];
-
         rigid_body_entity_dict.erase(rigid_body);
 
-        delete entity;
-
-        structures::IArray<Entity*> const *entity_array = rigid_body_entity_dict.get_values();
-        for (size_t i = 0; i < entity_array->count(); ++i)
+        structures::IArray<RectRigidBody*> const *rigid_body_array = rigid_body_entity_dict.get_keys();
+        for (size_t i = 0; i < rigid_body_array->count(); ++i)
         {
-            (*entity_array)[i]->remove_link(rigid_body);
+            rigid_body_entity_dict[(*rigid_body_array)[i]]->remove_link(rigid_body);
+            entity->remove_link((*rigid_body_array)[i]);
         }
+
+        delete entity;
 
         return true;
     }

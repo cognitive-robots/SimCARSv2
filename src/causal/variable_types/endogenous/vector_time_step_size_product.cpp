@@ -14,7 +14,7 @@ bool VectorTimeStepSizeProductVariable::get_value(geometry::Vec &val) const
 {
     if (get_parent()->get_value(val))
     {
-        val = val * std::chrono::duration_cast<std::chrono::seconds>(
+        val = val * std::chrono::duration_cast<std::chrono::duration<FP_DATA_TYPE>>(
                     VariableContext::get_time_step_size()).count();
         return true;
     }
@@ -26,7 +26,8 @@ bool VectorTimeStepSizeProductVariable::get_value(geometry::Vec &val) const
 
 bool VectorTimeStepSizeProductVariable::set_value(geometry::Vec const &val)
 {
-    return get_parent()->set_value(val / std::chrono::duration_cast<std::chrono::seconds>(
+    return get_parent()->set_value(val /
+                                   std::chrono::duration_cast<std::chrono::duration<FP_DATA_TYPE>>(
                                        VariableContext::get_time_step_size()).count());
 }
 

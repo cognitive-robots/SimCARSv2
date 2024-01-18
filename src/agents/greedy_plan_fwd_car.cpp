@@ -15,10 +15,7 @@ void GreedyPlanFWDCar::init_links()
 {
     pos.set_parent(control_fwd_car->get_fwd_car()->get_pos_variable());
 
-    speed_val_goal.set_parent(&best_action_speed_goal_val);
-    speed_time_goal.set_parent(&best_action_speed_goal_time);
-    lane_val_goal.set_parent(&best_action_lane_goal_val);
-    lane_time_goal.set_parent(&best_action_lane_goal_time);
+    action.set_parent(&best_action);
 }
 
 GreedyPlanFWDCar::GreedyPlanFWDCar(map::IMap const *map,
@@ -30,6 +27,10 @@ GreedyPlanFWDCar::GreedyPlanFWDCar(map::IMap const *map,
                                    FP_DATA_TYPE speed_interval_value,
                                    FP_DATA_TYPE time_horizon_value,
                                    FP_DATA_TYPE time_interval_value) :
+    map(map),
+    outcome_sim(fwd_car_outcome_sim),
+    reward_calc(fwd_car_reward_calc),
+
     time_horizon(time_horizon_value),
     time_horizon_proxy(&time_horizon),
     time_interval(time_interval_value),
@@ -53,15 +54,39 @@ GreedyPlanFWDCar::GreedyPlanFWDCar(map::IMap const *map,
     reward_params(fwd_car_reward_parameters),
     action_outcome_rewards(&sim_action_outcomes, &reward_params, fwd_car_reward_calc),
 
-    best_action(&action_outcome_rewards),
+    best_action(&action_outcome_rewards)
+{
+}
 
-    best_action_speed_goal(&best_action),
-    best_action_speed_goal_val(&best_action_speed_goal),
-    best_action_speed_goal_time(&best_action_speed_goal),
+GreedyPlanFWDCar::GreedyPlanFWDCar(GreedyPlanFWDCar const &plan_fwd_car) :
+    map(plan_fwd_car.map),
+    outcome_sim(plan_fwd_car.outcome_sim),
+    reward_calc(plan_fwd_car.reward_calc),
 
-    best_action_lane_goal(&best_action),
-    best_action_lane_goal_val(&best_action_lane_goal),
-    best_action_lane_goal_time(&best_action_lane_goal)
+    time_horizon(plan_fwd_car.time_horizon),
+    time_horizon_proxy(&time_horizon),
+    time_interval(plan_fwd_car.time_interval),
+    time_options(&time_horizon_proxy, &time_interval),
+
+    speed_min(plan_fwd_car.speed_min),
+    speed_min_proxy(&speed_min),
+    speed_max(plan_fwd_car.speed_max),
+    speed_max_proxy(&speed_max),
+    speed_interval(plan_fwd_car.speed_interval),
+    speed_options(&speed_min_proxy, &speed_max_proxy, &speed_interval),
+
+    pos(),
+    lane_options(&pos, plan_fwd_car.map),
+
+    actions(&time_options, &speed_options, &lane_options),
+
+    sim_params(plan_fwd_car.sim_params),
+    sim_action_outcomes(&actions, &sim_params, plan_fwd_car.outcome_sim),
+
+    reward_params(plan_fwd_car.reward_params),
+    action_outcome_rewards(&sim_action_outcomes, &reward_params, plan_fwd_car.reward_calc),
+
+    best_action(&action_outcome_rewards)
 {
 }
 

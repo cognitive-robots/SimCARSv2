@@ -58,7 +58,7 @@ bool ScalarMaxVariable::set_value(FP_DATA_TYPE const &val)
         {
             if (val > val_1)
             {
-                return false;
+                return get_other_parent()->set_value(val);
             }
             else
             {
@@ -72,7 +72,7 @@ bool ScalarMaxVariable::set_value(FP_DATA_TYPE const &val)
         {
             if (val > val_2)
             {
-                return false;
+                return get_endogenous_parent()->set_value(val);
             }
             else
             {

@@ -10,6 +10,25 @@ namespace simcars
 namespace agents
 {
 
+ControlFWDCar::ControlFWDCar() :
+    fwd_car(nullptr),
+
+    action(),
+    action_buff(&action),
+
+    speed_goal(&action_buff),
+    speed_val_goal(&speed_goal),
+    speed_time_goal(&speed_goal),
+
+    lane_goal(&action_buff),
+    lane_val_goal(&lane_goal),
+    lane_time_goal(&lane_goal),
+
+    motor_torque(),
+    steer()
+{
+}
+
 FWDCar* ControlFWDCar::get_fwd_car()
 {
     return fwd_car;

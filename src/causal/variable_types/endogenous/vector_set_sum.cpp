@@ -12,20 +12,18 @@ bool VectorSetSumVariable::get_value(geometry::Vec &val) const
 {
     structures::IArray<IEndogenousVariable<geometry::Vec>*> const *parents = get_array();
     geometry::Vec current_val, total_val = geometry::Vec::Zero();
+    bool res = false;
     for (size_t i = 0; i < count(); ++i)
     {
         if ((*parents)[i]->get_value(current_val))
         {
             total_val += current_val;
-        }
-        else
-        {
-            return false;
+            res = true;
         }
     }
 
     val = total_val;
-    return true;
+    return res;
 }
 
 bool VectorSetSumVariable::set_value(geometry::Vec const &val)

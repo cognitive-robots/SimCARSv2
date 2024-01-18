@@ -59,13 +59,15 @@ protected:
     simcars::causal::ScalarReciprocalVariable moi_recip;
 
     simcars::causal::VectorSocketVariable env_force;
-    simcars::causal::VectorProxyVariable env_force_proxy;
+    simcars::causal::VectorBufferVariable env_force_buffer;
     simcars::causal::VectorSocketVariable other_force;
+    simcars::causal::VectorBufferVariable other_force_buffer;
     simcars::causal::VectorSumVariable total_force;
 
     simcars::causal::ScalarSocketVariable env_torque;
-    simcars::causal::ScalarProxyVariable env_torque_proxy;
+    simcars::causal::ScalarBufferVariable env_torque_buffer;
     simcars::causal::ScalarSocketVariable other_torque;
+    simcars::causal::ScalarBufferVariable other_torque_buffer;
     simcars::causal::ScalarSumVariable total_torque;
 
     simcars::causal::VectorScalarProductVariable lin_acc;
@@ -101,6 +103,7 @@ protected:
 public:
     RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value, FP_DATA_TYPE width_value,
                   FP_DATA_TYPE height_value, FP_DATA_TYPE drag_area_value = 0.631);
+    RectRigidBody(RectRigidBody const &rect_rigid_body);
 
     virtual ~RectRigidBody() = default;
 

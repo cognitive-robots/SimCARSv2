@@ -18,15 +18,7 @@ int main(int argc, char *argv[])
 
     map::highd::HighDMap map;
 
-    try
-    {
-        map.load(argv[1]);
-    }
-    catch (std::exception const &e)
-    {
-        std::cerr << "Exception occured during map load:" << std::endl << e.what() << std::endl;
-        return -1;
-    }
+    map.load(argv[1]);
 
     std::cout << "Finished map load" << std::endl;
 }
