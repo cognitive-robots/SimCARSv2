@@ -13,7 +13,7 @@ namespace simcars
 namespace agents
 {
 
-class FullControlFWDCar : public virtual MotorTorqueControlFWDCar, public virtual SteerControlFWDCar
+class FullControlFWDCar : public MotorTorqueControlFWDCar, public SteerControlFWDCar
 {
 protected:
     void init_links() override;

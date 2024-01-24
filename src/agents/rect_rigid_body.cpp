@@ -8,9 +8,12 @@ namespace simcars
 namespace agents
 {
 
-RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
+RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
                              FP_DATA_TYPE width_value, FP_DATA_TYPE height_value,
                              FP_DATA_TYPE drag_area_value) :
+    id(id_value),
+    id_proxy(&id),
+
     mass(mass_value),
     mass_proxy(&mass),
     mass_recip(&mass),
@@ -38,16 +41,16 @@ RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
     moi_recip(&moi),
 
     env_force(),
-    env_force_buffer(&env_force, nullptr, true),
+    env_force_buff(&env_force, nullptr, true),
     other_force(),
-    other_force_buffer(&other_force, nullptr, true),
-    total_force(&env_force_buffer, &other_force_buffer),
+    other_force_buff(&other_force, nullptr, true),
+    total_force(&env_force_buff, &other_force_buff),
 
     env_torque(),
-    env_torque_buffer(&env_torque, nullptr, true),
+    env_torque_buff(&env_torque, nullptr, true),
     other_torque(),
-    other_torque_buffer(&other_torque, nullptr, true),
-    total_torque(&env_torque_buffer, &other_torque_buffer),
+    other_torque_buff(&other_torque, nullptr, true),
+    total_torque(&env_torque_buff, &other_torque_buff),
 
     lin_acc(&total_force, &mass_recip),
     lin_acc_buff(&lin_acc, nullptr, true),
@@ -87,6 +90,9 @@ RectRigidBody::RectRigidBody(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
 }
 
 RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
+    id(rect_rigid_body.id),
+    id_proxy(&id),
+
     mass(rect_rigid_body.mass),
     mass_proxy(&mass),
     mass_recip(&mass),
@@ -114,34 +120,34 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
     moi_recip(&moi),
 
     env_force(),
-    env_force_buffer(&env_force, nullptr, true),
+    env_force_buff(&env_force, nullptr, false),
     other_force(),
-    other_force_buffer(&other_force, nullptr, true),
-    total_force(&env_force_buffer, &other_force_buffer),
+    other_force_buff(&other_force, nullptr, false),
+    total_force(&env_force_buff, &other_force_buff),
 
     env_torque(),
-    env_torque_buffer(&env_torque, nullptr, true),
+    env_torque_buff(&env_torque, nullptr, false),
     other_torque(),
-    other_torque_buffer(&other_torque, nullptr, true),
-    total_torque(&env_torque_buffer, &other_torque_buffer),
+    other_torque_buff(&other_torque, nullptr, false),
+    total_torque(&env_torque_buff, &other_torque_buff),
 
     lin_acc(&total_force, &mass_recip),
-    lin_acc_buff(&lin_acc, nullptr, true),
+    lin_acc_buff(&lin_acc, nullptr, false),
     prev_lin_acc(&lin_acc_buff),
 
     ang_acc(&total_torque, &moi_recip),
-    ang_acc_buff(&ang_acc, nullptr, true),
+    ang_acc_buff(&ang_acc, nullptr, false),
     prev_ang_acc(&ang_acc_buff),
 
     lin_vel_diff(&prev_lin_acc),
     prev_lin_vel(&lin_vel_buff),
     lin_vel(&prev_lin_vel, &lin_vel_diff),
-    lin_vel_buff(&lin_vel, nullptr, true),
+    lin_vel_buff(&lin_vel, nullptr, false),
 
     ang_vel_diff(&prev_ang_acc),
     prev_ang_vel(&ang_vel_buff),
     ang_vel(&prev_ang_vel, &ang_vel_diff),
-    ang_vel_buff(&ang_vel, nullptr, true),
+    ang_vel_buff(&ang_vel, nullptr, false),
 
     pos_diff(&lin_vel_buff),
     prev_pos(&pos_buff),
@@ -156,69 +162,89 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
     rect(&pos_buff, &rot_buff, &length_proxy, &width_proxy)
 {}
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_mass_variable()
+simcars::causal::IEndogenousVariable<uint64_t>* RectRigidBody::get_id_variable()
+{
+    return &id_proxy;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_mass_variable()
 {
     return &mass_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_length_variable()
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_length_variable()
 {
     return &length_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_width_variable()
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_width_variable()
 {
     return &width_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_height_variable()
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_height_variable()
 {
     return &height_proxy;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_drag_area_variable()
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_drag_area_variable()
 {
     return &drag_area_proxy;
 }
 
-causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_env_force_variable()
+simcars::causal::IEndogenousVariable<geometry::ORect>* RectRigidBody::get_rect_variable()
 {
-    return &env_force_buffer;
+    return &rect;
 }
 
-causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_acc_variable()
+simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_env_force_variable()
+{
+    return &env_force_buff;
+}
+
+simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_other_force_variable()
+{
+    return &other_force_buff;
+}
+
+simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_acc_variable()
 {
     return &lin_acc_buff;
 }
 
-causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_vel_variable()
+simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_vel_variable()
 {
     return &lin_vel_buff;
 }
 
-causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_pos_variable()
+simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_pos_variable()
 {
     return &pos_buff;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_ang_acc_variable()
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_env_torque_variable()
+{
+    return &env_torque_buff;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_other_torque_variable()
+{
+    return &other_torque_buff;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_ang_acc_variable()
 {
     return &ang_acc_buff;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_ang_vel_variable()
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_ang_vel_variable()
 {
     return &ang_vel_buff;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_rot_variable()
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_rot_variable()
 {
     return &rot_buff;
-}
-
-causal::IEndogenousVariable<geometry::ORect>* RectRigidBody::get_rect_variable()
-{
-    return &rect;
 }
 
 }

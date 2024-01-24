@@ -79,6 +79,11 @@ bool FWDCarActionBufferVariable::set_value(FWDCarAction const &val)
     }
 }
 
+void FWDCarActionBufferVariable::set_axiomatic(bool axiomatic)
+{
+    this->axiomatic = axiomatic;
+}
+
 }
 }
 }

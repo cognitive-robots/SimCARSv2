@@ -28,6 +28,8 @@ public:
     bool get_value(geometry::Vec &val) const override;
 
     bool set_value(geometry::Vec const &val) override;
+
+    void set_axiomatic(bool axiomatic);
 };
 
 }

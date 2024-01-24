@@ -76,6 +76,11 @@ bool VectorBufferVariable::set_value(geometry::Vec const &val)
     }
 }
 
+void VectorBufferVariable::set_axiomatic(bool axiomatic)
+{
+    this->axiomatic = axiomatic;
+}
+
 }
 }
 }

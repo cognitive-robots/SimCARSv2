@@ -64,8 +64,8 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
         FP_DATA_TYPE approx_axel_dist = 0.292 * length;
         FP_DATA_TYPE approx_wheel_radius = 0.19;
 
-        FWDCar *fwd_car = new FWDCar(approx_mass, length, width, approx_height, approx_wheel_radius,
-                                     approx_axel_dist);
+        FWDCar *fwd_car = new FWDCar(id, approx_mass, length, width, approx_height,
+                                     approx_wheel_radius, approx_axel_dist);
         id_car_dict.update(id, fwd_car);
         scene_env.add_rigid_body(fwd_car);
 
@@ -273,6 +273,11 @@ structures::IArray<ControlFWDCar*> const* HighDFWDCarScene::get_control_fwd_cars
 structures::IArray<PlanFWDCar*> const* HighDFWDCarScene::get_plan_fwd_cars() const
 {
     return id_plan_dict.get_values();
+}
+
+RectRigidBodyEnv* HighDFWDCarScene::get_env()
+{
+    return &scene_env;
 }
 
 }

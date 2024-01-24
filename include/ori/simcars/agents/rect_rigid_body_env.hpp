@@ -39,6 +39,11 @@ class RectRigidBodyEnv
     {
         class Link
         {
+            uint64_t id;
+            RectRigidBody *rigid_body;
+            uint64_t other_id;
+            RectRigidBody *other_rigid_body;
+
         protected:
             simcars::causal::ScalarSumVariable mass_sum;
             simcars::causal::ScalarReciprocalVariable mass_sum_recip;
@@ -80,14 +85,16 @@ class RectRigidBodyEnv
             simcars::causal::ScalarConditionalVariable actual_coll_torque;
 
         public:
-            Link(RectRigidBody *rigid_body, RectRigidBody *other_rigid_body);
+            Link(uint64_t id, RectRigidBody *rigid_body, uint64_t other_id,
+                 RectRigidBody *other_rigid_body);
 
             simcars::causal::IEndogenousVariable<geometry::Vec>* get_coll_force();
             simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_coll_torque();
         };
 
+        uint64_t id;
         RectRigidBody *rigid_body;
-        structures::stl::STLDictionary<RectRigidBody const*, Link*> other_rigid_body_link_dict;
+        structures::stl::STLDictionary<uint64_t, Link*> id_link_dict;
 
     protected:
         simcars::causal::ScalarFixedVariable half_scale_factor;
@@ -111,7 +118,7 @@ class RectRigidBodyEnv
         simcars::causal::ScalarSetSumVariable env_torque;
 
     public:
-        Entity(RectRigidBody *rigid_body);
+        Entity(uint64_t id, RectRigidBody *rigid_body);
 
         virtual ~Entity();
 
@@ -122,7 +129,8 @@ class RectRigidBodyEnv
         bool remove_link(RectRigidBody *other_rigid_body);
     };
 
-    structures::stl::STLDictionary<RectRigidBody*, Entity*> rigid_body_entity_dict;
+    structures::stl::STLDictionary<uint64_t, RectRigidBody*> id_rigid_body_dict;
+    structures::stl::STLDictionary<uint64_t, Entity*> id_entity_dict;
 
 public:
     virtual ~RectRigidBodyEnv();

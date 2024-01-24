@@ -13,8 +13,6 @@ namespace agents
 FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_car,
                                            temporal::Time start_time) :
     FullControlFWDCar(*full_control_fwd_car),
-    MotorTorqueControlFWDCar(*full_control_fwd_car),
-    SteerControlFWDCar(*full_control_fwd_car),
 
     sim_start_time(start_time),
 

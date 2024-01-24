@@ -30,7 +30,10 @@ private:
     FocusMode focus_mode;
     geometry::Vec focal_position;
     size_t focal_agent_count;
-    //structures::IArray<std::string> const *focal_entities;
+    // TODO: Consider replacing this with a set rather than an array pointer
+    structures::IArray<uint64_t> const *focal_agent_ids;
+
+    structures::stl::STLDictionary<uint64_t, sf::Color> id_colour_dict;
 
     temporal::Time start_time;
     temporal::Time end_time;
@@ -67,14 +70,15 @@ public:
     FP_DATA_TYPE get_pixels_per_metre() const;
     FocusMode get_focus_mode() const;
     geometry::Vec const& get_focal_position() const;
-    //structures::IArray<std::string> const* get_focal_entities() const;
+    structures::IArray<uint64_t> const* get_focal_agent_ids() const;
     temporal::Time get_time() const;
 
     void set_realtime_factor(FP_DATA_TYPE realtime_factor);
     void set_pixels_per_metre(FP_DATA_TYPE pixels_per_metre);
     void set_focus_mode(FocusMode focus_mode);
     void set_focal_position(geometry::Vec const &focal_position);
-    //void set_focal_entities(structures::IArray<std::string> const *focal_entities);
+    void set_focal_agent_ids(structures::IArray<uint64_t> const *focal_agent_ids);
+    void set_agent_colour(uint64_t agent_id, sf::Color colour);
     void set_time(temporal::Time time);
 
 public slots:

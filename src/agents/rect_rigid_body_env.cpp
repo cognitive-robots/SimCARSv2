@@ -10,8 +10,13 @@ namespace simcars
 namespace agents
 {
 
-RectRigidBodyEnv::Entity::Link::Link(RectRigidBody *rigid_body,
+RectRigidBodyEnv::Entity::Link::Link(uint64_t id, RectRigidBody *rigid_body, uint64_t other_id,
                                      RectRigidBody *other_rigid_body) :
+    id(id),
+    rigid_body(rigid_body),
+    other_id(other_id),
+    other_rigid_body(other_rigid_body),
+
     mass_sum(rigid_body->get_mass_variable(), other_rigid_body->get_mass_variable()),
     mass_sum_recip(&mass_sum),
 
@@ -63,7 +68,8 @@ causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::Link::get_c
     return &actual_coll_torque;
 }
 
-RectRigidBodyEnv::Entity::Entity(RectRigidBody *rigid_body) :
+RectRigidBodyEnv::Entity::Entity(uint64_t id, RectRigidBody *rigid_body) :
+    id(id),
     rigid_body(rigid_body),
 
     half_scale_factor(0.5),
@@ -90,7 +96,7 @@ RectRigidBodyEnv::Entity::Entity(RectRigidBody *rigid_body) :
 
 RectRigidBodyEnv::Entity::~Entity()
 {
-    structures::IArray<Link*> const *link_array = other_rigid_body_link_dict.get_values();
+    structures::IArray<Link*> const *link_array = id_link_dict.get_values();
     for (size_t i = 0; i < link_array->count(); ++i)
     {
         delete (*link_array)[i];
@@ -109,15 +115,21 @@ causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::get_env_tor
 
 bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
 {
-    if (other_rigid_body == rigid_body || other_rigid_body_link_dict.contains(other_rigid_body))
+    simcars::causal::IEndogenousVariable<uint64_t> *id_variable =
+            other_rigid_body->get_id_variable();
+
+    uint64_t other_id;
+    bool res = id_variable->get_value(other_id);
+
+    if (!res || other_id == id || id_link_dict.contains(other_id))
     {
         return false;
     }
     else
     {
-        Link *link = new Link(rigid_body, other_rigid_body);
+        Link *link = new Link(id, rigid_body, other_id, other_rigid_body);
 
-        other_rigid_body_link_dict.update(other_rigid_body, link);
+        id_link_dict.update(other_id, link);
 
         env_force.insert(link->get_coll_force());
         env_torque.insert(link->get_coll_torque());
@@ -128,18 +140,24 @@ bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
 
 bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
 {
-    if (other_rigid_body == rigid_body || !other_rigid_body_link_dict.contains(other_rigid_body))
+    simcars::causal::IEndogenousVariable<uint64_t> *id_variable =
+            other_rigid_body->get_id_variable();
+
+    uint64_t other_id;
+    bool res = id_variable->get_value(other_id);
+
+    if (!res || other_id == id || !id_link_dict.contains(other_id))
     {
         return false;
     }
     else
     {
-        Link *link = other_rigid_body_link_dict[other_rigid_body];
+        Link *link = id_link_dict[other_id];
 
         env_force.erase(link->get_coll_force());
         env_torque.erase(link->get_coll_torque());
 
-        other_rigid_body_link_dict.erase(other_rigid_body);
+        id_link_dict.erase(other_id);
 
         return true;
     }
@@ -147,7 +165,7 @@ bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
 
 RectRigidBodyEnv::~RectRigidBodyEnv()
 {
-    structures::IArray<Entity*> const *entity_array = rigid_body_entity_dict.get_values();
+    structures::IArray<Entity*> const *entity_array = id_entity_dict.get_values();
     for (size_t i = 0; i < entity_array->count(); ++i)
     {
         delete (*entity_array)[i];
@@ -156,28 +174,34 @@ RectRigidBodyEnv::~RectRigidBodyEnv()
 
 structures::IArray<RectRigidBody*> const* RectRigidBodyEnv::get_rigid_bodies() const
 {
-    return rigid_body_entity_dict.get_keys();
+    return id_rigid_body_dict.get_values();
 }
 
 bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body)
 {
-    if (rigid_body_entity_dict.contains(rigid_body))
+    simcars::causal::IEndogenousVariable<uint64_t> *id_variable =
+            rigid_body->get_id_variable();
+
+    uint64_t id;
+    bool res = id_variable->get_value(id);
+
+    if (!res || id_entity_dict.contains(id))
     {
         return false;
     }
     else
     {
-        Entity *entity = new Entity(rigid_body);
+        Entity *entity = new Entity(id, rigid_body);
 
-        structures::IArray<RectRigidBody*> const *rigid_body_array =
-                rigid_body_entity_dict.get_keys();
-        for (size_t i = 0; i < rigid_body_array->count(); ++i)
+        structures::IArray<uint64_t> const *id_array = id_entity_dict.get_keys();
+        for (size_t i = 0; i < id_array->count(); ++i)
         {
-            rigid_body_entity_dict[(*rigid_body_array)[i]]->add_link(rigid_body);
-            entity->add_link((*rigid_body_array)[i]);
+            id_entity_dict[(*id_array)[i]]->add_link(rigid_body);
+            entity->add_link(id_rigid_body_dict[(*id_array)[i]]);
         }
 
-        rigid_body_entity_dict.update(rigid_body, entity);
+        id_rigid_body_dict.update(id, rigid_body);
+        id_entity_dict.update(id, entity);
 
         rigid_body->env_force.set_parent(entity->get_env_force());
         rigid_body->env_torque.set_parent(entity->get_env_torque());
@@ -188,24 +212,31 @@ bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body)
 
 bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body)
 {
-    if (!rigid_body_entity_dict.contains(rigid_body))
+    simcars::causal::IEndogenousVariable<uint64_t> *id_variable =
+            rigid_body->get_id_variable();
+
+    uint64_t id;
+    bool res = id_variable->get_value(id);
+
+    if (!res || !id_entity_dict.contains(id))
     {
         return false;
     }
     else
     {
-        Entity *entity = rigid_body_entity_dict[rigid_body];
+        Entity *entity = id_entity_dict[id];
 
         rigid_body->env_force.set_parent(nullptr);
         rigid_body->env_torque.set_parent(nullptr);
 
-        rigid_body_entity_dict.erase(rigid_body);
+        id_entity_dict.erase(id);
+        id_rigid_body_dict.erase(id);
 
-        structures::IArray<RectRigidBody*> const *rigid_body_array = rigid_body_entity_dict.get_keys();
-        for (size_t i = 0; i < rigid_body_array->count(); ++i)
+        structures::IArray<uint64_t> const *id_array = id_entity_dict.get_keys();
+        for (size_t i = 0; i < id_array->count(); ++i)
         {
-            rigid_body_entity_dict[(*rigid_body_array)[i]]->remove_link(rigid_body);
-            entity->remove_link((*rigid_body_array)[i]);
+            id_entity_dict[(*id_array)[i]]->remove_link(rigid_body);
+            entity->remove_link(id_rigid_body_dict[(*id_array)[i]]);
         }
 
         delete entity;

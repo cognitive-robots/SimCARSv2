@@ -10,7 +10,7 @@ namespace simcars
 namespace agents
 {
 
-class FWDCarSim : public virtual FWDCar, public virtual RectRigidBodySim
+class FWDCarSim : public FWDCar, public RectRigidBodySim
 {
 public:
     FWDCarSim(FWDCar *fwd_car, temporal::Time start_time);

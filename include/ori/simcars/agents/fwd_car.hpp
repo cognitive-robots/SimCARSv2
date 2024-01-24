@@ -1,5 +1,8 @@
 #pragma once
 
+#include <ori/simcars/causal/variable_types/endogenous/scalar_absolute.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_min.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_max.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_angle_construction.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_xy_construction.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_y.hpp>
@@ -30,10 +33,15 @@ protected:
 
     simcars::causal::ScalarFixedVariable cornering_stiffness;
 
+    simcars::causal::ScalarFixedVariable max_abs_slip_angle;
+    simcars::causal::ScalarNegationVariable neg_max_abs_slip_angle;
+
     simcars::causal::VectorAngleConstructionVariable dir;
 
     simcars::causal::VectorDotProductVariable lon_lin_vel;
     simcars::causal::ScalarReciprocalVariable lon_lin_vel_recip;
+    simcars::causal::ScalarAbsoluteVariable abs_lon_lin_vel;
+    simcars::causal::ScalarReciprocalVariable abs_lon_lin_vel_recip;
 
     simcars::causal::VectorCrossProductVariable lat_lin_vel;
 
@@ -51,12 +59,16 @@ protected:
     simcars::causal::ScalarSocketVariable steer;
     simcars::causal::ScalarBufferVariable steer_buff;
     simcars::causal::ScalarSumVariable front_wheel_slip_ang;
+    simcars::causal::ScalarMinVariable max_lim_front_wheel_slip_ang;
+    simcars::causal::ScalarMaxVariable actual_front_wheel_slip_ang;
     simcars::causal::ScalarProductVariable front_wheel_lat_force_mag;
 
     simcars::causal::ScalarProductVariable rear_wheel_ang_lat_lin_vel;
     simcars::causal::ScalarSumVariable rear_wheel_lat_lin_vel;
     simcars::causal::ScalarProductVariable neg_rear_wheel_slip_ang;
     simcars::causal::ScalarNegationVariable rear_wheel_slip_ang;
+    simcars::causal::ScalarMinVariable max_lim_rear_wheel_slip_ang;
+    simcars::causal::ScalarMaxVariable actual_rear_wheel_slip_ang;
     simcars::causal::ScalarProductVariable rear_wheel_lat_force_mag;
 
     simcars::causal::VectorXYConstructionVariable front_wheel_local_force;
@@ -78,17 +90,29 @@ protected:
     simcars::causal::ScalarSumVariable combined_wheel_torque;
 
 public:
-    FWDCar(FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value, FP_DATA_TYPE width_value,
-           FP_DATA_TYPE height_value, FP_DATA_TYPE wheel_radius_value,
+    FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
+           FP_DATA_TYPE width_value, FP_DATA_TYPE height_value, FP_DATA_TYPE wheel_radius_value,
            FP_DATA_TYPE axel_dist_value, FP_DATA_TYPE drag_area_value = 0.631,
-           FP_DATA_TYPE cornering_stiffness_value = 49675.0);
+           FP_DATA_TYPE cornering_stiffness_value = 49675.0,
+           FP_DATA_TYPE max_abs_slip_angle_value = M_PI_2);
     FWDCar(FWDCar const &fwd_car);
 
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_wheel_radius_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_axel_dist_variable();
+    simcars::causal::IEndogenousVariable<geometry::Vec>* get_dir_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_recip_variable();
-    simcars::causal::IEndogenousVariable<geometry::Vec>* get_dir_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lat_lin_vel_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_motor_torque_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_steer_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_front_wheel_ang_lat_lin_vel_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_front_wheel_slip_ang();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_actual_front_wheel_slip_ang();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_front_wheel_lat_force_mag_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_rear_wheel_ang_lat_lin_vel_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_rear_wheel_slip_ang();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_actual_rear_wheel_slip_ang();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_rear_wheel_lat_force_mag_variable();
 
     friend void ControlFWDCar::set_fwd_car(FWDCar *fwd_car);
 };

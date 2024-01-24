@@ -179,6 +179,7 @@ add_library(simcars_causal STATIC
   src/causal/variable_types/endogenous/ids_previous_time_step.cpp
   src/causal/variable_types/endogenous/scalar_proxy.cpp
   src/causal/variable_types/endogenous/scalar_proxy.cpp
+  src/causal/variable_types/endogenous/scalar_absolute.cpp
   src/causal/variable_types/endogenous/scalar_negation.cpp
   src/causal/variable_types/endogenous/scalar_reciprocal.cpp
   src/causal/variable_types/endogenous/scalar_max.cpp
@@ -250,6 +251,7 @@ add_library(simcars_causal STATIC
   include/ori/simcars/causal/variable_types/endogenous/id_proxy.hpp
   include/ori/simcars/causal/variable_types/endogenous/ids_previous_time_step.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp
+  include/ori/simcars/causal/variable_types/endogenous/scalar_absolute.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_negation.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_reciprocal.hpp
   include/ori/simcars/causal/variable_types/endogenous/scalar_max.hpp

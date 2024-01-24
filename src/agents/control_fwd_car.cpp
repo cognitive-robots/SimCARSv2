@@ -14,7 +14,7 @@ ControlFWDCar::ControlFWDCar() :
     fwd_car(nullptr),
 
     action(),
-    action_buff(&action),
+    action_buff(&action, nullptr, false),
 
     speed_goal(&action_buff),
     speed_val_goal(&speed_goal),

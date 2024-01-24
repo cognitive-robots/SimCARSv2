@@ -4,6 +4,8 @@
 #include <ori/simcars/geometry/o_rect.hpp>
 #include <ori/simcars/causal/variable_context.hpp>
 
+#include <iostream>
+
 namespace ori
 {
 namespace simcars
@@ -21,29 +23,104 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
         return;
     }
 
+    uint64_t id;
+    res = agent->get_id_variable()->get_value(id);
+
+    sf::Color agent_colour;
+    if (res && id_colour_dict.contains(id))
+    {
+        agent_colour = id_colour_dict[id];
+
+        /*
+        geometry::Vec other_force;
+        agent->get_other_force_variable()->get_value(other_force);
+        geometry::Vec env_force;
+        agent->get_env_force_variable()->get_value(env_force);
+        FP_DATA_TYPE mass;
+        agent->get_mass_variable()->get_value(mass);
+        geometry::Vec lin_acc;
+        agent->get_lin_acc_variable()->get_value(lin_acc);
+        geometry::Vec lin_vel;
+        agent->get_lin_vel_variable()->get_value(lin_vel);
+        geometry::Vec dir;
+        agent->get_dir_variable()->get_value(dir);
+        FP_DATA_TYPE lon_lin_vel;
+        agent->get_lon_lin_vel_variable()->get_value(lon_lin_vel);
+        FP_DATA_TYPE lat_lin_vel;
+        agent->get_lat_lin_vel_variable()->get_value(lat_lin_vel);
+        FP_DATA_TYPE front_wheel_ang_lat_lin_vel;
+        agent->get_front_wheel_ang_lat_lin_vel_variable()->get_value(front_wheel_ang_lat_lin_vel);
+        FP_DATA_TYPE front_wheel_slip_ang;
+        agent->get_front_wheel_slip_ang()->get_value(front_wheel_slip_ang);
+        FP_DATA_TYPE actual_front_wheel_slip_ang;
+        agent->get_actual_front_wheel_slip_ang()->get_value(actual_front_wheel_slip_ang);
+        FP_DATA_TYPE front_wheel_lat_force_mag;
+        agent->get_front_wheel_lat_force_mag_variable()->get_value(front_wheel_lat_force_mag);
+        FP_DATA_TYPE rear_wheel_ang_lat_lin_vel;
+        agent->get_rear_wheel_ang_lat_lin_vel_variable()->get_value(rear_wheel_ang_lat_lin_vel);
+        FP_DATA_TYPE rear_wheel_slip_ang;
+        agent->get_rear_wheel_slip_ang()->get_value(rear_wheel_slip_ang);
+        FP_DATA_TYPE actual_rear_wheel_slip_ang;
+        agent->get_actual_rear_wheel_slip_ang()->get_value(actual_rear_wheel_slip_ang);
+        FP_DATA_TYPE rear_wheel_lat_force_mag;
+        agent->get_rear_wheel_lat_force_mag_variable()->get_value(rear_wheel_lat_force_mag);
+        FP_DATA_TYPE other_torque;
+        agent->get_other_torque_variable()->get_value(other_torque);
+        FP_DATA_TYPE ang_acc;
+        agent->get_ang_acc_variable()->get_value(ang_acc);
+        FP_DATA_TYPE ang_vel;
+        agent->get_ang_vel_variable()->get_value(ang_vel);
+        std::cout << "Other Force: (" << other_force.x() << ", " << other_force.y() << ") N, " <<
+                     "Env. Force: (" << env_force.x() << ", " << env_force.y() << ") N, " <<
+                     "Mass: " << mass << " kg, " <<
+                     "Lin. Acc.: (" << lin_acc.x() << ", " << lin_acc.y() << ") m/s^2, " <<
+                     "Lin. Vel.: (" << lin_vel.x() << ", " << lin_vel.y() << ") m/s, " <<
+                     "Dir.: (" << dir.x() << ", " << dir.y() << "), " <<
+                     "Lat. Lin. Vel.: " << lat_lin_vel << " m/s, " <<
+                     "Lon. Lin. Vel.: " << lon_lin_vel << " m/s, " <<
+                     "Front Wheel Ang. Lat. Lin. Vel.: " << front_wheel_ang_lat_lin_vel << " m/s, " <<
+                     "Front Wheel Slip Ang.: " << front_wheel_slip_ang << " rad, " <<
+                     "Actual Front Wheel Slip Ang.: " << actual_front_wheel_slip_ang << " rad, " <<
+                     "Front Wheel Lat. Force Mag.: " << front_wheel_lat_force_mag << " N, " <<
+                     "Rear Wheel Ang. Lat. Lin. Vel.: " << rear_wheel_ang_lat_lin_vel << " m/s, " <<
+                     "Rear Wheel Slip Ang.: " << rear_wheel_slip_ang << " rad, " <<
+                     "Actual Rear Wheel Slip Ang.: " << actual_rear_wheel_slip_ang << " rad, " <<
+                     "Rear Wheel Lat. Force Mag.: " << rear_wheel_lat_force_mag << " N, " <<
+                     "Other Torque: " << other_torque << " Nm, " <<
+                     "Ang. Acc: " << ang_acc << " rad/s^2, " <<
+                     "Ang. Vel: " << ang_vel << " rad/s" <<
+                     std::endl;
+                     */
+    }
+    else
+    {
+        agent_colour = sf::Color::Green;
+    }
+
     sf::VertexArray *agent_shape = new sf::VertexArray(sf::PrimitiveType::TriangleStrip, 4);
 
     geometry::Vec rect_point = agent_rect[0];
     (*agent_shape)[0].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
                                            -get_pixels_per_metre() * rect_point.y());
-    (*agent_shape)[0].color = sf::Color::Green;
+    (*agent_shape)[0].color = agent_colour;
 
     rect_point = agent_rect[3];
     (*agent_shape)[1].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
                                            -get_pixels_per_metre() * rect_point.y());
-    (*agent_shape)[1].color = sf::Color::Green;
+    (*agent_shape)[1].color = agent_colour;
 
     rect_point = agent_rect[1];
     (*agent_shape)[2].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
                                            -get_pixels_per_metre() * rect_point.y());
-    (*agent_shape)[2].color = sf::Color::Green;
+    (*agent_shape)[2].color = agent_colour;
 
     rect_point = agent_rect[2];
     (*agent_shape)[3].position = sf::Vector2f(get_pixels_per_metre() * rect_point.x(),
                                            -get_pixels_per_metre() * rect_point.y());
-    (*agent_shape)[3].color = sf::Color::Green;
+    (*agent_shape)[3].color = agent_colour;
 
-    if (focus_mode == FocusMode::ALL_AGENTS || focus_mode == FocusMode::FOCAL_AGENTS)
+    if (focus_mode == FocusMode::ALL_AGENTS ||
+            (focus_mode == FocusMode::FOCAL_AGENTS && res && focal_agent_ids->contains(id)))
     {
         focal_position += agent_rect.get_origin();
         focal_agent_count++;
@@ -133,7 +210,7 @@ QAgentsWidget::QAgentsWidget(
         FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre, FocusMode focus_mode) :
     AQSFMLCanvas(parent, position, size, frame_interval), frame_interval(frame_interval),
     realtime_factor(realtime_factor), pixels_per_metre(pixels_per_metre), focus_mode(focus_mode),
-    start_time(start_time), end_time(end_time), current_time(start_time),
+    focal_agent_ids(nullptr), start_time(start_time), end_time(end_time), current_time(start_time),
     last_realtime(std::chrono::time_point<std::chrono::steady_clock>::min()),
     update_required(false) {}
 
@@ -165,14 +242,12 @@ geometry::Vec const& QAgentsWidget::get_focal_position() const
     return focal_position;
 }
 
-/*
-structures::IArray<std::string> const* QAgentsWidget::get_focal_entities() const
+structures::IArray<uint64_t> const* QAgentsWidget::get_focal_agent_ids() const
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
-    return focal_entities;
+    return focal_agent_ids;
 }
-*/
 
 temporal::Time QAgentsWidget::get_time() const
 {
@@ -222,15 +297,18 @@ void QAgentsWidget::set_focal_position(geometry::Vec const &focal_position)
     }
 }
 
-/*
-void QAgentsWidget::set_focal_entities(structures::IArray<std::string> const *focal_entities)
+void QAgentsWidget::set_focal_agent_ids(structures::IArray<uint64_t> const *focal_agent_ids)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
-    if (this->focal_entities != focal_entities)
+    if (this->focal_agent_ids != focal_agent_ids)
     {
-        delete this->focal_entities;
-        this->focal_entities = focal_entities;
+        if (this->focal_agent_ids != nullptr)
+        {
+            delete this->focal_agent_ids;
+        }
+
+        this->focal_agent_ids = focal_agent_ids;
 
         // TODO: Possibly add a check to see if an update is actually required?
         if (focus_mode == FocusMode::FOCAL_AGENTS)
@@ -239,7 +317,18 @@ void QAgentsWidget::set_focal_entities(structures::IArray<std::string> const *fo
         }
     }
 }
-*/
+
+void QAgentsWidget::set_agent_colour(uint64_t agent_id, sf::Color colour)
+{
+    std::lock_guard<std::recursive_mutex> const lock(data_mutex);
+
+    if (id_colour_dict.contains(agent_id) && id_colour_dict[agent_id] != colour)
+    {
+        update_required = true;
+    }
+
+    id_colour_dict.update(agent_id, colour);
+}
 
 void QAgentsWidget::set_time(temporal::Time time)
 {

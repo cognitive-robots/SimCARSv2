@@ -76,6 +76,11 @@ bool ScalarBufferVariable::set_value(FP_DATA_TYPE const &val)
     }
 }
 
+void ScalarBufferVariable::set_axiomatic(bool axiomatic)
+{
+    this->axiomatic = axiomatic;
+}
+
 }
 }
 }

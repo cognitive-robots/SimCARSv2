@@ -15,7 +15,7 @@ namespace simcars
 namespace agents
 {
 
-class FullControlFWDCarSim : public virtual FullControlFWDCar
+class FullControlFWDCarSim : public FullControlFWDCar
 {
 protected:
     simcars::causal::TimeFixedVariable sim_start_time;

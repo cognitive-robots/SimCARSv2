@@ -32,6 +32,8 @@ public:
     bool get_value(FWDCarAction &val) const override;
 
     bool set_value(FWDCarAction const &val) override;
+
+    void set_axiomatic(bool axiomatic);
 };
 
 }

@@ -27,6 +27,8 @@ public:
     virtual structures::IArray<FWDCar*> const* get_fwd_cars() const = 0;
     virtual structures::IArray<ControlFWDCar*> const* get_control_fwd_cars() const = 0;
     virtual structures::IArray<PlanFWDCar*> const* get_plan_fwd_cars() const = 0;
+
+    virtual RectRigidBodyEnv* get_env() = 0;
 };
 
 }

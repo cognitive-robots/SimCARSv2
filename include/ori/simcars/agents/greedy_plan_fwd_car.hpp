@@ -24,7 +24,7 @@ namespace simcars
 namespace agents
 {
 
-class GreedyPlanFWDCar : public virtual PlanFWDCar
+class GreedyPlanFWDCar : public PlanFWDCar
 {
 protected:
     void init_links() override;

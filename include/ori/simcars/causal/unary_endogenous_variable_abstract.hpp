@@ -26,6 +26,11 @@ public:
     {
         return parent;
     }
+
+    void set_parent(IVariable<P1> *parent)
+    {
+        this->parent = parent;
+    }
 };
 
 }

@@ -42,6 +42,19 @@ public:
     {
         return other_parent;
     }
+
+    void set_endogenous_parent_1(IEndogenousVariable<P1> *parent)
+    {
+        this->endogenous_parent_1 = parent;
+    }
+    void set_endogenous_parent_2(IEndogenousVariable<P2> *parent)
+    {
+        this->endogenous_parent_2 = parent;
+    }
+    void set_other_parent(IVariable<P3> *parent)
+    {
+        this->other_parent = parent;
+    }
 };
 
 }
