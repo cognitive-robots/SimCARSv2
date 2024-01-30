@@ -365,6 +365,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/fwd_car_sim.hpp
   include/ori/simcars/agents/fwd_car_action.hpp
   include/ori/simcars/agents/fwd_car_outcome.hpp
+  include/ori/simcars/agents/fwd_car_rewards.hpp
   include/ori/simcars/agents/fwd_car_sim_parameters.hpp
   include/ori/simcars/agents/fwd_car_reward_parameters.hpp
   include/ori/simcars/agents/control_fwd_car.hpp

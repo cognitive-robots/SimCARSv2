@@ -13,23 +13,29 @@ namespace agents
 FP_DATA_TYPE DefaultFWDCarRewardCalc::calc_reward(const FWDCarOutcome *outcome,
                                                   const FWDCarRewardParameters *parameters) const
 {
-    FP_DATA_TYPE lane_transitions_exp = std::exp(outcome->lane_transitions);
-    FP_DATA_TYPE lane_transitions_metric = lane_transitions_exp / (lane_transitions_exp + 1.0);
-    FP_DATA_TYPE lane_transitions_weighted_metric = parameters->lane_transitions_weight *
-            lane_transitions_metric;
+    FWDCarRewards rewards = calc_rewards(outcome, parameters);
 
-    FP_DATA_TYPE final_speed_metric = 1.0 - std::exp(-4.0 * outcome->final_speed /
-                                                     parameters->speed_limit);
-    FP_DATA_TYPE final_speed_weighted_metric = parameters->final_speed_weight * final_speed_metric;
+    return parameters->lane_transitions_weight * rewards.lane_transitions_reward +
+            parameters->final_speed_weight * rewards.final_speed_reward +
+            parameters->max_env_force_mag_weight * rewards.max_env_force_mag_reward;
+}
+
+FWDCarRewards DefaultFWDCarRewardCalc::calc_rewards(FWDCarOutcome const *outcome,
+                                                    FWDCarRewardParameters const *parameters) const
+{
+    FWDCarRewards rewards;
+
+    FP_DATA_TYPE lane_transitions_exp = std::exp(outcome->lane_transitions);
+    rewards.lane_transitions_reward = lane_transitions_exp / (lane_transitions_exp + 1.0);
+
+    rewards.final_speed_reward = 1.0 - std::exp(-4.0 * outcome->final_speed /
+                                                parameters->speed_limit);
 
     FP_DATA_TYPE max_env_force_mag_exp = std::exp(outcome->max_env_force_mag -
                                                   parameters->env_force_mag_limit);
-    FP_DATA_TYPE max_env_force_mag_metric = max_env_force_mag_exp / (max_env_force_mag_exp + 1.0);
-    FP_DATA_TYPE max_env_force_mag_weighted_metric = parameters->max_env_force_mag_weight *
-            max_env_force_mag_metric;
+    rewards.max_env_force_mag_reward = max_env_force_mag_exp / (max_env_force_mag_exp + 1.0);
 
-    return lane_transitions_weighted_metric + final_speed_weighted_metric +
-            max_env_force_mag_weighted_metric;
+    return rewards;
 }
 
 }

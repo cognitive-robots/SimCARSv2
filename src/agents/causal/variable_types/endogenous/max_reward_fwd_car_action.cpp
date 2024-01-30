@@ -1,6 +1,8 @@
 
 #include <ori/simcars/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.hpp>
 
+#include <cmath>
+
 namespace ori
 {
 namespace simcars
@@ -42,17 +44,11 @@ bool MaxRewardFWDCarActionVariable::set_value(FWDCarAction const &val)
         size_t val_index = -1;
         for (size_t i = 0; i < reward_action_pairs.count(); ++i)
         {
-            if (reward_action_pairs[i].first > reward_action_pairs[max_reward_index].first)
-            {
-                max_reward_index = i;
-            }
-            if (reward_action_pairs[i].second == val)
-            {
-                val_index = i;
-            }
+            FP_DATA_TYPE new_reward = std::exp(-(diff(val, reward_action_pairs[i].second)));
+            reward_action_pairs[i].first = new_reward;
         }
 
-        return max_reward_index == val_index;
+        return get_parent()->set_value(reward_action_pairs);
     }
     else
     {

@@ -14,6 +14,8 @@ class DefaultFWDCarRewardCalc : public virtual IFWDCarRewardCalc
 public:
     FP_DATA_TYPE calc_reward(FWDCarOutcome const *outcome,
                              FWDCarRewardParameters const *parameters) const override;
+    FWDCarRewards calc_rewards(FWDCarOutcome const *outcome,
+                               FWDCarRewardParameters const *parameters) const override;
 };
 
 }
