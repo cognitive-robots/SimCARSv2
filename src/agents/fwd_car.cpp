@@ -192,16 +192,6 @@ simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_lat_lin_vel_vari
     return &lat_lin_vel;
 }
 
-simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_motor_torque_variable()
-{
-    return &motor_torque_buff;
-}
-
-simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_steer_variable()
-{
-    return &steer_buff;
-}
-
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_front_wheel_ang_lat_lin_vel_variable()
 {
     return &front_wheel_ang_lat_lin_vel;
@@ -240,6 +230,16 @@ simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_actual_rear_whee
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_rear_wheel_lat_force_mag_variable()
 {
     return &rear_wheel_lat_force_mag;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_motor_torque_variable()
+{
+    return &motor_torque_buff;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_steer_variable()
+{
+    return &steer_buff;
 }
 
 }

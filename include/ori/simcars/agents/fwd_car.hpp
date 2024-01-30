@@ -103,8 +103,6 @@ public:
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_recip_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lat_lin_vel_variable();
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_motor_torque_variable();
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_steer_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_front_wheel_ang_lat_lin_vel_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_front_wheel_slip_ang();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_actual_front_wheel_slip_ang();
@@ -113,6 +111,9 @@ public:
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_rear_wheel_slip_ang();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_actual_rear_wheel_slip_ang();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_rear_wheel_lat_force_mag_variable();
+
+    virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_motor_torque_variable();
+    virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_steer_variable();
 
     friend void ControlFWDCar::set_fwd_car(FWDCar *fwd_car);
 };
