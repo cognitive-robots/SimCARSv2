@@ -10,7 +10,7 @@ namespace simcars
 namespace map
 {
 
-class LaneBranch
+class LaneBranch : public structures::IContainer<ILane const*>
 {
     structures::IArray<uint64_t> *lane_ids;
 
@@ -26,6 +26,9 @@ public:
     LaneBranch(structures::IArray<uint64_t> *ids, IMap const *map);
 
     virtual ~LaneBranch();
+
+    size_t count() const override;
+    bool contains(ILane const* const &val) const override;
 
     ILane const* operator [](size_t idx) const;
 };

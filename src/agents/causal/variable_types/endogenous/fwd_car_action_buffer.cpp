@@ -79,6 +79,16 @@ bool FWDCarActionBufferVariable::set_value(FWDCarAction const &val)
     }
 }
 
+temporal::Time FWDCarActionBufferVariable::get_min_time() const
+{
+    return temporal_dictionary->get_earliest_time();
+}
+
+temporal::Time FWDCarActionBufferVariable::get_max_time() const
+{
+    return temporal_dictionary->get_latest_time();
+}
+
 void FWDCarActionBufferVariable::set_axiomatic(bool axiomatic)
 {
     this->axiomatic = axiomatic;

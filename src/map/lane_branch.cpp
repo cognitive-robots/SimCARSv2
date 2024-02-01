@@ -80,6 +80,16 @@ LaneBranch::~LaneBranch()
     if (lane_ids != nullptr) delete lane_ids;
 }
 
+size_t LaneBranch::count() const
+{
+    return lane_ids->count();
+}
+
+bool LaneBranch::contains(ILane const* const &val) const
+{
+    return lane_ids->contains(val->get_id());
+}
+
 ILane const* LaneBranch::operator [](size_t idx) const
 {
     if (idx < 0)

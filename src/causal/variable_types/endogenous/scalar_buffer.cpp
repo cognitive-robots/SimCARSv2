@@ -76,6 +76,16 @@ bool ScalarBufferVariable::set_value(FP_DATA_TYPE const &val)
     }
 }
 
+temporal::Time ScalarBufferVariable::get_min_time() const
+{
+    return temporal_dictionary->get_earliest_time();
+}
+
+temporal::Time ScalarBufferVariable::get_max_time() const
+{
+    return temporal_dictionary->get_latest_time();
+}
+
 void ScalarBufferVariable::set_axiomatic(bool axiomatic)
 {
     this->axiomatic = axiomatic;

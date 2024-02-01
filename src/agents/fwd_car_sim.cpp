@@ -21,14 +21,13 @@ FWDCarSim::FWDCarSim(FWDCar *fwd_car, temporal::Time start_time) :
 {
     dir.set_parent(&sim_rot);
 
+    lon_lin_acc.set_endogenous_parent(&sim_lin_acc);
     lon_lin_vel.set_endogenous_parent(&sim_lin_vel);
 
     lat_lin_vel.set_endogenous_parent(&sim_lin_vel);
 
     front_wheel_lon_force_mag.set_other_parent(&sim_motor_torque);
-
     front_wheel_ang_lat_lin_vel.set_endogenous_parent(&sim_ang_vel);
-
     front_wheel_slip_ang.set_other_parent(&sim_steer);
 
     rear_wheel_ang_lat_lin_vel.set_endogenous_parent(&sim_ang_vel);

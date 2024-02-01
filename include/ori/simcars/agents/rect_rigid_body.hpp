@@ -113,6 +113,9 @@ public:
 
     virtual ~RectRigidBody() = default;
 
+    temporal::Time get_min_time() const;
+    temporal::Time get_max_time() const;
+
     simcars::causal::IEndogenousVariable<uint64_t>* get_id_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_mass_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_length_variable();

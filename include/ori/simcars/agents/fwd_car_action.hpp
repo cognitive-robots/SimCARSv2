@@ -17,6 +17,11 @@ struct FWDCarAction
     Goal<FP_DATA_TYPE> speed_goal;
     Goal<uint64_t> lane_goal;
 
+public:
+    FWDCarAction(Goal<FP_DATA_TYPE> speed_goal = Goal<FP_DATA_TYPE>(),
+                 Goal<uint64_t> lane_goal = Goal<uint64_t>()) : speed_goal(speed_goal),
+        lane_goal(lane_goal) {}
+
     friend bool operator ==(FWDCarAction const &action_1, FWDCarAction const &action_2)
     {
         return action_1.speed_goal == action_2.speed_goal && action_1.lane_goal == action_2.lane_goal;

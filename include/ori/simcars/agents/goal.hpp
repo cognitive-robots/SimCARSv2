@@ -14,6 +14,10 @@ struct Goal
 {
     T val;
     temporal::Time time;
+
+public:
+    Goal(T val = T(), temporal::Time time = temporal::Time(temporal::Duration(0))) :
+        val(val), time(time) {}
 };
 
 template <typename T>

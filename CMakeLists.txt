@@ -336,6 +336,7 @@ add_library(simcars_agents STATIC
   src/agents/action_intervention_fwd_car.cpp
   src/agents/default_fwd_car_outcome_sim.cpp
   src/agents/default_fwd_car_reward_calc.cpp
+  src/agents/fwd_car_action_extractor.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_action_fixed.cpp
@@ -378,6 +379,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/action_intervention_fwd_car.hpp
   include/ori/simcars/agents/default_fwd_car_outcome_sim.hpp
   include/ori/simcars/agents/default_fwd_car_reward_calc.hpp
+  include/ori/simcars/agents/fwd_car_action_extractor.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_action_fixed.hpp

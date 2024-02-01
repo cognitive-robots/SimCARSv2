@@ -76,6 +76,16 @@ bool VectorBufferVariable::set_value(geometry::Vec const &val)
     }
 }
 
+temporal::Time VectorBufferVariable::get_min_time() const
+{
+    return temporal_dictionary->get_earliest_time();
+}
+
+temporal::Time VectorBufferVariable::get_max_time() const
+{
+    return temporal_dictionary->get_latest_time();
+}
+
 void VectorBufferVariable::set_axiomatic(bool axiomatic)
 {
     this->axiomatic = axiomatic;

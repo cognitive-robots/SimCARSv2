@@ -38,6 +38,7 @@ protected:
 
     simcars::causal::VectorAngleConstructionVariable dir;
 
+    simcars::causal::VectorDotProductVariable lon_lin_acc;
     simcars::causal::VectorDotProductVariable lon_lin_vel;
     simcars::causal::ScalarReciprocalVariable lon_lin_vel_recip;
     simcars::causal::ScalarAbsoluteVariable abs_lon_lin_vel;
@@ -100,6 +101,7 @@ public:
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_wheel_radius_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_axel_dist_variable();
     simcars::causal::IEndogenousVariable<geometry::Vec>* get_dir_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_acc_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_recip_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lat_lin_vel_variable();

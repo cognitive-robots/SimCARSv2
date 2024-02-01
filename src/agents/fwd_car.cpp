@@ -29,6 +29,7 @@ FWDCar::FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_v
 
     dir(&rot_buff),
 
+    lon_lin_acc(&lin_acc_buff, &dir),
     lon_lin_vel(&lin_vel_buff, &dir),
     lon_lin_vel_recip(&lon_lin_vel),
     abs_lon_lin_vel(&lon_lin_vel),
@@ -107,6 +108,7 @@ FWDCar::FWDCar(FWDCar const &fwd_car) :
 
     dir(&rot_buff),
 
+    lon_lin_acc(&lin_acc_buff, &dir),
     lon_lin_vel(&lin_vel_buff, &dir),
     lon_lin_vel_recip(&lon_lin_vel),
     abs_lon_lin_vel(&lon_lin_vel),
@@ -175,6 +177,11 @@ simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_axel_dist_variab
 simcars::causal::IEndogenousVariable<geometry::Vec>* FWDCar::get_dir_variable()
 {
     return &dir;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_lon_lin_acc_variable()
+{
+    return &lon_lin_acc;
 }
 
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_lon_lin_vel_variable()

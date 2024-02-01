@@ -162,6 +162,16 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
     rect(&pos_buff, &rot_buff, &length_proxy, &width_proxy)
 {}
 
+temporal::Time RectRigidBody::get_min_time() const
+{
+    return std::max(pos_buff.get_min_time(), rot_buff.get_min_time());
+}
+
+temporal::Time RectRigidBody::get_max_time() const
+{
+    return std::min(pos_buff.get_max_time(), rot_buff.get_max_time());
+}
+
 simcars::causal::IEndogenousVariable<uint64_t>* RectRigidBody::get_id_variable()
 {
     return &id_proxy;

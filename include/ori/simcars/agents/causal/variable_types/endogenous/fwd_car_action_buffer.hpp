@@ -33,6 +33,9 @@ public:
 
     bool set_value(FWDCarAction const &val) override;
 
+    temporal::Time get_min_time() const;
+    temporal::Time get_max_time() const;
+
     void set_axiomatic(bool axiomatic);
 };
 
