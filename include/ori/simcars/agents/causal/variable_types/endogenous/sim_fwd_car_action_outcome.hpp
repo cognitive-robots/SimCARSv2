@@ -19,7 +19,7 @@ namespace causal
 
 class SimFWDCarActionOutcomeVariable :
         public simcars::causal::ABinaryEndogenousVariable<
-        structures::stl::STLStackArray<FWDCarOutcomeActionPair>,
+        FWDCarOutcomeActionPairs,
         structures::stl::STLStackArray<FWDCarAction>, FWDCarSimParameters>
 {
     IFWDCarOutcomeSim const *fwd_car_outcome_sim;
@@ -30,9 +30,9 @@ public:
             simcars::causal::IVariable<FWDCarSimParameters> *other_parent,
             IFWDCarOutcomeSim const *fwd_car_outcome_sim);
 
-    bool get_value(structures::stl::STLStackArray<FWDCarOutcomeActionPair> &val) const override;
+    bool get_value(FWDCarOutcomeActionPairs &val) const override;
 
-    bool set_value(structures::stl::STLStackArray<FWDCarOutcomeActionPair> const &val) override;
+    bool set_value(FWDCarOutcomeActionPairs const &val) override;
 };
 
 }

@@ -2,6 +2,8 @@
 
 #include <ori/simcars/causal/variable_types/endogenous/id_proxy.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_buffer.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_previous_time_step.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/lane_map_point.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_negation.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_sum.hpp>
@@ -49,8 +51,19 @@ protected:
     simcars::causal::ScalarReciprocalVariable act_horizon_ang_cos_recip;
     simcars::causal::ScalarProductVariable act_horizon_ang;
 
-    simcars::causal::ScalarProductVariable needed_ang_vel;
+    simcars::causal::ScalarNegationVariable ang_error;
+    simcars::causal::ScalarBufferVariable ang_error_buff;
+    simcars::causal::ScalarPreviousTimeStepVariable prev_ang_error;
+    simcars::causal::ScalarNegationVariable neg_prev_ang_error;
+    simcars::causal::ScalarSumVariable ang_error_diff;
 
+    simcars::causal::ScalarFixedVariable k_p;
+    simcars::causal::ScalarProductVariable p_factor;
+    simcars::causal::ScalarFixedVariable k_d;
+    simcars::causal::ScalarProductVariable d_factor;
+    simcars::causal::ScalarSumVariable needed_steer;
+
+    /*
     simcars::causal::ScalarSocketVariable axel_dist;
     simcars::causal::ScalarFixedVariable double_scale_factor;
     simcars::causal::ScalarProxyVariable double_scale_factor_proxy;
@@ -59,6 +72,7 @@ protected:
     simcars::causal::ScalarSocketVariable lon_lin_vel_recip;
     simcars::causal::ScalarProductVariable needed_ang_vel_double_axel_dist_prod;
     simcars::causal::ScalarProductVariable needed_steer;
+    */
 
     simcars::causal::ScalarMinVariable max_lim_steer;
     simcars::causal::ScalarMaxVariable actual_steer;

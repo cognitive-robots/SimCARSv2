@@ -32,12 +32,14 @@ bool LaneTransitionsCalcVariable::get_value(FP_DATA_TYPE &val) const
 
             for (size_t j = 0; j < next_lanes.count(); ++j)
             {
-                if (next_lanes[j] == prev_left_adjacent_lane->get_id())
+                if (prev_left_adjacent_lane != nullptr &&
+                        next_lanes[j] == prev_left_adjacent_lane->get_id())
                 {
                     left_transition = true;
                 }
 
-                if (next_lanes[j] == prev_right_adjacent_lane->get_id())
+                if (prev_right_adjacent_lane != nullptr &&
+                        next_lanes[j] == prev_right_adjacent_lane->get_id())
                 {
                     right_transition = true;
                 }

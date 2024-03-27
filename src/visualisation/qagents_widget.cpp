@@ -31,6 +31,27 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
     {
         agent_colour = id_colour_dict[id];
 
+        FP_DATA_TYPE motor_torque;
+        agent->get_motor_torque_variable()->get_value(motor_torque);
+        FP_DATA_TYPE steer;
+        agent->get_steer_variable()->get_value(steer);
+        geometry::Vec lin_vel;
+        agent->get_lin_vel_variable()->get_value(lin_vel);
+        FP_DATA_TYPE lon_lin_vel;
+        agent->get_lon_lin_vel_variable()->get_value(lon_lin_vel);
+        geometry::Vec lin_acc;
+        agent->get_lin_acc_variable()->get_value(lin_acc);
+        geometry::Vec env_force;
+        agent->get_env_force_variable()->get_value(env_force);
+        geometry::Vec other_force;
+        agent->get_other_force_variable()->get_value(other_force);
+        std::cout << "Motor Torque: " << motor_torque << " Nm, " << "Steer: " << steer << " rad, " <<
+                     "Lin. Vel.: (" << lin_vel.x() << ", " << lin_vel.y() << ") m/s, " <<
+                     "Lon. Lin. Vel.: " << lon_lin_vel << " m/s, " <<
+                     "Lin. Acc.: (" << lin_acc.x() << ", " << lin_acc.y() << ") m/s^2, " <<
+                     "Env. Force: (" << env_force.x() << ", " << env_force.y() << ") N, " <<
+                     "Other Force: (" << other_force.x() << ", " << other_force.y() << ") N " <<
+                     std::endl;
         /*
         geometry::Vec other_force;
         agent->get_other_force_variable()->get_value(other_force);

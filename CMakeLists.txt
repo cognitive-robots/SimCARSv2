@@ -333,7 +333,7 @@ add_library(simcars_agents STATIC
   src/agents/full_control_fwd_car_sim.cpp
   src/agents/plan_fwd_car.cpp
   src/agents/greedy_plan_fwd_car.cpp
-  src/agents/action_intervention_fwd_car.cpp
+  src/agents/fwd_car_action_intervention.cpp
   src/agents/default_fwd_car_outcome_sim.cpp
   src/agents/default_fwd_car_reward_calc.cpp
   src/agents/fwd_car_action_extractor.cpp
@@ -341,6 +341,7 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_action_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_action_socket.cpp
+  src/agents/causal/variable_types/endogenous/fwd_car_reward_parameters_proxy.cpp
   src/agents/causal/variable_types/endogenous/id_goal_val_part.cpp
   src/agents/causal/variable_types/endogenous/id_goal_time_part.cpp
   src/agents/causal/variable_types/endogenous/scalar_goal_val_part.cpp
@@ -349,6 +350,7 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/endogenous/fwd_car_action_buffer.cpp
   src/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.cpp
   src/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.cpp
+  src/agents/causal/variable_types/endogenous/fwd_car_outcome_action_pairs_buffer.cpp
   src/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.cpp
   src/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.cpp
   src/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.cpp
@@ -376,7 +378,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/full_control_fwd_car_sim.hpp
   include/ori/simcars/agents/plan_fwd_car.hpp
   include/ori/simcars/agents/greedy_plan_fwd_car.hpp
-  include/ori/simcars/agents/action_intervention_fwd_car.hpp
+  include/ori/simcars/agents/fwd_car_action_intervention.hpp
   include/ori/simcars/agents/default_fwd_car_outcome_sim.hpp
   include/ori/simcars/agents/default_fwd_car_reward_calc.hpp
   include/ori/simcars/agents/fwd_car_action_extractor.hpp
@@ -384,6 +386,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_action_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_action_socket.hpp
+  include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_reward_parameters_proxy.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/id_goal_val_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/id_goal_time_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/scalar_goal_val_part.hpp
@@ -392,6 +395,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_buffer.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_speed_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_action_lane_part.hpp
+  include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_outcome_action_pairs_buffer.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp
@@ -416,177 +420,6 @@ PUBLIC
 add_dependencies(simcars_agents simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_causal)
 target_compile_options(simcars_agents PRIVATE -fPIC)
 set_target_properties(simcars_agents PROPERTIES VERSION ${PROJECT_VERSION})
-
-#[[
-add_library(simcars_agents STATIC
-  src/agent/valueless_constant_abstract.cpp
-  src/agent/valueless_variable_abstract.cpp
-  src/agent/driving_agent_abstract.cpp
-  src/agent/read_only_driving_agent_state_abstract.cpp
-  src/agent/driving_scene_abstract.cpp
-  src/agent/read_only_driving_scene_state_abstract.cpp
-  src/agent/driving_scene_state_abstract.cpp
-  src/agent/driving_simulation_agent_abstract.cpp
-  src/agent/driving_simulation_scene_abstract.cpp
-  src/agent/driving_agent_reward_calculator_abstract.cpp
-  src/agent/driving_agent_agency_calculator_abstract.cpp
-  src/agent/basic_driving_agent_state.cpp
-  src/agent/view_read_only_driving_agent_state.cpp
-  src/agent/view_driving_agent_state.cpp
-  src/agent/basic_read_only_driving_scene_state.cpp
-  src/agent/basic_driving_scene_state.cpp
-  src/agent/view_driving_scene_state.cpp
-  src/agent/basic_goal_driving_agent_state.cpp
-  src/agent/safe_speedy_driving_agent_reward_calculator.cpp
-  src/agent/basic_driving_agent_agency_calculator.cpp
-  src/agent/basic_fp_action_sampler.cpp
-  src/agent/basic_driving_simulator.cpp
-  src/agent/driving_simulation_agent.cpp
-  src/agent/driving_simulation_scene.cpp
-  src/agent/driving_simulation_scene_factory.cpp
-  src/agent/lyft/lyft_driving_agent.cpp
-  src/agent/lyft/lyft_scene.cpp
-  src/agent/highd/highd_driving_agent.cpp
-  src/agent/highd/highd_scene.cpp
-  src/agent/plg/plg_driving_agent.cpp
-  src/agent/plg/plg_scene.cpp
-  src/agent/csv/csv_scene.cpp
-  include/ori/simcars/agent/defines.hpp
-  include/ori/simcars/agent/declarations.hpp
-  include/ori/simcars/agent/driving_declarations.hpp
-  include/ori/simcars/agent/valueless_constant_interface.hpp
-  include/ori/simcars/agent/valueless_event_interface.hpp
-  include/ori/simcars/agent/valueless_variable_interface.hpp
-  include/ori/simcars/agent/simulated_valueless_variable_interface.hpp
-  include/ori/simcars/agent/constant_interface.hpp
-  include/ori/simcars/agent/event_interface.hpp
-  include/ori/simcars/agent/variable_interface.hpp
-  include/ori/simcars/agent/simulated_variable_interface.hpp
-  include/ori/simcars/agent/entity_interface.hpp
-  include/ori/simcars/agent/read_only_entity_state_interface.hpp
-  include/ori/simcars/agent/entity_state_interface.hpp
-  include/ori/simcars/agent/driving_enums.hpp
-  include/ori/simcars/agent/driving_agent_interface.hpp
-  include/ori/simcars/agent/read_only_driving_agent_state_interface.hpp
-  include/ori/simcars/agent/driving_agent_state_interface.hpp
-  include/ori/simcars/agent/scene_interface.hpp
-  include/ori/simcars/agent/read_only_scene_state_interface.hpp
-  include/ori/simcars/agent/scene_state_interface.hpp
-  include/ori/simcars/agent/driving_scene_interface.hpp
-  include/ori/simcars/agent/read_only_driving_scene_state_interface.hpp
-  include/ori/simcars/agent/driving_scene_state_interface.hpp
-  include/ori/simcars/agent/file_based_scene_interface.hpp
-  include/ori/simcars/agent/two_file_based_scene_interface.hpp
-  include/ori/simcars/agent/controller_interface.hpp
-  include/ori/simcars/agent/reward_calculator_interface.hpp
-  include/ori/simcars/agent/agency_calculator_interface.hpp
-  include/ori/simcars/agent/action_sampler_interface.hpp
-  include/ori/simcars/agent/simulator_interface.hpp
-  include/ori/simcars/agent/simulation_scene_interface.hpp
-  include/ori/simcars/agent/simulation_scene_factory_interface.hpp
-  include/ori/simcars/agent/driving_simulation_agent_interface.hpp
-  include/ori/simcars/agent/driving_simulation_scene_interface.hpp
-  include/ori/simcars/agent/driving_agent_controller_interface.hpp
-  include/ori/simcars/agent/driving_agent_reward_calculator_interface.hpp
-  include/ori/simcars/agent/driving_agent_agency_calculator_interface.hpp
-  include/ori/simcars/agent/driving_simulator_interface.hpp
-  include/ori/simcars/agent/valueless_constant_abstract.hpp
-  include/ori/simcars/agent/valueless_variable_abstract.hpp
-  include/ori/simcars/agent/constant_abstract.hpp
-  include/ori/simcars/agent/event_abstract.hpp
-  include/ori/simcars/agent/variable_abstract.hpp
-  include/ori/simcars/agent/simulated_variable_abstract.hpp
-  include/ori/simcars/agent/driving_agent_abstract.hpp
-  include/ori/simcars/agent/read_only_driving_agent_state_abstract.hpp
-  include/ori/simcars/agent/driving_agent_state_abstract.hpp
-  include/ori/simcars/agent/driving_scene_abstract.hpp
-  include/ori/simcars/agent/read_only_driving_scene_state_abstract.hpp
-  include/ori/simcars/agent/driving_scene_state_abstract.hpp
-  include/ori/simcars/agent/file_based_scene_abstract.hpp
-  include/ori/simcars/agent/two_file_based_scene_abstract.hpp
-  include/ori/simcars/agent/driving_simulation_agent_abstract.hpp
-  include/ori/simcars/agent/driving_simulation_scene_abstract.hpp
-  include/ori/simcars/agent/driving_agent_reward_calculator_abstract.hpp
-  include/ori/simcars/agent/driving_agent_agency_calculator_abstract.hpp
-  include/ori/simcars/agent/goal.hpp
-  include/ori/simcars/agent/basic_constant.hpp
-  include/ori/simcars/agent/basic_event.hpp
-  include/ori/simcars/agent/basic_variable.hpp
-  include/ori/simcars/agent/basic_driving_agent_state.hpp
-  include/ori/simcars/agent/view_read_only_driving_agent_state.hpp
-  include/ori/simcars/agent/view_driving_agent_state.hpp
-  include/ori/simcars/agent/basic_read_only_driving_scene_state.hpp
-  include/ori/simcars/agent/basic_driving_scene_state.hpp
-  include/ori/simcars/agent/view_driving_scene_state.hpp
-  include/ori/simcars/agent/basic_goal_driving_agent_state.hpp
-  include/ori/simcars/agent/driving_goal_extraction_agent.hpp
-  include/ori/simcars/agent/driving_goal_extraction_scene.hpp
-  include/ori/simcars/agent/basic_simulated_variable.hpp
-  include/ori/simcars/agent/basic_driving_simulator.hpp
-  include/ori/simcars/agent/driving_simulation_agent.hpp
-  include/ori/simcars/agent/driving_simulation_scene.hpp
-  include/ori/simcars/agent/driving_simulation_scene_factory.hpp
-  include/ori/simcars/agent/basic_driving_agent_controller.hpp
-  include/ori/simcars/agent/safe_speedy_driving_agent_reward_calculator.hpp
-  include/ori/simcars/agent/basic_driving_agent_agency_calculator.hpp
-  include/ori/simcars/agent/basic_fp_action_sampler.hpp
-  include/ori/simcars/agent/lyft/lyft_driving_agent.hpp
-  include/ori/simcars/agent/lyft/lyft_scene.hpp
-  include/ori/simcars/agent/highd/highd_driving_agent.hpp
-  include/ori/simcars/agent/highd/highd_scene.hpp
-  include/ori/simcars/agent/plg/plg_driving_agent.hpp
-  include/ori/simcars/agent/plg/plg_scene.hpp
-  include/ori/simcars/agent/csv/csv_scene.hpp
-)
-target_include_directories(simcars_agents
-PUBLIC
-  $<INSTALL_INTERFACE:include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  ${RAPIDJSON_INCLUDE_DIRS}
-)
-target_link_libraries(simcars_agents
-PUBLIC
-  simcars_utils
-  simcars_structures
-  simcars_geometry
-  simcars_temporal
-  simcars_map
-PRIVATE
-  magic_enum::magic_enum
-  rapidcsv
-#  lz4_stream
-)
-add_dependencies(simcars_agents simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
-target_compile_options(simcars_agents PRIVATE -fPIC)
-set_target_properties(simcars_agents PROPERTIES VERSION ${PROJECT_VERSION})
-
-add_library(simcars_causal STATIC
-  src/causal/necessary_fp_goal_causal_link_tester.cpp
-  include/ori/simcars/causal/causal_link_tester_interface.hpp
-  include/ori/simcars/causal/causal_discoverer_interface.hpp
-  include/ori/simcars/causal/necessary_fp_goal_causal_link_tester.hpp
-  include/ori/simcars/causal/necessary_driving_causal_discoverer.hpp
-)
-target_include_directories(simcars_causal
-PUBLIC
-  $<INSTALL_INTERFACE:include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-)
-target_link_libraries(simcars_causal
-PUBLIC
-  simcars_utils
-  simcars_structures
-  simcars_geometry
-  simcars_temporal
-  simcars_map
-  simcars_agents
-PRIVATE
-  pthread
-)
-add_dependencies(simcars_causal simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-target_compile_options(simcars_causal PRIVATE -fPIC)
-set_target_properties(simcars_causal PROPERTIES VERSION ${PROJECT_VERSION})
-]]
 
 add_library(simcars_visualisation STATIC
   src/visualisation/qsfml_canvas_abstract.cpp
@@ -632,57 +465,23 @@ add_executable(highd_scene_test src/highd_scene_test/highd_scene_test.cpp)
 target_link_libraries(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 add_dependencies(highd_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 
-#[[
-add_executable(highd_simulation_test src/highd_simulation_test/highd_simulation_test.cpp)
-target_link_libraries(highd_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-add_dependencies(highd_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-
-add_executable(highd_bulk_simulation_test src/highd_bulk_simulation_test/highd_bulk_simulation_test.cpp)
-target_link_libraries(highd_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-add_dependencies(highd_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-
-add_executable(highd_json_meta_simulation_test src/highd_json_meta_simulation_test/highd_json_meta_simulation_test.cpp)
-target_link_libraries(highd_json_meta_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-add_dependencies(highd_json_meta_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-
-add_executable(highd_json_meta_bulk_simulation_test src/highd_json_meta_bulk_simulation_test/highd_json_meta_bulk_simulation_test.cpp)
-target_link_libraries(highd_json_meta_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-add_dependencies(highd_json_meta_bulk_simulation_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-
-add_executable(highd_json_meta_link_test src/highd_json_meta_link_test/highd_json_meta_link_test.cpp)
-target_link_libraries(highd_json_meta_link_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_causal)
-add_dependencies(highd_json_meta_link_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_causal)
-
-add_executable(highd_json_meta_causal_discovery src/highd_json_meta_causal_discovery/highd_json_meta_causal_discovery.cpp)
-target_link_libraries(highd_json_meta_causal_discovery simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_causal)
-add_dependencies(highd_json_meta_causal_discovery simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_causal)
-]]
+add_executable(highd_action_extraction src/highd_action_extraction/highd_action_extraction.cpp)
+target_link_libraries(highd_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
+add_dependencies(highd_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 
 add_executable(highd_visualisation src/highd_visualisation/highd_visualisation.cpp)
 target_link_libraries(highd_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
 add_dependencies(highd_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
 
-#[[
-add_executable(highd_json_meta_simcars_intervention_demo src/highd_json_meta_simcars_intervention_demo/highd_json_meta_simcars_intervention_demo.cpp)
-target_link_libraries(highd_json_meta_simcars_intervention_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
-add_dependencies(highd_json_meta_simcars_intervention_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
+add_executable(highd_intervention src/highd_intervention/highd_intervention.cpp)
+target_link_libraries(highd_intervention simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
+add_dependencies(highd_intervention simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
 
-add_executable(highd_json_meta_simcars_causal_discovery_demo src/highd_json_meta_simcars_causal_discovery_demo/highd_json_meta_simcars_causal_discovery_demo.cpp)
-target_link_libraries(highd_json_meta_simcars_causal_discovery_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
-add_dependencies(highd_json_meta_simcars_causal_discovery_demo simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
-]]
+add_executable(highd_action_explanation src/highd_action_explanation/highd_action_explanation.cpp)
+target_link_libraries(highd_action_explanation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
+add_dependencies(highd_action_explanation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
 
 
 add_executable(plg_map_test src/plg_map_test/plg_map_test.cpp)
 target_link_libraries(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
-
-#[[
-add_executable(plg_scene_test src/plg_scene_test/plg_scene_test.cpp)
-target_link_libraries(plg_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-add_dependencies(plg_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
-
-add_executable(plg_qmap_scene_widget_test src/plg_qmap_scene_widget_test/plg_qmap_scene_widget_test.cpp)
-target_link_libraries(plg_qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
-add_dependencies(plg_qmap_scene_widget_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
-]]

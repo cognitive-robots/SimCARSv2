@@ -18,13 +18,14 @@ namespace causal
 {
 
 class CalcFWDCarActionOutcomeRewardVariable :
-        public simcars::causal::ABinaryEndogenousVariable<structures::stl::STLStackArray<RewardFWDCarActionPair>, structures::stl::STLStackArray<FWDCarOutcomeActionPair>, FWDCarRewardParameters>
+        public simcars::causal::ABinaryEndogenousVariable<structures::stl::STLStackArray<RewardFWDCarActionPair>,
+        FWDCarOutcomeActionPairs, FWDCarRewardParameters>
 {
     IFWDCarRewardCalc const *fwd_car_reward_calculator;
 
 public:
     CalcFWDCarActionOutcomeRewardVariable(
-            simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarOutcomeActionPair>> *endogenous_parent,
+            simcars::causal::IEndogenousVariable<FWDCarOutcomeActionPairs> *endogenous_parent,
             simcars::causal::IVariable<FWDCarRewardParameters> *other_parent,
             IFWDCarRewardCalc const *fwd_car_reward_calculator);
 

@@ -92,14 +92,19 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
         */
     }
 
-    min_time = temporal::Time(temporal::Duration(((min_frame - 1) * get_time_step_size())));
-    max_time = temporal::Time(temporal::Duration(((max_frame - 1) * get_time_step_size())));
-
     if (start_frame == 0 && end_frame == -1)
     {
         start_frame = min_frame;
         end_frame = max_frame;
     }
+    else
+    {
+        min_frame = std::max(start_frame, min_frame);
+        max_frame = std::min(end_frame, max_frame);
+    }
+
+    min_time = temporal::Time(temporal::Duration(((min_frame - 1) * get_time_step_size())));
+    max_time = temporal::Time(temporal::Duration(((max_frame - 1) * get_time_step_size())));
 
     structures::stl::STLStackArray<uint32_t> id_array;
     structures::stl::STLDictionary<uint32_t, size_t> id_initial_frame_dict;

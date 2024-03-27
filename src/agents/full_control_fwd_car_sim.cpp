@@ -23,7 +23,7 @@ FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_c
     prev_lane_encaps(&lane_encaps),
     lane_trans(&prev_lane_encaps, &lane_encaps, map),
 
-    sim_cumil_lane_trans(&cumil_lane_trans, &zero_cumil_lane_trans_proxy, &sim_start_time),
+    sim_cumil_lane_trans(&zero_cumil_lane_trans_proxy, &cumil_lane_trans, &sim_start_time),
     prev_cumil_lane_trans(&sim_cumil_lane_trans),
 
     cumil_lane_trans(&lane_trans, &prev_cumil_lane_trans)

@@ -4,6 +4,8 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#include <iostream>
+
 namespace ori
 {
 namespace simcars
@@ -14,7 +16,7 @@ namespace causal
 {
 
 CalcFWDCarActionOutcomeRewardVariable::CalcFWDCarActionOutcomeRewardVariable(
-        simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarOutcomeActionPair>> *endogenous_parent,
+        simcars::causal::IEndogenousVariable<FWDCarOutcomeActionPairs> *endogenous_parent,
         simcars::causal::IVariable<FWDCarRewardParameters> *other_parent,
         IFWDCarRewardCalc const *fwd_car_reward_calculator) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent),
@@ -22,7 +24,7 @@ CalcFWDCarActionOutcomeRewardVariable::CalcFWDCarActionOutcomeRewardVariable(
 
 bool CalcFWDCarActionOutcomeRewardVariable::get_value(structures::stl::STLStackArray<RewardFWDCarActionPair> &val) const
 {
-    structures::stl::STLStackArray<FWDCarOutcomeActionPair> outcome_action_pairs;
+    FWDCarOutcomeActionPairs outcome_action_pairs;
     FWDCarRewardParameters reward_parameters;
     if (get_endogenous_parent()->get_value(outcome_action_pairs) && get_other_parent()->get_value(reward_parameters))
     {
@@ -48,12 +50,12 @@ bool CalcFWDCarActionOutcomeRewardVariable::set_value(structures::stl::STLStackA
 {
     // WARNING: Assumes action ordering is the same in both arrays
     // TODO: Potentially consider separating reward weightings from other reward parameters
-    structures::stl::STLStackArray<FWDCarOutcomeActionPair> outcome_action_pairs;
+    FWDCarOutcomeActionPairs outcome_action_pairs;
     FWDCarRewardParameters reward_parameters;
     if (get_endogenous_parent()->get_value(outcome_action_pairs) &&
             get_other_parent()->get_value(reward_parameters))
     {
-        Eigen::MatrixXd individual_rewards(outcome_action_pairs.count(), 3);
+        Eigen::MatrixXd individual_rewards(outcome_action_pairs.count(), 5);
         Eigen::VectorXd combined_rewards(outcome_action_pairs.count());
         for (size_t i = 0; i < outcome_action_pairs.count(); ++i)
         {
@@ -61,15 +63,27 @@ bool CalcFWDCarActionOutcomeRewardVariable::set_value(structures::stl::STLStackA
                         &(outcome_action_pairs[i].first),
                         &reward_parameters);
             individual_rewards(i, 0) = rewards.lane_transitions_reward;
-            individual_rewards(i, 1) = rewards.final_speed_reward;
-            individual_rewards(i, 2) = rewards.max_env_force_mag_reward;
+            individual_rewards(i, 1) = rewards.caution_reward;
+            individual_rewards(i, 2) = rewards.speed_limit_excess_reward;
+            individual_rewards(i, 3) = rewards.max_env_force_mag_reward;
+            individual_rewards(i, 4) = 1.0;
+            std::cout << "Action [" << i << "]: " << outcome_action_pairs[i].second << std::endl;
+            std::cout << "Individual Rewards: " << rewards << std::endl;
+            std::cout << "Combined Reward: " << val[i].first << std::endl;
+            std::cout << "Max. Env. Force Mag. [" << i << "]: " <<
+                         outcome_action_pairs[i].first.max_env_force_mag << std::endl;
+            //std::cout << "Max. Env. Force Mag. Reward [" << i <<  "]: " <<
+            //             rewards.max_env_force_mag_reward << std::endl;
             combined_rewards(i) = val[i].first;
+            //std::cout << "Action Diff. Derived Reward: " << val[i].first << std::endl;
         }
         Eigen::VectorXd reward_weights =
                 individual_rewards.colPivHouseholderQr().solve(combined_rewards);
         reward_parameters.lane_transitions_weight = reward_weights(0);
-        reward_parameters.final_speed_weight = reward_weights(1);
-        reward_parameters.max_env_force_mag_weight = reward_weights(2);
+        reward_parameters.caution_weight = reward_weights(1);
+        reward_parameters.speed_limit_excess_weight = reward_weights(2);
+        reward_parameters.max_env_force_mag_weight = reward_weights(3);
+        reward_parameters.bias_weight = reward_weights(4);
 
         return get_other_parent()->set_value(reward_parameters);
     }

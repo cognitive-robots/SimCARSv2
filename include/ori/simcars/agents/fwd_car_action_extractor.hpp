@@ -16,6 +16,7 @@ namespace agents
 class FWDCarActionExtractor
 {
     map::IMap *map;
+    temporal::Duration resolution;
     temporal::Duration action_min_duration;
     FP_DATA_TYPE action_min_lon_lin_acc;
     FP_DATA_TYPE action_min_lon_lin_vel_diff;
@@ -26,7 +27,7 @@ class FWDCarActionExtractor
     structures::IArray<TimeGoalPair<uint64_t>>* extract_lane_goals(agents::FWDCar *fwd_car) const;
 
 public:
-    FWDCarActionExtractor(map::IMap *map,
+    FWDCarActionExtractor(map::IMap *map, temporal::Duration resolution,
                           temporal::Duration action_min_duration,
                           FP_DATA_TYPE action_min_lon_lin_acc,
                           FP_DATA_TYPE action_min_lon_lin_vel_diff,

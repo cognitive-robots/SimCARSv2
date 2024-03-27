@@ -5,7 +5,7 @@
 #include <ori/simcars/agents/rect_rigid_body_sim.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
-#include <ori/simcars/agents/action_intervention_fwd_car.hpp>
+#include <ori/simcars/agents/fwd_car_action_intervention.hpp>
 
 namespace ori
 {
@@ -28,28 +28,36 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     // WARNING: Temporarily removed assertion, might not be necessary
     //assert(action->speed_goal.time > start_time && action->lane_goal.time > start_time);
 
-    RectRigidBody const *selected_rigid_body = control_fwd_car->get_fwd_car();
+    FWDCar *fwd_car = control_fwd_car->get_fwd_car();
 
+    /*
     RectRigidBodyEnv rigid_body_sim_env;
 
     structures::IArray<RectRigidBody*> const *env_rigid_body_array =
             rigid_body_env->get_rigid_bodies();
 
+    // TODO: Change this to just use the actual agents rather than copying, since this will fail to
+    // keep simulated agents as such
     size_t i;
     for (i = 0; i < env_rigid_body_array->count(); ++i)
     {
         if ((*env_rigid_body_array)[i] == selected_rigid_body) continue;
-        rigid_body_sim_env.add_rigid_body(
-                    new RectRigidBodySim((*env_rigid_body_array)[i], start_time));
+        // Simulating all agents is intractable, so just simulate the agent we are planning for
+        //rigid_body_sim_env.add_rigid_body(
+        //            new RectRigidBodySim((*env_rigid_body_array)[i], start_time));
+        rigid_body_sim_env.add_rigid_body(new RectRigidBody(*(*env_rigid_body_array)[i]));
     }
+    */
 
-    FWDCarSim *fwd_car_sim = new FWDCarSim(control_fwd_car->get_fwd_car(), start_time);
-    FullControlFWDCarSim *control_fwd_car_sim = new FullControlFWDCarSim(control_fwd_car,
-                                                                         start_time);
-    control_fwd_car_sim->set_fwd_car(fwd_car_sim);
-    ActionInterventionFWDCar *plan_fwd_car_intervention = new ActionInterventionFWDCar(*action);
-    plan_fwd_car_intervention->set_control_fwd_car(control_fwd_car_sim);
-    rigid_body_sim_env.add_rigid_body(fwd_car_sim);
+    FWDCarSim *fwd_car_sim = new FWDCarSim(fwd_car, start_time);
+    FullControlFWDCarSim control_fwd_car_sim(control_fwd_car, start_time);
+    control_fwd_car_sim.set_fwd_car(fwd_car_sim);
+    FWDCarActionIntervention plan_fwd_car_intervention(*action);
+    plan_fwd_car_intervention.set_control_fwd_car(&control_fwd_car_sim);
+
+    //rigid_body_sim_env.add_rigid_body(fwd_car_sim);
+    rigid_body_env->remove_rigid_body(fwd_car);
+    rigid_body_env->add_rigid_body(fwd_car_sim);
 
 
     temporal::Duration sim_horizon = std::chrono::duration_cast<temporal::Duration>(
@@ -59,11 +67,17 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     // TODO: Either utilise the FWD Car Outcome construction variable or remove it from the codebase
     FWDCarOutcome outcome;
 
-    control_fwd_car_sim->get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
+    control_fwd_car_sim.get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
     fwd_car_sim->get_lon_lin_vel_variable()->get_value(outcome.final_speed);
     fwd_car_sim->get_max_env_force_mag_variable()->get_value(outcome.max_env_force_mag);
 
 
+    rigid_body_env->remove_rigid_body(fwd_car_sim);
+    rigid_body_env->add_rigid_body(fwd_car);
+
+    delete fwd_car_sim;
+
+    /*
     structures::IArray<RectRigidBody*> const *sim_env_rigid_body_array =
             rigid_body_sim_env.get_rigid_bodies();
 
@@ -71,6 +85,7 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     {
         delete (*sim_env_rigid_body_array)[i];
     }
+    */
 
     simcars::causal::VariableContext::set_current_time(start_time);
 
