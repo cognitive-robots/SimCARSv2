@@ -12,21 +12,23 @@ namespace agents
 namespace causal
 {
 
-bool MaxRewardFWDCarActionVariable::get_value(FWDCarAction &val) const
+bool MaxRewardFWDCarActionVariable::get_value(FWDCarOutcomeActionPair &val) const
 {
-    structures::stl::STLStackArray<RewardFWDCarActionPair> reward_action_pairs;
-    if (get_parent()->get_value(reward_action_pairs))
+    RewardFWDCarOutcomeActionTuples reward_outcome_action_tuples;
+    if (get_parent()->get_value(reward_outcome_action_tuples))
     {
         size_t max_reward_index = 0;
-        for (size_t i = 1; i < reward_action_pairs.count(); ++i)
+        for (size_t i = 1; i < reward_outcome_action_tuples.count(); ++i)
         {
-            if (reward_action_pairs[i].first > reward_action_pairs[max_reward_index].first)
+            if (std::get<0>(reward_outcome_action_tuples[i]) >
+                    std::get<0>(reward_outcome_action_tuples[max_reward_index]))
             {
                 max_reward_index = i;
             }
         }
 
-        val = reward_action_pairs[max_reward_index].second;
+        val.first = std::get<1>(reward_outcome_action_tuples[max_reward_index]);
+        val.second = std::get<2>(reward_outcome_action_tuples[max_reward_index]);
         return true;
     }
     else
@@ -35,26 +37,28 @@ bool MaxRewardFWDCarActionVariable::get_value(FWDCarAction &val) const
     }
 }
 
-bool MaxRewardFWDCarActionVariable::set_value(FWDCarAction const &val)
+bool MaxRewardFWDCarActionVariable::set_value(FWDCarOutcomeActionPair const &val)
 {
-    structures::stl::STLStackArray<RewardFWDCarActionPair> reward_action_pairs;
-    if (get_parent()->get_value(reward_action_pairs))
+    RewardFWDCarOutcomeActionTuples reward_outcome_action_tuples;
+    if (get_parent()->get_value(reward_outcome_action_tuples))
     {
         //size_t max_reward_index = 0;
         //size_t val_index = -1;
-        for (size_t i = 0; i < reward_action_pairs.count(); ++i)
+        for (size_t i = 0; i < reward_outcome_action_tuples.count(); ++i)
         {
-            FP_DATA_TYPE action_diff = diff(val, reward_action_pairs[i].second);
+            FP_DATA_TYPE action_diff = diff(val.first, std::get<1>(reward_outcome_action_tuples[i]));
             FP_DATA_TYPE new_reward = std::exp(-action_diff);
             //FP_DATA_TYPE new_reward = 1.0 / action_diff;
-            reward_action_pairs[i].first = new_reward;
-            //std::cout << "Action 1 [" << i << "]: " << val << std::endl;
-            //std::cout << "Action 2 [" << i << "]: " << reward_action_pairs[i].second << std::endl;
-            //std::cout << "Action Diff. [" << i << "]: " << action_diff << std::endl;
-            //std::cout << "Action Diff. Reward [" << i << "]: " << new_reward << std::endl;
+            std::get<0>(reward_outcome_action_tuples[i]) = new_reward;
+            std::cout << "Action 1 [" << i << "]: " << val.second << std::endl;
+            std::cout << "Outcome 1 [" << i << "]: " << val.first << std::endl;
+            std::cout << "Action 2 [" << i << "]: " << std::get<2>(reward_outcome_action_tuples[i]) << std::endl;
+            std::cout << "Outcome 2 [" << i << "]: " << std::get<1>(reward_outcome_action_tuples[i]) << std::endl;
+            std::cout << "Action Diff. [" << i << "]: " << action_diff << std::endl;
+            std::cout << "Action Diff. Reward [" << i << "]: " << new_reward << std::endl;
         }
 
-        return get_parent()->set_value(reward_action_pairs);
+        return get_parent()->set_value(reward_outcome_action_tuples);
     }
     else
     {

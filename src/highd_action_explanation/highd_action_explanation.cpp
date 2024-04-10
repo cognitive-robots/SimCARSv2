@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
 
     agents::highd::HighDFWDCarScene scene(argv[2], argv[3], start_frame, end_frame);
 
-    //causal::VariableContext::set_time_step_size(scene.get_time_step_size());
-    causal::VariableContext::set_time_step_size(temporal::Duration(100));
+    causal::VariableContext::set_time_step_size(scene.get_time_step_size());
+    //causal::VariableContext::set_time_step_size(temporal::Duration(10));
 
     structures::IArray<agents::FWDCar*> const *fwd_cars = scene.get_fwd_cars();
 
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
             throw std::runtime_error("Could not get FWD car id");
         }
 
-        std::cout << "Extracting actions for agent " << id << std::endl;
+        //std::cout << "Extracting actions for agent " << id << std::endl;
 
         id_fwd_car_dict.update(id, fwd_car);
 
@@ -91,7 +91,8 @@ int main(int argc, char *argv[])
 
     uint64_t effected_agent_id = atoi(argv[6]);
     agents::FWDCar *effected_fwd_car = id_fwd_car_dict[effected_agent_id];
-    structures::IArray<agents::TimeFWDCarActionPair> *effected_actions = id_action_dict[effected_agent_id];
+    structures::IArray<agents::TimeFWDCarActionPair> *effected_time_action_pairs =
+            id_action_dict[effected_agent_id];
 
     structures::IArray<uint64_t> const *ids = id_action_dict.get_keys();
 
@@ -99,19 +100,91 @@ int main(int argc, char *argv[])
     agents::RectRigidBodyEnv *original_env = scene.get_env();
     temporal::Time end_time = scene.get_max_time();
     size_t j, k, l;
-    for (i = 1; i < effected_actions->count(); ++i)
+    for (i = 1; i < effected_time_action_pairs->count(); ++i)
     {
         std::cout << "Processing explanation for action " << i << " of agent " <<
                      effected_agent_id << std::endl;
 
-        agents::TimeFWDCarActionPair effected_action = (*effected_actions)[i];
+        agents::TimeFWDCarActionPair effected_time_action_pair = (*effected_time_action_pairs)[i];
+
+        agents::FWDCarOutcomeActionPair effected_outcome_action_pair;
+        temporal::Duration sim_horizon(0);
+        if (i == effected_time_action_pairs->count() - 1)
+        {
+            causal::IEndogenousVariable<FP_DATA_TYPE> *lon_lin_vel =
+                    effected_fwd_car->get_lon_lin_vel_variable();
+            causal::VariableContext::set_current_time(effected_time_action_pair.first);
+            lon_lin_vel->get_value(effected_outcome_action_pair.first.final_speed);
+            while (true)
+            {
+                causal::VariableContext::set_current_time(effected_time_action_pair.first +
+                                                          sim_horizon +
+                                                          causal::VariableContext::get_time_step_size());
+                FP_DATA_TYPE speed;
+                if (lon_lin_vel->get_value(speed))
+                {
+                    sim_horizon += causal::VariableContext::get_time_step_size();
+                    effected_outcome_action_pair.first.final_speed = speed;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            sim_horizon = (*effected_time_action_pairs)[i + 1].first -
+                    effected_time_action_pair.first;
+            causal::VariableContext::set_current_time(effected_time_action_pair.first + sim_horizon);
+            effected_fwd_car->get_lon_lin_vel_variable()->get_value(
+                        effected_outcome_action_pair.first.final_speed);
+        }
+        causal::LaneEncapsulatingVariable lane_encaps(effected_fwd_car->get_pos_variable(), &map);
+        causal::IdsPreviousTimeStepVariable prev_lane_encaps(&lane_encaps);
+        causal::LaneTransitionsCalcVariable lane_trans(&prev_lane_encaps, &lane_encaps, &map);
+        effected_outcome_action_pair.first.lane_transitions = 0.0;
+        temporal::Time current_time;
+        for (current_time = effected_time_action_pair.first +
+             causal::VariableContext::get_time_step_size();
+             current_time <= effected_time_action_pair.first + sim_horizon;
+             current_time += causal::VariableContext::get_time_step_size())
+        {
+            causal::VariableContext::set_current_time(current_time);
+            FP_DATA_TYPE lane_transitions;
+            lane_trans.get_value(lane_transitions);
+            effected_outcome_action_pair.first.lane_transitions += lane_transitions;
+        }
+        for (current_time = effected_time_action_pair.first;
+             current_time <= effected_time_action_pair.first + sim_horizon;
+             current_time += causal::VariableContext::get_time_step_size())
+        {
+            causal::VariableContext::set_current_time(current_time);
+            geometry::Vec env_force;
+            effected_fwd_car->get_env_force_variable()->get_value(env_force);
+            if (current_time == effected_time_action_pair.first)
+            {
+                effected_outcome_action_pair.first.max_env_force_mag = env_force.norm();
+            }
+            else
+            {
+                effected_outcome_action_pair.first.max_env_force_mag = std::max(
+                            env_force.norm(),
+                            effected_outcome_action_pair.first.max_env_force_mag);
+            }
+        }
+        effected_outcome_action_pair.first.action_done = true;
+        effected_outcome_action_pair.second = effected_time_action_pair.second;
 
         // TODO: Integrate better information regarding braking
-        agents::FullControlFWDCar effected_control_fwd_car(&map, 163 * 20, -163, 0.616);
-
+        agents::FullControlFWDCar effected_control_fwd_car(&map, 163 * 20, -163 * 20, 0.616);
         agents::DefaultFWDCarOutcomeSim original_outcome_sim(&effected_control_fwd_car,
                                                              original_env);
-        agents::FWDCarSimParameters outcome_sim_params = { .sim_horizon_secs = 5 };
+        agents::FWDCarSimParameters outcome_sim_params = {
+            .sim_horizon_secs = std::chrono::duration_cast<std::chrono::duration<FP_DATA_TYPE>>(
+            sim_horizon).count(),
+            .action_done_final_speed_threshold = 1.0
+        };
         agents::DefaultFWDCarRewardCalc reward_calc;
         agents::FWDCarRewardParameters reward_calc_params = {
             .speed_limit = 31.3,
@@ -120,16 +193,16 @@ int main(int argc, char *argv[])
         agents::GreedyPlanFWDCar effected_original_plan_fwd_car(&map, &original_outcome_sim,
                                                        outcome_sim_params, &reward_calc,
                                                        reward_calc_params, 0, 45, 2.5, 5, 2.5);
-
         effected_control_fwd_car.set_fwd_car(effected_fwd_car);
         effected_original_plan_fwd_car.set_control_fwd_car(&effected_control_fwd_car);
 
-        causal::VariableContext::set_current_time(effected_action.first);
-        causal::IEndogenousVariable<agents::FWDCarAction> *effected_original_fwd_car_best_action =
-                effected_original_plan_fwd_car.get_best_action_variable();
-        effected_original_fwd_car_best_action->set_value(effected_action.second);
-        agents::FWDCarAction effected_closest_action;
-        effected_original_fwd_car_best_action->get_value(effected_closest_action);
+        causal::VariableContext::set_current_time(effected_time_action_pair.first);
+        causal::IEndogenousVariable<agents::FWDCarOutcomeActionPair> *effected_original_fwd_car_best_action =
+                effected_original_plan_fwd_car.get_best_outcome_action_pair_variable();
+        effected_original_fwd_car_best_action->set_value(effected_outcome_action_pair);
+        agents::FWDCarOutcomeActionPair effected_best_sim_outcome_action_pair;
+        effected_original_fwd_car_best_action->get_value(effected_best_sim_outcome_action_pair);
+        agents::FWDCarAction effected_best_sim_action = effected_best_sim_outcome_action_pair.second;
         causal::IEndogenousVariable<agents::FWDCarRewardParameters> *effected_original_fwd_car_reward_params =
                 effected_original_plan_fwd_car.get_reward_params_variable();
         effected_original_fwd_car_reward_params->get_value(reward_calc_params);
@@ -151,14 +224,14 @@ int main(int argc, char *argv[])
             }
             else
             {
-                structures::IArray<agents::TimeFWDCarActionPair> *causing_actions =
+                structures::IArray<agents::TimeFWDCarActionPair> *causing_time_action_pairs =
                         id_action_dict[(*ids)[j]];
 
-                for (k = 1; k < causing_actions->count(); ++k)
+                for (k = 1; k < causing_time_action_pairs->count(); ++k)
                 {
-                    agents::TimeFWDCarActionPair causing_action = (*causing_actions)[k];
+                    agents::TimeFWDCarActionPair causing_time_action_pair = (*causing_time_action_pairs)[k];
 
-                    if (causing_action.first >= effected_action.first)
+                    if (causing_time_action_pair.first >= effected_time_action_pair.first)
                     {
                         continue;
                     }
@@ -181,12 +254,12 @@ int main(int argc, char *argv[])
                     */
 
 
-                    agents::FWDCarSim causing_fwd_car_sim(causing_fwd_car, causing_action.first);
+                    agents::FWDCarSim causing_fwd_car_sim(causing_fwd_car, causing_time_action_pair.first);
 
                     // TODO: Integrate better information regarding braking
                     agents::FullControlFWDCar causing_control_fwd_car(&map, 163 * 20, -163, 0.616);
                     agents::FullControlFWDCarSim causing_control_fwd_car_sim(
-                                &causing_control_fwd_car, causing_action.first);
+                                &causing_control_fwd_car, causing_time_action_pair.first);
 
                     agents::FWDCarActionIntervention causing_plan_fwd_car(default_fwd_car_action);
 
@@ -194,7 +267,7 @@ int main(int argc, char *argv[])
                             causing_plan_fwd_car.get_action_intervention_variable();
                     for (l = 0; l < k; ++l)
                     {
-                        agents::TimeFWDCarActionPair current_action = (*causing_actions)[l];
+                        agents::TimeFWDCarActionPair current_action = (*causing_time_action_pairs)[l];
                         for (temporal::Time current_time = current_action.first;
                              current_time <= end_time;
                              current_time += causal::VariableContext::get_time_step_size())
@@ -212,10 +285,10 @@ int main(int argc, char *argv[])
                     original_env->add_rigid_body(&causing_fwd_car_sim);
 
 
-                    agents::FWDCarSim effected_fwd_car_sim(effected_fwd_car, effected_action.first);
+                    agents::FWDCarSim effected_fwd_car_sim(effected_fwd_car, effected_time_action_pair.first);
 
                     agents::FullControlFWDCarSim effected_control_fwd_car_sim(
-                                &effected_control_fwd_car, effected_action.first);
+                                &effected_control_fwd_car, effected_time_action_pair.first);
 
                     agents::DefaultFWDCarOutcomeSim outcome_sim(&effected_control_fwd_car_sim,
                                                                 original_env);
@@ -232,11 +305,13 @@ int main(int argc, char *argv[])
                     original_env->add_rigid_body(&effected_fwd_car_sim);
 
 
-                    causal::VariableContext::set_current_time(effected_action.first);
-                    causal::IEndogenousVariable<agents::FWDCarAction> * effected_fwd_car_best_action =
-                                    effected_plan_fwd_car.get_best_action_variable();
-                    agents::FWDCarAction effected_alt_action;
-                    effected_fwd_car_best_action->get_value(effected_alt_action);
+                    causal::VariableContext::set_current_time(effected_time_action_pair.first);
+                    causal::IEndogenousVariable<agents::FWDCarOutcomeActionPair> *effected_fwd_car_best_action =
+                                    effected_plan_fwd_car.get_best_outcome_action_pair_variable();
+                    agents::FWDCarOutcomeActionPair effected_best_alt_sim_outcome_action_pair;
+                    effected_fwd_car_best_action->get_value(effected_best_alt_sim_outcome_action_pair);
+                    agents::FWDCarAction effected_best_alt_sim_action =
+                            effected_best_alt_sim_outcome_action_pair.second;
 
 
                     original_env->remove_rigid_body(&effected_fwd_car_sim);
@@ -245,23 +320,25 @@ int main(int argc, char *argv[])
                     original_env->remove_rigid_body(&causing_fwd_car_sim);
                     original_env->add_rigid_body(causing_fwd_car);
 
-                    // Compare effected_action, effected_closest_action and effected_alt_action
+                    // Compare effected_time_action_pair, effected_best_sim_action and effected_best_alt_sim_action
 
+                    /*
                     std::cout << "Action Time: " <<
-                                 std::to_string(effected_action.first.time_since_epoch().count() /
+                                 std::to_string(effected_time_action_pair.first.time_since_epoch().count() /
                                                 1000) << " s" << std::endl;
-                    std::cout << "Effected Action: " << effected_action.second << std::endl;
-                    std::cout << "Effected Closest Action: " << effected_closest_action << std::endl;
-                    std::cout << "Effected Closest Alt. Action: " << effected_alt_action << std::endl;
+                    std::cout << "Effected Action: " << effected_time_action_pair.second << std::endl;
+                    std::cout << "Effected Best Sim. Action: " << effected_best_sim_action << std::endl;
+                    std::cout << "Effected Best Alt. Sim. Action: " << effected_best_alt_sim_action << std::endl;
+                    */
 
-                    FP_DATA_TYPE representativeness = diff(effected_action.second,
-                                                           effected_closest_action);
-                    FP_DATA_TYPE alt_representativeness = diff(effected_action.second,
-                                                           effected_closest_action);
-                    FP_DATA_TYPE intervention_impact = diff(effected_closest_action,
-                                                            effected_alt_action);
+                    FP_DATA_TYPE representativeness = diff(effected_time_action_pair.second,
+                                                           effected_best_sim_action);
+                    FP_DATA_TYPE alt_representativeness = diff(effected_time_action_pair.second,
+                                                           effected_best_sim_action);
+                    FP_DATA_TYPE intervention_impact = diff(effected_best_sim_action,
+                                                            effected_best_alt_sim_action);
 
-                    std::cout << "Intervention Impact: " << intervention_impact << std::endl;
+                    //std::cout << "Intervention Impact: " << intervention_impact << std::endl;
 
                     // TODO: Change this from being hardcoded to a command line argument
                     FP_DATA_TYPE intervention_impact_threshold = 0.25;
@@ -273,6 +350,12 @@ int main(int argc, char *argv[])
                         std::cout << "Action " << k << " of agent " << (*ids)[j] <<
                                      " -> Action " << i << " of agent " << effected_agent_id <<
                                      std::endl;
+                        std::cout << "Action Time: " <<
+                                     std::to_string(effected_time_action_pair.first.time_since_epoch().count() /
+                                                    1000) << " s" << std::endl;
+                        std::cout << "Effected Action: " << effected_time_action_pair.second << std::endl;
+                        std::cout << "Effected Best Sim. Action: " << effected_best_sim_action << std::endl;
+                        std::cout << "Effected Best Alt. Sim. Action: " << effected_best_alt_sim_action << std::endl;
                     }
                 }
             }

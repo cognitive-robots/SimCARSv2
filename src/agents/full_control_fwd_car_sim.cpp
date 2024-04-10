@@ -30,6 +30,11 @@ FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_c
 {
 }
 
+simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<uint64_t>>* FullControlFWDCarSim::get_lane_encaps()
+{
+    return &lane_encaps;
+}
+
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FullControlFWDCarSim::get_cumil_lane_trans_variable()
 {
     return &cumil_lane_trans;

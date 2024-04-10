@@ -159,6 +159,8 @@ bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
 
         id_link_dict.erase(other_id);
 
+        delete link;
+
         return true;
     }
 }
@@ -204,7 +206,10 @@ bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body)
         id_entity_dict.update(id, entity);
 
         rigid_body->env_force.set_parent(entity->get_env_force());
+        rigid_body->env_force_buff.set_axiomatic(false);
+
         rigid_body->env_torque.set_parent(entity->get_env_torque());
+        rigid_body->env_torque_buff.set_axiomatic(false);
 
         return true;
     }
@@ -226,7 +231,10 @@ bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body)
     {
         Entity *entity = id_entity_dict[id];
 
+        rigid_body->env_force_buff.set_axiomatic(true);
         rigid_body->env_force.set_parent(nullptr);
+
+        rigid_body->env_torque_buff.set_axiomatic(true);
         rigid_body->env_torque.set_parent(nullptr);
 
         id_entity_dict.erase(id);

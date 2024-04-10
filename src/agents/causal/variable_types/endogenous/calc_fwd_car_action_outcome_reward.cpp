@@ -22,7 +22,7 @@ CalcFWDCarActionOutcomeRewardVariable::CalcFWDCarActionOutcomeRewardVariable(
     ABinaryEndogenousVariable(endogenous_parent, other_parent),
     fwd_car_reward_calculator(fwd_car_reward_calculator) {}
 
-bool CalcFWDCarActionOutcomeRewardVariable::get_value(structures::stl::STLStackArray<RewardFWDCarActionPair> &val) const
+bool CalcFWDCarActionOutcomeRewardVariable::get_value(RewardFWDCarOutcomeActionTuples &val) const
 {
     FWDCarOutcomeActionPairs outcome_action_pairs;
     FWDCarRewardParameters reward_parameters;
@@ -32,10 +32,11 @@ bool CalcFWDCarActionOutcomeRewardVariable::get_value(structures::stl::STLStackA
 
         for (size_t i = 0; i < outcome_action_pairs.count(); ++i)
         {
-            val.push_back(RewardFWDCarActionPair(fwd_car_reward_calculator->calc_reward(
-                                                     &(outcome_action_pairs[i].first),
-                                                     &reward_parameters),
-                                                 outcome_action_pairs[i].second));
+            val.push_back(RewardFWDCarOutcomeActionTuple(fwd_car_reward_calculator->calc_reward(
+                                                             &(outcome_action_pairs[i].first),
+                                                             &reward_parameters),
+                                                         outcome_action_pairs[i].first,
+                                                         outcome_action_pairs[i].second));
         }
 
         return true;
@@ -46,35 +47,35 @@ bool CalcFWDCarActionOutcomeRewardVariable::get_value(structures::stl::STLStackA
     }
 }
 
-bool CalcFWDCarActionOutcomeRewardVariable::set_value(structures::stl::STLStackArray<RewardFWDCarActionPair> const &val)
+bool CalcFWDCarActionOutcomeRewardVariable::set_value(RewardFWDCarOutcomeActionTuples const &val)
 {
     // WARNING: Assumes action ordering is the same in both arrays
     // TODO: Potentially consider separating reward weightings from other reward parameters
-    FWDCarOutcomeActionPairs outcome_action_pairs;
     FWDCarRewardParameters reward_parameters;
-    if (get_endogenous_parent()->get_value(outcome_action_pairs) &&
-            get_other_parent()->get_value(reward_parameters))
+    if (get_other_parent()->get_value(reward_parameters))
     {
-        Eigen::MatrixXd individual_rewards(outcome_action_pairs.count(), 5);
-        Eigen::VectorXd combined_rewards(outcome_action_pairs.count());
-        for (size_t i = 0; i < outcome_action_pairs.count(); ++i)
+        Eigen::MatrixXd individual_rewards(val.count(), 5);
+        Eigen::VectorXd combined_rewards(val.count());
+        for (size_t i = 0; i < val.count(); ++i)
         {
             FWDCarRewards rewards = fwd_car_reward_calculator->calc_rewards(
-                        &(outcome_action_pairs[i].first),
-                        &reward_parameters);
+                        &(std::get<1>(val[i])), &reward_parameters);
             individual_rewards(i, 0) = rewards.lane_transitions_reward;
             individual_rewards(i, 1) = rewards.caution_reward;
             individual_rewards(i, 2) = rewards.speed_limit_excess_reward;
             individual_rewards(i, 3) = rewards.max_env_force_mag_reward;
             individual_rewards(i, 4) = 1.0;
-            std::cout << "Action [" << i << "]: " << outcome_action_pairs[i].second << std::endl;
+            /*
+            std::cout << "Action [" << i << "]: " << std::get<2>(val[i]) << std::endl;
             std::cout << "Individual Rewards: " << rewards << std::endl;
-            std::cout << "Combined Reward: " << val[i].first << std::endl;
-            std::cout << "Max. Env. Force Mag. [" << i << "]: " <<
-                         outcome_action_pairs[i].first.max_env_force_mag << std::endl;
+            std::cout << "Combined Reward: " << std::get<0>(val[i]) << std::endl;
+            std::cout << "Lane Transitions: " << std::get<1>(val[i]).lane_transitions << std::endl;
+            std::cout << "Max. Env. Force Mag.: " <<
+                         std::get<1>(val[i]).max_env_force_mag << std::endl;
+            */
             //std::cout << "Max. Env. Force Mag. Reward [" << i <<  "]: " <<
             //             rewards.max_env_force_mag_reward << std::endl;
-            combined_rewards(i) = val[i].first;
+            combined_rewards(i) = std::get<0>(val[i]);
             //std::cout << "Action Diff. Derived Reward: " << val[i].first << std::endl;
         }
         Eigen::VectorXd reward_weights =

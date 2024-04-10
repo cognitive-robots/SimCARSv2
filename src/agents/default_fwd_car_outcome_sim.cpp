@@ -51,8 +51,8 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
 
     FWDCarSim *fwd_car_sim = new FWDCarSim(fwd_car, start_time);
     FullControlFWDCarSim control_fwd_car_sim(control_fwd_car, start_time);
-    control_fwd_car_sim.set_fwd_car(fwd_car_sim);
     FWDCarActionIntervention plan_fwd_car_intervention(*action);
+    control_fwd_car_sim.set_fwd_car(fwd_car_sim);
     plan_fwd_car_intervention.set_control_fwd_car(&control_fwd_car_sim);
 
     //rigid_body_sim_env.add_rigid_body(fwd_car_sim);
@@ -67,9 +67,30 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     // TODO: Either utilise the FWD Car Outcome construction variable or remove it from the codebase
     FWDCarOutcome outcome;
 
-    control_fwd_car_sim.get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
-    fwd_car_sim->get_lon_lin_vel_variable()->get_value(outcome.final_speed);
-    fwd_car_sim->get_max_env_force_mag_variable()->get_value(outcome.max_env_force_mag);
+    bool res = control_fwd_car_sim.get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
+    if (!res)
+    {
+        throw std::runtime_error("Could not get cumilative lane transitions");
+    }
+    res = fwd_car_sim->get_lon_lin_vel_variable()->get_value(outcome.final_speed);
+    if (!res)
+    {
+        throw std::runtime_error("Could not get final speed");
+    }
+    res = fwd_car_sim->get_max_env_force_mag_variable()->get_value(outcome.max_env_force_mag);
+    if (!res)
+    {
+        throw std::runtime_error("Could not get maximum environment force magnitude");
+    }
+    structures::stl::STLStackArray<uint64_t> lane_encaps;
+    res = control_fwd_car_sim.get_lane_encaps()->get_value(lane_encaps);
+    if (!res)
+    {
+        throw std::runtime_error("Could not get encapsulating lanes");
+    }
+    outcome.action_done = (std::abs(outcome.final_speed - action->speed_goal.val) <=
+            parameters->action_done_final_speed_threshold) &&
+            lane_encaps.contains(action->lane_goal.val);
 
 
     rigid_body_env->remove_rigid_body(fwd_car_sim);

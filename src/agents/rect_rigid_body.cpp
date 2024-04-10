@@ -53,22 +53,22 @@ RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA
     total_torque(&env_torque_buff, &other_torque_buff),
 
     lin_acc(&total_force, &mass_recip),
-    lin_acc_buff(&lin_acc, nullptr, true),
+    lin_acc_buff(&lin_acc, nullptr, false),
     prev_lin_acc(&lin_acc_buff),
 
     ang_acc(&total_torque, &moi_recip),
-    ang_acc_buff(&ang_acc, nullptr, true),
+    ang_acc_buff(&ang_acc, nullptr, false),
     prev_ang_acc(&ang_acc_buff),
 
     lin_vel_diff(&prev_lin_acc),
     prev_lin_vel(&lin_vel_buff),
     lin_vel(&prev_lin_vel, &lin_vel_diff),
-    lin_vel_buff(&lin_vel, nullptr, true),
+    lin_vel_buff(&lin_vel, nullptr, false),
 
     ang_vel_diff(&prev_ang_acc),
     prev_ang_vel(&ang_vel_buff),
     ang_vel(&prev_ang_vel, &ang_vel_diff),
-    ang_vel_buff(&ang_vel, nullptr, true),
+    ang_vel_buff(&ang_vel, nullptr, false),
 
     pos_diff(&lin_vel_buff),
     prev_pos(&pos_buff),
@@ -120,15 +120,15 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
     moi_recip(&moi),
 
     env_force(),
-    env_force_buff(&env_force, nullptr, false),
+    env_force_buff(&env_force, nullptr, true),
     other_force(),
-    other_force_buff(&other_force, nullptr, false),
+    other_force_buff(&other_force, nullptr, true),
     total_force(&env_force_buff, &other_force_buff),
 
     env_torque(),
-    env_torque_buff(&env_torque, nullptr, false),
+    env_torque_buff(&env_torque, nullptr, true),
     other_torque(),
-    other_torque_buff(&other_torque, nullptr, false),
+    other_torque_buff(&other_torque, nullptr, true),
     total_torque(&env_torque_buff, &other_torque_buff),
 
     lin_acc(&total_force, &mass_recip),

@@ -33,7 +33,7 @@ RectRigidBodySim::RectRigidBodySim(RectRigidBody *rect_rigid_body,
     zero_max_env_force_mag(0.0),
     zero_max_env_force_mag_proxy(&zero_max_env_force_mag),
 
-    env_force_mag(&env_force),
+    env_force_mag(&sim_env_force),
 
     sim_max_env_force_mag(&zero_max_env_force_mag_proxy, &max_env_force_mag, &sim_start_time),
     prev_max_env_force_mag(&sim_max_env_force_mag),

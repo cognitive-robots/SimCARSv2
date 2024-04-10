@@ -35,6 +35,7 @@ protected:
 public:
     FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_car, temporal::Time start_time);
 
+    simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<uint64_t>>* get_lane_encaps();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_cumil_lane_trans_variable();
 };
 

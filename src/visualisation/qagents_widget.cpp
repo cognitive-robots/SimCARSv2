@@ -152,8 +152,8 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
 
 void QAgentsWidget::on_init()
 {
-    causal::VariableContext::set_time_step_size(
-                std::chrono::duration_cast<temporal::Duration>(frame_interval));
+    //causal::VariableContext::set_time_step_size(
+    //            std::chrono::duration_cast<temporal::Duration>(frame_interval));
 
     on_update();
 }

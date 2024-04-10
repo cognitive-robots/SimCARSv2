@@ -14,7 +14,7 @@ ControlFWDCar::ControlFWDCar() :
     fwd_car(nullptr),
 
     action(),
-    action_buff(&action, nullptr, false),
+    action_buff(&action, nullptr, true),
 
     speed_goal(&action_buff),
     speed_val_goal(&speed_goal),
@@ -39,7 +39,10 @@ void ControlFWDCar::set_fwd_car(FWDCar *fwd_car)
     this->fwd_car = fwd_car;
 
     fwd_car->motor_torque.set_parent(&motor_torque);
+    fwd_car->motor_torque_buff.set_axiomatic(false);
+
     fwd_car->steer.set_parent(&steer);
+    fwd_car->steer_buff.set_axiomatic(false);
 
     init_links();
 }

@@ -18,7 +18,7 @@ namespace causal
 {
 
 class CalcFWDCarActionOutcomeRewardVariable :
-        public simcars::causal::ABinaryEndogenousVariable<structures::stl::STLStackArray<RewardFWDCarActionPair>,
+        public simcars::causal::ABinaryEndogenousVariable<RewardFWDCarOutcomeActionTuples,
         FWDCarOutcomeActionPairs, FWDCarRewardParameters>
 {
     IFWDCarRewardCalc const *fwd_car_reward_calculator;
@@ -29,9 +29,9 @@ public:
             simcars::causal::IVariable<FWDCarRewardParameters> *other_parent,
             IFWDCarRewardCalc const *fwd_car_reward_calculator);
 
-    bool get_value(structures::stl::STLStackArray<RewardFWDCarActionPair> &val) const override;
+    bool get_value(RewardFWDCarOutcomeActionTuples &val) const override;
 
-    bool set_value(structures::stl::STLStackArray<RewardFWDCarActionPair> const &val) override;
+    bool set_value(RewardFWDCarOutcomeActionTuples const &val) override;
 };
 
 }

@@ -27,6 +27,7 @@ void PlanFWDCar::set_control_fwd_car(ControlFWDCar *control_fwd_car)
     this->control_fwd_car = control_fwd_car;
 
     control_fwd_car->action.set_parent(&action);
+    control_fwd_car->action_buff.set_axiomatic(false);
 
     init_links();
 }

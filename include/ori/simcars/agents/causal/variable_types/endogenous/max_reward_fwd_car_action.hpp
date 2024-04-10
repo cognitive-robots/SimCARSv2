@@ -15,14 +15,16 @@ namespace causal
 {
 
 class MaxRewardFWDCarActionVariable :
-        public simcars::causal::AUnaryEndogenousVariable<FWDCarAction, structures::stl::STLStackArray<RewardFWDCarActionPair>>
+        public simcars::causal::AUnaryEndogenousVariable<FWDCarOutcomeActionPair,
+        RewardFWDCarOutcomeActionTuples>
 {
 public:
-    using simcars::causal::AUnaryEndogenousVariable<FWDCarAction, structures::stl::STLStackArray<RewardFWDCarActionPair>>::AUnaryEndogenousVariable;
+    using simcars::causal::AUnaryEndogenousVariable<FWDCarOutcomeActionPair,
+    RewardFWDCarOutcomeActionTuples>::AUnaryEndogenousVariable;
 
-    bool get_value(FWDCarAction &val) const override;
+    bool get_value(FWDCarOutcomeActionPair &val) const override;
 
-    bool set_value(FWDCarAction const &val) override;
+    bool set_value(FWDCarOutcomeActionPair const &val) override;
 };
 
 }

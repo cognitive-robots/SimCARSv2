@@ -14,6 +14,7 @@
 #include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_reward_parameters_proxy.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/generate_fwd_car_actions.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_outcome_action_pair_action_part.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_outcome_action_pairs_buffer.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp>
@@ -60,7 +61,8 @@ protected:
     causal::FWDCarRewardParametersProxyVariable reward_params_proxy;
     causal::CalcFWDCarActionOutcomeRewardVariable action_outcome_rewards;
 
-    causal::MaxRewardFWDCarActionVariable best_action;
+    causal::MaxRewardFWDCarActionVariable best_outcome_action_pair;
+    causal::FWDCarOutcomeActionPairActionPartVariable best_action;
 
 public:
     GreedyPlanFWDCar(map::IMap const *map, IFWDCarOutcomeSim const *fwd_car_outcome_sim,
@@ -73,7 +75,7 @@ public:
     GreedyPlanFWDCar(GreedyPlanFWDCar const &plan_fwd_car);
 
     simcars::causal::IEndogenousVariable<FWDCarRewardParameters>* get_reward_params_variable();
-    simcars::causal::IEndogenousVariable<FWDCarAction>* get_best_action_variable();
+    simcars::causal::IEndogenousVariable<FWDCarOutcomeActionPair>* get_best_outcome_action_pair_variable();
 };
 
 }

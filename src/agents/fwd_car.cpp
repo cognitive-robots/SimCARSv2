@@ -38,7 +38,7 @@ FWDCar::FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_v
     lat_lin_vel(&lin_vel_buff, &dir),
 
     motor_torque(),
-    motor_torque_buff(&motor_torque, nullptr, false),
+    motor_torque_buff(&motor_torque, nullptr, true),
     front_wheel_lon_force_mag(&wheel_radius_recip, &motor_torque_buff),
 
     rear_wheel_lon_force_mag(0.0),
@@ -49,7 +49,7 @@ FWDCar::FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_v
     neg_front_wheel_slip_ang_minus_steer(&front_wheel_lat_lin_vel, &abs_lon_lin_vel_recip),
     front_wheel_slip_ang_minus_steer(&neg_front_wheel_slip_ang_minus_steer),
     steer(),
-    steer_buff(&steer, nullptr, false),
+    steer_buff(&steer, nullptr, true),
     front_wheel_slip_ang(&front_wheel_slip_ang_minus_steer, &steer_buff),
     max_lim_front_wheel_slip_ang(&front_wheel_slip_ang, &max_abs_slip_angle),
     actual_front_wheel_slip_ang(&max_lim_front_wheel_slip_ang, &neg_max_abs_slip_angle),
@@ -87,7 +87,10 @@ FWDCar::FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_v
     assert(cornering_stiffness_value > 0.0);
 
     RectRigidBody::other_force.set_parent(&combined_wheel_force);
+    RectRigidBody::other_force_buff.set_axiomatic(false);
+
     RectRigidBody::other_torque.set_parent(&combined_wheel_torque);
+    RectRigidBody::other_torque_buff.set_axiomatic(false);
 }
 
 FWDCar::FWDCar(FWDCar const &fwd_car) :
@@ -117,7 +120,7 @@ FWDCar::FWDCar(FWDCar const &fwd_car) :
     lat_lin_vel(&lin_vel_buff, &dir),
 
     motor_torque(),
-    motor_torque_buff(&motor_torque, nullptr, false),
+    motor_torque_buff(&motor_torque, nullptr, true),
     front_wheel_lon_force_mag(&wheel_radius_recip, &motor_torque_buff),
 
     rear_wheel_lon_force_mag(0.0),
@@ -128,7 +131,7 @@ FWDCar::FWDCar(FWDCar const &fwd_car) :
     neg_front_wheel_slip_ang_minus_steer(&front_wheel_lat_lin_vel, &abs_lon_lin_vel_recip),
     front_wheel_slip_ang_minus_steer(&neg_front_wheel_slip_ang_minus_steer),
     steer(),
-    steer_buff(&steer, nullptr, false),
+    steer_buff(&steer, nullptr, true),
     front_wheel_slip_ang(&front_wheel_slip_ang_minus_steer, &steer_buff),
     max_lim_front_wheel_slip_ang(&front_wheel_slip_ang, &max_abs_slip_angle),
     actual_front_wheel_slip_ang(&max_lim_front_wheel_slip_ang, &neg_max_abs_slip_angle),
@@ -161,7 +164,10 @@ FWDCar::FWDCar(FWDCar const &fwd_car) :
     combined_wheel_torque(&front_wheel_torque, &rear_wheel_torque)
 {
     RectRigidBody::other_force.set_parent(&combined_wheel_force);
+    RectRigidBody::other_force_buff.set_axiomatic(false);
+
     RectRigidBody::other_torque.set_parent(&combined_wheel_torque);
+    RectRigidBody::other_torque_buff.set_axiomatic(false);
 }
 
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* FWDCar::get_wheel_radius_variable()

@@ -56,7 +56,8 @@ GreedyPlanFWDCar::GreedyPlanFWDCar(map::IMap const *map,
     reward_params_proxy(&reward_params),
     action_outcome_rewards(&sim_action_outcomes_buff, &reward_params, fwd_car_reward_calc),
 
-    best_action(&action_outcome_rewards)
+    best_outcome_action_pair(&action_outcome_rewards),
+    best_action(&best_outcome_action_pair)
 {
 }
 
@@ -90,7 +91,8 @@ GreedyPlanFWDCar::GreedyPlanFWDCar(GreedyPlanFWDCar const &plan_fwd_car) :
     reward_params_proxy(&reward_params),
     action_outcome_rewards(&sim_action_outcomes_buff, &reward_params, plan_fwd_car.reward_calc),
 
-    best_action(&action_outcome_rewards)
+    best_outcome_action_pair(&action_outcome_rewards),
+    best_action(&best_outcome_action_pair)
 {
 }
 
@@ -99,9 +101,9 @@ simcars::causal::IEndogenousVariable<FWDCarRewardParameters>* GreedyPlanFWDCar::
     return &reward_params_proxy;
 }
 
-simcars::causal::IEndogenousVariable<FWDCarAction>* GreedyPlanFWDCar::get_best_action_variable()
+simcars::causal::IEndogenousVariable<FWDCarOutcomeActionPair>* GreedyPlanFWDCar::get_best_outcome_action_pair_variable()
 {
-    return &best_action;
+    return &best_outcome_action_pair;
 }
 
 }

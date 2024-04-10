@@ -27,7 +27,7 @@ FWDCarRewards DefaultFWDCarRewardCalc::calc_rewards(FWDCarOutcome const *outcome
 {
     FWDCarRewards rewards;
 
-    FP_DATA_TYPE lane_transitions_exp = std::exp(outcome->lane_transitions);
+    FP_DATA_TYPE lane_transitions_exp = std::exp(-outcome->lane_transitions);
     rewards.lane_transitions_reward = lane_transitions_exp / (lane_transitions_exp + 1.0);
 
     rewards.caution_reward = std::exp(-0.1 * outcome->final_speed);

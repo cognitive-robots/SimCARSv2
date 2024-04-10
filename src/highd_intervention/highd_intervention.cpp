@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     scene = new agents::highd::HighDFWDCarScene(argv[2], argv[3], start_frame, end_frame);
 
     causal::VariableContext::set_time_step_size(scene->get_time_step_size());
+    //causal::VariableContext::set_time_step_size(temporal::Duration(2000));
 
     structures::IArray<agents::FWDCar*> const *fwd_cars = scene->get_fwd_cars();
 
@@ -87,7 +88,7 @@ int main(int argc, char *argv[])
     agents::FWDCarSim *fwd_car_sim;
 
     // TODO: Integrate better information regarding braking
-    agents::FullControlFWDCar control_fwd_car(&map, 163 * 20, -163, 0.616);
+    agents::FullControlFWDCar control_fwd_car(&map, 163 * 20, -163 * 20, 0.616);
     agents::FullControlFWDCarSim *control_fwd_car_sim;
 
     agents::FWDCarAction default_fwd_car_action;
@@ -158,6 +159,21 @@ int main(int argc, char *argv[])
              */
             env->remove_rigid_body(fwd_car);
             env->add_rigid_body(fwd_car_sim);
+
+            /*
+             *  This section essentially just simulates the car ahead of time in order to prevent
+             *  some inconsistencies that arise from making the visualisation itself call the
+             *  simulation
+             */
+            causal::VariableContext::set_current_time(scene->get_max_time());
+
+            agents::FWDCarOutcome outcome;
+
+            control_fwd_car_sim->get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
+            fwd_car_sim->get_lon_lin_vel_variable()->get_value(outcome.final_speed);
+            fwd_car_sim->get_max_env_force_mag_variable()->get_value(outcome.max_env_force_mag);
+
+            causal::VariableContext::set_current_time(scene->get_min_time());
 
             map_scene_widget->insert(fwd_car_sim);
 
