@@ -70,6 +70,7 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     bool res = control_fwd_car_sim.get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
     if (!res)
     {
+        control_fwd_car_sim.get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
         throw std::runtime_error("Could not get cumilative lane transitions");
     }
     res = fwd_car_sim->get_lon_lin_vel_variable()->get_value(outcome.final_speed);

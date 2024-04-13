@@ -14,9 +14,6 @@
 #include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
 #include <ori/simcars/visualisation/qmap_agents_widget.hpp>
 
-#include <QApplication>
-#include <QFrame>
-
 #include <iostream>
 #include <exception>
 
@@ -206,6 +203,8 @@ int main(int argc, char *argv[])
         causal::IEndogenousVariable<agents::FWDCarRewardParameters> *effected_original_fwd_car_reward_params =
                 effected_original_plan_fwd_car.get_reward_params_variable();
         effected_original_fwd_car_reward_params->get_value(reward_calc_params);
+
+        effected_control_fwd_car.set_fwd_car(nullptr);
 
         std::cout << "Reward Parameters: { lane_transition: " <<
                      reward_calc_params.lane_transitions_weight << ", caution: " <<

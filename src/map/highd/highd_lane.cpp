@@ -21,42 +21,54 @@ HighDLane::HighDLane(uint64_t id, uint64_t left_adjacent_lane_id, uint64_t right
     if (driving_left)
     {
         left_boundary = geometry::Vecs::Zero(2, 2);
-        left_boundary(0, 0) = 460.0;
+        //left_boundary(0, 0) = 460.0;
+        left_boundary(0, 0) = 560.0;
         left_boundary(1, 0) = lower_bound;
-        left_boundary(0, 1) = -40.0;
+        //left_boundary(0, 1) = -40.0;
+        left_boundary(0, 1) = -140.0;
         left_boundary(1, 1) = lower_bound;
 
         right_boundary = geometry::Vecs::Zero(2, 2);
-        right_boundary(0, 0) = 460.0;
+        //right_boundary(0, 0) = 460.0;
+        right_boundary(0, 0) = 560.0;
         right_boundary(1, 0) = upper_bound;
-        right_boundary(0, 1) = -40.0;
+        //right_boundary(0, 1) = -40.0;
+        right_boundary(0, 1) = -140.0;
         right_boundary(1, 1) = upper_bound;
 
         waypoints = geometry::Vecs::Zero(2, 2);
-        waypoints(0, 0) = 460.0;
+        //waypoints(0, 0) = 460.0;
+        waypoints(0, 0) = 560.0;
         waypoints(1, 0) = 0.5 * (upper_bound + lower_bound);
-        waypoints(0, 1) = -40.0;
+        //waypoints(0, 1) = -40.0;
+        waypoints(0, 1) = -140.0;
         waypoints(1, 1) = 0.5 * (upper_bound + lower_bound);
 
     }
     else
     {
         left_boundary = geometry::Vecs::Zero(2, 2);
-        left_boundary(0, 0) = -40.0;
+        //left_boundary(0, 0) = -40.0;
+        left_boundary(0, 0) = -140.0;
         left_boundary(1, 0) = upper_bound;
-        left_boundary(0, 1) = 460.0;
+        //left_boundary(0, 1) = 460.0;
+        left_boundary(0, 1) = 560.0;
         left_boundary(1, 1) = upper_bound;
 
         right_boundary = geometry::Vecs::Zero(2, 2);
-        right_boundary(0, 0) = -40.0;
+        //right_boundary(0, 0) = -40.0;
+        right_boundary(0, 0) = -140.0;
         right_boundary(1, 0) = lower_bound;
-        right_boundary(0, 1) = 460.0;
+        //right_boundary(0, 1) = 460.0;
+        right_boundary(0, 1) = 560.0;
         right_boundary(1, 1) = lower_bound;
 
         waypoints = geometry::Vecs::Zero(2, 2);
-        waypoints(0, 0) = -40.0;
+        //waypoints(0, 0) = -40.0;
+        waypoints(0, 0) = -140.0;
         waypoints(1, 0) = 0.5 * (upper_bound + lower_bound);
-        waypoints(0, 1) = 460.0;
+        //waypoints(0, 1) = 460.0;
+        waypoints(0, 1) = 560.0;
         waypoints(1, 1) = 0.5 * (upper_bound + lower_bound);
     }
 
@@ -68,7 +80,8 @@ HighDLane::HighDLane(uint64_t id, uint64_t left_adjacent_lane_id, uint64_t right
     geometry::Tri tri_2(right_boundary.col(0), right_boundary.col(1), left_boundary.col(1));
     tris.push_back(tri_2);
 
-    bounding_box = geometry::Rect(-40.0f, upper_bound, 460.0f, lower_bound);
+    //bounding_box = geometry::Rect(-40.0f, upper_bound, 460.0f, lower_bound);
+    bounding_box = geometry::Rect(-140.0f, upper_bound, 560.0f, lower_bound);
 }
 
 geometry::Vecs const& HighDLane::get_left_boundary() const

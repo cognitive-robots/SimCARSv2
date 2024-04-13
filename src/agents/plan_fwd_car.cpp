@@ -24,12 +24,20 @@ ControlFWDCar* PlanFWDCar::get_control_fwd_car()
 
 void PlanFWDCar::set_control_fwd_car(ControlFWDCar *control_fwd_car)
 {
-    this->control_fwd_car = control_fwd_car;
+    if (this->control_fwd_car != nullptr)
+    {
+        control_fwd_car->action.set_parent(nullptr);
+        control_fwd_car->action_buff.set_axiomatic(true);
+    }
+    if (control_fwd_car != nullptr)
+    {
+        this->control_fwd_car = control_fwd_car;
 
-    control_fwd_car->action.set_parent(&action);
-    control_fwd_car->action_buff.set_axiomatic(false);
+        control_fwd_car->action.set_parent(&action);
+        control_fwd_car->action_buff.set_axiomatic(false);
 
-    init_links();
+        init_links();
+    }
 }
 
 }

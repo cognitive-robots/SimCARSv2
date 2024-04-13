@@ -25,7 +25,7 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
             fwd_car->get_lon_lin_vel_variable();
 
     temporal::Time action_start_time = start_time;
-    FP_DATA_TYPE action_start_lon_lin_vel = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE action_start_lon_lin_vel = std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
     FP_DATA_TYPE prev_lon_lin_vel = std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
     FP_DATA_TYPE prev_lon_lin_acc = std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
     for (temporal::Time current_time = start_time;
@@ -38,6 +38,11 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
         if (!lon_lin_vel->get_value(curr_lon_lin_vel))
         {
             continue;
+        }
+
+        if (std::isnan(action_start_lon_lin_vel))
+        {
+            action_start_lon_lin_vel = curr_lon_lin_vel;
         }
 
         if (std::isnan(prev_lon_lin_vel))
@@ -115,6 +120,9 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
                     Goal<FP_DATA_TYPE> speed_goal(curr_lon_lin_vel, current_time - resolution);
                     speed_goals->push_back(TimeGoalPair<FP_DATA_TYPE>(action_start_time,
                                                                       speed_goal));
+
+                    action_start_time = current_time - resolution;
+                    action_start_lon_lin_vel = prev_lon_lin_vel;
                 }
 
                 if (curr_lon_lin_acc <= -action_min_lon_lin_acc)
@@ -182,6 +190,9 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
                     Goal<FP_DATA_TYPE> speed_goal(curr_lon_lin_vel, current_time - resolution);
                     speed_goals->push_back(TimeGoalPair<FP_DATA_TYPE>(action_start_time,
                                                                       speed_goal));
+
+                    action_start_time = current_time - resolution;
+                    action_start_lon_lin_vel = prev_lon_lin_vel;
                 }
 
                 if (curr_lon_lin_acc >= action_min_lon_lin_acc)
@@ -247,6 +258,9 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
                     Goal<FP_DATA_TYPE> speed_goal(curr_lon_lin_vel, current_time);
                     speed_goals->push_back(TimeGoalPair<FP_DATA_TYPE>(action_start_time,
                                                                       speed_goal));
+
+                    action_start_time = current_time - resolution;
+                    action_start_lon_lin_vel = prev_lon_lin_vel;
                 }
             }
         }

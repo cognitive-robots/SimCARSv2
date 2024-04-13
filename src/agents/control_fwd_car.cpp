@@ -36,15 +36,26 @@ FWDCar* ControlFWDCar::get_fwd_car()
 
 void ControlFWDCar::set_fwd_car(FWDCar *fwd_car)
 {
-    this->fwd_car = fwd_car;
+    if (this->fwd_car != nullptr)
+    {
+        this->fwd_car->motor_torque.set_parent(nullptr);
+        this->fwd_car->motor_torque_buff.set_axiomatic(true);
 
-    fwd_car->motor_torque.set_parent(&motor_torque);
-    fwd_car->motor_torque_buff.set_axiomatic(false);
+        this->fwd_car->steer.set_parent(nullptr);
+        this->fwd_car->steer_buff.set_axiomatic(true);
+    }
+    if (fwd_car != nullptr)
+    {
+        this->fwd_car = fwd_car;
 
-    fwd_car->steer.set_parent(&steer);
-    fwd_car->steer_buff.set_axiomatic(false);
+        fwd_car->motor_torque.set_parent(&motor_torque);
+        fwd_car->motor_torque_buff.set_axiomatic(false);
 
-    init_links();
+        fwd_car->steer.set_parent(&steer);
+        fwd_car->steer_buff.set_axiomatic(false);
+
+        init_links();
+    }
 }
 
 }
