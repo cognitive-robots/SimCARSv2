@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     {
         std::cerr << "Usage: ./highd_json_meta_action_explanation intervention_impact_threshold "
                      "input_json_meta_file_path trimmed_data_directory_path "
-                     "[output_json_meta_file_path]" <<
+                     "[output_json_meta_file_path] [restrict_to_relevant_agents]" <<
                      std::endl;
         return -1;
     }
@@ -58,6 +58,16 @@ int main(int argc, char *argv[])
 
     std::cout << "Intervention Impact Threshold: " <<
                  std::to_string(intervention_impact_threshold) << std::endl;
+
+    bool restrict_to_relevant_agents;
+    if (argc > 5)
+    {
+        restrict_to_relevant_agents = std::atoi(argv[5]) == 0 ? false : true;
+    }
+    else
+    {
+        restrict_to_relevant_agents = false;
+    }
 
 
     std::string input_json_meta_file_path_str = argv[2];
@@ -212,6 +222,12 @@ int main(int argc, char *argv[])
         structures::IArray<agents::TimeFWDCarActionPair> *effected_time_action_pairs =
                 id_action_dict[effected_agent_id];
 
+        if (restrict_to_relevant_agents && effected_agent_id != convoy_head_id &&
+                effected_agent_id != convoy_tail_id && effected_agent_id != independent_id)
+        {
+            continue;
+        }
+
         agents::FWDCarAction default_fwd_car_action;
         agents::RectRigidBodyEnv *original_env = scene.get_env();
         temporal::Time end_time = scene.get_max_time();
@@ -336,14 +352,20 @@ int main(int argc, char *argv[])
                 uint64_t causing_agent_id = (*ids)[j];
                 agents::FWDCar *causing_fwd_car = id_fwd_car_dict[causing_agent_id];
 
-                if ((*ids)[j] == effected_agent_id)
+                if (restrict_to_relevant_agents && causing_agent_id != convoy_head_id &&
+                        causing_agent_id != convoy_tail_id && causing_agent_id != independent_id)
+                {
+                    continue;
+                }
+
+                if (causing_agent_id == effected_agent_id)
                 {
                     continue;
                 }
                 else
                 {
                     structures::IArray<agents::TimeFWDCarActionPair> *causing_time_action_pairs =
-                            id_action_dict[(*ids)[j]];
+                            id_action_dict[causing_agent_id];
 
                     for (k = 1; k < causing_time_action_pairs->count(); ++k)
                     {
@@ -354,7 +376,7 @@ int main(int argc, char *argv[])
                             continue;
                         }
 
-                        //std::cout << "Testing link: Action " << k << " of agent " << (*ids)[j] <<
+                        //std::cout << "Testing link: Action " << k << " of agent " << causing_agent_id <<
                         //             " -> Action " << i << " of agent " << effected_agent_id <<
                         //             std::endl;
 
@@ -462,7 +484,7 @@ int main(int argc, char *argv[])
                                 //representativeness < intervention_impact &&
                                 intervention_impact > intervention_impact_threshold)
                         {
-                            std::cout << "Action " << k << " of agent " << (*ids)[j] <<
+                            std::cout << "Action " << k << " of agent " << causing_agent_id <<
                                          " -> Action " << i << " of agent " << effected_agent_id <<
                                          std::endl;
                             std::cout << "Action Time: " <<
