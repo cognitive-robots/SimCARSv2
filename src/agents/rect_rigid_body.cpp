@@ -40,6 +40,9 @@ RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA
     moi(&moi_scaled_mass, &span_squared),
     moi_recip(&moi),
 
+    dist_headway(),
+    dist_headway_buff(&dist_headway, nullptr, true),
+
     env_force(),
     env_force_buff(&env_force, nullptr, true),
     other_force(),
@@ -118,6 +121,9 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
 
     moi(&moi_scaled_mass, &span_squared),
     moi_recip(&moi),
+
+    dist_headway(),
+    dist_headway_buff(&dist_headway, nullptr, true),
 
     env_force(),
     env_force_buff(&env_force, nullptr, true),
@@ -205,6 +211,11 @@ simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_drag_area
 simcars::causal::IEndogenousVariable<geometry::ORect>* RectRigidBody::get_rect_variable()
 {
     return &rect;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_dist_headway_variable()
+{
+    return &dist_headway_buff;
 }
 
 simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_env_force_variable()

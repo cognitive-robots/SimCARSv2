@@ -45,12 +45,15 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
         agent->get_env_force_variable()->get_value(env_force);
         geometry::Vec other_force;
         agent->get_other_force_variable()->get_value(other_force);
+        FP_DATA_TYPE dist_headway;
+        agent->get_dist_headway_variable()->get_value(dist_headway);
         std::cout << "Motor Torque: " << motor_torque << " Nm, " << "Steer: " << steer << " rad, " <<
                      "Lin. Vel.: (" << lin_vel.x() << ", " << lin_vel.y() << ") m/s, " <<
                      "Lon. Lin. Vel.: " << lon_lin_vel << " m/s, " <<
                      "Lin. Acc.: (" << lin_acc.x() << ", " << lin_acc.y() << ") m/s^2, " <<
                      "Env. Force: (" << env_force.x() << ", " << env_force.y() << ") N, " <<
-                     "Other Force: (" << other_force.x() << ", " << other_force.y() << ") N " <<
+                     "Other Force: (" << other_force.x() << ", " << other_force.y() << ") N, " <<
+                     "Dist. Headway: " << dist_headway << " m" <<
                      std::endl;
         /*
         geometry::Vec other_force;

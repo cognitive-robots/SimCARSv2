@@ -3,6 +3,8 @@
 
 #include <cmath>
 
+#define N_SECOND_RULE_NUM 2.0
+
 namespace ori
 {
 namespace simcars
@@ -16,8 +18,9 @@ FP_DATA_TYPE DefaultFWDCarRewardCalc::calc_reward(const FWDCarOutcome *outcome,
     FWDCarRewards rewards = calc_rewards(outcome, parameters);
 
     return parameters->lane_transitions_weight * rewards.lane_transitions_reward +
-            parameters->caution_weight * rewards.caution_reward +
-            parameters->speed_limit_excess_weight * rewards.speed_limit_excess_reward +
+            parameters->dist_headway_weight * rewards.dist_headway_reward +
+            parameters->max_speed_weight * rewards.max_speed_reward +
+            parameters->anti_speed_weight * rewards.anti_speed_reward +
             parameters->max_env_force_mag_weight * rewards.max_env_force_mag_reward +
             parameters->bias_weight;
 }
@@ -30,10 +33,11 @@ FWDCarRewards DefaultFWDCarRewardCalc::calc_rewards(FWDCarOutcome const *outcome
     FP_DATA_TYPE lane_transitions_exp = std::exp(-outcome->lane_transitions);
     rewards.lane_transitions_reward = lane_transitions_exp / (lane_transitions_exp + 1.0);
 
-    rewards.caution_reward = std::exp(-0.1 * outcome->final_speed);
+    rewards.dist_headway_reward = std::min(outcome->dist_headway /
+                                           (N_SECOND_RULE_NUM * outcome->final_speed), 1.0);
 
-    rewards.speed_limit_excess_reward = std::exp(0.1 * (outcome->final_speed -
-                                                        parameters->speed_limit));
+    rewards.max_speed_reward = std::exp(0.05 * (outcome->final_speed - parameters->speed_limit));
+    rewards.anti_speed_reward = std::exp(-0.05 * outcome->final_speed);
 
     //rewards.final_speed_reward =
     //        std::exp(-8.0 * std::pow(outcome->final_speed - parameters->speed_limit, 2) /

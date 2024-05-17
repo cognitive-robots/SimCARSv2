@@ -63,6 +63,9 @@ protected:
     simcars::causal::ScalarProductVariable moi;
     simcars::causal::ScalarReciprocalVariable moi_recip;
 
+    simcars::causal::ScalarSocketVariable dist_headway;
+    simcars::causal::ScalarBufferVariable dist_headway_buff;
+
     simcars::causal::VectorSocketVariable env_force;
     simcars::causal::VectorBufferVariable env_force_buff;
     simcars::causal::VectorSocketVariable other_force;
@@ -124,6 +127,7 @@ public:
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_drag_area_variable();
     simcars::causal::IEndogenousVariable<geometry::ORect>* get_rect_variable();
 
+    virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_dist_headway_variable();
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force_variable();
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_other_force_variable();
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_acc_variable();

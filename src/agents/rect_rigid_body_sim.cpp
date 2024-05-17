@@ -14,6 +14,9 @@ RectRigidBodySim::RectRigidBodySim(RectRigidBody *rect_rigid_body,
 
     sim_start_time(start_time),
 
+    sim_dist_headway(rect_rigid_body->get_dist_headway_variable(), &(this->dist_headway_buff),
+                     &sim_start_time),
+
     sim_env_force(rect_rigid_body->get_env_force_variable(), &(this->env_force_buff),
                   &sim_start_time),
     sim_other_force(rect_rigid_body->get_other_force_variable(), &(this->other_force_buff),
@@ -59,6 +62,11 @@ RectRigidBodySim::RectRigidBodySim(RectRigidBody *rect_rigid_body,
 
     pos_buff.set_axiomatic(false);
     rot_buff.set_axiomatic(false);
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodySim::get_dist_headway_variable()
+{
+    return &sim_dist_headway;
 }
 
 simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBodySim::get_env_force_variable()

@@ -54,17 +54,18 @@ bool CalcFWDCarActionOutcomeRewardVariable::set_value(RewardFWDCarOutcomeActionT
     FWDCarRewardParameters reward_parameters;
     if (get_other_parent()->get_value(reward_parameters))
     {
-        Eigen::MatrixXd individual_rewards(val.count(), 5);
+        Eigen::MatrixXd individual_rewards(val.count(), 6);
         Eigen::VectorXd combined_rewards(val.count());
         for (size_t i = 0; i < val.count(); ++i)
         {
             FWDCarRewards rewards = fwd_car_reward_calculator->calc_rewards(
                         &(std::get<1>(val[i])), &reward_parameters);
             individual_rewards(i, 0) = rewards.lane_transitions_reward;
-            individual_rewards(i, 1) = rewards.caution_reward;
-            individual_rewards(i, 2) = rewards.speed_limit_excess_reward;
-            individual_rewards(i, 3) = rewards.max_env_force_mag_reward;
-            individual_rewards(i, 4) = 1.0;
+            individual_rewards(i, 1) = rewards.dist_headway_reward;
+            individual_rewards(i, 2) = rewards.max_speed_reward;
+            individual_rewards(i, 3) = rewards.anti_speed_reward;
+            individual_rewards(i, 4) = rewards.max_env_force_mag_reward;
+            individual_rewards(i, 5) = 1.0;
             /*
             std::cout << "Action [" << i << "]: " << std::get<2>(val[i]) << std::endl;
             std::cout << "Individual Rewards: " << rewards << std::endl;
@@ -81,10 +82,11 @@ bool CalcFWDCarActionOutcomeRewardVariable::set_value(RewardFWDCarOutcomeActionT
         Eigen::VectorXd reward_weights =
                 individual_rewards.colPivHouseholderQr().solve(combined_rewards);
         reward_parameters.lane_transitions_weight = reward_weights(0);
-        reward_parameters.caution_weight = reward_weights(1);
-        reward_parameters.speed_limit_excess_weight = reward_weights(2);
-        reward_parameters.max_env_force_mag_weight = reward_weights(3);
-        reward_parameters.bias_weight = reward_weights(4);
+        reward_parameters.dist_headway_weight = reward_weights(1);
+        reward_parameters.max_speed_weight = reward_weights(2);
+        reward_parameters.anti_speed_weight = reward_weights(3);
+        reward_parameters.max_env_force_mag_weight = reward_weights(4);
+        reward_parameters.bias_weight = reward_weights(5);
 
         return get_other_parent()->set_value(reward_parameters);
     }

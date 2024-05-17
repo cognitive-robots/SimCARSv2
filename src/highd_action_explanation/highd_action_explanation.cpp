@@ -208,8 +208,8 @@ int main(int argc, char *argv[])
 
         std::cout << "Reward Parameters: { lane_transition: " <<
                      reward_calc_params.lane_transitions_weight << ", caution: " <<
-                     reward_calc_params.caution_weight << ", speed_limit_excess: " <<
-                     reward_calc_params.speed_limit_excess_weight << ", max_env_force_mag: " <<
+                     reward_calc_params.dist_headway_weight << ", speed_limit_excess: " <<
+                     reward_calc_params.anti_speed_weight << ", max_env_force_mag: " <<
                      reward_calc_params.max_env_force_mag_weight << ", bias: " <<
                      reward_calc_params.bias_weight << " }" << std::endl;
 

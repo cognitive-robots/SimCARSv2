@@ -10,6 +10,7 @@
 #include <ori/simcars/causal/variable_types/endogenous/scalar_product.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_time_step_size_quotient.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_conditional.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_set_min.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_set_sum.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_proxy.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_negation.hpp>
@@ -24,6 +25,7 @@
 #include <ori/simcars/causal/variable_types/endogenous/vector_set_sum.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/o_rect_collision.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/o_rect_contact.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/o_rect_dist_headway.hpp>
 #include <ori/simcars/agents/declarations.hpp>
 
 namespace ori
@@ -84,12 +86,16 @@ class RectRigidBodyEnv
 
             simcars::causal::ScalarConditionalVariable actual_coll_torque;
 
+            simcars::causal::ORectDistHeadwayVariable dist_headway;
+
         public:
             Link(uint64_t id, RectRigidBody *rigid_body, uint64_t other_id,
                  RectRigidBody *other_rigid_body);
 
             simcars::causal::IEndogenousVariable<geometry::Vec>* get_coll_force();
             simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_coll_torque();
+
+            simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_dist_headway();
         };
 
         uint64_t id;
@@ -99,6 +105,9 @@ class RectRigidBodyEnv
     protected:
         simcars::causal::ScalarFixedVariable half_scale_factor;
         simcars::causal::ScalarProxyVariable half_scale_factor_proxy;
+
+        simcars::causal::ScalarFixedVariable dist_headway_limit;
+        simcars::causal::ScalarProxyVariable dist_headway_limit_proxy;
 
         simcars::causal::ScalarFixedVariable air_mass_density;
         simcars::causal::ScalarProductVariable drag_scaled_air_mass_density;
@@ -117,6 +126,8 @@ class RectRigidBodyEnv
         simcars::causal::VectorSetSumVariable env_force;
         simcars::causal::ScalarSetSumVariable env_torque;
 
+        simcars::causal::ScalarSetMinVariable min_dist_headway;
+
     public:
         Entity(uint64_t id, RectRigidBody *rigid_body);
 
@@ -124,6 +135,8 @@ class RectRigidBodyEnv
 
         simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force();
         simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_env_torque();
+
+        simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_dist_headway();
 
         bool add_link(RectRigidBody *other_rigid_body);
         bool remove_link(RectRigidBody *other_rigid_body);

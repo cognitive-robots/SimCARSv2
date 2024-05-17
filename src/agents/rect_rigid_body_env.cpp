@@ -54,7 +54,9 @@ RectRigidBodyEnv::Entity::Link::Link(uint64_t id, RectRigidBody *rigid_body, uin
     no_coll_torque(0.0),
     no_coll_torque_proxy(&no_coll_torque),
 
-    actual_coll_torque(&coll_torque, &no_coll_torque_proxy, &coll)
+    actual_coll_torque(&coll_torque, &no_coll_torque_proxy, &coll),
+
+    dist_headway(rigid_body->get_rect_variable(), other_rigid_body->get_rect_variable())
 {
 }
 
@@ -68,12 +70,20 @@ causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::Link::get_c
     return &actual_coll_torque;
 }
 
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::Link::get_dist_headway()
+{
+    return &dist_headway;
+}
+
 RectRigidBodyEnv::Entity::Entity(uint64_t id, RectRigidBody *rigid_body) :
     id(id),
     rigid_body(rigid_body),
 
     half_scale_factor(0.5),
     half_scale_factor_proxy(&half_scale_factor),
+
+    dist_headway_limit(100.0),
+    dist_headway_limit_proxy(&dist_headway_limit),
 
     air_mass_density(1.2578),
     drag_scaled_air_mass_density(&half_scale_factor_proxy, &air_mass_density),
@@ -90,7 +100,9 @@ RectRigidBodyEnv::Entity::Entity(uint64_t id, RectRigidBody *rigid_body) :
     drag_torque_proxy(&drag_torque),
 
     env_force({ &drag_force }),
-    env_torque({ &drag_torque_proxy })
+    env_torque({ &drag_torque_proxy }),
+
+    min_dist_headway({ &dist_headway_limit_proxy })
 {
 }
 
@@ -113,6 +125,11 @@ causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::get_env_tor
     return &env_torque;
 }
 
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::get_dist_headway()
+{
+    return &min_dist_headway;
+}
+
 bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
 {
     simcars::causal::IEndogenousVariable<uint64_t> *id_variable =
@@ -133,6 +150,7 @@ bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
 
         env_force.insert(link->get_coll_force());
         env_torque.insert(link->get_coll_torque());
+        min_dist_headway.insert(link->get_dist_headway());
 
         return true;
     }
@@ -156,6 +174,7 @@ bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
 
         env_force.erase(link->get_coll_force());
         env_torque.erase(link->get_coll_torque());
+        min_dist_headway.erase(link->get_dist_headway());
 
         id_link_dict.erase(other_id);
 
@@ -211,6 +230,9 @@ bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body)
         rigid_body->env_torque.set_parent(entity->get_env_torque());
         rigid_body->env_torque_buff.set_axiomatic(false);
 
+        rigid_body->dist_headway.set_parent(entity->get_dist_headway());
+        rigid_body->dist_headway_buff.set_axiomatic(false);
+
         return true;
     }
 }
@@ -236,6 +258,9 @@ bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body)
 
         rigid_body->env_torque_buff.set_axiomatic(true);
         rigid_body->env_torque.set_parent(nullptr);
+
+        rigid_body->dist_headway_buff.set_axiomatic(true);
+        rigid_body->dist_headway.set_parent(nullptr);
 
         id_entity_dict.erase(id);
         id_rigid_body_dict.erase(id);

@@ -78,6 +78,11 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     {
         throw std::runtime_error("Could not get final speed");
     }
+    res = fwd_car_sim->get_dist_headway_variable()->get_value(outcome.dist_headway);
+    if (!res)
+    {
+        throw std::runtime_error("Could not get distance headway");
+    }
     res = fwd_car_sim->get_max_env_force_mag_variable()->get_value(outcome.max_env_force_mag);
     if (!res)
     {

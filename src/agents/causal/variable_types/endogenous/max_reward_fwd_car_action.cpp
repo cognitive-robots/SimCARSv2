@@ -50,12 +50,12 @@ bool MaxRewardFWDCarActionVariable::set_value(FWDCarOutcomeActionPair const &val
             FP_DATA_TYPE new_reward = std::exp(-action_diff);
             //FP_DATA_TYPE new_reward = 1.0 / action_diff;
             std::get<0>(reward_outcome_action_tuples[i]) = new_reward;
-            std::cout << "Action 1 [" << i << "]: " << val.second << std::endl;
-            std::cout << "Outcome 1 [" << i << "]: " << val.first << std::endl;
-            std::cout << "Action 2 [" << i << "]: " << std::get<2>(reward_outcome_action_tuples[i]) << std::endl;
-            std::cout << "Outcome 2 [" << i << "]: " << std::get<1>(reward_outcome_action_tuples[i]) << std::endl;
-            std::cout << "Action Diff. [" << i << "]: " << action_diff << std::endl;
-            std::cout << "Action Diff. Reward [" << i << "]: " << new_reward << std::endl;
+            //std::cout << "Action 1 [" << i << "]: " << val.second << std::endl;
+            //std::cout << "Outcome 1 [" << i << "]: " << val.first << std::endl;
+            //std::cout << "Action 2 [" << i << "]: " << std::get<2>(reward_outcome_action_tuples[i]) << std::endl;
+            //std::cout << "Outcome 2 [" << i << "]: " << std::get<1>(reward_outcome_action_tuples[i]) << std::endl;
+            //std::cout << "Action Diff. [" << i << "]: " << action_diff << std::endl;
+            //std::cout << "Action Diff. Reward [" << i << "]: " << new_reward << std::endl;
         }
 
         return get_parent()->set_value(reward_outcome_action_tuples);

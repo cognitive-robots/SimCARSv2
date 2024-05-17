@@ -19,6 +19,8 @@ class RectRigidBodySim : public virtual RectRigidBody
 protected:
     simcars::causal::TimeFixedVariable sim_start_time;
 
+    simcars::causal::ScalarTimeConditionalVariable sim_dist_headway;
+
     simcars::causal::VectorTimeConditionalVariable sim_env_force;
     simcars::causal::VectorTimeConditionalVariable sim_other_force;
     simcars::causal::VectorTimeConditionalVariable sim_lin_acc;
@@ -44,6 +46,7 @@ protected:
 public:
     RectRigidBodySim(RectRigidBody *rect_rigid_body, temporal::Time start_time);
 
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_dist_headway_variable() override;
     simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force_variable() override;
     simcars::causal::IEndogenousVariable<geometry::Vec>* get_other_force_variable() override;
     simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_acc_variable() override;
