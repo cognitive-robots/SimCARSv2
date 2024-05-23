@@ -50,7 +50,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
     size_t i, j = 0, k;
     for (i = 0; i < tracks_meta_doc.GetRowCount(); ++i)
     {
-        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("track_id", i);
+        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("trackId", i);
 
         // Note: Length/width in local frame vs width/height in global frame
         FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("length", i);
@@ -123,7 +123,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
 
     for (i = 0; i < tracks_meta_doc.GetRowCount(); ++i)
     {
-        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("track_id", i);
+        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("trackId", i);
 
         FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("length", i);
         FP_DATA_TYPE width = tracks_meta_doc.GetCell<FP_DATA_TYPE>("width", i);
@@ -146,7 +146,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
 
         for (; j < tracks_doc.GetRowCount(); ++j)
         {
-            if (tracks_doc.GetCell<uint32_t>("track_id", j) == id)
+            if (tracks_doc.GetCell<uint32_t>("trackId", j) == id)
             {
                 break;
             }
