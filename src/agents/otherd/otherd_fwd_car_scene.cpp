@@ -1,5 +1,5 @@
 
-#include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
+#include <ori/simcars/agents/otherd/otherd_fwd_car_scene.hpp>
 
 #include <ori/simcars/causal/variable_context.hpp>
 #include <ori/simcars/agents/full_control_fwd_car.hpp>
@@ -13,39 +13,48 @@ namespace simcars
 {
 namespace agents
 {
-namespace highd
+namespace otherd
 {
 
-HighDFWDCarScene::HighDFWDCarScene(std::string const &tracks_meta_path_str,
-                                   std::string const &tracks_path_str, map::IMap const *map)
-    : HighDFWDCarScene(rapidcsv::Document(tracks_meta_path_str),
-                       rapidcsv::Document(tracks_path_str), map) {}
+OtherDFWDCarScene::OtherDFWDCarScene(std::string const &recording_meta_path_str,
+                                     std::string const &tracks_meta_path_str,
+                                     std::string const &tracks_path_str, map::IMap const *map)
+    : OtherDFWDCarScene(rapidcsv::Document(recording_meta_path_str),
+                        rapidcsv::Document(tracks_meta_path_str),
+                        rapidcsv::Document(tracks_path_str), map) {}
 
-HighDFWDCarScene::HighDFWDCarScene(std::string const &tracks_meta_path_str,
-                                   std::string const &tracks_path_str, size_t start_frame,
-                                   size_t end_frame, map::IMap const *map)
-    : HighDFWDCarScene(rapidcsv::Document(tracks_meta_path_str),
-                       rapidcsv::Document(tracks_path_str), start_frame, end_frame, map) {}
+OtherDFWDCarScene::OtherDFWDCarScene(std::string const &recording_meta_path_str,
+                                     std::string const &tracks_meta_path_str,
+                                     std::string const &tracks_path_str, size_t start_frame,
+                                     size_t end_frame, map::IMap const *map)
+    : OtherDFWDCarScene(rapidcsv::Document(recording_meta_path_str),
+                        rapidcsv::Document(tracks_meta_path_str),
+                        rapidcsv::Document(tracks_path_str), start_frame, end_frame, map) {}
 
-HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
-                                   rapidcsv::Document const &tracks_doc, map::IMap const *map)
-    : HighDFWDCarScene(tracks_meta_doc, tracks_doc, 0, -1, map) {}
+OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_doc,
+                                     rapidcsv::Document const &tracks_meta_doc,
+                                     rapidcsv::Document const &tracks_doc, map::IMap const *map)
+    : OtherDFWDCarScene(recording_meta_doc, tracks_meta_doc, tracks_doc, 0, -1, map) {}
 
-HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
-                                   rapidcsv::Document const &tracks_doc, size_t start_frame,
-                                   size_t end_frame, map::IMap const *map)
+OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_doc,
+                                     rapidcsv::Document const &tracks_meta_doc,
+                                     rapidcsv::Document const &tracks_doc, size_t start_frame,
+                                     size_t end_frame, map::IMap const *map)
 {
+    geometry::Vec utm_origin(recording_meta_doc.GetCell<FP_DATA_TYPE>("xUtmOrigin", 0),
+                             recording_meta_doc.GetCell<FP_DATA_TYPE>("yUtmOrigin", 0));
+
     size_t min_frame = std::numeric_limits<size_t>::max();
     size_t max_frame = std::numeric_limits<size_t>::min();
 
     size_t i, j = 0, k;
     for (i = 0; i < tracks_meta_doc.GetRowCount(); ++i)
     {
-        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("id", i);
+        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("track_id", i);
 
         // Note: Length/width in local frame vs width/height in global frame
-        FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("width", i);
-        FP_DATA_TYPE width = tracks_meta_doc.GetCell<FP_DATA_TYPE>("height", i);
+        FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("length", i);
+        FP_DATA_TYPE width = tracks_meta_doc.GetCell<FP_DATA_TYPE>("width", i);
 
         size_t initial_frame = tracks_meta_doc.GetCell<size_t>("initialFrame", i);
         size_t final_frame = tracks_meta_doc.GetCell<size_t>("finalFrame", i);
@@ -114,10 +123,10 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
 
     for (i = 0; i < tracks_meta_doc.GetRowCount(); ++i)
     {
-        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("id", i);
+        uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("track_id", i);
 
-        FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("width", i);
-        FP_DATA_TYPE width = tracks_meta_doc.GetCell<FP_DATA_TYPE>("height", i);
+        FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("length", i);
+        FP_DATA_TYPE width = tracks_meta_doc.GetCell<FP_DATA_TYPE>("width", i);
 
         size_t initial_frame = tracks_meta_doc.GetCell<size_t>("initialFrame", i);
         size_t final_frame = tracks_meta_doc.GetCell<size_t>("finalFrame", i);
@@ -137,7 +146,7 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
 
         for (; j < tracks_doc.GetRowCount(); ++j)
         {
-            if (tracks_doc.GetCell<uint32_t>("id", j) == id)
+            if (tracks_doc.GetCell<uint32_t>("track_id", j) == id)
             {
                 break;
             }
@@ -158,15 +167,14 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
             if (current_frame > end_frame) break;
             if (current_frame < start_frame) continue;
 
-            FP_DATA_TYPE const position_x = tracks_doc.GetCell<FP_DATA_TYPE>("x", k) + length / 2.0f;
-            FP_DATA_TYPE const position_y = tracks_doc.GetCell<FP_DATA_TYPE>("y", k) + width / 2.0f;
-            geometry::Vec const position(position_x, position_y);
+            FP_DATA_TYPE const position_x = tracks_doc.GetCell<FP_DATA_TYPE>("xCenter", k);
+            FP_DATA_TYPE const position_y = tracks_doc.GetCell<FP_DATA_TYPE>("yCenter", k);
+            geometry::Vec const position = geometry::Vec(position_x, position_y) + utm_origin;
 
             (*(id_pos_dict[id]))[current_frame - start_frame] = position;
 
-            FP_DATA_TYPE const velocity_x = tracks_doc.GetCell<FP_DATA_TYPE>("xVelocity", k);
-            FP_DATA_TYPE const velocity_y = tracks_doc.GetCell<FP_DATA_TYPE>("yVelocity", k);
-            FP_DATA_TYPE const rotation = std::atan2(velocity_y, velocity_x);
+            FP_DATA_TYPE const rotation = tracks_doc.GetCell<FP_DATA_TYPE>("heading", k) *
+                    (M_PI / 180.0);
 
             (*(id_rot_dict[id]))[current_frame - start_frame] = rotation;
         }
@@ -226,7 +234,7 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
     }
 }
 
-HighDFWDCarScene::~HighDFWDCarScene()
+OtherDFWDCarScene::~OtherDFWDCarScene()
 {
     structures::IArray<FWDCar*> const *cars = id_car_dict.get_values();
     for (size_t i = 0; i < cars->count(); ++i)
@@ -235,52 +243,52 @@ HighDFWDCarScene::~HighDFWDCarScene()
     }
 }
 
-temporal::Duration HighDFWDCarScene::get_time_step_size() const
+temporal::Duration OtherDFWDCarScene::get_time_step_size() const
 {
     return temporal::Duration(40);
 }
 
-temporal::Time HighDFWDCarScene::get_min_time() const
+temporal::Time OtherDFWDCarScene::get_min_time() const
 {
     return min_time;
 }
 
-temporal::Time HighDFWDCarScene::get_max_time() const
+temporal::Time OtherDFWDCarScene::get_max_time() const
 {
     return max_time;
 }
 
-FWDCar* HighDFWDCarScene::get_fwd_car(uint32_t id) const
+FWDCar* OtherDFWDCarScene::get_fwd_car(uint32_t id) const
 {
     return id_car_dict[id];
 }
 
-ControlFWDCar* HighDFWDCarScene::get_control_fwd_car(uint32_t id) const
+ControlFWDCar* OtherDFWDCarScene::get_control_fwd_car(uint32_t id) const
 {
     return id_control_dict[id];
 }
 
-PlanFWDCar* HighDFWDCarScene::get_plan_fwd_car(uint32_t id) const
+PlanFWDCar* OtherDFWDCarScene::get_plan_fwd_car(uint32_t id) const
 {
     return id_plan_dict[id];
 }
 
-structures::IArray<FWDCar*> const* HighDFWDCarScene::get_fwd_cars() const
+structures::IArray<FWDCar*> const* OtherDFWDCarScene::get_fwd_cars() const
 {
     return id_car_dict.get_values();
 }
 
-structures::IArray<ControlFWDCar*> const* HighDFWDCarScene::get_control_fwd_cars() const
+structures::IArray<ControlFWDCar*> const* OtherDFWDCarScene::get_control_fwd_cars() const
 {
     return id_control_dict.get_values();
 }
 
-structures::IArray<PlanFWDCar*> const* HighDFWDCarScene::get_plan_fwd_cars() const
+structures::IArray<PlanFWDCar*> const* OtherDFWDCarScene::get_plan_fwd_cars() const
 {
     return id_plan_dict.get_values();
 }
 
-RectRigidBodyEnv* HighDFWDCarScene::get_env()
+RectRigidBodyEnv* OtherDFWDCarScene::get_env()
 {
     return &scene_env;
 }

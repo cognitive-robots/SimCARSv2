@@ -11,10 +11,10 @@ namespace simcars
 {
 namespace agents
 {
-namespace highd
+namespace otherd
 {
 
-class HighDFWDCarScene : public IFWDCarScene
+class OtherDFWDCarScene : public IFWDCarScene
 {
     temporal::Time min_time;
     temporal::Time max_time;
@@ -25,17 +25,21 @@ class HighDFWDCarScene : public IFWDCarScene
     structures::stl::STLDictionary<uint32_t, PlanFWDCar*> id_plan_dict;
 
 public:
-    HighDFWDCarScene(std::string const &tracks_meta_path_str, std::string const &tracks_path_str,
-                     map::IMap const *map = nullptr);
-    HighDFWDCarScene(std::string const &tracks_meta_path_str, std::string const &tracks_path_str,
-                     size_t start_frame, size_t end_frame, map::IMap const *map = nullptr);
-    HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
-                     rapidcsv::Document const &tracks_doc, map::IMap const *map = nullptr);
-    HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
-                     rapidcsv::Document const &tracks_doc, size_t start_frame, size_t end_frame,
-                     map::IMap const *map = nullptr);
+    OtherDFWDCarScene(std::string const &recording_meta_path_str,
+                      std::string const &tracks_meta_path_str, std::string const &tracks_path_str,
+                      map::IMap const *map = nullptr);
+    OtherDFWDCarScene(std::string const &recording_meta_path_str,
+                      std::string const &tracks_meta_path_str, std::string const &tracks_path_str,
+                      size_t start_frame, size_t end_frame, map::IMap const *map = nullptr);
+    OtherDFWDCarScene(rapidcsv::Document const &recording_meta_doc,
+                      rapidcsv::Document const &tracks_meta_doc,
+                      rapidcsv::Document const &tracks_doc, map::IMap const *map = nullptr);
+    OtherDFWDCarScene(rapidcsv::Document const &recording_meta_doc,
+                      rapidcsv::Document const &tracks_meta_doc,
+                      rapidcsv::Document const &tracks_doc, size_t start_frame, size_t end_frame,
+                      map::IMap const *map = nullptr);
 
-    ~HighDFWDCarScene() override;
+    ~OtherDFWDCarScene() override;
 
     temporal::Duration get_time_step_size() const override;
     temporal::Time get_min_time() const override;

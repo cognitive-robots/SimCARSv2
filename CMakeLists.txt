@@ -14,6 +14,10 @@ find_package(Eigen3 REQUIRED)
 find_package(RapidJSON REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(SFML REQUIRED COMPONENTS graphics)
+find_package(lanelet2_core REQUIRED)
+find_package(lanelet2_io REQUIRED)
+find_package(lanelet2_projection REQUIRED)
+find_package(lanelet2_traffic_rules REQUIRED)
 
 add_subdirectory(extern/magic_enum)
 if (NOT TARGET rapidcsv)
@@ -126,6 +130,8 @@ add_library(simcars_map STATIC
   src/map/lane_branch.cpp
   src/map/highd/highd_lane.cpp
   src/map/highd/highd_map.cpp
+  src/map/laneletd/laneletd_lane.cpp
+  src/map/laneletd/laneletd_map.cpp
   src/map/plg/plg_lane.cpp
   src/map/plg/plg_map.cpp
   include/ori/simcars/map/declarations.hpp
@@ -139,6 +145,9 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/highd/highd_declarations.hpp
   include/ori/simcars/map/highd/highd_map.hpp
   include/ori/simcars/map/highd/highd_lane.hpp
+  include/ori/simcars/map/laneletd/laneletd_declarations.hpp
+  include/ori/simcars/map/laneletd/laneletd_map.hpp
+  include/ori/simcars/map/laneletd/laneletd_lane.hpp
   include/ori/simcars/map/plg/plg_declarations.hpp
   include/ori/simcars/map/plg/plg_map.hpp
   include/ori/simcars/map/plg/plg_lane.hpp
@@ -159,6 +168,10 @@ PUBLIC
 PRIVATE
 #  lz4_stream
   rapidcsv
+  ${lanelet2_core_LIBRARIES}
+  ${lanelet2_io_LIBRARIES}
+  ${lanelet2_projection_LIBRARIES}
+  ${lanelet2_traffic_rules_LIBRARIES}
 )
 add_dependencies(simcars_map simcars_utils simcars_structures simcars_geometry simcars_temporal)
 target_compile_options(simcars_map PRIVATE -fPIC)
@@ -360,6 +373,7 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.cpp
   src/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.cpp
   src/agents/highd/highd_fwd_car_scene.cpp
+  src/agents/otherd/otherd_fwd_car_scene.cpp
   include/ori/simcars/agents/declarations.hpp
   include/ori/simcars/agents/typedefs.hpp
   include/ori/simcars/agents/fwd_car_outcome_sim_interface.hpp
@@ -406,6 +420,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp
   include/ori/simcars/agents/highd/highd_fwd_car_scene.hpp
+  include/ori/simcars/agents/otherd/otherd_fwd_car_scene.hpp
 )
 target_include_directories(simcars_agents
 PUBLIC
