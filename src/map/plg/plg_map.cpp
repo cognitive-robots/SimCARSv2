@@ -25,6 +25,48 @@ PLGMap::~PLGMap()
     clear();
 }
 
+geometry::Vec PLGMap::get_map_centre() const
+{
+    structures::IArray<PLGLane*> const *lane_array = id_to_lane_dict.get_values();
+
+    FP_DATA_TYPE min_x = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_x = std::numeric_limits<FP_DATA_TYPE>::min();
+    FP_DATA_TYPE min_y = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_y = std::numeric_limits<FP_DATA_TYPE>::min();
+
+    for (size_t i = 0; i < lane_array->count(); ++i)
+    {
+        geometry::Rect const &rect = (*lane_array)[i]->get_bounding_box();
+        min_x = std::min(rect.get_min_x(), min_x);
+        max_x = std::max(rect.get_max_x(), max_x);
+        min_y = std::min(rect.get_min_y(), min_y);
+        max_y = std::max(rect.get_max_y(), max_y);
+    }
+
+    return geometry::Vec((min_x + max_x) / 2, (min_y + max_y) / 2);
+}
+
+FP_DATA_TYPE PLGMap::get_max_dim_size() const
+{
+    structures::IArray<PLGLane*> const *lane_array = id_to_lane_dict.get_values();
+
+    FP_DATA_TYPE min_x = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_x = std::numeric_limits<FP_DATA_TYPE>::min();
+    FP_DATA_TYPE min_y = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_y = std::numeric_limits<FP_DATA_TYPE>::min();
+
+    for (size_t i = 0; i < lane_array->count(); ++i)
+    {
+        geometry::Rect const &rect = (*lane_array)[i]->get_bounding_box();
+        min_x = std::min(rect.get_min_x(), min_x);
+        max_x = std::max(rect.get_max_x(), max_x);
+        min_y = std::min(rect.get_min_y(), min_y);
+        max_y = std::max(rect.get_max_y(), max_y);
+    }
+
+    return std::max(max_x - min_x, max_y - min_y);
+}
+
 ILane const* PLGMap::get_lane(uint64_t id) const
 {
     if (id_to_lane_dict.contains(id))

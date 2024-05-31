@@ -20,6 +20,8 @@ class LaneletDMap : public virtual IMap
 public:
     ~LaneletDMap() override;
 
+    geometry::Vec get_map_centre() const override;
+    FP_DATA_TYPE get_max_dim_size() const override;
     ILane const* get_lane(uint64_t id) const override;
     structures::IArray<ILane const*>* get_lanes(structures::IArray<uint64_t> const *ids) const override;
     structures::IArray<ILane const*>* get_encapsulating_lanes(geometry::Vec point) const override;

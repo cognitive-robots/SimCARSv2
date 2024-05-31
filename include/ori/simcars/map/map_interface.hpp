@@ -18,6 +18,8 @@ class IMap
 public:
     virtual ~IMap() = default;
 
+    virtual geometry::Vec get_map_centre() const = 0;
+    virtual FP_DATA_TYPE get_max_dim_size() const = 0;
     virtual ILane const* get_lane(uint64_t id) const = 0;
     virtual structures::IArray<ILane const*>* get_lanes(structures::IArray<uint64_t> const *ids) const = 0;
     virtual structures::IArray<ILane const*>* get_encapsulating_lanes(geometry::Vec point) const = 0;

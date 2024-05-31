@@ -1,10 +1,10 @@
 
 #include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
-#include <ori/simcars/map/highd/highd_map.hpp>
+#include <ori/simcars/map/laneletd/laneletd_map.hpp>
 #include <ori/simcars/causal/variable_context.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
-#include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
+#include <ori/simcars/agents/otherd/otherd_fwd_car_scene.hpp>
 #include <ori/simcars/visualisation/qmap_agents_widget.hpp>
 
 #include <QApplication>
@@ -17,16 +17,17 @@ using namespace ori::simcars;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 6)
+    if (argc < 7)
     {
-        std::cerr << "Usage: ./highd_visualisation recording_meta_file_path tracks_meta_file_path "
-                     "tracks_file_path start_frame end_frame [agent_id_1] [agent_id_2]" <<
+        std::cerr << "Usage: ./laneletd_visualisation lanelet_map_file_path recording_meta_file_path "
+                     "tracks_meta_file_path tracks_file_path start_frame end_frame [agent_id_1] "
+                     "[agent_id_2]" <<
                      std::endl;
         return -1;
     }
 
-    size_t start_frame = atoi(argv[4]);
-    size_t end_frame = atoi(argv[5]);
+    size_t start_frame = atoi(argv[5]);
+    size_t end_frame = atoi(argv[6]);
 
     geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
@@ -34,9 +35,9 @@ int main(int argc, char *argv[])
 
     std::cout << "Beginning map load" << std::endl;
 
-    map::highd::HighDMap map;
+    map::laneletd::LaneletDMap map;
 
-    map.load(argv[1]);
+    map.load(argv[1], argv[2]);
 
     std::cout << "Finished map load" << std::endl;
 
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
 
     agents::IFWDCarScene *scene;
 
-    scene = new agents::highd::HighDFWDCarScene(argv[2], argv[3], start_frame, end_frame);
+    scene = new agents::otherd::OtherDFWDCarScene(argv[2], argv[3], argv[4], start_frame, end_frame);
 
     structures::IArray<agents::FWDCar*> const *fwd_cars = scene->get_fwd_cars();
 
@@ -63,24 +64,24 @@ int main(int argc, char *argv[])
                 QSize(1260, 1260),
                 scene->get_min_time(),
                 scene->get_max_time(),
-                std::chrono::milliseconds(40), 1.0, 3.0,
+                std::chrono::milliseconds(40), 1.0, 1260.0 / map.get_max_dim_size(),
                 visualisation::QMapAgentsWidget::FocusMode::FIXED);
 
     map_scene_widget->set_focal_position(map.get_map_centre());
 
-    if (argc > 6)
+    if (argc > 7)
     {
-        uint64_t agent_id_1 = atoi(argv[6]);
+        uint64_t agent_id_1 = atoi(argv[7]);
         map_scene_widget->set_agent_colour(agent_id_1, sf::Color::Cyan);
     }
 
-    if (argc > 7)
+    if (argc > 8)
     {
-        uint64_t agent_id_2 = atoi(argv[7]);
+        uint64_t agent_id_2 = atoi(argv[8]);
         map_scene_widget->set_agent_colour(agent_id_2, sf::Color::Magenta);
     }
 
-    for (size_t i = 8; i < argc; ++i)
+    for (size_t i = 9; i < argc; ++i)
     {
         uint64_t other_rel_agent_id = std::atoll(argv[i]);
         map_scene_widget->set_agent_colour(other_rel_agent_id, sf::Color::Yellow);

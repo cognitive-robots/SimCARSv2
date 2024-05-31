@@ -23,6 +23,9 @@ public:
     };
 
 private:
+    bool text_enabled;
+    sf::Font text_font;
+
     std::chrono::milliseconds frame_interval;
     FP_DATA_TYPE realtime_factor;
     FP_DATA_TYPE pixels_per_metre;

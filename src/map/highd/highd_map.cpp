@@ -25,6 +25,16 @@ HighDMap::~HighDMap()
     clear();
 }
 
+geometry::Vec HighDMap::get_map_centre() const
+{
+    return geometry::Vec(210.0f, 19.0f);
+}
+
+FP_DATA_TYPE HighDMap::get_max_dim_size() const
+{
+    return 700;
+}
+
 ILane const* HighDMap::get_lane(uint64_t id) const
 {
     if (id_to_lane_dict.contains(id))

@@ -47,13 +47,13 @@ void ORect::calc_points_virt() const
     FP_DATA_TYPE sin_o = trig_buff->get_sin(orientation);
     FP_DATA_TYPE cos_o = trig_buff->get_cos(orientation);
     set_points(get_origin() + Vec(get_half_width() * cos_o - get_half_height() * sin_o,
-                                  get_half_height() * cos_o + get_half_width() * sin_o),
+                                  get_half_width() * sin_o + get_half_height() * cos_o),
                get_origin() + Vec(-get_half_width() * cos_o - get_half_height() * sin_o,
-                                  get_half_height() * cos_o - get_half_width() * sin_o),
+                                  -get_half_width() * sin_o + get_half_height() * cos_o),
                get_origin() + Vec(-get_half_width() * cos_o + get_half_height() * sin_o,
-                                  -get_half_height() * cos_o - get_half_width() * sin_o),
+                                  -get_half_width() * sin_o - get_half_height() * cos_o),
                get_origin() + Vec(get_half_width() * cos_o + get_half_height() * sin_o,
-                                  -get_half_height() * cos_o + get_half_width() * sin_o));
+                                  get_half_width() * sin_o - get_half_height() * cos_o));
 }
 
 bool ORect::align_and_check_bounds(Vec const &point) const

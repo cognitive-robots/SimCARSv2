@@ -72,29 +72,32 @@ void QMapAgentsWidget::add_lane_to_render_stack(map::ILane const *lane)
         ++k;
     }
 
-    sf::VertexArray *left_boundary_shape = new sf::VertexArray(sf::PrimitiveType::LineStrip,
-                                                               left_boundary.cols());
+    sf::VertexArray *boundary_shape = new sf::VertexArray(sf::PrimitiveType::LineStrip,
+                                                               left_boundary.cols() +
+                                                               right_boundary.cols() + 1);
 
     for (i = 0; i < left_boundary.cols(); ++i)
     {
-        (*left_boundary_shape)[i].position = sf::Vector2f(get_pixels_per_metre() * left_boundary(0, i),
-                                                          -get_pixels_per_metre() * left_boundary(1, i));
-        (*left_boundary_shape)[i].color = markings_color;
+        (*boundary_shape)[i].position = sf::Vector2f(get_pixels_per_metre() * left_boundary(0, i),
+                                                     -get_pixels_per_metre() * left_boundary(1, i));
+        (*boundary_shape)[i].color = markings_color;
     }
-
-    sf::VertexArray *right_boundary_shape = new sf::VertexArray(sf::PrimitiveType::LineStrip,
-                                                               right_boundary.cols());
 
     for (i = 0; i < right_boundary.cols(); ++i)
     {
-        (*right_boundary_shape)[i].position = sf::Vector2f(get_pixels_per_metre() * right_boundary(0, i),
-                                                          -get_pixels_per_metre() * right_boundary(1, i));
-        (*right_boundary_shape)[i].color = markings_color;
+        (*boundary_shape)[left_boundary.cols() + i].position =
+                sf::Vector2f(get_pixels_per_metre() * right_boundary(0, (right_boundary.cols() - 1) - i),
+                             -get_pixels_per_metre() * right_boundary(1, (right_boundary.cols() - 1) - i));
+        (*boundary_shape)[left_boundary.cols() + i].color = markings_color;
     }
 
+    (*boundary_shape)[left_boundary.cols() + right_boundary.cols()].position =
+            sf::Vector2f(get_pixels_per_metre() * left_boundary(0, 0),
+                         -get_pixels_per_metre() * left_boundary(1, 0));
+    (*boundary_shape)[left_boundary.cols() + right_boundary.cols()].color = markings_color;
+
     add_to_render_stack(lane_shape);
-    add_to_render_stack(left_boundary_shape);
-    add_to_render_stack(right_boundary_shape);
+    add_to_render_stack(boundary_shape);
 }
 
 void QMapAgentsWidget::populate_render_stack()

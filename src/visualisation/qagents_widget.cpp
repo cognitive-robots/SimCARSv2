@@ -151,10 +151,24 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
     }
 
     add_to_render_stack(agent_shape);
+
+    if (text_enabled)
+    {
+        sf::Text *agent_text = new sf::Text(std::to_string(id), text_font, 16);
+        agent_text->setPosition(sf::Vector2f(get_pixels_per_metre() * agent_rect.get_origin().x(),
+                                             -get_pixels_per_metre() * agent_rect.get_origin().y()));
+        add_to_render_stack(agent_text);
+    }
 }
 
 void QAgentsWidget::on_init()
 {
+    // TODO: Make this non-OS specific
+    if(!text_font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-M.ttf"))
+    {
+        text_enabled = false;
+    }
+
     //causal::VariableContext::set_time_step_size(
     //            std::chrono::duration_cast<temporal::Duration>(frame_interval));
 
@@ -181,9 +195,10 @@ void QAgentsWidget::on_update()
 
             populate_render_stack();
 
-            sf::View view(sf::Vector2f(get_pixels_per_metre() * focal_position.x(),
-                                       -get_pixels_per_metre() * focal_position.y()),
-                          sf::Vector2f(width(), height()));
+            sf::Vector2f centre = sf::Vector2f(get_pixels_per_metre() * focal_position.x(),
+                                               -get_pixels_per_metre() * focal_position.y());
+            sf::Vector2f dims = sf::Vector2f(width(), height());
+            sf::View view(centre, dims);
             setView(view);
 
             clear(sf::Color(0, 0, 0));
@@ -191,6 +206,14 @@ void QAgentsWidget::on_update()
             {
                 draw(*(render_stack[i]));
             }
+
+            sf::Text timer_text(
+                        std::to_string(
+                            std::chrono::duration_cast<std::chrono::duration<FP_DATA_TYPE>>(
+                                current_time.time_since_epoch()).count()) + " s",
+                        text_font, 16);
+            timer_text.setPosition(centre.x - 0.5 * width(), centre.y - 0.5 * height());
+            draw(timer_text);
 
             update_required = false;
         }
@@ -232,9 +255,10 @@ QAgentsWidget::QAgentsWidget(
         QWidget *parent, QPoint const &position, QSize const &size, temporal::Time start_time,
         temporal::Time end_time, std::chrono::milliseconds frame_interval,
         FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre, FocusMode focus_mode) :
-    AQSFMLCanvas(parent, position, size, frame_interval), frame_interval(frame_interval),
-    realtime_factor(realtime_factor), pixels_per_metre(pixels_per_metre), focus_mode(focus_mode),
-    focal_agent_ids(nullptr), start_time(start_time), end_time(end_time), current_time(start_time),
+    AQSFMLCanvas(parent, position, size, frame_interval), text_enabled(true),
+    frame_interval(frame_interval), realtime_factor(realtime_factor),
+    pixels_per_metre(pixels_per_metre), focus_mode(focus_mode), focal_agent_ids(nullptr),
+    start_time(start_time), end_time(end_time), current_time(start_time),
     last_realtime(std::chrono::time_point<std::chrono::steady_clock>::min()),
     update_required(false) {}
 

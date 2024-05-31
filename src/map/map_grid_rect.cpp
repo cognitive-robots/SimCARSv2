@@ -10,7 +10,7 @@ namespace simcars
 namespace map
 {
 
-MapGridRect::MapGridRect(geometry::Vec origin, double size)
+MapGridRect::MapGridRect(geometry::Vec origin, FP_DATA_TYPE size)
     : geometry::GridRect<MapGridRect>(origin, size, size) {}
 
 structures::ISet<ILane const*> const* MapGridRect::get_lanes() const

@@ -32,9 +32,13 @@ bool CalcFWDCarActionOutcomeRewardVariable::get_value(RewardFWDCarOutcomeActionT
 
         for (size_t i = 0; i < outcome_action_pairs.count(); ++i)
         {
-            val.push_back(RewardFWDCarOutcomeActionTuple(fwd_car_reward_calculator->calc_reward(
-                                                             &(outcome_action_pairs[i].first),
-                                                             &reward_parameters),
+            FP_DATA_TYPE reward = fwd_car_reward_calculator->calc_reward(
+                        &(outcome_action_pairs[i].first),
+                        &reward_parameters);
+            //std::cout << "Action [" << i << "]: " <<  outcome_action_pairs[i].second << std::endl;
+            //std::cout << "Outcome [" << i << "]: " <<  outcome_action_pairs[i].first << std::endl;
+            //std::cout << "Reward [" << i << "]: " <<  reward << std::endl;
+            val.push_back(RewardFWDCarOutcomeActionTuple(reward,
                                                          outcome_action_pairs[i].first,
                                                          outcome_action_pairs[i].second));
         }

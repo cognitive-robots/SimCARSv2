@@ -1,10 +1,10 @@
 
 #include <ori/simcars/structures/stl/stl_set.hpp>
 #include <ori/simcars/geometry/trig_buff.hpp>
-#include <ori/simcars/map/highd/highd_map.hpp>
+#include <ori/simcars/map/laneletd/laneletd_map.hpp>
 #include <ori/simcars/causal/variable_context.hpp>
 #include <ori/simcars/agents/fwd_car_action_extractor.hpp>
-#include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
+#include <ori/simcars/agents/otherd/otherd_fwd_car_scene.hpp>
 
 #include <iostream>
 #include <exception>
@@ -13,24 +13,25 @@ using namespace ori::simcars;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 7)
+    if (argc < 8)
     {
-        std::cerr << "Usage: ./highd_action_extraction recording_meta_file_path tracks_meta_file_path "
-                     "tracks_file_path start_frame end_frame agent_id" <<
+        std::cerr << "Usage: ./laneletd_action_extraction lanelet_map_file_path "
+                     "recording_meta_file_path tracks_meta_file_path tracks_file_path start_frame "
+                     "end_frame agent_id" <<
                      std::endl;
         return -1;
     }
 
-    size_t start_frame = atoi(argv[4]);
-    size_t end_frame = atoi(argv[5]);
+    size_t start_frame = atoi(argv[5]);
+    size_t end_frame = atoi(argv[6]);
 
     geometry::TrigBuff::init_instance(360000, geometry::AngleType::RADIANS);
 
     std::cout << "Beginning map load" << std::endl;
 
-    map::highd::HighDMap map;
+    map::laneletd::LaneletDMap map;
 
-    map.load(argv[1]);
+    map.load(argv[1], argv[2]);
 
     std::cout << "Finished map load" << std::endl;
 
@@ -38,11 +39,11 @@ int main(int argc, char *argv[])
 
     agents::IFWDCarScene *scene;
 
-    scene = new agents::highd::HighDFWDCarScene(argv[2], argv[3], start_frame, end_frame);
+    scene = new agents::otherd::OtherDFWDCarScene(argv[2], argv[3], argv[4], start_frame, end_frame);
 
     std::cout << "Finished scene load" << std::endl;
 
-    uint64_t agent_id = atoi(argv[6]);
+    uint64_t agent_id = atoi(argv[7]);
 
     agents::FWDCar *fwd_car = scene->get_fwd_car(agent_id);
 

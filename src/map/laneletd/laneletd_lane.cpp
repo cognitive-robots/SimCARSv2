@@ -16,7 +16,8 @@ LaneletDLane::LaneletDLane(uint64_t id, uint64_t left_adjacent_lane_id,
                            uint64_t right_adjacent_lane_id,
                            structures::IArray<uint64_t> *fore_lanes,
                            structures::IArray<uint64_t> *aft_lanes,
-                           IMap const *map, lanelet::ConstLanelet &lanelet) :
+                           IMap const *map, lanelet::ConstLanelet &lanelet,
+                           geometry::Vec const &utm_origin) :
     ALane(id, left_adjacent_lane_id, right_adjacent_lane_id, fore_lanes, aft_lanes, map),
     AMapObject(id, map)
 {
@@ -34,26 +35,26 @@ LaneletDLane::LaneletDLane(uint64_t id, uint64_t left_adjacent_lane_id,
     size_t i;
     for (i = 0; i < left_boundary_line_string.size(); ++i)
     {
-        geometry::Vec const &point = left_boundary_line_string[i].basicPoint();
+        geometry::Vec const point = left_boundary_line_string[i].basicPoint() - utm_origin;
         left_boundary.col(i) = point;
         centroid += point;
         min_x = std::min(point.x(), min_x);
         max_x = std::max(point.x(), max_x);
         min_y = std::min(point.y(), min_y);
-        max_y = std::min(point.y(), max_y);
+        max_y = std::max(point.y(), max_y);
     }
 
     lanelet::ConstLineString2d right_boundary_line_string = lanelet.rightBound2d();
     right_boundary = geometry::Vecs::Zero(2, right_boundary_line_string.size());
     for (i = 0; i < right_boundary_line_string.size(); ++i)
     {
-        geometry::Vec const &point = right_boundary_line_string[i].basicPoint();
+        geometry::Vec const point = right_boundary_line_string[i].basicPoint() - utm_origin;
         right_boundary.col(i) = point;
         centroid += point;
         min_x = std::min(point.x(), min_x);
         max_x = std::max(point.x(), max_x);
         min_y = std::min(point.y(), min_y);
-        max_y = std::min(point.y(), max_y);
+        max_y = std::max(point.y(), max_y);
     }
 
     centroid /= (left_boundary_line_string.size() + right_boundary_line_string.size());
@@ -67,7 +68,7 @@ LaneletDLane::LaneletDLane(uint64_t id, uint64_t left_adjacent_lane_id,
     geometry::Vec previous_diff;
     for (i = 0; i < centre_line_string.size(); ++i)
     {
-        waypoints.col(i) = centre_line_string[i].basicPoint();
+        waypoints.col(i) = centre_line_string[i].basicPoint() - utm_origin;
 
         if (i > 0)
         {
@@ -178,7 +179,7 @@ geometry::Vec LaneletDLane::map_point(geometry::Vec const &point) const
         {
             return waypoints.col(i);
         }
-        else if (lane_dist < waypoint_diff.norm())
+        else if (lane_dist < waypoint_diff.norm() || i == waypoints.cols() - 2)
         {
             return waypoints.col(i) + lane_dir * lane_dist;
         }

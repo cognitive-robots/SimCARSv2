@@ -59,7 +59,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
         size_t initial_frame = tracks_meta_doc.GetCell<size_t>("initialFrame", i);
         size_t final_frame = tracks_meta_doc.GetCell<size_t>("finalFrame", i);
 
-        if ((start_frame < end_frame) && (initial_frame > end_frame || final_frame < start_frame))
+        if ((start_frame < end_frame) && (initial_frame >= end_frame || final_frame < start_frame))
         {
             continue;
         }
@@ -67,11 +67,39 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
         min_frame = std::min(initial_frame, min_frame);
         max_frame = std::max(final_frame, max_frame);
 
-        // Several big approximations here based off Toyota Ascent Sport (Hybrid), 1.8L
-        FP_DATA_TYPE approx_height = 0.806 * width;
-        FP_DATA_TYPE approx_mass = 116 * length * width * approx_height;
-        FP_DATA_TYPE approx_axel_dist = 0.292 * length;
-        FP_DATA_TYPE approx_wheel_radius = 0.19;
+        FP_DATA_TYPE approx_height;
+        FP_DATA_TYPE approx_mass;
+        FP_DATA_TYPE approx_axel_dist;
+        FP_DATA_TYPE approx_wheel_radius;
+        if (tracks_meta_doc.GetCell<std::string>("class", i) == "motorcycle" ||
+                tracks_meta_doc.GetCell<std::string>("class", i) == "bicycle")
+        {
+            // Several big approximations here based off Honda Super Cub C125 2022
+            length = 1.915;
+            width = 0.72;
+            approx_height = 1;
+            approx_mass = 110;
+            approx_axel_dist = 0.6225;
+            approx_wheel_radius = 0.17;
+        }
+        else if (tracks_meta_doc.GetCell<std::string>("class", i) == "pedestrian")
+        {
+            // Based upon an average human female
+            length = 0.25;
+            width = 0.4;
+            approx_height = 1.6;
+            approx_mass = 70;
+            approx_axel_dist = 0.01;
+            approx_wheel_radius = 0.8;
+        }
+        else
+        {
+            // Several big approximations here based off Toyota Ascent Sport (Hybrid), 1.8L
+            approx_height = 0.806 * width;
+            approx_mass = 116 * length * width * approx_height;
+            approx_axel_dist = 0.292 * length;
+            approx_wheel_radius = 0.19;
+        }
 
         FWDCar *fwd_car = new FWDCar(id, approx_mass, length, width, approx_height,
                                      approx_wheel_radius, approx_axel_dist);
@@ -112,8 +140,8 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
         max_frame = std::min(end_frame, max_frame);
     }
 
-    min_time = temporal::Time(temporal::Duration(((min_frame - 1) * get_time_step_size())));
-    max_time = temporal::Time(temporal::Duration(((max_frame - 1) * get_time_step_size())));
+    min_time = temporal::Time(temporal::Duration((min_frame * get_time_step_size())));
+    max_time = temporal::Time(temporal::Duration((max_frame * get_time_step_size())));
 
     structures::stl::STLStackArray<uint32_t> id_array;
     structures::stl::STLDictionary<uint32_t, size_t> id_initial_frame_dict;
@@ -125,13 +153,10 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
     {
         uint32_t const id = tracks_meta_doc.GetCell<uint32_t>("trackId", i);
 
-        FP_DATA_TYPE length = tracks_meta_doc.GetCell<FP_DATA_TYPE>("length", i);
-        FP_DATA_TYPE width = tracks_meta_doc.GetCell<FP_DATA_TYPE>("width", i);
-
         size_t initial_frame = tracks_meta_doc.GetCell<size_t>("initialFrame", i);
         size_t final_frame = tracks_meta_doc.GetCell<size_t>("finalFrame", i);
 
-        if (initial_frame > end_frame || final_frame < start_frame)
+        if (initial_frame >= end_frame || final_frame < start_frame)
         {
             continue;
         }
@@ -139,9 +164,9 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
         id_array.push_back(id);
         id_initial_frame_dict.update(id, initial_frame);
         id_final_frame_dict.update(id, final_frame);
-        id_pos_dict.update(id, new structures::stl::STLStackArray<geometry::Vec>(1 + end_frame -
+        id_pos_dict.update(id, new structures::stl::STLStackArray<geometry::Vec>(end_frame -
                                                                                  start_frame));
-        id_rot_dict.update(id, new structures::stl::STLStackArray<FP_DATA_TYPE>(1 + end_frame -
+        id_rot_dict.update(id, new structures::stl::STLStackArray<FP_DATA_TYPE>(end_frame -
                                                                                 start_frame));
 
         for (; j < tracks_doc.GetRowCount(); ++j)
@@ -160,16 +185,16 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
         size_t const tracks_start_row = j;
         size_t const tracks_end_row = tracks_start_row + (final_frame - initial_frame);
         j = tracks_end_row + 1;
-        for (k = tracks_start_row; k <= tracks_end_row; ++k)
+        for (k = tracks_start_row; k < tracks_end_row; ++k)
         {
             uint32_t current_frame = tracks_doc.GetCell<uint32_t>("frame", k);
 
-            if (current_frame > end_frame) break;
+            if (current_frame >= end_frame) break;
             if (current_frame < start_frame) continue;
 
             FP_DATA_TYPE const position_x = tracks_doc.GetCell<FP_DATA_TYPE>("xCenter", k);
             FP_DATA_TYPE const position_y = tracks_doc.GetCell<FP_DATA_TYPE>("yCenter", k);
-            geometry::Vec const position = geometry::Vec(position_x, position_y) + utm_origin;
+            geometry::Vec const position = geometry::Vec(position_x, position_y);// + utm_origin;
 
             (*(id_pos_dict[id]))[current_frame - start_frame] = position;
 
@@ -181,11 +206,11 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
     }
 
     simcars::causal::VariableContext::set_time_step_size(get_time_step_size());
-    for (i = 0; i < 1 + end_frame - start_frame; ++i)
+    for (i = 0; i < end_frame - start_frame; ++i)
     {
         uint32_t current_frame = start_frame + i;
 
-        temporal::Time current_time = temporal::Time(temporal::Duration(((current_frame - 1) *
+        temporal::Time current_time = temporal::Time(temporal::Duration((current_frame *
                                                                          get_time_step_size())));
 
         simcars::causal::VariableContext::set_current_time(current_time);
@@ -195,7 +220,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
             uint32_t id = id_array[j];
 
             if (current_frame < id_initial_frame_dict[id] ||
-                    current_frame > id_final_frame_dict[id])
+                    current_frame >= id_final_frame_dict[id])
             {
                 continue;
             }

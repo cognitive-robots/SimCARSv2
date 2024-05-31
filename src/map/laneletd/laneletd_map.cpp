@@ -30,6 +30,48 @@ LaneletDMap::~LaneletDMap()
     clear();
 }
 
+geometry::Vec LaneletDMap::get_map_centre() const
+{
+    structures::IArray<LaneletDLane*> const *lane_array = id_to_lane_dict.get_values();
+
+    FP_DATA_TYPE min_x = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_x = std::numeric_limits<FP_DATA_TYPE>::min();
+    FP_DATA_TYPE min_y = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_y = std::numeric_limits<FP_DATA_TYPE>::min();
+
+    for (size_t i = 0; i < lane_array->count(); ++i)
+    {
+        geometry::Rect const &rect = (*lane_array)[i]->get_bounding_box();
+        min_x = std::min(rect.get_min_x(), min_x);
+        max_x = std::max(rect.get_max_x(), max_x);
+        min_y = std::min(rect.get_min_y(), min_y);
+        max_y = std::max(rect.get_max_y(), max_y);
+    }
+
+    return geometry::Vec((min_x + max_x) / 2, (min_y + max_y) / 2);
+}
+
+FP_DATA_TYPE LaneletDMap::get_max_dim_size() const
+{
+    structures::IArray<LaneletDLane*> const *lane_array = id_to_lane_dict.get_values();
+
+    FP_DATA_TYPE min_x = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_x = std::numeric_limits<FP_DATA_TYPE>::min();
+    FP_DATA_TYPE min_y = std::numeric_limits<FP_DATA_TYPE>::max();
+    FP_DATA_TYPE max_y = std::numeric_limits<FP_DATA_TYPE>::min();
+
+    for (size_t i = 0; i < lane_array->count(); ++i)
+    {
+        geometry::Rect const &rect = (*lane_array)[i]->get_bounding_box();
+        min_x = std::min(rect.get_min_x(), min_x);
+        max_x = std::max(rect.get_max_x(), max_x);
+        min_y = std::min(rect.get_min_y(), min_y);
+        max_y = std::max(rect.get_max_y(), max_y);
+    }
+
+    return std::max(max_x - min_x, max_y - min_y);
+}
+
 ILane const* LaneletDMap::get_lane(uint64_t id) const
 {
     if (id_to_lane_dict.contains(id))
@@ -123,7 +165,7 @@ void LaneletDMap::load(std::string const &input_file_path_str,
 
     lanelet::projection::UtmProjector utm_projector(
                 lanelet::Origin({recording_meta_csv_document.GetCell<FP_DATA_TYPE>("latLocation", 0),
-                                 recording_meta_csv_document.GetCell<FP_DATA_TYPE>("lonLocation", 0)}));
+                                 recording_meta_csv_document.GetCell<FP_DATA_TYPE>("lonLocation", 0)}), false);
     lanelet::LaneletMapPtr lanelet_map = lanelet::load(input_file_path.string(), utm_projector, nullptr, lanelet::io::Configuration());
 
     lanelet::traffic_rules::TrafficRulesPtr traffic_rules =
@@ -131,6 +173,9 @@ void LaneletDMap::load(std::string const &input_file_path_str,
                                                                 lanelet::Participants::Vehicle);
     lanelet::routing::RoutingGraphUPtr routing_graph = lanelet::routing::RoutingGraph::build(
                 *lanelet_map, *traffic_rules);
+
+    geometry::Vec utm_origin(recording_meta_csv_document.GetCell<FP_DATA_TYPE>("xUtmOrigin", 0),
+                             recording_meta_csv_document.GetCell<FP_DATA_TYPE>("yUtmOrigin", 0));
 
     lanelet::LaneletLayer &lanelet_layer = lanelet_map->laneletLayer;
 
@@ -181,7 +226,8 @@ void LaneletDMap::load(std::string const &input_file_path_str,
                                                                       right_adjacent_lane_id,
                                                                       fore_lanes,
                                                                       aft_lanes,
-                                                                      this, current_lanelet));
+                                                                      this, current_lanelet,
+                                                                      utm_origin));
     }
 }
 
