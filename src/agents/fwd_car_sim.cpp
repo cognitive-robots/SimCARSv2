@@ -15,9 +15,8 @@ FWDCarSim::FWDCarSim(FWDCar *fwd_car, temporal::Time start_time) :
     RectRigidBodySim(fwd_car, start_time),
     FWDCar(*fwd_car),
 
-    sim_motor_torque(fwd_car->get_motor_torque_variable(), &(this->motor_torque_buff),
-    &sim_start_time),
-    sim_steer(fwd_car->get_steer_variable(), &(this->steer_buff), &sim_start_time)
+    sim_motor_torque(fwd_car->get_motor_torque_variable(), &(this->motor_torque_buff), start_time),
+    sim_steer(fwd_car->get_steer_variable(), &(this->steer_buff), start_time)
 {
     dir.set_parent(&sim_rot);
 

@@ -18,8 +18,6 @@ namespace agents
 class FullControlFWDCarSim : public FullControlFWDCar
 {
 protected:
-    simcars::causal::TimeFixedVariable sim_start_time;
-
     simcars::causal::ScalarFixedVariable zero_cumil_lane_trans;
     simcars::causal::ScalarProxyVariable zero_cumil_lane_trans_proxy;
 

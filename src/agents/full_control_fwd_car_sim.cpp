@@ -14,8 +14,6 @@ FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_c
                                            temporal::Time start_time) :
     FullControlFWDCar(*full_control_fwd_car),
 
-    sim_start_time(start_time),
-
     zero_cumil_lane_trans(0),
     zero_cumil_lane_trans_proxy(&zero_cumil_lane_trans),
 
@@ -23,7 +21,7 @@ FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_c
     prev_lane_encaps(&lane_encaps),
     lane_trans(&prev_lane_encaps, &lane_encaps, map),
 
-    sim_cumil_lane_trans(&zero_cumil_lane_trans_proxy, &cumil_lane_trans, &sim_start_time),
+    sim_cumil_lane_trans(&zero_cumil_lane_trans_proxy, &cumil_lane_trans, start_time),
     prev_cumil_lane_trans(&sim_cumil_lane_trans),
 
     cumil_lane_trans(&lane_trans, &prev_cumil_lane_trans)

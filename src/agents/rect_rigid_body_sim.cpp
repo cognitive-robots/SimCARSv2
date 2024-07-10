@@ -12,33 +12,30 @@ RectRigidBodySim::RectRigidBodySim(RectRigidBody *rect_rigid_body,
                                    temporal::Time start_time) :
     RectRigidBody(*rect_rigid_body),
 
-    sim_start_time(start_time),
-
     sim_dist_headway(rect_rigid_body->get_dist_headway_variable(), &(this->dist_headway_buff),
-                     &sim_start_time),
+                     start_time),
 
-    sim_env_force(rect_rigid_body->get_env_force_variable(), &(this->env_force_buff),
-                  &sim_start_time),
+    sim_env_force(rect_rigid_body->get_env_force_variable(), &(this->env_force_buff), start_time),
     sim_other_force(rect_rigid_body->get_other_force_variable(), &(this->other_force_buff),
-                    &sim_start_time),
-    sim_lin_acc(rect_rigid_body->get_lin_acc_variable(), &(this->lin_acc_buff), &sim_start_time),
-    sim_lin_vel(rect_rigid_body->get_lin_vel_variable(), &(this->lin_vel_buff), &sim_start_time),
-    sim_pos(rect_rigid_body->get_pos_variable(), &(this->pos_buff), &sim_start_time),
+                    start_time),
+    sim_lin_acc(rect_rigid_body->get_lin_acc_variable(), &(this->lin_acc_buff), start_time),
+    sim_lin_vel(rect_rigid_body->get_lin_vel_variable(), &(this->lin_vel_buff), start_time),
+    sim_pos(rect_rigid_body->get_pos_variable(), &(this->pos_buff), start_time),
 
     sim_env_torque(rect_rigid_body->get_env_torque_variable(), &(this->env_torque_buff),
-                   &sim_start_time),
+                   start_time),
     sim_other_torque(rect_rigid_body->get_other_torque_variable(), &(this->other_torque_buff),
-                   &sim_start_time),
-    sim_ang_acc(rect_rigid_body->get_ang_acc_variable(), &(this->ang_acc_buff), &sim_start_time),
-    sim_ang_vel(rect_rigid_body->get_ang_vel_variable(), &(this->ang_vel_buff), &sim_start_time),
-    sim_rot(rect_rigid_body->get_rot_variable(), &(this->rot_buff), &sim_start_time),
+                   start_time),
+    sim_ang_acc(rect_rigid_body->get_ang_acc_variable(), &(this->ang_acc_buff), start_time),
+    sim_ang_vel(rect_rigid_body->get_ang_vel_variable(), &(this->ang_vel_buff), start_time),
+    sim_rot(rect_rigid_body->get_rot_variable(), &(this->rot_buff), start_time),
 
     zero_max_env_force_mag(0.0),
     zero_max_env_force_mag_proxy(&zero_max_env_force_mag),
 
     env_force_mag(&sim_env_force),
 
-    sim_max_env_force_mag(&zero_max_env_force_mag_proxy, &max_env_force_mag, &sim_start_time),
+    sim_max_env_force_mag(&zero_max_env_force_mag_proxy, &max_env_force_mag, start_time),
     prev_max_env_force_mag(&sim_max_env_force_mag),
 
     max_env_force_mag(&env_force_mag, &prev_max_env_force_mag)

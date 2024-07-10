@@ -10,44 +10,32 @@ namespace simcars
 namespace causal
 {
 
+ScalarTimeConditionalVariable::ScalarTimeConditionalVariable(
+        IEndogenousVariable<FP_DATA_TYPE> *endogenous_parent, IVariable<FP_DATA_TYPE> *other_parent,
+        temporal::Time time) : ABinaryEndogenousVariable(endogenous_parent, other_parent),
+    time(time) {}
+
 bool ScalarTimeConditionalVariable::get_value(FP_DATA_TYPE &val) const
 {
-    temporal::Time time;
-    if (get_other_parent()->get_value(time))
+    if (time > VariableContext::get_current_time())
     {
-        if (time > VariableContext::get_current_time())
-        {
-            return get_endogenous_parent_1()->get_value(val);
-        }
-        else
-        {
-            return get_endogenous_parent_2()->get_value(val);
-        }
+        return get_endogenous_parent()->get_value(val);
     }
     else
     {
-        return false;
+        return get_other_parent()->get_value(val);
     }
 }
 
 bool ScalarTimeConditionalVariable::set_value(FP_DATA_TYPE const &val)
 {
-    // TODO: Allow set to change time variable
-    temporal::Time time;
-    if (get_other_parent()->get_value(time))
+    if (time > VariableContext::get_current_time())
     {
-        if (time > VariableContext::get_current_time())
-        {
-            return get_endogenous_parent_1()->set_value(val);
-        }
-        else
-        {
-            return get_endogenous_parent_2()->set_value(val);
-        }
+        return get_endogenous_parent()->set_value(val);
     }
     else
     {
-        return true;
+        return get_other_parent()->set_value(val);
     }
 }
 

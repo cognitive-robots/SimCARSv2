@@ -17,8 +17,6 @@ namespace agents
 class RectRigidBodySim : public virtual RectRigidBody
 {
 protected:
-    simcars::causal::TimeFixedVariable sim_start_time;
-
     simcars::causal::ScalarTimeConditionalVariable sim_dist_headway;
 
     simcars::causal::VectorTimeConditionalVariable sim_env_force;

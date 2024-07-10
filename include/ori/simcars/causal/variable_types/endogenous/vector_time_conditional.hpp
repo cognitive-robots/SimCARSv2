@@ -2,7 +2,7 @@
 
 #include <ori/simcars/geometry/typedefs.hpp>
 #include <ori/simcars/temporal/typedefs.hpp>
-#include <ori/simcars/causal/ternary_endogenous_variable_abstract.hpp>
+#include <ori/simcars/causal/binary_endogenous_variable_abstract.hpp>
 
 namespace ori
 {
@@ -12,11 +12,13 @@ namespace causal
 {
 
 class VectorTimeConditionalVariable :
-        public ATernaryEndogenousVariable<geometry::Vec, geometry::Vec, geometry::Vec, temporal::Time>
+        public ABinaryEndogenousVariable<geometry::Vec, geometry::Vec, geometry::Vec>
 {
+    temporal::Time const time;
+
 public:
-    using ATernaryEndogenousVariable<geometry::Vec, geometry::Vec, geometry::Vec,
-    temporal::Time>::ATernaryEndogenousVariable;
+    VectorTimeConditionalVariable(IEndogenousVariable<geometry::Vec> *endogenous_parent,
+                                  IVariable<geometry::Vec> *other_parent, temporal::Time time);
 
     bool get_value(geometry::Vec &val) const override;
 
