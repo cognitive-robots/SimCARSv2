@@ -454,9 +454,11 @@ add_library(simcars_visualisation STATIC
   src/visualisation/qsfml_canvas_abstract.cpp
   src/visualisation/qdriving_agents_widget.cpp
   src/visualisation/qdriving_map_agents_widget.cpp
+  src/visualisation/qped_agents_widget.cpp
   include/ori/simcars/visualisation/qsfml_canvas_abstract.hpp
   include/ori/simcars/visualisation/qdriving_agents_widget.hpp
   include/ori/simcars/visualisation/qdriving_map_agents_widget.hpp
+  include/ori/simcars/visualisation/qped_agents_widget.hpp
 )
 target_include_directories(simcars_visualisation
 PUBLIC
@@ -565,3 +567,7 @@ add_dependencies(plg_map_test simcars_utils simcars_structures simcars_geometry 
 add_executable(thor_magni_scene_test src/thor_magni_scene_test/thor_magni_scene_test.cpp)
 target_link_libraries(thor_magni_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 add_dependencies(thor_magni_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
+
+add_executable(thor_magni_visualisation src/thor_magni_visualisation/thor_magni_visualisation.cpp)
+target_link_libraries(thor_magni_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
+add_dependencies(thor_magni_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)

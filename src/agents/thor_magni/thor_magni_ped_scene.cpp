@@ -27,10 +27,10 @@ ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc)
     for (size_t i = 0; i < scene_doc.GetRowCount(); ++i)
     {
         std::string const id_str = scene_doc.GetCell<std::string>("ag_id", i);
-        uint32_t const id = str_hash(id_str);
+        uint64_t const id = str_hash(id_str);
 
         size_t const frame = scene_doc.GetCell<size_t>("frame_id", i);
-        temporal::Time const time(temporal::Duration(((frame - 1) * get_time_step_size())));
+        temporal::Time const time(((frame - 1) / 20) * get_time_step_size());
         min_time = std::min(time, min_time);
         max_time = std::max(time, max_time);
 
