@@ -12,7 +12,7 @@ namespace simcars
 namespace visualisation
 {
 
-class QAgentsWidget : public AQSFMLCanvas, public structures::stl::STLSet<agents::FWDCar*>
+class QDrivingAgentsWidget : public AQSFMLCanvas, public structures::stl::STLSet<agents::FWDCar*>
 {
 public:
     enum class FocusMode
@@ -61,13 +61,13 @@ protected:
     virtual void populate_render_stack();
 
 public:
-    QAgentsWidget(QWidget *parent, QPoint const &position, QSize const &size,
+    QDrivingAgentsWidget(QWidget *parent, QPoint const &position, QSize const &size,
                   temporal::Time start_time, temporal::Time end_time,
                   std::chrono::milliseconds frame_interval = std::chrono::milliseconds(100),
                   FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 10.0,
                   FocusMode focus_mode = FocusMode::ALL_AGENTS);
 
-    ~QAgentsWidget();
+    ~QDrivingAgentsWidget();
 
     FP_DATA_TYPE get_realtime_factor() const;
     FP_DATA_TYPE get_pixels_per_metre() const;

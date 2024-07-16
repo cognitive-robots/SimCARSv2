@@ -13,7 +13,7 @@ namespace map
 namespace highd
 {
 
-class HighDMap : public virtual IMap
+class HighDMap : public virtual IDrivingMap
 {
     structures::stl::STLDictionary<uint64_t, HighDLane*> id_to_lane_dict;
 

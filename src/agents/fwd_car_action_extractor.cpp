@@ -483,7 +483,7 @@ structures::IArray<TimeGoalPair<uint64_t>>* FWDCarActionExtractor::extract_lane_
     return lane_goals;
 }
 
-FWDCarActionExtractor::FWDCarActionExtractor(map::IMap *map, temporal::Duration resolution,
+FWDCarActionExtractor::FWDCarActionExtractor(map::IDrivingMap *map, temporal::Duration resolution,
                                              temporal::Duration action_min_duration,
                                              FP_DATA_TYPE action_min_lon_lin_acc,
                                              FP_DATA_TYPE action_min_lon_lin_vel_diff,

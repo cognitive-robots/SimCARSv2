@@ -12,7 +12,7 @@
 #include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 #include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
 #include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
-#include <ori/simcars/visualisation/qmap_agents_widget.hpp>
+#include <ori/simcars/visualisation/qdriving_map_agents_widget.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
@@ -270,8 +270,8 @@ int main(int argc, char *argv[])
     frame->setFixedSize(1280, 1280);
     frame->show();
 
-    visualisation::QMapAgentsWidget *map_scene_widget =
-            new visualisation::QMapAgentsWidget(
+    visualisation::QDrivingMapAgentsWidget *map_scene_widget =
+            new visualisation::QDrivingMapAgentsWidget(
                 &map,
                 frame,
                 QPoint(10, 10),
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
                 scene.get_min_time(),
                 scene.get_max_time(),
                 std::chrono::milliseconds(40), 1.0, 3.0,
-                visualisation::QMapAgentsWidget::FocusMode::FIXED);
+                visualisation::QDrivingMapAgentsWidget::FocusMode::FIXED);
 
     map_scene_widget->set_focal_position(map.get_map_centre());
 

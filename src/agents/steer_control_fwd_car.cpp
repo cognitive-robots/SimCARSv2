@@ -20,7 +20,7 @@ void SteerControlFWDCar::init_links()
     steer.set_parent(&actual_steer);
 }
 
-SteerControlFWDCar::SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_abs_steer_value) :
+SteerControlFWDCar::SteerControlFWDCar(map::IDrivingMap const *map, FP_DATA_TYPE max_abs_steer_value) :
     map(map),
 
     max_steer(max_abs_steer_value),

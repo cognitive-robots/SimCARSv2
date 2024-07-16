@@ -1,5 +1,5 @@
 
-#include <ori/simcars/visualisation/qagents_widget.hpp>
+#include <ori/simcars/visualisation/qdriving_agents_widget.hpp>
 
 #include <ori/simcars/geometry/o_rect.hpp>
 #include <ori/simcars/causal/variable_context.hpp>
@@ -13,7 +13,7 @@ namespace simcars
 namespace visualisation
 {
 
-void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
+void QDrivingAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
 {
     geometry::ORect agent_rect;
     bool res = agent->get_rect_variable()->get_value(agent_rect);
@@ -161,7 +161,7 @@ void QAgentsWidget::add_agent_to_render_stack(agents::FWDCar *agent)
     }
 }
 
-void QAgentsWidget::on_init()
+void QDrivingAgentsWidget::on_init()
 {
     // TODO: Make this non-OS specific
     if(!text_font.loadFromFile("/usr/share/fonts/truetype/ubuntu/Ubuntu-M.ttf"))
@@ -175,7 +175,7 @@ void QAgentsWidget::on_init()
     on_update();
 }
 
-void QAgentsWidget::on_update()
+void QDrivingAgentsWidget::on_update()
 {
     if (data_mutex.try_lock())
     {
@@ -220,12 +220,12 @@ void QAgentsWidget::on_update()
     }
 }
 
-void QAgentsWidget::add_to_render_stack(sf::Drawable const *drawable)
+void QDrivingAgentsWidget::add_to_render_stack(sf::Drawable const *drawable)
 {
     render_stack.push_back(drawable);
 }
 
-void QAgentsWidget::add_agents_to_render_stack()
+void QDrivingAgentsWidget::add_agents_to_render_stack()
 {
     if (focus_mode == FocusMode::ALL_AGENTS || focus_mode == FocusMode::FOCAL_AGENTS)
     {
@@ -246,12 +246,12 @@ void QAgentsWidget::add_agents_to_render_stack()
     }
 }
 
-void QAgentsWidget::populate_render_stack()
+void QDrivingAgentsWidget::populate_render_stack()
 {
     add_agents_to_render_stack();
 }
 
-QAgentsWidget::QAgentsWidget(
+QDrivingAgentsWidget::QDrivingAgentsWidget(
         QWidget *parent, QPoint const &position, QSize const &size, temporal::Time start_time,
         temporal::Time end_time, std::chrono::milliseconds frame_interval,
         FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre, FocusMode focus_mode) :
@@ -262,7 +262,7 @@ QAgentsWidget::QAgentsWidget(
     last_realtime(std::chrono::time_point<std::chrono::steady_clock>::min()),
     update_required(false) {}
 
-QAgentsWidget::~QAgentsWidget()
+QDrivingAgentsWidget::~QDrivingAgentsWidget()
 {
     for (size_t i = 0; i < render_stack.count(); ++i)
     {
@@ -270,48 +270,48 @@ QAgentsWidget::~QAgentsWidget()
     }
 }
 
-FP_DATA_TYPE QAgentsWidget::get_realtime_factor() const
+FP_DATA_TYPE QDrivingAgentsWidget::get_realtime_factor() const
 {
     return realtime_factor;
 }
 
-FP_DATA_TYPE QAgentsWidget::get_pixels_per_metre() const
+FP_DATA_TYPE QDrivingAgentsWidget::get_pixels_per_metre() const
 {
     return pixels_per_metre;
 }
 
-QAgentsWidget::FocusMode QAgentsWidget::get_focus_mode() const
+QDrivingAgentsWidget::FocusMode QDrivingAgentsWidget::get_focus_mode() const
 {
     return focus_mode;
 }
 
-geometry::Vec const& QAgentsWidget::get_focal_position() const
+geometry::Vec const& QDrivingAgentsWidget::get_focal_position() const
 {
     return focal_position;
 }
 
-structures::IArray<uint64_t> const* QAgentsWidget::get_focal_agent_ids() const
+structures::IArray<uint64_t> const* QDrivingAgentsWidget::get_focal_agent_ids() const
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
     return focal_agent_ids;
 }
 
-temporal::Time QAgentsWidget::get_time() const
+temporal::Time QDrivingAgentsWidget::get_time() const
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
     return current_time;
 }
 
-void QAgentsWidget::set_realtime_factor(FP_DATA_TYPE realtime_factor)
+void QDrivingAgentsWidget::set_realtime_factor(FP_DATA_TYPE realtime_factor)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
     this->realtime_factor = realtime_factor;
 }
 
-void QAgentsWidget::set_pixels_per_metre(FP_DATA_TYPE pixels_per_metre)
+void QDrivingAgentsWidget::set_pixels_per_metre(FP_DATA_TYPE pixels_per_metre)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
@@ -322,7 +322,7 @@ void QAgentsWidget::set_pixels_per_metre(FP_DATA_TYPE pixels_per_metre)
     }
 }
 
-void QAgentsWidget::set_focus_mode(FocusMode focus_mode)
+void QDrivingAgentsWidget::set_focus_mode(FocusMode focus_mode)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
@@ -333,7 +333,7 @@ void QAgentsWidget::set_focus_mode(FocusMode focus_mode)
     }
 }
 
-void QAgentsWidget::set_focal_position(geometry::Vec const &focal_position)
+void QDrivingAgentsWidget::set_focal_position(geometry::Vec const &focal_position)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
@@ -345,7 +345,7 @@ void QAgentsWidget::set_focal_position(geometry::Vec const &focal_position)
     }
 }
 
-void QAgentsWidget::set_focal_agent_ids(structures::IArray<uint64_t> const *focal_agent_ids)
+void QDrivingAgentsWidget::set_focal_agent_ids(structures::IArray<uint64_t> const *focal_agent_ids)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
@@ -366,7 +366,7 @@ void QAgentsWidget::set_focal_agent_ids(structures::IArray<uint64_t> const *foca
     }
 }
 
-void QAgentsWidget::set_agent_colour(uint64_t agent_id, sf::Color colour)
+void QDrivingAgentsWidget::set_agent_colour(uint64_t agent_id, sf::Color colour)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
@@ -378,7 +378,7 @@ void QAgentsWidget::set_agent_colour(uint64_t agent_id, sf::Color colour)
     id_colour_dict.update(agent_id, colour);
 }
 
-void QAgentsWidget::set_time(temporal::Time time)
+void QDrivingAgentsWidget::set_time(temporal::Time time)
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
@@ -398,7 +398,7 @@ void QAgentsWidget::set_time(temporal::Time time)
     update_required = true;
 }
 
-void QAgentsWidget::tick_forwards()
+void QDrivingAgentsWidget::tick_forwards()
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
@@ -426,7 +426,7 @@ void QAgentsWidget::tick_forwards()
     last_realtime = current_realtime;
 }
 
-void QAgentsWidget::tick_backwards()
+void QDrivingAgentsWidget::tick_backwards()
 {
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 

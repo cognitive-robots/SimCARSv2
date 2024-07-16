@@ -19,7 +19,7 @@ protected:
     void init_links() override;
 
 public:
-    FullControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_motor_torque_value,
+    FullControlFWDCar(map::IDrivingMap const *map, FP_DATA_TYPE max_motor_torque_value,
                       FP_DATA_TYPE min_motor_torque_value, FP_DATA_TYPE max_abs_steer_value);
     FullControlFWDCar(FullControlFWDCar const &control_fwd_car);
 };

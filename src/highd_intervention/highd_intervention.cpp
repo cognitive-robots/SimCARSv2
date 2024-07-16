@@ -9,7 +9,7 @@
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
 #include <ori/simcars/agents/fwd_car_action_intervention.hpp>
 #include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
-#include <ori/simcars/visualisation/qmap_agents_widget.hpp>
+#include <ori/simcars/visualisation/qdriving_map_agents_widget.hpp>
 
 #include <QApplication>
 #include <QFrame>
@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
 
     geometry::Vec focal_position(210.0f, 19.0f);
 
-    visualisation::QMapAgentsWidget *map_scene_widget =
-            new visualisation::QMapAgentsWidget(
+    visualisation::QDrivingMapAgentsWidget *map_scene_widget =
+            new visualisation::QDrivingMapAgentsWidget(
                 &map,
                 frame,
                 QPoint(10, 10),
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
                 scene->get_min_time(),
                 scene->get_max_time(),
                 std::chrono::milliseconds(40), 1.0, 3.0,
-                visualisation::QMapAgentsWidget::FocusMode::FIXED);
+                visualisation::QDrivingMapAgentsWidget::FocusMode::FIXED);
 
     map_scene_widget->set_focal_position(focal_position);
 

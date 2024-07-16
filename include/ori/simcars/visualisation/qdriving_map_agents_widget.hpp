@@ -3,7 +3,7 @@
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/map/map_interface.hpp>
 #include <ori/simcars/map/lane_interface.hpp>
-#include <ori/simcars/visualisation/qagents_widget.hpp>
+#include <ori/simcars/visualisation/qdriving_agents_widget.hpp>
 
 #include <random>
 
@@ -14,9 +14,9 @@ namespace simcars
 namespace visualisation
 {
 
-class QMapAgentsWidget : public QAgentsWidget
+class QDrivingMapAgentsWidget : public QDrivingAgentsWidget
 {
-    map::IMap const *map;
+    map::IDrivingMap const *map;
 
     void add_lane_to_render_stack(map::ILane const *lane);
 
@@ -26,7 +26,7 @@ protected:
     void add_map_to_render_stack();
 
 public:
-    QMapAgentsWidget(map::IMap const *map, QWidget *parent, QPoint const &position,
+    QDrivingMapAgentsWidget(map::IDrivingMap const *map, QWidget *parent, QPoint const &position,
                      QSize const &size, temporal::Time start_time, temporal::Time end_time,
                      std::chrono::milliseconds frame_interval = std::chrono::milliseconds(100),
                      FP_DATA_TYPE realtime_factor = 1.0f, FP_DATA_TYPE pixels_per_metre = 2.0,

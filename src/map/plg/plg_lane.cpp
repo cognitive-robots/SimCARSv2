@@ -15,9 +15,9 @@ namespace map
 namespace plg
 {
 
-PLGLane::PLGLane(uint64_t id, IMap const *map, geometry::Vecs const *vertices) :
+PLGLane::PLGLane(uint64_t id, IDrivingMap const *map, geometry::Vecs const *vertices) :
     ALane(id, 0, 0, new structures::stl::STLStackArray<uint64_t>,
-          new structures::stl::STLStackArray<uint64_t>, map), AMapObject(id, map),
+          new structures::stl::STLStackArray<uint64_t>, map), ADrivingMapObject(id, map),
     access_restriction(PLGLane::AccessRestriction::NO_RESTRICTION)
 {
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();

@@ -10,10 +10,11 @@ namespace map
 
 ALane::ALane(uint64_t id, uint64_t left_adjacent_lane_id, uint64_t right_adjacent_lane_id,
              structures::IArray<uint64_t> *fore_lane_ids,
-             structures::IArray<uint64_t> *aft_lane_ids, IMap const *map) : AMapObject(id, map),
-    left_adjacent_lane_id(left_adjacent_lane_id), right_adjacent_lane_id(right_adjacent_lane_id),
-    left_adjacent_lane(nullptr), right_adjacent_lane(nullptr),
-    fore_lane_branch(fore_lane_ids, map), aft_lane_branch(aft_lane_ids, map) {}
+             structures::IArray<uint64_t> *aft_lane_ids, IDrivingMap const *map) :
+    ADrivingMapObject(id, map), left_adjacent_lane_id(left_adjacent_lane_id),
+    right_adjacent_lane_id(right_adjacent_lane_id), left_adjacent_lane(nullptr),
+    right_adjacent_lane(nullptr), fore_lane_branch(fore_lane_ids, map),
+    aft_lane_branch(aft_lane_ids, map) {}
 
 ALane::Type ALane::get_type() const
 {

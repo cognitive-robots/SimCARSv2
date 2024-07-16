@@ -12,7 +12,7 @@
 #include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 #include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
 #include <ori/simcars/agents/otherd/otherd_fwd_car_scene.hpp>
-#include <ori/simcars/visualisation/qmap_agents_widget.hpp>
+#include <ori/simcars/visualisation/qdriving_map_agents_widget.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>

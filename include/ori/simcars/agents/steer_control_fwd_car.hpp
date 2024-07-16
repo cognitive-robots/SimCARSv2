@@ -23,7 +23,7 @@ class SteerControlFWDCar : public virtual ControlFWDCar
 protected:
     void init_links() override;
 
-    map::IMap const *map;
+    map::IDrivingMap const *map;
 
     simcars::causal::ScalarFixedVariable max_steer;
     simcars::causal::ScalarNegationVariable min_steer;
@@ -78,7 +78,7 @@ protected:
     simcars::causal::ScalarMaxVariable actual_steer;
 
 public:
-    SteerControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_abs_steer_value);
+    SteerControlFWDCar(map::IDrivingMap const *map, FP_DATA_TYPE max_abs_steer_value);
     SteerControlFWDCar(SteerControlFWDCar const &control_fwd_car);
 };
 

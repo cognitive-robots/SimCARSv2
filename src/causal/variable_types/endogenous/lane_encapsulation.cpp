@@ -10,7 +10,7 @@ namespace causal
 
 LaneEncapsulationVariable::LaneEncapsulationVariable(
         IEndogenousVariable<uint64_t> *endogenous_parent,
-        IVariable<geometry::Vec> *other_parent, map::IMap const *map) :
+        IVariable<geometry::Vec> *other_parent, map::IDrivingMap const *map) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent), map(map)
 {
     assert(map != nullptr);

@@ -26,7 +26,7 @@ class LaneletDLane : public virtual ALane
 public:
     LaneletDLane(uint64_t id, uint64_t left_adjacent_lane_id, uint64_t right_adjacent_lane_id,
                 structures::IArray<uint64_t> *fore_lanes, structures::IArray<uint64_t> *aft_lanes,
-                IMap const *map, lanelet::ConstLanelet &lanelet, geometry::Vec const &utm_origin);
+                IDrivingMap const *map, lanelet::ConstLanelet &lanelet, geometry::Vec const &utm_origin);
 
     geometry::Vecs const& get_left_boundary() const override;
     geometry::Vecs const& get_right_boundary() const override;

@@ -1,5 +1,5 @@
 
-#include <ori/simcars/visualisation/qmap_agents_widget.hpp>
+#include <ori/simcars/visualisation/qdriving_map_agents_widget.hpp>
 
 
 namespace ori
@@ -9,7 +9,7 @@ namespace simcars
 namespace visualisation
 {
 
-void QMapAgentsWidget::add_lane_to_render_stack(map::ILane const *lane)
+void QDrivingMapAgentsWidget::add_lane_to_render_stack(map::ILane const *lane)
 {
     sf::Color road_color(64, 64, 64);
     sf::Color markings_color(128, 128, 128);
@@ -100,13 +100,13 @@ void QMapAgentsWidget::add_lane_to_render_stack(map::ILane const *lane)
     add_to_render_stack(boundary_shape);
 }
 
-void QMapAgentsWidget::populate_render_stack()
+void QDrivingMapAgentsWidget::populate_render_stack()
 {
     add_map_to_render_stack();
     add_agents_to_render_stack();
 }
 
-void QMapAgentsWidget::add_map_to_render_stack()
+void QDrivingMapAgentsWidget::add_map_to_render_stack()
 {
     geometry::Vec const &point = get_focal_position();
     FP_DATA_TYPE distance = std::max(width() / get_pixels_per_metre(),
@@ -123,13 +123,13 @@ void QMapAgentsWidget::add_map_to_render_stack()
     delete lanes_in_view;
 }
 
-QMapAgentsWidget::QMapAgentsWidget(map::IMap const *map, QWidget *parent, QPoint const &position,
+QDrivingMapAgentsWidget::QDrivingMapAgentsWidget(map::IDrivingMap const *map, QWidget *parent, QPoint const &position,
                                    QSize const &size, temporal::Time start_time,
                                    temporal::Time end_time,
                                    std::chrono::milliseconds frame_interval,
                                    FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre,
                                    FocusMode focus_mode) :
-    QAgentsWidget(parent, position, size, start_time, end_time, frame_interval, realtime_factor,
+    QDrivingAgentsWidget(parent, position, size, start_time, end_time, frame_interval, realtime_factor,
                   pixels_per_metre),
     map(map) {}
 

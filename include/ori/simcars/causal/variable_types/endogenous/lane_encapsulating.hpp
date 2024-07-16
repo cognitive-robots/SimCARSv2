@@ -15,10 +15,10 @@ class LaneEncapsulatingVariable : public AUnaryEndogenousVariable<
         structures::stl::STLStackArray<uint64_t>,
         geometry::Vec>
 {
-    map::IMap const *map;
+    map::IDrivingMap const *map;
 
 public:
-    LaneEncapsulatingVariable(IVariable<geometry::Vec> *parent, map::IMap const *map);
+    LaneEncapsulatingVariable(IVariable<geometry::Vec> *parent, map::IDrivingMap const *map);
 
     bool get_value(structures::stl::STLStackArray<uint64_t> &val) const override;
 

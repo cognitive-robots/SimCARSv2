@@ -15,13 +15,13 @@ class LaneTransitionsCalcVariable : public ABinaryEndogenousVariable<FP_DATA_TYP
         structures::stl::STLStackArray<uint64_t>,
         structures::stl::STLStackArray<uint64_t>>
 {
-    map::IMap const *map;
+    map::IDrivingMap const *map;
 
 public:
     LaneTransitionsCalcVariable(
             IEndogenousVariable<structures::stl::STLStackArray<uint64_t>> *endogenous_parent,
             IVariable<structures::stl::STLStackArray<uint64_t>> *other_parent,
-            map::IMap const *map);
+            map::IDrivingMap const *map);
 
     bool get_value(FP_DATA_TYPE &val) const override;
 

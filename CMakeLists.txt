@@ -125,9 +125,8 @@ target_compile_options(simcars_temporal PRIVATE -fPIC)
 set_target_properties(simcars_temporal PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_map STATIC
-  src/map/map_object_abstract.cpp
+  src/map/driving_map_object_abstract.cpp
   src/map/lane_abstract.cpp
-  src/map/map_grid_rect.cpp
   src/map/lane_branch.cpp
   src/map/highd/highd_lane.cpp
   src/map/highd/highd_map.cpp
@@ -137,11 +136,11 @@ add_library(simcars_map STATIC
   src/map/plg/plg_map.cpp
   include/ori/simcars/map/declarations.hpp
   include/ori/simcars/map/map_interface.hpp
-  include/ori/simcars/map/map_object_interface.hpp
+  include/ori/simcars/map/driving_map_interface.hpp
+  include/ori/simcars/map/driving_map_object_interface.hpp
   include/ori/simcars/map/lane_interface.hpp
-  include/ori/simcars/map/map_object_abstract.hpp
+  include/ori/simcars/map/driving_map_object_abstract.hpp
   include/ori/simcars/map/lane_abstract.hpp
-  include/ori/simcars/map/map_grid_rect.hpp
   include/ori/simcars/map/lane_branch.hpp
   include/ori/simcars/map/highd/highd_declarations.hpp
   include/ori/simcars/map/highd/highd_map.hpp
@@ -453,11 +452,11 @@ set_target_properties(simcars_agents PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_visualisation STATIC
   src/visualisation/qsfml_canvas_abstract.cpp
-  src/visualisation/qagents_widget.cpp
-  src/visualisation/qmap_agents_widget.cpp
+  src/visualisation/qdriving_agents_widget.cpp
+  src/visualisation/qdriving_map_agents_widget.cpp
   include/ori/simcars/visualisation/qsfml_canvas_abstract.hpp
-  include/ori/simcars/visualisation/qagents_widget.hpp
-  include/ori/simcars/visualisation/qmap_agents_widget.hpp
+  include/ori/simcars/visualisation/qdriving_agents_widget.hpp
+  include/ori/simcars/visualisation/qdriving_map_agents_widget.hpp
 )
 target_include_directories(simcars_visualisation
 PUBLIC

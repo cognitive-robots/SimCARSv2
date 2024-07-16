@@ -9,7 +9,9 @@ namespace map
 
 class IMap;
 
-class IMapObject;
+class IDrivingMap;
+
+class IDrivingMapObject;
 
 class ILane;
 

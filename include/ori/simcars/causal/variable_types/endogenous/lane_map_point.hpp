@@ -13,12 +13,12 @@ namespace causal
 class LaneMapPointVariable :
         public ABinaryEndogenousVariable<geometry::Vec, uint64_t, geometry::Vec>
 {
-    map::IMap const *map;
+    map::IDrivingMap const *map;
 
 public:
     LaneMapPointVariable(IEndogenousVariable<uint64_t> *endogenous_parent,
                                     IVariable<geometry::Vec> *other_parent,
-                                    map::IMap const *map);
+                                    map::IDrivingMap const *map);
 
     bool get_value(geometry::Vec &val) const override;
 

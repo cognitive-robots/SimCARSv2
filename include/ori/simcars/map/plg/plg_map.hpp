@@ -13,7 +13,7 @@ namespace map
 namespace plg
 {
 
-class PLGMap : public virtual IMap
+class PLGMap : public virtual IDrivingMap
 {
     structures::stl::STLDictionary<uint64_t, PLGLane*> id_to_lane_dict;
 

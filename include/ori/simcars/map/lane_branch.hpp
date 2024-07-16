@@ -14,7 +14,7 @@ class LaneBranch : public structures::IContainer<ILane const*>
 {
     structures::IArray<uint64_t> *lane_ids;
 
-    IMap const *map;
+    IDrivingMap const *map;
 
     mutable ILane const *straightest_lane;
     mutable structures::stl::STLDequeArray<ILane const*> left_curving_lanes;
@@ -23,7 +23,7 @@ class LaneBranch : public structures::IContainer<ILane const*>
     void retrieve_lanes() const;
 
 public:
-    LaneBranch(structures::IArray<uint64_t> *ids, IMap const *map);
+    LaneBranch(structures::IArray<uint64_t> *ids, IDrivingMap const *map);
 
     virtual ~LaneBranch();
 
