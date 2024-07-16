@@ -12,6 +12,8 @@ namespace agents
 
 class FWDCarSim : public FWDCar, public RectRigidBodySim
 {
+    FWDCar const* const original_fwd_car;
+
 protected:
     simcars::causal::ScalarTimeConditionalVariable sim_motor_torque;
     simcars::causal::ScalarTimeConditionalVariable sim_steer;

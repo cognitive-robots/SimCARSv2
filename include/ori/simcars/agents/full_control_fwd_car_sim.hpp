@@ -17,6 +17,8 @@ namespace agents
 
 class FullControlFWDCarSim : public FullControlFWDCar
 {
+    FullControlFWDCar const* const original_full_control_fwd_car;
+
 protected:
     simcars::causal::ScalarFixedVariable zero_cumil_lane_trans;
     simcars::causal::ScalarProxyVariable zero_cumil_lane_trans_proxy;

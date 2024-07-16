@@ -7,6 +7,8 @@ namespace simcars
 namespace agents
 {
 
+class PointMass;
+
 class RectRigidBody;
 
 class RectRigidBodyEnv;

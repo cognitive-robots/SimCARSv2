@@ -14,6 +14,8 @@ FullControlFWDCarSim::FullControlFWDCarSim(FullControlFWDCar *full_control_fwd_c
                                            temporal::Time start_time) :
     FullControlFWDCar(*full_control_fwd_car),
 
+    original_full_control_fwd_car(full_control_fwd_car),
+
     zero_cumil_lane_trans(0),
     zero_cumil_lane_trans_proxy(&zero_cumil_lane_trans),
 

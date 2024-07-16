@@ -12,6 +12,7 @@ FWDCar::FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_v
                FP_DATA_TYPE width_value, FP_DATA_TYPE height_value, FP_DATA_TYPE wheel_radius_value,
                FP_DATA_TYPE axel_dist_value, FP_DATA_TYPE drag_area_value,
                FP_DATA_TYPE cornering_stiffness_value, FP_DATA_TYPE max_abs_slip_angle_value) :
+    PointMass(id_value, mass_value),
     RectRigidBody(id_value, mass_value, length_value, width_value, height_value, drag_area_value),
 
     wheel_radius(wheel_radius_value),
@@ -94,6 +95,7 @@ FWDCar::FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_v
 }
 
 FWDCar::FWDCar(FWDCar const &fwd_car) :
+    PointMass(fwd_car),
     RectRigidBody(fwd_car),
 
     wheel_radius(fwd_car.wheel_radius),

@@ -11,12 +11,7 @@ namespace agents
 RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
                              FP_DATA_TYPE width_value, FP_DATA_TYPE height_value,
                              FP_DATA_TYPE drag_area_value) :
-    id(id_value),
-    id_proxy(&id),
-
-    mass(mass_value),
-    mass_proxy(&mass),
-    mass_recip(&mass),
+    PointMass(id_value, mass_value),
 
     length(length_value),
     length_proxy(&length),
@@ -43,40 +38,20 @@ RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA
     dist_headway(),
     dist_headway_buff(&dist_headway, nullptr, true),
 
-    env_force(),
-    env_force_buff(&env_force, nullptr, true),
-    other_force(),
-    other_force_buff(&other_force, nullptr, true),
-    total_force(&env_force_buff, &other_force_buff),
-
     env_torque(),
     env_torque_buff(&env_torque, nullptr, true),
     other_torque(),
     other_torque_buff(&other_torque, nullptr, true),
     total_torque(&env_torque_buff, &other_torque_buff),
 
-    lin_acc(&total_force, &mass_recip),
-    lin_acc_buff(&lin_acc, nullptr, false),
-    prev_lin_acc(&lin_acc_buff),
-
     ang_acc(&total_torque, &moi_recip),
     ang_acc_buff(&ang_acc, nullptr, false),
     prev_ang_acc(&ang_acc_buff),
-
-    lin_vel_diff(&prev_lin_acc),
-    prev_lin_vel(&lin_vel_buff),
-    lin_vel(&prev_lin_vel, &lin_vel_diff),
-    lin_vel_buff(&lin_vel, nullptr, false),
 
     ang_vel_diff(&prev_ang_acc),
     prev_ang_vel(&ang_vel_buff),
     ang_vel(&prev_ang_vel, &ang_vel_diff),
     ang_vel_buff(&ang_vel, nullptr, false),
-
-    pos_diff(&lin_vel_buff),
-    prev_pos(&pos_buff),
-    pos(&prev_pos, &pos_diff),
-    pos_buff(&pos, nullptr, true),
 
     rot_diff(&ang_vel_buff),
     prev_rot(&rot_buff),
@@ -85,7 +60,6 @@ RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA
 
     rect(&pos_buff, &rot_buff, &length_proxy, &width_proxy)
 {
-    assert(mass_value > 0.0);
     assert(length_value > 0.0);
     assert(width_value > 0.0);
     assert(height_value > 0.0);
@@ -93,12 +67,7 @@ RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA
 }
 
 RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
-    id(rect_rigid_body.id),
-    id_proxy(&id),
-
-    mass(rect_rigid_body.mass),
-    mass_proxy(&mass),
-    mass_recip(&mass),
+    PointMass(rect_rigid_body),
 
     length(rect_rigid_body.length),
     length_proxy(&length),
@@ -125,40 +94,20 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
     dist_headway(),
     dist_headway_buff(&dist_headway, nullptr, true),
 
-    env_force(),
-    env_force_buff(&env_force, nullptr, true),
-    other_force(),
-    other_force_buff(&other_force, nullptr, true),
-    total_force(&env_force_buff, &other_force_buff),
-
     env_torque(),
     env_torque_buff(&env_torque, nullptr, true),
     other_torque(),
     other_torque_buff(&other_torque, nullptr, true),
     total_torque(&env_torque_buff, &other_torque_buff),
 
-    lin_acc(&total_force, &mass_recip),
-    lin_acc_buff(&lin_acc, nullptr, false),
-    prev_lin_acc(&lin_acc_buff),
-
     ang_acc(&total_torque, &moi_recip),
     ang_acc_buff(&ang_acc, nullptr, false),
     prev_ang_acc(&ang_acc_buff),
-
-    lin_vel_diff(&prev_lin_acc),
-    prev_lin_vel(&lin_vel_buff),
-    lin_vel(&prev_lin_vel, &lin_vel_diff),
-    lin_vel_buff(&lin_vel, nullptr, false),
 
     ang_vel_diff(&prev_ang_acc),
     prev_ang_vel(&ang_vel_buff),
     ang_vel(&prev_ang_vel, &ang_vel_diff),
     ang_vel_buff(&ang_vel, nullptr, false),
-
-    pos_diff(&lin_vel_buff),
-    prev_pos(&pos_buff),
-    pos(&prev_pos, &pos_diff),
-    pos_buff(&pos, nullptr, true),
 
     rot_diff(&ang_vel_buff),
     prev_rot(&rot_buff),
@@ -170,22 +119,12 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
 
 temporal::Time RectRigidBody::get_min_time() const
 {
-    return std::max(pos_buff.get_min_time(), rot_buff.get_min_time());
+    return std::max(PointMass::get_min_time(), rot_buff.get_min_time());
 }
 
 temporal::Time RectRigidBody::get_max_time() const
 {
-    return std::min(pos_buff.get_max_time(), rot_buff.get_max_time());
-}
-
-simcars::causal::IEndogenousVariable<uint64_t>* RectRigidBody::get_id_variable()
-{
-    return &id_proxy;
-}
-
-simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_mass_variable()
-{
-    return &mass_proxy;
+    return std::min(PointMass::get_max_time(), rot_buff.get_max_time());
 }
 
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_length_variable()
@@ -216,31 +155,6 @@ simcars::causal::IEndogenousVariable<geometry::ORect>* RectRigidBody::get_rect_v
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_dist_headway_variable()
 {
     return &dist_headway_buff;
-}
-
-simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_env_force_variable()
-{
-    return &env_force_buff;
-}
-
-simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_other_force_variable()
-{
-    return &other_force_buff;
-}
-
-simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_acc_variable()
-{
-    return &lin_acc_buff;
-}
-
-simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_lin_vel_variable()
-{
-    return &lin_vel_buff;
-}
-
-simcars::causal::IEndogenousVariable<geometry::Vec>* RectRigidBody::get_pos_variable()
-{
-    return &pos_buff;
 }
 
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBody::get_env_torque_variable()

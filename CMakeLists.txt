@@ -340,6 +340,8 @@ target_compile_options(simcars_causal PRIVATE -fPIC)
 set_target_properties(simcars_causal PROPERTIES VERSION ${PROJECT_VERSION})
 
 add_library(simcars_agents STATIC
+  src/agents/point_mass.cpp
+  src/agents/point_mass_sim.cpp
   src/agents/rect_rigid_body.cpp
   src/agents/rect_rigid_body_sim.cpp
   src/agents/rect_rigid_body_env.cpp
@@ -382,6 +384,8 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/fwd_car_reward_calc_interface.hpp
   include/ori/simcars/agents/fwd_car_scene_interface.hpp
   include/ori/simcars/agents/goal.hpp
+  include/ori/simcars/agents/point_mass.hpp
+  include/ori/simcars/agents/point_mass_sim.hpp
   include/ori/simcars/agents/rect_rigid_body.hpp
   include/ori/simcars/agents/rect_rigid_body_sim.hpp
   include/ori/simcars/agents/rect_rigid_body_env.hpp
