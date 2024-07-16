@@ -2,10 +2,6 @@
 #include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
 
 #include <ori/simcars/causal/variable_context.hpp>
-#include <ori/simcars/agents/full_control_fwd_car.hpp>
-#include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
-#include <ori/simcars/agents/default_fwd_car_outcome_sim.hpp>
-#include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 
 namespace ori
 {
@@ -173,6 +169,7 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
     }
 
     simcars::causal::VariableContext::set_time_step_size(get_time_step_size());
+
     for (i = 0; i < 1 + end_frame - start_frame; ++i)
     {
         uint32_t current_frame = start_frame + i;

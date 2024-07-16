@@ -378,11 +378,13 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.cpp
   src/agents/highd/highd_fwd_car_scene.cpp
   src/agents/otherd/otherd_fwd_car_scene.cpp
+  src/agents/thor_magni/thor_magni_ped_scene.cpp
   include/ori/simcars/agents/declarations.hpp
   include/ori/simcars/agents/typedefs.hpp
   include/ori/simcars/agents/fwd_car_outcome_sim_interface.hpp
   include/ori/simcars/agents/fwd_car_reward_calc_interface.hpp
   include/ori/simcars/agents/fwd_car_scene_interface.hpp
+  include/ori/simcars/agents/ped_scene_interface.hpp
   include/ori/simcars/agents/goal.hpp
   include/ori/simcars/agents/point_mass.hpp
   include/ori/simcars/agents/point_mass_sim.hpp
@@ -427,6 +429,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp
   include/ori/simcars/agents/highd/highd_fwd_car_scene.hpp
   include/ori/simcars/agents/otherd/otherd_fwd_car_scene.hpp
+  include/ori/simcars/agents/thor_magni/thor_magni_ped_scene.hpp
 )
 target_include_directories(simcars_agents
 PUBLIC
@@ -558,3 +561,8 @@ add_dependencies(laneletd_sim_visualisation simcars_utils simcars_structures sim
 add_executable(plg_map_test src/plg_map_test/plg_map_test.cpp)
 target_link_libraries(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
 add_dependencies(plg_map_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map)
+
+
+add_executable(thor_magni_scene_test src/thor_magni_scene_test/thor_magni_scene_test.cpp)
+target_link_libraries(thor_magni_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
+add_dependencies(thor_magni_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
