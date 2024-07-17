@@ -130,7 +130,7 @@ QDrivingMapAgentsWidget::QDrivingMapAgentsWidget(map::IDrivingMap const *map, QW
                                    FP_DATA_TYPE realtime_factor, FP_DATA_TYPE pixels_per_metre,
                                    FocusMode focus_mode) :
     QDrivingAgentsWidget(parent, position, size, start_time, end_time, frame_interval, realtime_factor,
-                  pixels_per_metre),
+                  pixels_per_metre, focus_mode),
     map(map) {}
 
 }

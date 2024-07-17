@@ -15,6 +15,8 @@ class IDrivingMapObject;
 
 class ILane;
 
+class IPedMap;
+
 class LaneBranch;
 
 }

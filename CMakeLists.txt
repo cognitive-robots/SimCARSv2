@@ -134,11 +134,13 @@ add_library(simcars_map STATIC
   src/map/laneletd/laneletd_map.cpp
   src/map/plg/plg_lane.cpp
   src/map/plg/plg_map.cpp
+  src/map/thor_magni/thor_magni_map.cpp
   include/ori/simcars/map/declarations.hpp
   include/ori/simcars/map/map_interface.hpp
   include/ori/simcars/map/driving_map_interface.hpp
   include/ori/simcars/map/driving_map_object_interface.hpp
   include/ori/simcars/map/lane_interface.hpp
+  include/ori/simcars/map/ped_map_interface.hpp
   include/ori/simcars/map/driving_map_object_abstract.hpp
   include/ori/simcars/map/lane_abstract.hpp
   include/ori/simcars/map/lane_branch.hpp
@@ -151,6 +153,7 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/plg/plg_declarations.hpp
   include/ori/simcars/map/plg/plg_map.hpp
   include/ori/simcars/map/plg/plg_lane.hpp
+  include/ori/simcars/map/thor_magni/thor_magni_map.hpp
 )
 target_include_directories(simcars_map
 PUBLIC
@@ -455,10 +458,12 @@ add_library(simcars_visualisation STATIC
   src/visualisation/qdriving_agents_widget.cpp
   src/visualisation/qdriving_map_agents_widget.cpp
   src/visualisation/qped_agents_widget.cpp
+  src/visualisation/qped_map_agents_widget.cpp
   include/ori/simcars/visualisation/qsfml_canvas_abstract.hpp
   include/ori/simcars/visualisation/qdriving_agents_widget.hpp
   include/ori/simcars/visualisation/qdriving_map_agents_widget.hpp
   include/ori/simcars/visualisation/qped_agents_widget.hpp
+  include/ori/simcars/visualisation/qped_map_agents_widget.hpp
 )
 target_include_directories(simcars_visualisation
 PUBLIC
