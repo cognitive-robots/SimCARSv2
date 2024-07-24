@@ -36,7 +36,7 @@ void QPedAgentsWidget::add_agent_to_render_stack(agents::PointMass *agent)
         agent_colour = sf::Color::Green;
     }
 
-    FP_DATA_TYPE agent_radius = 0.175;
+    FP_DATA_TYPE const agent_radius = 0.175;
 
     sf::CircleShape *agent_shape = new sf::CircleShape(get_pixels_per_metre() * agent_radius, 8);
 

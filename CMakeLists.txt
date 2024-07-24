@@ -135,12 +135,15 @@ add_library(simcars_map STATIC
   src/map/plg/plg_lane.cpp
   src/map/plg/plg_map.cpp
   src/map/thor_magni/thor_magni_map.cpp
+  src/map/thor_magni/thor_magni_node.cpp
   include/ori/simcars/map/declarations.hpp
   include/ori/simcars/map/map_interface.hpp
   include/ori/simcars/map/driving_map_interface.hpp
   include/ori/simcars/map/driving_map_object_interface.hpp
   include/ori/simcars/map/lane_interface.hpp
   include/ori/simcars/map/ped_map_interface.hpp
+  include/ori/simcars/map/ped_map_object_interface.hpp
+  include/ori/simcars/map/node_interface.hpp
   include/ori/simcars/map/driving_map_object_abstract.hpp
   include/ori/simcars/map/lane_abstract.hpp
   include/ori/simcars/map/lane_branch.hpp
@@ -154,6 +157,7 @@ add_library(simcars_map STATIC
   include/ori/simcars/map/plg/plg_map.hpp
   include/ori/simcars/map/plg/plg_lane.hpp
   include/ori/simcars/map/thor_magni/thor_magni_map.hpp
+  include/ori/simcars/map/thor_magni/thor_magni_node.hpp
 )
 target_include_directories(simcars_map
 PUBLIC

@@ -21,6 +21,7 @@ public:
     ~PLGMap() override;
 
     geometry::Vec get_map_centre() const override;
+    geometry::Rect get_bounding_box() const override;
     FP_DATA_TYPE get_max_dim_size() const override;
     ILane const* get_lane(uint64_t id) const override;
     structures::IArray<ILane const*>* get_lanes(structures::IArray<uint64_t> const *ids) const override;

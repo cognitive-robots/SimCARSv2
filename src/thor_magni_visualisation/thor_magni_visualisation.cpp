@@ -16,10 +16,10 @@ using namespace ori::simcars;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    if (argc < 5)
     {
-        std::cerr << "Usage: ./thor_magni_visualisation scene_file_path texture_file_path "
-                     "offset_json_file_path" << std::endl;
+        std::cerr << "Usage: ./thor_magni_visualisation texture_file_path offset_json_file_path "
+                     "scene_file_path goals_file_path" << std::endl;
         return -1;
     }
 
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     map::thor_magni::ThorMagniMap map;
 
-    map.load(argv[2], argv[3], argv[1]);
+    map.load(argv[1], argv[2], argv[3], argv[4]);
 
     std::cout << "Finished map load" << std::endl;
 
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     agents::IPedScene *scene;
 
-    scene = new agents::thor_magni::ThorMagniPedScene(argv[1]);
+    scene = new agents::thor_magni::ThorMagniPedScene(argv[3]);
 
     structures::IArray<agents::PointMass*> const *agents = scene->get_point_masses();
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
                 QSize(1260, 1260),
                 scene->get_min_time(),
                 scene->get_max_time(),
-                std::chrono::milliseconds(40), 1.0, 40.0,
+                std::chrono::milliseconds(40), 1.0, 1260.0 / map.get_max_dim_size(),
                 visualisation::QPedMapAgentsWidget::FocusMode::FIXED);
 
     map_scene_widget->set_focal_position(map.get_map_centre());

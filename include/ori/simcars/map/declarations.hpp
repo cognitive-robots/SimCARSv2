@@ -17,6 +17,10 @@ class ILane;
 
 class IPedMap;
 
+class IPedMapObject;
+
+class INode;
+
 class LaneBranch;
 
 }
