@@ -11,7 +11,7 @@ namespace simcars
 namespace agents
 {
 
-class FWDCarActionIntervention : public virtual PlanFWDCar
+class ActionInterventionFWDCar : public virtual PlanFWDCar
 {
 protected:
     void init_links() override;
@@ -20,7 +20,7 @@ protected:
     causal::FWDCarActionBufferVariable action_intervention_buff;
 
 public:
-    FWDCarActionIntervention(FWDCarAction action);
+    ActionInterventionFWDCar(FWDCarAction action);
 
     simcars::causal::IEndogenousVariable<FWDCarAction>* get_action_intervention_variable();
 };

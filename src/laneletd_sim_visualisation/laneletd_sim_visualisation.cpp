@@ -7,7 +7,7 @@
 #include <ori/simcars/agents/fwd_car_action_extractor.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
-#include <ori/simcars/agents/fwd_car_action_intervention.hpp>
+#include <ori/simcars/agents/action_intervention_fwd_car.hpp>
 #include <ori/simcars/agents/default_fwd_car_outcome_sim.hpp>
 #include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 #include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
     agents::FWDCarSim affected_fwd_car_sim(affected_fwd_car, affected_time_action_pair.first);
     agents::FullControlFWDCarSim affected_control_fwd_car_sim(
                 &affected_control_fwd_car, affected_time_action_pair.first);
-    agents::FWDCarActionIntervention affected_best_alt_sim_action_intervention(
+    agents::ActionInterventionFWDCar affected_best_alt_sim_action_intervention(
                 affected_best_sim_action);
     affected_control_fwd_car_sim.set_fwd_car(&affected_fwd_car_sim);
     affected_best_alt_sim_action_intervention.set_control_fwd_car(&affected_control_fwd_car_sim);

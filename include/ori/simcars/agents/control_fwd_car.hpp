@@ -2,9 +2,7 @@
 
 #include <ori/simcars/geometry/defines.hpp>
 #include <ori/simcars/causal/endogenous_variable_interface.hpp>
-#include <ori/simcars/causal/variable_types/exogenous/id_socket.hpp>
 #include <ori/simcars/causal/variable_types/exogenous/scalar_socket.hpp>
-#include <ori/simcars/causal/variable_types/exogenous/time_socket.hpp>
 #include <ori/simcars/agents/declarations.hpp>
 #include <ori/simcars/agents/plan_fwd_car.hpp>
 #include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_action_socket.hpp>

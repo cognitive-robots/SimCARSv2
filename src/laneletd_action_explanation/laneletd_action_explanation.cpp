@@ -7,7 +7,7 @@
 #include <ori/simcars/agents/fwd_car_action_extractor.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
-#include <ori/simcars/agents/fwd_car_action_intervention.hpp>
+#include <ori/simcars/agents/action_intervention_fwd_car.hpp>
 #include <ori/simcars/agents/default_fwd_car_outcome_sim.hpp>
 #include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 #include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
@@ -328,9 +328,9 @@ int main(int argc, char *argv[])
                         agents::FullControlFWDCarSim causing_control_fwd_car_sim(
                                     &causing_control_fwd_car, causing_time_action_pair.first);
 
-                        agents::FWDCarActionIntervention causing_plan_fwd_car(default_fwd_car_action);
+                        agents::ActionInterventionFWDCar causing_plan_fwd_car(default_fwd_car_action);
 
-                        causal::IEndogenousVariable<agents::FWDCarAction> *causing_fwd_car_action_intervention =
+                        causal::IEndogenousVariable<agents::FWDCarAction> *causing_action_intervention_fwd_car =
                                 causing_plan_fwd_car.get_action_intervention_variable();
                         for (l = 0; l < k; ++l)
                         {
@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
                                  current_time += causal::VariableContext::get_time_step_size())
                             {
                                 causal::VariableContext::set_current_time(current_time);
-                                causing_fwd_car_action_intervention->set_value(current_action.second);
+                                causing_action_intervention_fwd_car->set_value(current_action.second);
                             }
                         }
 

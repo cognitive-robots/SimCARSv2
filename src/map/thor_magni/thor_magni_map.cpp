@@ -110,6 +110,39 @@ geometry::Vec const& ThorMagniMap::get_texture_offset() const
     return texture_offset;
 }
 
+INode const* ThorMagniMap::get_node(uint64_t id) const
+{
+    if (id_to_node_dict.contains(id))
+    {
+        return id_to_node_dict[id];
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+INode const* ThorMagniMap::get_node(geometry::Vec const &position) const
+{
+    // NOTE: Not the most efficient means of finding a node associated with a position
+    structures::IArray<ThorMagniNode*> *nodes_within_clearance =
+            get_nodes_within_dist(position, node_clearance);
+
+    INode const *found_node;
+    if (nodes_within_clearance->count() == 1)
+    {
+        found_node = (*nodes_within_clearance)[0];
+    }
+    else
+    {
+        found_node = nullptr;
+    }
+
+    delete nodes_within_clearance;
+
+    return found_node;
+}
+
 structures::IArray<INode const*>* ThorMagniMap::get_nodes() const
 {
     structures::IArray<INode const*> *node_array =
@@ -162,6 +195,8 @@ void ThorMagniMap::load(std::string const &texture_file_path_str,
                         std::string const &goals_file_path_str, FP_DATA_TYPE node_clearance,
                         FP_DATA_TYPE node_adjacency, size_t random_sample_count)
 {
+    this->node_clearance = node_clearance;
+
     std::filesystem::path texture_file_path(texture_file_path_str);
 
     std::string texture_filename = texture_file_path.filename();

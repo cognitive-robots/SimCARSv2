@@ -20,7 +20,7 @@ class ThorMagniMap : public virtual IPedMap
     geometry::Vec texture_offset;
 
     uint64_t max_goal_id;
-
+    FP_DATA_TYPE node_clearance;
     structures::stl::STLDictionary<uint64_t, ThorMagniNode*> id_to_node_dict;
 
     bool is_node_within_dist(geometry::Vec const &position, FP_DATA_TYPE dist) const;
@@ -38,6 +38,8 @@ public:
     FP_DATA_TYPE get_texture_scale() const override;
     geometry::Vec const& get_texture_offset() const override;
 
+    INode const* get_node(uint64_t id) const override;
+    INode const* get_node(geometry::Vec const &position) const override;
     structures::IArray<INode const*>* get_nodes() const override;
     structures::IArray<INode const*>* get_goal_nodes() const override;
     structures::IArray<geometry::VecPair>* get_edges() const override;

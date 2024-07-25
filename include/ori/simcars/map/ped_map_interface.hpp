@@ -24,6 +24,8 @@ public:
     virtual FP_DATA_TYPE get_texture_scale() const = 0;
     virtual geometry::Vec const& get_texture_offset() const = 0;
 
+    virtual INode const* get_node(uint64_t id) const = 0;
+    virtual INode const* get_node(geometry::Vec const &position) const = 0;
     virtual structures::IArray<INode const*>* get_nodes() const = 0;
     virtual structures::IArray<INode const*>* get_goal_nodes() const = 0;
     virtual structures::IArray<geometry::VecPair>* get_edges() const = 0;

@@ -5,7 +5,7 @@
 #include <ori/simcars/agents/rect_rigid_body_sim.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
-#include <ori/simcars/agents/fwd_car_action_intervention.hpp>
+#include <ori/simcars/agents/action_intervention_fwd_car.hpp>
 
 namespace ori
 {
@@ -51,7 +51,7 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
 
     FWDCarSim *fwd_car_sim = new FWDCarSim(fwd_car, start_time);
     FullControlFWDCarSim control_fwd_car_sim(control_fwd_car, start_time);
-    FWDCarActionIntervention plan_fwd_car_intervention(*action);
+    ActionInterventionFWDCar plan_fwd_car_intervention(*action);
     control_fwd_car_sim.set_fwd_car(fwd_car_sim);
     plan_fwd_car_intervention.set_control_fwd_car(&control_fwd_car_sim);
 

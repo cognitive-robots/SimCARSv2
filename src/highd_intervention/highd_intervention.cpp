@@ -7,7 +7,7 @@
 #include <ori/simcars/agents/fwd_car_action_extractor.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
-#include <ori/simcars/agents/fwd_car_action_intervention.hpp>
+#include <ori/simcars/agents/action_intervention_fwd_car.hpp>
 #include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
 #include <ori/simcars/visualisation/qdriving_map_agents_widget.hpp>
 
@@ -101,8 +101,8 @@ int main(int argc, char *argv[])
         default_fwd_car_action.lane_goal.time = temporal::Time(temporal::Duration(atoi(argv[11])));
     }
 
-    agents::FWDCarActionIntervention plan_fwd_car(default_fwd_car_action);
-    causal::IEndogenousVariable<agents::FWDCarAction> *fwd_car_action_intervention =
+    agents::ActionInterventionFWDCar plan_fwd_car(default_fwd_car_action);
+    causal::IEndogenousVariable<agents::FWDCarAction> *action_intervention_fwd_car =
             plan_fwd_car.get_action_intervention_variable();
 
     agents::RectRigidBodyEnv *env = scene->get_env();
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
                          current_time += causal::VariableContext::get_time_step_size())
                     {
                         causal::VariableContext::set_current_time(current_time);
-                        fwd_car_action_intervention->set_value((*fwd_car_actions)[j].second);
+                        action_intervention_fwd_car->set_value((*fwd_car_actions)[j].second);
                     }
                 }
             }

@@ -15,9 +15,15 @@ class RectRigidBodyEnv;
 
 class FWDCar;
 
+class Ped;
+
 class ControlFWDCar;
 
+class ControlPed;
+
 class PlanFWDCar;
+
+class PlanPed;
 
 struct FWDCarAction;
 
