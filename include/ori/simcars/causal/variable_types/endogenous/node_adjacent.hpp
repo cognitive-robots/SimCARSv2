@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/stl/stl_stack_array.hpp>
-#include <ori/simcars/map/lane_interface.hpp>
+#include <ori/simcars/map/node_interface.hpp>
 #include <ori/simcars/causal/unary_endogenous_variable_abstract.hpp>
 
 namespace ori
@@ -11,13 +11,13 @@ namespace simcars
 namespace causal
 {
 
-class LaneSelectableVariable : public AUnaryEndogenousVariable<
-        structures::stl::STLStackArray<uint64_t>, geometry::Vec>
+class NodeAdjacentVariable : public AUnaryEndogenousVariable<
+        structures::stl::STLStackArray<uint64_t>, uint64_t>
 {
-    map::IDrivingMap const *map;
+    map::IPedMap const *map;
 
 public:
-    LaneSelectableVariable(IVariable<geometry::Vec> *parent, map::IDrivingMap const *map);
+    NodeAdjacentVariable(IVariable<uint64_t> *parent, map::IPedMap const *map);
 
     bool get_value(structures::stl::STLStackArray<uint64_t> &val) const override;
 

@@ -57,6 +57,7 @@ protected:
     simcars::causal::ScalarProductVariable moi;
     simcars::causal::ScalarReciprocalVariable moi_recip;
 
+    // TODO: Move distance headway related elements to the FWD car class
     simcars::causal::ScalarSocketVariable dist_headway;
     simcars::causal::ScalarBufferVariable dist_headway_buff;
 

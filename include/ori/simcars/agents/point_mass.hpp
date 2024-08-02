@@ -22,6 +22,7 @@
 #include <ori/simcars/causal/variable_types/endogenous/vector_buffer.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/o_rect_construction.hpp>
 #include <ori/simcars/agents/declarations.hpp>
+#include <ori/simcars/agents/point_mass_env.hpp>
 
 namespace ori
 {
@@ -78,8 +79,8 @@ public:
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_vel_variable();
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_pos_variable();
 
-    //friend bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body);
-    //friend bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body);
+    friend bool PointMassEnv::add_point_mass(PointMass *point_mass);
+    friend bool PointMassEnv::remove_point_mass(PointMass *point_mass);
 };
 
 }
