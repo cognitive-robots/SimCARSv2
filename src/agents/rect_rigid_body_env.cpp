@@ -91,8 +91,8 @@ RectRigidBodyEnv::RectRigidBodyEntity::RectRigidBodyEntity(uint64_t id, RectRigi
     lin_vel_dir(rigid_body->get_lin_vel_variable()),
     drag_force_dir(&lin_vel_dir),
 
-    lin_spd_squared(rigid_body->get_lin_vel_variable(), rigid_body->get_lin_vel_variable()),
-    dynamic_pressure(&drag_scaled_air_mass_density, &lin_spd_squared),
+    lin_vel_mag_squared(rigid_body->get_lin_vel_variable(), rigid_body->get_lin_vel_variable()),
+    dynamic_pressure(&drag_scaled_air_mass_density, &lin_vel_mag_squared),
     drag_force_mag(&dynamic_pressure, rigid_body->get_drag_area_variable()),
 
     drag_force(&drag_force_dir, &drag_force_mag),

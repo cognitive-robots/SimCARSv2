@@ -30,15 +30,15 @@ protected:
     simcars::causal::ScalarFixedVariable max_motor_torque;
     simcars::causal::ScalarFixedVariable min_motor_torque;
 
-    simcars::causal::TimeCurrentTimeDifferenceVariable time_error;
-    simcars::causal::DurationSecondsCastVariable time_error_secs;
+    simcars::causal::TimeCurrentTimeDifferenceVariable time_diff;
+    simcars::causal::DurationSecondsCastVariable time_diff_secs;
     simcars::causal::ScalarFixedVariable min_act_horizon_secs;
     simcars::causal::ScalarMaxVariable actual_act_horizon_secs;
     simcars::causal::ScalarReciprocalVariable actual_act_horizon_secs_recip;
 
     simcars::causal::ScalarSocketVariable speed;
     simcars::causal::ScalarNegationVariable neg_speed;
-    simcars::causal::ScalarSumVariable speed_error;
+    simcars::causal::ScalarSumVariable speed_diff;
 
     simcars::causal::ScalarSocketVariable mass;
     simcars::causal::ScalarSocketVariable wheel_radius;

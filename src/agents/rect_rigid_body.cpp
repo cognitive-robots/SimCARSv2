@@ -35,7 +35,7 @@ RectRigidBody::RectRigidBody(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA
     moi(&moi_scaled_mass, &span_squared),
     moi_recip(&moi),
 
-    dist_headway(),
+    dist_headway(100.0),
     dist_headway_buff(&dist_headway, nullptr, true),
 
     env_torque(),
@@ -91,7 +91,7 @@ RectRigidBody::RectRigidBody(RectRigidBody const &rect_rigid_body) :
     moi(&moi_scaled_mass, &span_squared),
     moi_recip(&moi),
 
-    dist_headway(),
+    dist_headway(100.0),
     dist_headway_buff(&dist_headway, nullptr, true),
 
     env_torque(),

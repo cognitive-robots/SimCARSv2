@@ -39,7 +39,6 @@ protected:
     causal::IdGoalValPartVariable lane_val_goal;
     causal::IdGoalTimePartVariable lane_time_goal;
 
-
     simcars::causal::ScalarSocketVariable motor_torque;
     simcars::causal::ScalarSocketVariable steer;
 

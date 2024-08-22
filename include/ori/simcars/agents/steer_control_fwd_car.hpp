@@ -28,10 +28,8 @@ protected:
     simcars::causal::ScalarFixedVariable max_steer;
     simcars::causal::ScalarNegationVariable min_steer;
 
-    simcars::causal::IdProxyVariable lane_val_goal_proxy;
-
-    simcars::causal::TimeCurrentTimeDifferenceVariable time_error;
-    simcars::causal::DurationSecondsCastVariable time_error_secs;
+    simcars::causal::TimeCurrentTimeDifferenceVariable time_diff;
+    simcars::causal::DurationSecondsCastVariable time_diff_secs;
     simcars::causal::ScalarFixedVariable min_act_horizon_secs;
     simcars::causal::ScalarMaxVariable actual_act_horizon_secs;
     simcars::causal::ScalarReciprocalVariable actual_act_horizon_secs_recip;
@@ -51,11 +49,11 @@ protected:
     simcars::causal::ScalarReciprocalVariable act_horizon_ang_cos_recip;
     simcars::causal::ScalarProductVariable act_horizon_ang;
 
-    simcars::causal::ScalarNegationVariable ang_error;
-    simcars::causal::ScalarBufferVariable ang_error_buff;
-    simcars::causal::ScalarPreviousTimeStepVariable prev_ang_error;
-    simcars::causal::ScalarNegationVariable neg_prev_ang_error;
-    simcars::causal::ScalarSumVariable ang_error_diff;
+    simcars::causal::ScalarNegationVariable ang_diff;
+    simcars::causal::ScalarBufferVariable ang_diff_buff;
+    simcars::causal::ScalarPreviousTimeStepVariable prev_ang_diff;
+    simcars::causal::ScalarNegationVariable neg_prev_ang_diff;
+    simcars::causal::ScalarSumVariable ang_diff_diff;
 
     simcars::causal::ScalarFixedVariable k_p;
     simcars::causal::ScalarProductVariable p_factor;
@@ -64,13 +62,13 @@ protected:
     simcars::causal::ScalarSumVariable needed_steer;
 
     /*
-    simcars::causal::ScalarSocketVariable axel_dist;
+    simcars::causal::ScalarSocketVariable axle_dist;
     simcars::causal::ScalarFixedVariable double_scale_factor;
     simcars::causal::ScalarProxyVariable double_scale_factor_proxy;
-    simcars::causal::ScalarProductVariable double_axel_dist;
+    simcars::causal::ScalarProductVariable double_axle_dist;
 
     simcars::causal::ScalarSocketVariable lon_lin_vel_recip;
-    simcars::causal::ScalarProductVariable needed_ang_vel_double_axel_dist_prod;
+    simcars::causal::ScalarProductVariable needed_ang_vel_double_axle_dist_prod;
     simcars::causal::ScalarProductVariable needed_steer;
     */
 

@@ -30,9 +30,11 @@ GoalForceControlPed::GoalForceControlPed(map::IPedMap const *map,
 
     time_diff(&node_time_goal),
     time_diff_secs(&time_diff),
-    time_diff_secs_recip(&time_diff_secs),
+    min_act_horizon_secs(1.0),
+    actual_act_horizon_secs(&time_diff_secs, &min_act_horizon_secs),
+    actual_act_horizon_secs_recip(&actual_act_horizon_secs),
 
-    goal_lin_vel(&pos_diff, &time_diff_secs_recip),
+    goal_lin_vel(&pos_diff, &actual_act_horizon_secs_recip),
     lin_vel(),
     neg_lin_vel(&lin_vel),
     lin_vel_diff(&goal_lin_vel, &neg_lin_vel),
@@ -45,8 +47,8 @@ GoalForceControlPed::GoalForceControlPed(map::IPedMap const *map,
     goal_force_mag(&goal_force),
     actual_goal_force_mag(&goal_force_mag, &max_goal_force_mag),
 
-    goal_force_unit(&goal_force),
-    actual_goal_force(&goal_force_unit, &actual_goal_force_mag)
+    goal_force_dir(&goal_force),
+    actual_goal_force(&goal_force_dir, &actual_goal_force_mag)
 {
 }
 
@@ -60,9 +62,11 @@ GoalForceControlPed::GoalForceControlPed(const GoalForceControlPed &control_fwd_
 
     time_diff(&node_time_goal),
     time_diff_secs(&time_diff),
-    time_diff_secs_recip(&time_diff_secs),
+    min_act_horizon_secs(1.0),
+    actual_act_horizon_secs(&time_diff_secs, &min_act_horizon_secs),
+    actual_act_horizon_secs_recip(&actual_act_horizon_secs),
 
-    goal_lin_vel(&pos_diff, &time_diff_secs_recip),
+    goal_lin_vel(&pos_diff, &actual_act_horizon_secs_recip),
     lin_vel(),
     neg_lin_vel(&lin_vel),
     lin_vel_diff(&goal_lin_vel, &neg_lin_vel),
@@ -75,8 +79,8 @@ GoalForceControlPed::GoalForceControlPed(const GoalForceControlPed &control_fwd_
     goal_force_mag(&goal_force),
     actual_goal_force_mag(&goal_force_mag, &max_goal_force_mag),
 
-    goal_force_unit(&goal_force),
-    actual_goal_force(&goal_force_unit, &actual_goal_force_mag)
+    goal_force_dir(&goal_force),
+    actual_goal_force(&goal_force_dir, &actual_goal_force_mag)
 {
 }
 

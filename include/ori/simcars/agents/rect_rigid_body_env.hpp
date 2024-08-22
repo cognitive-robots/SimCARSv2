@@ -115,7 +115,7 @@ class RectRigidBodyEnv
         simcars::causal::VectorNormalisationVariable lin_vel_dir;
         simcars::causal::VectorNegationVariable drag_force_dir;
 
-        simcars::causal::VectorDotProductVariable lin_spd_squared;
+        simcars::causal::VectorDotProductVariable lin_vel_mag_squared;
         simcars::causal::ScalarProductVariable dynamic_pressure;
         simcars::causal::ScalarProductVariable drag_force_mag;
 

@@ -27,9 +27,9 @@ protected:
     simcars::causal::ScalarProxyVariable wheel_radius_proxy;
     simcars::causal::ScalarReciprocalVariable wheel_radius_recip;
 
-    simcars::causal::ScalarFixedVariable axel_dist;
-    simcars::causal::ScalarProxyVariable axel_dist_proxy;
-    simcars::causal::ScalarNegationVariable neg_axel_dist;
+    simcars::causal::ScalarFixedVariable axle_dist;
+    simcars::causal::ScalarProxyVariable axle_dist_proxy;
+    simcars::causal::ScalarNegationVariable neg_axle_dist;
 
     simcars::causal::ScalarFixedVariable cornering_stiffness;
 
@@ -93,13 +93,13 @@ protected:
 public:
     FWDCar(uint64_t id_value, FP_DATA_TYPE mass_value, FP_DATA_TYPE length_value,
            FP_DATA_TYPE width_value, FP_DATA_TYPE height_value, FP_DATA_TYPE wheel_radius_value,
-           FP_DATA_TYPE axel_dist_value, FP_DATA_TYPE drag_area_value = 0.631,
+           FP_DATA_TYPE axle_dist_value, FP_DATA_TYPE drag_area_value = 0.631,
            FP_DATA_TYPE cornering_stiffness_value = 49675.0,
            FP_DATA_TYPE max_abs_slip_angle_value = M_PI_2);
     FWDCar(FWDCar const &fwd_car);
 
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_wheel_radius_variable();
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_axel_dist_variable();
+    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_axle_dist_variable();
     simcars::causal::IEndogenousVariable<geometry::Vec>* get_dir_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_acc_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_lon_lin_vel_variable();
