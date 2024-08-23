@@ -25,9 +25,6 @@ public:
     };
 
 private:
-    bool text_enabled;
-    sf::Font text_font;
-
     std::chrono::milliseconds frame_interval;
     FP_DATA_TYPE realtime_factor;
     FP_DATA_TYPE pixels_per_metre;
@@ -53,6 +50,8 @@ private:
     void add_agent_to_render_stack(agents::PointMass *agent);
 
 protected:
+    bool text_enabled;
+    sf::Font text_font;
 
     void on_init() final;
     void on_update() final;

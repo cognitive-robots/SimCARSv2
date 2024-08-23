@@ -56,15 +56,17 @@ void QPedAgentsWidget::add_agent_to_render_stack(agents::PointMass *agent)
 
     add_to_render_stack(agent_shape);
 
-    /*
     if (text_enabled)
     {
         sf::Text *agent_text = new sf::Text(std::to_string(id), text_font, 16);
-        agent_text->setPosition(sf::Vector2f(get_pixels_per_metre() * agent_pos.x(),
-                                             -get_pixels_per_metre() * agent_pos.y()));
+        sf::FloatRect bounds = agent_text->getLocalBounds();
+        agent_text->setPosition(sf::Vector2f(get_pixels_per_metre() * agent_pos.x() -
+                                             0.5 * bounds.width,
+                                             -get_pixels_per_metre() * agent_pos.y() -
+                                             0.5 * bounds.height));
+        agent_text->setColor(sf::Color::Black);
         add_to_render_stack(agent_text);
     }
-    */
 }
 
 void QPedAgentsWidget::on_init()

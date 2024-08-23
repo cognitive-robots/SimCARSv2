@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/dictionary_interface.hpp>
-#include <ori/simcars/map/map_interface.hpp>
+#include <ori/simcars/map/driving_map_interface.hpp>
 #include <ori/simcars/agents/typedefs.hpp>
 #include <ori/simcars/agents/fwd_car_action.hpp>
 #include <ori/simcars/agents/fwd_car.hpp>

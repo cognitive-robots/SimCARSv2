@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     scene = new agents::thor_magni::ThorMagniPedScene(argv[3]);
 
-    structures::IArray<agents::PointMass*> const *agents = scene->get_point_masses();
+    structures::IArray<agents::Ped*> const *agents = scene->get_peds();
 
     std::cout << "Finished scene load" << std::endl;
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
     for (size_t i = 0; i < agents->count(); ++i)
     {
-        agents::PointMass *agent = (*agents)[i];
+        agents::Ped *agent = (*agents)[i];
         map_scene_widget->insert(agent);
     }
 

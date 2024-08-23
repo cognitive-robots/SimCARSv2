@@ -129,9 +129,17 @@ INode const* ThorMagniMap::get_node(geometry::Vec const &position) const
             get_nodes_within_dist(position, node_clearance);
 
     INode const *found_node;
-    if (nodes_within_clearance->count() == 1)
+    if (nodes_within_clearance->count() > 0)
     {
         found_node = (*nodes_within_clearance)[0];
+        for (size_t i = 1; i < nodes_within_clearance->count(); ++i)
+        {
+            if (((*nodes_within_clearance)[i]->get_centroid() - position).norm() <
+                    (found_node->get_centroid() - position).norm())
+            {
+                found_node = (*nodes_within_clearance)[i];
+            }
+        }
     }
     else
     {

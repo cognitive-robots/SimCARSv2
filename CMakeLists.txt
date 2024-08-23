@@ -177,6 +177,7 @@ PUBLIC
   ${lanelet2_projection_LIBRARIES}
   ${lanelet2_traffic_rules_LIBRARIES}
   ${lanelet2_routing_LIBRARIES}
+  sfml-graphics
 PRIVATE
 #  lz4_stream
   rapidcsv
@@ -379,6 +380,7 @@ add_library(simcars_agents STATIC
   src/agents/default_fwd_car_outcome_sim.cpp
   src/agents/default_fwd_car_reward_calc.cpp
   src/agents/fwd_car_action_extractor.cpp
+  src/agents/ped_action_extractor.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_action_fixed.cpp
@@ -456,6 +458,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/default_fwd_car_outcome_sim.hpp
   include/ori/simcars/agents/default_fwd_car_reward_calc.hpp
   include/ori/simcars/agents/fwd_car_action_extractor.hpp
+  include/ori/simcars/agents/ped_action_extractor.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_action_fixed.hpp
@@ -629,6 +632,10 @@ add_dependencies(plg_map_test simcars_utils simcars_structures simcars_geometry 
 add_executable(thor_magni_scene_test src/thor_magni_scene_test/thor_magni_scene_test.cpp)
 target_link_libraries(thor_magni_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 add_dependencies(thor_magni_scene_test simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
+
+add_executable(thor_magni_action_extraction src/thor_magni_action_extraction/thor_magni_action_extraction.cpp)
+target_link_libraries(thor_magni_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
+add_dependencies(thor_magni_action_extraction simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents)
 
 add_executable(thor_magni_visualisation src/thor_magni_visualisation/thor_magni_visualisation.cpp)
 target_link_libraries(thor_magni_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)

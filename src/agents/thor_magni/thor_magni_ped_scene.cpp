@@ -17,17 +17,28 @@ ThorMagniPedScene::ThorMagniPedScene(std::string const &scene_path_str)
 
 ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc)
 {
-    std::hash<std::string> str_hash;
-
     min_time = temporal::Time::max();
     max_time = temporal::Time::min();
 
     simcars::causal::VariableContext::set_time_step_size(get_time_step_size());
 
+    structures::stl::STLDictionary<std::string, uint64_t> id_map_dict;
+    uint64_t next_id = 1;
     for (size_t i = 0; i < scene_doc.GetRowCount(); ++i)
     {
         std::string const id_str = scene_doc.GetCell<std::string>("ag_id", i);
-        uint64_t const id = str_hash(id_str);
+
+        uint64_t id;
+        if (id_map_dict.contains(id_str))
+        {
+            id = id_map_dict[id_str];
+        }
+        else
+        {
+            id = next_id;
+            ++next_id;
+            id_map_dict.update(id_str, id);
+        }
 
         size_t const frame = scene_doc.GetCell<size_t>("frame_id", i);
         temporal::Time const time(((frame - 1) / 20) * get_time_step_size());
@@ -37,22 +48,22 @@ ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc)
         // Approximate average human mass
         FP_DATA_TYPE const approx_mass = 70;
 
-        PointMass *point_mass;
+        Ped *ped;
 
-        if (id_mass_dict.contains(id))
+        if (id_ped_dict.contains(id))
         {
-            point_mass = id_mass_dict[id];
+            ped = id_ped_dict[id];
         }
         else
         {
-            point_mass = new PointMass(id, approx_mass);
-            id_mass_dict.update(id, point_mass);
+            ped = new Ped(id, approx_mass);
+            id_ped_dict.update(id, ped);
         }
 
         simcars::causal::VariableContext::set_current_time(time);
 
         simcars::causal::IEndogenousVariable<geometry::Vec>* const position_variable =
-                point_mass->get_pos_variable();
+                ped->get_pos_variable();
 
         std::string const position_x_str = scene_doc.GetCell<std::string>("x", i);
         std::string const position_y_str = scene_doc.GetCell<std::string>("y", i);
@@ -75,10 +86,10 @@ ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc)
 
 ThorMagniPedScene::~ThorMagniPedScene()
 {
-    structures::IArray<PointMass*> const *masses = id_mass_dict.get_values();
-    for (size_t i = 0; i < masses->count(); ++i)
+    structures::IArray<Ped*> const *peds = id_ped_dict.get_values();
+    for (size_t i = 0; i < peds->count(); ++i)
     {
-        delete (*masses)[i];
+        delete (*peds)[i];
     }
 }
 
@@ -97,20 +108,20 @@ temporal::Time ThorMagniPedScene::get_max_time() const
     return max_time;
 }
 
-PointMass* ThorMagniPedScene::get_point_mass(uint32_t id) const
+Ped* ThorMagniPedScene::get_ped(uint32_t id) const
 {
-    return id_mass_dict[id];
+    return id_ped_dict[id];
 }
 
-structures::IArray<PointMass*> const* ThorMagniPedScene::get_point_masses() const
+structures::IArray<Ped*> const* ThorMagniPedScene::get_peds() const
 {
-    return id_mass_dict.get_values();
+    return id_ped_dict.get_values();
 }
 
-//RectRigidBodyEnv* ThorMagniPedScene::get_env()
-//{
-//    return &scene_env;
-//}
+PointMassEnv* ThorMagniPedScene::get_env()
+{
+    return &scene_env;
+}
 
 }
 }

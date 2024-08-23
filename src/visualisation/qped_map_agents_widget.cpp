@@ -69,8 +69,6 @@ void QPedMapAgentsWidget::add_map_to_render_stack()
         add_to_render_stack(node_shape);
     }
 
-    delete node_array;
-
 
     structures::IArray<map::INode const*>* const goal_node_array = map->get_goal_nodes();
 
@@ -92,6 +90,27 @@ void QPedMapAgentsWidget::add_map_to_render_stack()
     }
 
     delete goal_node_array;
+
+
+    if (text_enabled)
+    {
+        for (i = 0; i < node_array->count(); ++i)
+        {
+            map::INode const* const node = (*node_array)[i];
+            geometry::Vec const &centroid = node->get_centroid();
+
+            sf::Text *node_text = new sf::Text(std::to_string(node->get_id()), text_font, 16);
+            sf::FloatRect bounds = node_text->getLocalBounds();
+            node_text->setPosition(sf::Vector2f(get_pixels_per_metre() * centroid.x() -
+                                                0.5 * bounds.width,
+                                                -get_pixels_per_metre() * centroid.y() -
+                                                0.5 * bounds.height));
+            node_text->setColor(sf::Color::Black);
+            add_to_render_stack(node_text);
+        }
+    }
+
+    delete node_array;
 }
 
 QPedMapAgentsWidget::QPedMapAgentsWidget(map::IPedMap const *map, QWidget *parent,
