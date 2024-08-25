@@ -47,6 +47,11 @@ void ControlPed::set_ped(Ped *ped)
     }
 }
 
+simcars::causal::IEndogenousVariable<PedAction>* ControlPed::get_action_variable()
+{
+    return &action_buff;
+}
+
 }
 }
 }

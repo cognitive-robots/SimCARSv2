@@ -89,7 +89,7 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
         throw std::runtime_error("Could not get maximum environment force magnitude");
     }
     structures::stl::STLStackArray<uint64_t> lane_encaps;
-    res = control_fwd_car_sim.get_lane_encaps()->get_value(lane_encaps);
+    res = control_fwd_car_sim.get_lane_encaps_variable()->get_value(lane_encaps);
     if (!res)
     {
         throw std::runtime_error("Could not get encapsulating lanes");

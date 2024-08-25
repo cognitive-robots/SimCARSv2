@@ -14,8 +14,6 @@ void SteerControlFWDCar::init_links()
 {
     pos.set_parent(fwd_car->get_pos_variable());
     lin_vel.set_parent(fwd_car->get_lin_vel_variable());
-    //axle_dist.set_parent(fwd_car->get_axle_dist_variable());
-    //lon_lin_vel_recip.set_parent(fwd_car->get_lon_lin_vel_recip_variable());
 
     steer.set_parent(&actual_steer);
 }
@@ -58,17 +56,6 @@ SteerControlFWDCar::SteerControlFWDCar(map::IDrivingMap const *map, FP_DATA_TYPE
     k_d(0),
     d_factor(&ang_diff_diff, &k_d),
     needed_steer(&p_factor, &d_factor),
-
-    /*
-    axle_dist(),
-    double_scale_factor(2.0),
-    double_scale_factor_proxy(&double_scale_factor),
-    double_axle_dist(&double_scale_factor_proxy, &axle_dist),
-
-    lon_lin_vel_recip(),
-    needed_ang_vel_double_axle_dist_prod(&scaled_needed_ang_vel, &double_axle_dist),
-    needed_steer(&needed_ang_vel_double_axle_dist_prod, &lon_lin_vel_recip),
-    */
 
     max_lim_steer(&needed_steer, &max_steer),
     actual_steer(&max_lim_steer, &min_steer)
@@ -115,20 +102,14 @@ SteerControlFWDCar::SteerControlFWDCar(SteerControlFWDCar const &control_fwd_car
     d_factor(&ang_diff_diff, &k_d),
     needed_steer(&p_factor, &d_factor),
 
-    /*
-    axle_dist(),
-    double_scale_factor(2.0),
-    double_scale_factor_proxy(&double_scale_factor),
-    double_axle_dist(&double_scale_factor_proxy, &axle_dist),
-
-    lon_lin_vel_recip(),
-    needed_ang_vel_double_axle_dist_prod(&scaled_needed_ang_vel, &double_axle_dist),
-    needed_steer(&needed_ang_vel_double_axle_dist_prod, &lon_lin_vel_recip),
-    */
-
     max_lim_steer(&needed_steer, &max_steer),
     actual_steer(&max_lim_steer, &min_steer)
 {
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* SteerControlFWDCar::get_ang_diff_variable()
+{
+    return &ang_diff_buff;
 }
 
 }

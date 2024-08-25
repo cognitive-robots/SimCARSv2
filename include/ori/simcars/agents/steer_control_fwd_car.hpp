@@ -61,23 +61,14 @@ protected:
     simcars::causal::ScalarProductVariable d_factor;
     simcars::causal::ScalarSumVariable needed_steer;
 
-    /*
-    simcars::causal::ScalarSocketVariable axle_dist;
-    simcars::causal::ScalarFixedVariable double_scale_factor;
-    simcars::causal::ScalarProxyVariable double_scale_factor_proxy;
-    simcars::causal::ScalarProductVariable double_axle_dist;
-
-    simcars::causal::ScalarSocketVariable lon_lin_vel_recip;
-    simcars::causal::ScalarProductVariable needed_ang_vel_double_axle_dist_prod;
-    simcars::causal::ScalarProductVariable needed_steer;
-    */
-
     simcars::causal::ScalarMinVariable max_lim_steer;
     simcars::causal::ScalarMaxVariable actual_steer;
 
 public:
     SteerControlFWDCar(map::IDrivingMap const *map, FP_DATA_TYPE max_abs_steer_value);
     SteerControlFWDCar(SteerControlFWDCar const &control_fwd_car);
+
+    virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_ang_diff_variable();
 };
 
 }

@@ -49,6 +49,8 @@ public:
 
     void set_fwd_car(FWDCar *fwd_car);
 
+    virtual simcars::causal::IEndogenousVariable<FWDCarAction>* get_action_variable();
+
     friend void PlanFWDCar::set_control_fwd_car(ControlFWDCar *control_fwd_car);
 };
 

@@ -61,6 +61,8 @@ protected:
 public:
     GoalForceControlPed(map::IPedMap const *map, FP_DATA_TYPE max_goal_force_mag_value);
     GoalForceControlPed(GoalForceControlPed const &control_fwd_car);
+
+    simcars::causal::IEndogenousVariable<geometry::Vec>* get_pos_diff_variable();
 };
 
 }

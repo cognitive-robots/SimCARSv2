@@ -84,6 +84,11 @@ GoalForceControlPed::GoalForceControlPed(const GoalForceControlPed &control_fwd_
 {
 }
 
+simcars::causal::IEndogenousVariable<geometry::Vec>* GoalForceControlPed::get_pos_diff_variable()
+{
+    return &pos_diff;
+}
+
 }
 }
 }

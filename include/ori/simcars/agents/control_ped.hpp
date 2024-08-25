@@ -42,6 +42,8 @@ public:
 
     void set_ped(Ped *ped);
 
+    virtual simcars::causal::IEndogenousVariable<PedAction>* get_action_variable();
+
     friend void PlanPed::set_control_ped(ControlPed *control_ped);
 };
 
