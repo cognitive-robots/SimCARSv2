@@ -16,6 +16,9 @@ PointMass::PointMass(uint64_t id_value, FP_DATA_TYPE mass_value) :
     mass_proxy(&mass),
     mass_recip(&mass),
 
+    min_neighbour_dist(2.0),
+    min_neighbour_dist_buff(&min_neighbour_dist, nullptr, true),
+
     env_force(),
     env_force_buff(&env_force, nullptr, true),
     other_force(),
@@ -46,6 +49,9 @@ PointMass::PointMass(PointMass const &point_mass) :
     mass(point_mass.mass),
     mass_proxy(&mass),
     mass_recip(&mass),
+
+    min_neighbour_dist(2.0),
+    min_neighbour_dist_buff(&min_neighbour_dist, nullptr, true),
 
     env_force(),
     env_force_buff(&env_force, nullptr, true),
@@ -86,6 +92,11 @@ simcars::causal::IEndogenousVariable<uint64_t>* PointMass::get_id_variable()
 simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* PointMass::get_mass_variable()
 {
     return &mass_proxy;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* PointMass::get_min_neighbour_dist_variable()
+{
+    return &min_neighbour_dist_buff;
 }
 
 simcars::causal::IEndogenousVariable<geometry::Vec>* PointMass::get_env_force_variable()

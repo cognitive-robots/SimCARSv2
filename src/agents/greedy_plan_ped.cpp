@@ -27,6 +27,9 @@ GreedyPlanPed::GreedyPlanPed(map::IPedMap const *map, IPedOutcomeSim const *ped_
     outcome_sim(ped_outcome_sim),
     reward_calc(ped_reward_calc),
 
+    task(),
+    task_proxy(&task),
+
     time_horizon(time_horizon_value),
     time_horizon_proxy(&time_horizon),
     time_interval(time_interval_value),
@@ -44,7 +47,7 @@ GreedyPlanPed::GreedyPlanPed(map::IPedMap const *map, IPedOutcomeSim const *ped_
 
     reward_params(ped_reward_parameters),
     reward_params_proxy(&reward_params),
-    action_outcome_rewards(&sim_action_outcomes_buff, &reward_params, ped_reward_calc),
+    action_outcome_rewards(&sim_action_outcomes_buff, &task_proxy, &reward_params, ped_reward_calc),
 
     best_outcome_action_pair(&action_outcome_rewards),
     best_action(&best_outcome_action_pair)
@@ -55,6 +58,9 @@ GreedyPlanPed::GreedyPlanPed(GreedyPlanPed const &plan_ped) :
     map(plan_ped.map),
     outcome_sim(plan_ped.outcome_sim),
     reward_calc(plan_ped.reward_calc),
+
+    task(),
+    task_proxy(&task),
 
     time_horizon(plan_ped.time_horizon),
     time_horizon_proxy(&time_horizon),
@@ -73,7 +79,7 @@ GreedyPlanPed::GreedyPlanPed(GreedyPlanPed const &plan_ped) :
 
     reward_params(plan_ped.reward_params),
     reward_params_proxy(&reward_params),
-    action_outcome_rewards(&sim_action_outcomes_buff, &reward_params, plan_ped.reward_calc),
+    action_outcome_rewards(&sim_action_outcomes_buff, &task_proxy, &reward_params, plan_ped.reward_calc),
 
     best_outcome_action_pair(&action_outcome_rewards),
     best_action(&best_outcome_action_pair)

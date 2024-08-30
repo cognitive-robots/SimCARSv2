@@ -32,6 +32,11 @@ PointMassEnv::PointMassEntity::PointMassLink::PointMassLink(uint64_t id, PointMa
 {
 }
 
+causal::IEndogenousVariable<FP_DATA_TYPE>* PointMassEnv::PointMassEntity::PointMassLink::get_dist()
+{
+    return &dist;
+}
+
 causal::IEndogenousVariable<geometry::Vec>* PointMassEnv::PointMassEntity::PointMassLink::get_avoidance_force()
 {
     return &actual_avoidance_force;
@@ -41,7 +46,12 @@ PointMassEnv::PointMassEntity::PointMassEntity(uint64_t id, PointMass *point_mas
     id(id),
     point_mass(point_mass),
 
-    env_force({})
+    neighbour_dist_limit(2.0),
+    neighbour_dist_limit_proxy(&neighbour_dist_limit),
+
+    env_force({}),
+
+    min_neighbour_dist({ &neighbour_dist_limit_proxy })
 {
 }
 
@@ -57,6 +67,11 @@ PointMassEnv::PointMassEntity::~PointMassEntity()
 causal::IEndogenousVariable<geometry::Vec>* PointMassEnv::PointMassEntity::get_env_force()
 {
     return &env_force;
+}
+
+causal::IEndogenousVariable<FP_DATA_TYPE>* PointMassEnv::PointMassEntity::get_min_neighbour_dist()
+{
+    return &min_neighbour_dist;
 }
 
 bool PointMassEnv::PointMassEntity::add_link(PointMass *other_point_mass)
@@ -78,6 +93,7 @@ bool PointMassEnv::PointMassEntity::add_link(PointMass *other_point_mass)
         id_link_dict.update(other_id, link);
 
         env_force.insert(link->get_avoidance_force());
+        min_neighbour_dist.insert(link->get_dist());
 
         return true;
     }
@@ -100,6 +116,7 @@ bool PointMassEnv::PointMassEntity::remove_link(PointMass *other_point_mass)
         PointMassLink *link = id_link_dict[other_id];
 
         env_force.erase(link->get_avoidance_force());
+        min_neighbour_dist.erase(link->get_dist());
 
         id_link_dict.erase(other_id);
 
@@ -152,6 +169,9 @@ bool PointMassEnv::add_point_mass(PointMass *point_mass)
         point_mass->env_force.set_parent(entity->get_env_force());
         point_mass->env_force_buff.set_axiomatic(false);
 
+        point_mass->min_neighbour_dist.set_parent(entity->get_min_neighbour_dist());
+        point_mass->min_neighbour_dist_buff.set_axiomatic(false);
+
         return true;
     }
 }
@@ -174,6 +194,9 @@ bool PointMassEnv::remove_point_mass(PointMass *point_mass)
 
         point_mass->env_force_buff.set_axiomatic(true);
         point_mass->env_force.set_parent(nullptr);
+
+        point_mass->min_neighbour_dist_buff.set_axiomatic(true);
+        point_mass->min_neighbour_dist.set_parent(nullptr);
 
         id_entity_dict.erase(id);
         id_point_mass_dict.erase(id);

@@ -39,13 +39,6 @@ FWDCarRewards DefaultFWDCarRewardCalc::calc_rewards(FWDCarOutcome const *outcome
     rewards.max_speed_reward = std::exp(0.05 * (outcome->final_speed - parameters->speed_limit));
     rewards.anti_speed_reward = std::exp(-0.05 * outcome->final_speed);
 
-    //rewards.final_speed_reward =
-    //        std::exp(-8.0 * std::pow(outcome->final_speed - parameters->speed_limit, 2) /
-    //                 std::pow(parameters->speed_limit, 2));
-
-    //FP_DATA_TYPE max_env_force_mag_exp = std::exp(outcome->max_env_force_mag -
-    //                                              parameters->env_force_mag_limit);
-    //rewards.max_env_force_mag_reward = max_env_force_mag_exp / (max_env_force_mag_exp + 1.0);
     rewards.max_env_force_mag_reward =
             outcome->max_env_force_mag > parameters->env_force_mag_limit ? 0.0 : 1.0;
 

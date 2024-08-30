@@ -383,6 +383,7 @@ add_library(simcars_agents STATIC
   src/agents/default_fwd_car_reward_calc.cpp
   src/agents/fwd_car_action_extractor.cpp
   src/agents/default_ped_outcome_sim.cpp
+  src/agents/default_ped_reward_calc.cpp
   src/agents/ped_action_extractor.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.cpp
@@ -392,7 +393,9 @@ add_library(simcars_agents STATIC
   src/agents/causal/variable_types/exogenous/ped_reward_parameters_fixed.cpp
   src/agents/causal/variable_types/exogenous/ped_action_fixed.cpp
   src/agents/causal/variable_types/exogenous/ped_action_socket.cpp
+  src/agents/causal/variable_types/exogenous/ped_task_socket.cpp
   src/agents/causal/variable_types/endogenous/fwd_car_reward_parameters_proxy.cpp
+  src/agents/causal/variable_types/endogenous/ped_task_proxy.cpp
   src/agents/causal/variable_types/endogenous/ped_reward_parameters_proxy.cpp
   src/agents/causal/variable_types/endogenous/id_goal_val_part.cpp
   src/agents/causal/variable_types/endogenous/id_goal_time_part.cpp
@@ -447,6 +450,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/ped_action.hpp
   include/ori/simcars/agents/ped_outcome.hpp
   include/ori/simcars/agents/ped_rewards.hpp
+  include/ori/simcars/agents/ped_task.hpp
   include/ori/simcars/agents/ped_sim_parameters.hpp
   include/ori/simcars/agents/ped_reward_parameters.hpp
   include/ori/simcars/agents/control_fwd_car.hpp
@@ -467,6 +471,7 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/default_fwd_car_reward_calc.hpp
   include/ori/simcars/agents/fwd_car_action_extractor.hpp
   include/ori/simcars/agents/default_ped_outcome_sim.hpp
+  include/ori/simcars/agents/default_ped_reward_calc.hpp
   include/ori/simcars/agents/ped_action_extractor.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp
@@ -476,7 +481,9 @@ add_library(simcars_agents STATIC
   include/ori/simcars/agents/causal/variable_types/exogenous/ped_reward_parameters_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/ped_action_fixed.hpp
   include/ori/simcars/agents/causal/variable_types/exogenous/ped_action_socket.hpp
+  include/ori/simcars/agents/causal/variable_types/exogenous/ped_task_socket.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/fwd_car_reward_parameters_proxy.hpp
+  include/ori/simcars/agents/causal/variable_types/endogenous/ped_task_proxy.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/ped_reward_parameters_proxy.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/id_goal_val_part.hpp
   include/ori/simcars/agents/causal/variable_types/endogenous/id_goal_time_part.hpp
@@ -520,6 +527,8 @@ PUBLIC
   simcars_map
   simcars_causal
   rapidcsv
+PRIVATE
+  magic_enum::magic_enum
 )
 add_dependencies(simcars_agents simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_causal)
 target_compile_options(simcars_agents PRIVATE -fPIC)

@@ -16,25 +16,28 @@ namespace causal
 {
 
 CalcPedActionOutcomeRewardVariable::CalcPedActionOutcomeRewardVariable(
-        simcars::causal::IEndogenousVariable<PedOutcomeActionPairs> *endogenous_parent,
+        simcars::causal::IEndogenousVariable<PedOutcomeActionPairs> *endogenous_parent_1,
+        simcars::causal::IEndogenousVariable<PedTask> *endogenous_parent_2,
         simcars::causal::IVariable<PedRewardParameters> *other_parent,
         IPedRewardCalc const *ped_reward_calculator) :
-    ABinaryEndogenousVariable(endogenous_parent, other_parent),
+    ATernaryEndogenousVariable(endogenous_parent_1, endogenous_parent_2, other_parent),
     ped_reward_calculator(ped_reward_calculator) {}
 
 bool CalcPedActionOutcomeRewardVariable::get_value(RewardPedOutcomeActionTuples &val) const
 {
     PedOutcomeActionPairs outcome_action_pairs;
+    PedTask task;
     PedRewardParameters reward_parameters;
-    if (get_endogenous_parent()->get_value(outcome_action_pairs) && get_other_parent()->get_value(reward_parameters))
+    if (get_endogenous_parent_1()->get_value(outcome_action_pairs) &&
+            get_endogenous_parent_2()->get_value(task) &&
+            get_other_parent()->get_value(reward_parameters))
     {
         val.clear();
 
         for (size_t i = 0; i < outcome_action_pairs.count(); ++i)
         {
             FP_DATA_TYPE reward = ped_reward_calculator->calc_reward(
-                        &(outcome_action_pairs[i].first),
-                        &reward_parameters);
+                        &(outcome_action_pairs[i].first), &task, &reward_parameters);
             val.push_back(RewardPedOutcomeActionTuple(reward, outcome_action_pairs[i].first,
                                                       outcome_action_pairs[i].second));
         }
@@ -51,15 +54,17 @@ bool CalcPedActionOutcomeRewardVariable::set_value(RewardPedOutcomeActionTuples 
 {
     // WARNING: Assumes action ordering is the same in both arrays
     // TODO: Potentially consider separating reward weightings from other reward parameters
+    PedTask task;
     PedRewardParameters reward_parameters;
-    if (get_other_parent()->get_value(reward_parameters))
+    if (get_endogenous_parent_2()->get_value(task) &&
+            get_other_parent()->get_value(reward_parameters))
     {
         Eigen::MatrixXd individual_rewards(val.count(), 1);
         Eigen::VectorXd combined_rewards(val.count());
         for (size_t i = 0; i < val.count(); ++i)
         {
             PedRewards rewards = ped_reward_calculator->calc_rewards(
-                        &(std::get<1>(val[i])), &reward_parameters);
+                        &(std::get<1>(val[i])), &task, &reward_parameters);
             individual_rewards(i, 0) = 1.0;
             combined_rewards(i) = std::get<0>(val[i]);
         }

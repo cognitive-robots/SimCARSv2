@@ -10,8 +10,10 @@
 #include <ori/simcars/agents/ped_sim_parameters.hpp>
 #include <ori/simcars/agents/ped_reward_parameters.hpp>
 #include <ori/simcars/agents/plan_ped.hpp>
+#include <ori/simcars/agents/causal/variable_types/exogenous/ped_task_socket.hpp>
 #include <ori/simcars/agents/causal/variable_types/exogenous/ped_outcome_parameters_fixed.hpp>
 #include <ori/simcars/agents/causal/variable_types/exogenous/ped_reward_parameters_fixed.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/ped_task_proxy.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/ped_reward_parameters_proxy.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/generate_ped_actions.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/ped_outcome_action_pair_action_part.hpp>
@@ -35,6 +37,9 @@ protected:
     map::IPedMap const *map;
     agents::IPedOutcomeSim const *outcome_sim;
     agents::IPedRewardCalc const *reward_calc;
+
+    causal::PedTaskSocketVariable task;
+    causal::PedTaskProxyVariable task_proxy;
 
     simcars::causal::ScalarFixedVariable time_horizon;
     simcars::causal::ScalarProxyVariable time_horizon_proxy;

@@ -41,6 +41,10 @@ protected:
     simcars::causal::ScalarProxyVariable mass_proxy;
     simcars::causal::ScalarReciprocalVariable mass_recip;
 
+    // TODO: Move neighbour distance related elements to the pedestrian class
+    simcars::causal::ScalarSocketVariable min_neighbour_dist;
+    simcars::causal::ScalarBufferVariable min_neighbour_dist_buff;
+
     simcars::causal::VectorSocketVariable env_force;
     simcars::causal::VectorBufferVariable env_force_buff;
     simcars::causal::VectorSocketVariable other_force;
@@ -73,6 +77,7 @@ public:
     virtual temporal::Time get_min_time() const;
     virtual temporal::Time get_max_time() const;
 
+    virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_min_neighbour_dist_variable();
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force_variable();
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_other_force_variable();
     virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_acc_variable();

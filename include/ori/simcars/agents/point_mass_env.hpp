@@ -2,9 +2,11 @@
 
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/causal/variable_types/exogenous/scalar_fixed.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_negation.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_product.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_exponent.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/scalar_set_min.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_negation.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_norm.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_normalisation.hpp>
@@ -48,6 +50,7 @@ class PointMassEnv
             PointMassLink(uint64_t id, PointMass *point_mass, uint64_t other_id,
                  PointMass *other_point_mass);
 
+            simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_dist();
             simcars::causal::IEndogenousVariable<geometry::Vec>* get_avoidance_force();
         };
 
@@ -56,7 +59,12 @@ class PointMassEnv
         structures::stl::STLDictionary<uint64_t, PointMassLink*> id_link_dict;
 
     protected:
+        simcars::causal::ScalarFixedVariable neighbour_dist_limit;
+        simcars::causal::ScalarProxyVariable neighbour_dist_limit_proxy;
+
         simcars::causal::VectorSetSumVariable env_force;
+
+        simcars::causal::ScalarSetMinVariable min_neighbour_dist;
 
     public:
         PointMassEntity(uint64_t id, PointMass *point_mass);
@@ -64,6 +72,7 @@ class PointMassEnv
         virtual ~PointMassEntity();
 
         simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force();
+        simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_min_neighbour_dist();
 
         bool add_link(PointMass *other_point_mass);
         bool remove_link(PointMass *other_point_mass);

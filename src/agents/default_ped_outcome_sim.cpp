@@ -49,6 +49,11 @@ PedOutcome DefaultPedOutcomeSim::sim_outcome(PedAction const *action,
     {
         throw std::runtime_error("Could not get position");
     }
+    res = ped_sim->get_min_neighbour_dist_variable()->get_value(outcome.min_neighbour_dist);
+    if (!res)
+    {
+        throw std::runtime_error("Could not get minimum neighbour distance");
+    }
     geometry::Vec pos_diff;
     res = control_ped_sim.get_pos_diff_variable()->get_value(pos_diff);
     if (!res)
