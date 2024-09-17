@@ -5,7 +5,7 @@
 #include <ori/simcars/geometry/tri.hpp>
 #include <ori/simcars/geometry/rect.hpp>
 #include <ori/simcars/map/declarations.hpp>
-#include <ori/simcars/map/map_object_interface.hpp>
+#include <ori/simcars/map/driving_map_object_interface.hpp>
 #include <ori/simcars/map/lane_branch.hpp>
 
 namespace ori
@@ -15,7 +15,7 @@ namespace simcars
 namespace map
 {
 
-class ILane : public virtual IMapObject
+class ILane : public virtual IDrivingMapObject
 {
 public:
     enum class AccessRestriction

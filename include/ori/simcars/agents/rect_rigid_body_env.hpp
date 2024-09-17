@@ -37,9 +37,9 @@ namespace agents
 
 class RectRigidBodyEnv
 {
-    class Entity
+    class RectRigidBodyEntity
     {
-        class Link
+        class RectRigidBodyLink
         {
             uint64_t id;
             RectRigidBody *rigid_body;
@@ -89,7 +89,7 @@ class RectRigidBodyEnv
             simcars::causal::ORectDistHeadwayVariable dist_headway;
 
         public:
-            Link(uint64_t id, RectRigidBody *rigid_body, uint64_t other_id,
+            RectRigidBodyLink(uint64_t id, RectRigidBody *rigid_body, uint64_t other_id,
                  RectRigidBody *other_rigid_body);
 
             simcars::causal::IEndogenousVariable<geometry::Vec>* get_coll_force();
@@ -100,7 +100,7 @@ class RectRigidBodyEnv
 
         uint64_t id;
         RectRigidBody *rigid_body;
-        structures::stl::STLDictionary<uint64_t, Link*> id_link_dict;
+        structures::stl::STLDictionary<uint64_t, RectRigidBodyLink*> id_link_dict;
 
     protected:
         simcars::causal::ScalarFixedVariable half_scale_factor;
@@ -115,7 +115,7 @@ class RectRigidBodyEnv
         simcars::causal::VectorNormalisationVariable lin_vel_dir;
         simcars::causal::VectorNegationVariable drag_force_dir;
 
-        simcars::causal::VectorDotProductVariable lin_spd_squared;
+        simcars::causal::VectorDotProductVariable lin_vel_mag_squared;
         simcars::causal::ScalarProductVariable dynamic_pressure;
         simcars::causal::ScalarProductVariable drag_force_mag;
 
@@ -129,9 +129,9 @@ class RectRigidBodyEnv
         simcars::causal::ScalarSetMinVariable min_dist_headway;
 
     public:
-        Entity(uint64_t id, RectRigidBody *rigid_body);
+        RectRigidBodyEntity(uint64_t id, RectRigidBody *rigid_body);
 
-        virtual ~Entity();
+        virtual ~RectRigidBodyEntity();
 
         simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force();
         simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_env_torque();
@@ -143,7 +143,7 @@ class RectRigidBodyEnv
     };
 
     structures::stl::STLDictionary<uint64_t, RectRigidBody*> id_rigid_body_dict;
-    structures::stl::STLDictionary<uint64_t, Entity*> id_entity_dict;
+    structures::stl::STLDictionary<uint64_t, RectRigidBodyEntity*> id_entity_dict;
 
 public:
     virtual ~RectRigidBodyEnv();

@@ -17,7 +17,7 @@ ScalarTimeConditionalVariable::ScalarTimeConditionalVariable(
 
 bool ScalarTimeConditionalVariable::get_value(FP_DATA_TYPE &val) const
 {
-    if (time > VariableContext::get_current_time())
+    if (time >= VariableContext::get_current_time())
     {
         return get_endogenous_parent()->get_value(val);
     }
@@ -29,7 +29,7 @@ bool ScalarTimeConditionalVariable::get_value(FP_DATA_TYPE &val) const
 
 bool ScalarTimeConditionalVariable::set_value(FP_DATA_TYPE const &val)
 {
-    if (time > VariableContext::get_current_time())
+    if (time >= VariableContext::get_current_time())
     {
         return get_endogenous_parent()->set_value(val);
     }

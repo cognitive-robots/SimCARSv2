@@ -7,6 +7,8 @@
 #include <ori/simcars/agents/goal.hpp>
 #include <ori/simcars/agents/fwd_car_action.hpp>
 #include <ori/simcars/agents/fwd_car_outcome.hpp>
+#include <ori/simcars/agents/ped_action.hpp>
+#include <ori/simcars/agents/ped_outcome.hpp>
 
 #include <utility>
 
@@ -16,6 +18,10 @@ namespace simcars
 {
 namespace agents
 {
+
+template <typename T>
+using TimeGoalPair = std::pair<temporal::Time, Goal<T>>;
+
 
 typedef std::pair<FWDCarOutcome, FWDCarAction> FWDCarOutcomeActionPair;
 
@@ -29,10 +35,22 @@ typedef std::tuple<FP_DATA_TYPE, FWDCarOutcome, FWDCarAction> RewardFWDCarOutcom
 
 typedef structures::stl::STLStackArray<std::tuple<FP_DATA_TYPE, FWDCarOutcome, FWDCarAction>> RewardFWDCarOutcomeActionTuples;
 
-template <typename T>
-using TimeGoalPair = std::pair<temporal::Time, Goal<T>>;
-
 typedef std::pair<temporal::Time, FWDCarAction> TimeFWDCarActionPair;
+
+
+typedef std::pair<PedOutcome, PedAction> PedOutcomeActionPair;
+
+typedef structures::stl::STLStackArray<PedOutcomeActionPair> PedOutcomeActionPairs;
+
+typedef std::pair<FP_DATA_TYPE, PedAction> RewardPedActionPair;
+
+typedef structures::stl::STLStackArray<std::pair<FP_DATA_TYPE, PedAction>> RewardPedActionPairs;
+
+typedef std::tuple<FP_DATA_TYPE, PedOutcome, PedAction> RewardPedOutcomeActionTuple;
+
+typedef structures::stl::STLStackArray<std::tuple<FP_DATA_TYPE, PedOutcome, PedAction>> RewardPedOutcomeActionTuples;
+
+typedef std::pair<temporal::Time, PedAction> TimePedActionPair;
 
 }
 }

@@ -14,7 +14,7 @@ void FullControlFWDCar::init_links()
     SteerControlFWDCar::init_links();
 }
 
-FullControlFWDCar::FullControlFWDCar(map::IMap const *map, FP_DATA_TYPE max_motor_torque_value,
+FullControlFWDCar::FullControlFWDCar(map::IDrivingMap const *map, FP_DATA_TYPE max_motor_torque_value,
                                      FP_DATA_TYPE min_motor_torque_value,
                                      FP_DATA_TYPE max_abs_steer_value) :
     MotorTorqueControlFWDCar(max_motor_torque_value, min_motor_torque_value),

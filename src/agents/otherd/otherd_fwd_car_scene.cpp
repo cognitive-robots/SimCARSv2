@@ -2,10 +2,6 @@
 #include <ori/simcars/agents/otherd/otherd_fwd_car_scene.hpp>
 
 #include <ori/simcars/causal/variable_context.hpp>
-#include <ori/simcars/agents/full_control_fwd_car.hpp>
-#include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
-#include <ori/simcars/agents/default_fwd_car_outcome_sim.hpp>
-#include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 
 namespace ori
 {
@@ -69,7 +65,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
 
         FP_DATA_TYPE approx_height;
         FP_DATA_TYPE approx_mass;
-        FP_DATA_TYPE approx_axel_dist;
+        FP_DATA_TYPE approx_axle_dist;
         FP_DATA_TYPE approx_wheel_radius;
         if (tracks_meta_doc.GetCell<std::string>("class", i) == "motorcycle" ||
                 tracks_meta_doc.GetCell<std::string>("class", i) == "bicycle")
@@ -79,7 +75,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
             width = 0.72;
             approx_height = 1;
             approx_mass = 110;
-            approx_axel_dist = 0.6225;
+            approx_axle_dist = 0.6225;
             approx_wheel_radius = 0.17;
         }
         else if (tracks_meta_doc.GetCell<std::string>("class", i) == "pedestrian")
@@ -89,7 +85,7 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
             width = 0.4;
             approx_height = 1.6;
             approx_mass = 70;
-            approx_axel_dist = 0.01;
+            approx_axle_dist = 0.01;
             approx_wheel_radius = 0.8;
         }
         else
@@ -97,12 +93,12 @@ OtherDFWDCarScene::OtherDFWDCarScene(rapidcsv::Document const &recording_meta_do
             // Several big approximations here based off Toyota Ascent Sport (Hybrid), 1.8L
             approx_height = 0.806 * width;
             approx_mass = 116 * length * width * approx_height;
-            approx_axel_dist = 0.292 * length;
+            approx_axle_dist = 0.292 * length;
             approx_wheel_radius = 0.19;
         }
 
         FWDCar *fwd_car = new FWDCar(id, approx_mass, length, width, approx_height,
-                                     approx_wheel_radius, approx_axel_dist);
+                                     approx_wheel_radius, approx_axle_dist);
         id_car_dict.update(id, fwd_car);
         scene_env.add_rigid_body(fwd_car);
 

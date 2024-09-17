@@ -68,7 +68,7 @@ void LaneBranch::retrieve_lanes() const
     delete lanes;
 }
 
-LaneBranch::LaneBranch(structures::IArray<uint64_t> *lane_ids, IMap const *map) :
+LaneBranch::LaneBranch(structures::IArray<uint64_t> *lane_ids, IDrivingMap const *map) :
     lane_ids(lane_ids), map(map), straightest_lane(nullptr)
 {
     assert(lane_ids != nullptr);

@@ -32,7 +32,7 @@ class GreedyPlanFWDCar : public PlanFWDCar
 protected:
     void init_links() override;
 
-    map::IMap const *map;
+    map::IDrivingMap const *map;
     agents::IFWDCarOutcomeSim const *outcome_sim;
     agents::IFWDCarRewardCalc const *reward_calc;
 
@@ -65,7 +65,7 @@ protected:
     causal::FWDCarOutcomeActionPairActionPartVariable best_action;
 
 public:
-    GreedyPlanFWDCar(map::IMap const *map, IFWDCarOutcomeSim const *fwd_car_outcome_sim,
+    GreedyPlanFWDCar(map::IDrivingMap const *map, IFWDCarOutcomeSim const *fwd_car_outcome_sim,
                      FWDCarSimParameters fwd_car_sim_parameters,
                      IFWDCarRewardCalc const *fwd_car_reward_calc,
                      FWDCarRewardParameters fwd_car_reward_parameters,

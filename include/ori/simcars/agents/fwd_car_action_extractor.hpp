@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ori/simcars/structures/dictionary_interface.hpp>
-#include <ori/simcars/map/map_interface.hpp>
+#include <ori/simcars/map/driving_map_interface.hpp>
 #include <ori/simcars/agents/typedefs.hpp>
 #include <ori/simcars/agents/fwd_car_action.hpp>
 #include <ori/simcars/agents/fwd_car.hpp>
@@ -15,7 +15,7 @@ namespace agents
 
 class FWDCarActionExtractor
 {
-    map::IMap *map;
+    map::IDrivingMap *map;
     temporal::Duration resolution;
     temporal::Duration action_min_duration;
     FP_DATA_TYPE action_min_lon_lin_acc;
@@ -27,7 +27,7 @@ class FWDCarActionExtractor
     structures::IArray<TimeGoalPair<uint64_t>>* extract_lane_goals(agents::FWDCar *fwd_car) const;
 
 public:
-    FWDCarActionExtractor(map::IMap *map, temporal::Duration resolution,
+    FWDCarActionExtractor(map::IDrivingMap *map, temporal::Duration resolution,
                           temporal::Duration action_min_duration,
                           FP_DATA_TYPE action_min_lon_lin_acc,
                           FP_DATA_TYPE action_min_lon_lin_vel_diff,

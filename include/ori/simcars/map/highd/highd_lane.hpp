@@ -23,7 +23,7 @@ class HighDLane : public virtual ALane
 
 public:
     HighDLane(uint64_t id, uint64_t left_adjacent_lane_id, uint64_t right_adjacent_lane_id,
-              IMap const *map, FP_DATA_TYPE upper_bound, FP_DATA_TYPE lower_bound,
+              IDrivingMap const *map, FP_DATA_TYPE upper_bound, FP_DATA_TYPE lower_bound,
               bool driving_left);
 
     geometry::Vecs const& get_left_boundary() const override;

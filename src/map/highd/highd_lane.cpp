@@ -11,11 +11,11 @@ namespace highd
 {
 
 HighDLane::HighDLane(uint64_t id, uint64_t left_adjacent_lane_id, uint64_t right_adjacent_lane_id,
-                     IMap const *map, FP_DATA_TYPE upper_bound, FP_DATA_TYPE lower_bound,
+                     IDrivingMap const *map, FP_DATA_TYPE upper_bound, FP_DATA_TYPE lower_bound,
                      bool driving_left) :
     ALane(id, left_adjacent_lane_id, right_adjacent_lane_id,
           new structures::stl::STLStackArray<uint64_t>,
-          new structures::stl::STLStackArray<uint64_t>, map), AMapObject(id, map),
+          new structures::stl::STLStackArray<uint64_t>, map), ADrivingMapObject(id, map),
     curvature(0.0f), access_restriction(HighDLane::AccessRestriction::NO_RESTRICTION)
 {
     if (driving_left)

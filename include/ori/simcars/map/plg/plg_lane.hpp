@@ -22,7 +22,7 @@ class PLGLane : public virtual ALane
     AccessRestriction access_restriction;
 
 public:
-    PLGLane(uint64_t id, IMap const *map, geometry::Vecs const *vertices);
+    PLGLane(uint64_t id, IDrivingMap const *map, geometry::Vecs const *vertices);
 
     geometry::Vecs const& get_left_boundary() const override;
     geometry::Vecs const& get_right_boundary() const override;

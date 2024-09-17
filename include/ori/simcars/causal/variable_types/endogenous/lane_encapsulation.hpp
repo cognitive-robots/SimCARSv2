@@ -12,11 +12,11 @@ namespace causal
 
 class LaneEncapsulationVariable : public ABinaryEndogenousVariable<bool, uint64_t, geometry::Vec>
 {
-    map::IMap const *map;
+    map::IDrivingMap const *map;
 
 public:
     LaneEncapsulationVariable(IEndogenousVariable<uint64_t> *endogenous_parent,
-                              IVariable<geometry::Vec> *other_parent, map::IMap const *map);
+                              IVariable<geometry::Vec> *other_parent, map::IDrivingMap const *map);
 
     bool get_value(bool &val) const override;
 

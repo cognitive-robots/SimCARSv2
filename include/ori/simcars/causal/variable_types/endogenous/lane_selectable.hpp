@@ -12,13 +12,12 @@ namespace causal
 {
 
 class LaneSelectableVariable : public AUnaryEndogenousVariable<
-        structures::stl::STLStackArray<uint64_t>,
-        geometry::Vec>
+        structures::stl::STLStackArray<uint64_t>, geometry::Vec>
 {
-    map::IMap const *map;
+    map::IDrivingMap const *map;
 
 public:
-    LaneSelectableVariable(IVariable<geometry::Vec> *parent, map::IMap const *map);
+    LaneSelectableVariable(IVariable<geometry::Vec> *parent, map::IDrivingMap const *map);
 
     bool get_value(structures::stl::STLStackArray<uint64_t> &val) const override;
 

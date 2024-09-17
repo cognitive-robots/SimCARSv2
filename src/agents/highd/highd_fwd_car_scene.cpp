@@ -2,10 +2,6 @@
 #include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
 
 #include <ori/simcars/causal/variable_context.hpp>
-#include <ori/simcars/agents/full_control_fwd_car.hpp>
-#include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
-#include <ori/simcars/agents/default_fwd_car_outcome_sim.hpp>
-#include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 
 namespace ori
 {
@@ -61,11 +57,11 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
         // Several big approximations here based off Toyota Ascent Sport (Hybrid), 1.8L
         FP_DATA_TYPE approx_height = 0.806 * width;
         FP_DATA_TYPE approx_mass = 116 * length * width * approx_height;
-        FP_DATA_TYPE approx_axel_dist = 0.292 * length;
+        FP_DATA_TYPE approx_axle_dist = 0.292 * length;
         FP_DATA_TYPE approx_wheel_radius = 0.19;
 
         FWDCar *fwd_car = new FWDCar(id, approx_mass, length, width, approx_height,
-                                     approx_wheel_radius, approx_axel_dist);
+                                     approx_wheel_radius, approx_axle_dist);
         id_car_dict.update(id, fwd_car);
         scene_env.add_rigid_body(fwd_car);
 
@@ -173,6 +169,7 @@ HighDFWDCarScene::HighDFWDCarScene(rapidcsv::Document const &tracks_meta_doc,
     }
 
     simcars::causal::VariableContext::set_time_step_size(get_time_step_size());
+
     for (i = 0; i < 1 + end_frame - start_frame; ++i)
     {
         uint32_t current_frame = start_frame + i;

@@ -30,6 +30,12 @@ geometry::Vec HighDMap::get_map_centre() const
     return geometry::Vec(210.0f, 19.0f);
 }
 
+geometry::Rect HighDMap::get_bounding_box() const
+{
+    // WARNING: The height is exaggerated for this bounding box
+    return geometry::Rect(get_map_centre(), 700, 700);
+}
+
 FP_DATA_TYPE HighDMap::get_max_dim_size() const
 {
     return 700;

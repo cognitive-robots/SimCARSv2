@@ -16,10 +16,10 @@ LaneletDLane::LaneletDLane(uint64_t id, uint64_t left_adjacent_lane_id,
                            uint64_t right_adjacent_lane_id,
                            structures::IArray<uint64_t> *fore_lanes,
                            structures::IArray<uint64_t> *aft_lanes,
-                           IMap const *map, lanelet::ConstLanelet &lanelet,
+                           IDrivingMap const *map, lanelet::ConstLanelet &lanelet,
                            geometry::Vec const &utm_origin) :
     ALane(id, left_adjacent_lane_id, right_adjacent_lane_id, fore_lanes, aft_lanes, map),
-    AMapObject(id, map)
+    ADrivingMapObject(id, map)
 {
     geometry::TrigBuff const *trig_buff = geometry::TrigBuff::get_instance();
 

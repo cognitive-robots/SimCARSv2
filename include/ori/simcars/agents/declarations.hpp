@@ -7,19 +7,33 @@ namespace simcars
 namespace agents
 {
 
+class PointMass;
+
+class PointMassEnv;
+
 class RectRigidBody;
 
 class RectRigidBodyEnv;
 
 class FWDCar;
 
-class ControlFWDCar;
-
-class PlanFWDCar;
-
 struct FWDCarAction;
 
 struct FWDCarOutcome;
+
+class Ped;
+
+struct PedAction;
+
+struct PedOutcome;
+
+class ControlFWDCar;
+
+class ControlPed;
+
+class PlanFWDCar;
+
+class PlanPed;
 
 }
 }

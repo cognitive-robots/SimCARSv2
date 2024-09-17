@@ -5,7 +5,7 @@
 #include <ori/simcars/agents/rect_rigid_body_sim.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
-#include <ori/simcars/agents/fwd_car_action_intervention.hpp>
+#include <ori/simcars/agents/action_intervention_fwd_car.hpp>
 
 namespace ori
 {
@@ -24,6 +24,7 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
                                                    FWDCarSimParameters const *parameters) const
 {
     temporal::Time start_time = simcars::causal::VariableContext::get_current_time();
+    temporal::Duration time_step_size = simcars::causal::VariableContext::get_time_step_size();
 
     // WARNING: Temporarily removed assertion, might not be necessary
     //assert(action->speed_goal.time > start_time && action->lane_goal.time > start_time);
@@ -50,8 +51,8 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     */
 
     FWDCarSim *fwd_car_sim = new FWDCarSim(fwd_car, start_time);
-    FullControlFWDCarSim control_fwd_car_sim(control_fwd_car, start_time);
-    FWDCarActionIntervention plan_fwd_car_intervention(*action);
+    FullControlFWDCarSim control_fwd_car_sim(control_fwd_car, start_time - time_step_size);
+    ActionInterventionFWDCar plan_fwd_car_intervention(*action);
     control_fwd_car_sim.set_fwd_car(fwd_car_sim);
     plan_fwd_car_intervention.set_control_fwd_car(&control_fwd_car_sim);
 
@@ -70,7 +71,6 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
     bool res = control_fwd_car_sim.get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
     if (!res)
     {
-        control_fwd_car_sim.get_cumil_lane_trans_variable()->get_value(outcome.lane_transitions);
         throw std::runtime_error("Could not get cumilative lane transitions");
     }
     res = fwd_car_sim->get_lon_lin_vel_variable()->get_value(outcome.final_speed);
@@ -89,7 +89,7 @@ FWDCarOutcome DefaultFWDCarOutcomeSim::sim_outcome(FWDCarAction const *action,
         throw std::runtime_error("Could not get maximum environment force magnitude");
     }
     structures::stl::STLStackArray<uint64_t> lane_encaps;
-    res = control_fwd_car_sim.get_lane_encaps()->get_value(lane_encaps);
+    res = control_fwd_car_sim.get_lane_encaps_variable()->get_value(lane_encaps);
     if (!res)
     {
         throw std::runtime_error("Could not get encapsulating lanes");

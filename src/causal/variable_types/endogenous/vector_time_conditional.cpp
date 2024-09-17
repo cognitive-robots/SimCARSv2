@@ -17,7 +17,7 @@ VectorTimeConditionalVariable::VectorTimeConditionalVariable(
 
 bool VectorTimeConditionalVariable::get_value(geometry::Vec &val) const
 {
-    if (time > VariableContext::get_current_time())
+    if (time >= VariableContext::get_current_time())
     {
         return get_endogenous_parent()->get_value(val);
     }
@@ -29,7 +29,7 @@ bool VectorTimeConditionalVariable::get_value(geometry::Vec &val) const
 
 bool VectorTimeConditionalVariable::set_value(geometry::Vec const &val)
 {
-    if (time > VariableContext::get_current_time())
+    if (time >= VariableContext::get_current_time())
     {
         return get_endogenous_parent()->set_value(val);
     }

@@ -58,6 +58,11 @@ void ControlFWDCar::set_fwd_car(FWDCar *fwd_car)
     }
 }
 
+simcars::causal::IEndogenousVariable<FWDCarAction>* ControlFWDCar::get_action_variable()
+{
+    return &action_buff;
+}
+
 }
 }
 }

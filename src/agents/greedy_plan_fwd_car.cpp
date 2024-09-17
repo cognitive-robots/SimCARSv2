@@ -18,7 +18,7 @@ void GreedyPlanFWDCar::init_links()
     action.set_parent(&best_action);
 }
 
-GreedyPlanFWDCar::GreedyPlanFWDCar(map::IMap const *map,
+GreedyPlanFWDCar::GreedyPlanFWDCar(map::IDrivingMap const *map,
                                    IFWDCarOutcomeSim const *fwd_car_outcome_sim,
                                    FWDCarSimParameters fwd_car_sim_parameters,
                                    IFWDCarRewardCalc const *fwd_car_reward_calc,

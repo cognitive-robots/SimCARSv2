@@ -10,7 +10,7 @@ namespace causal
 
 LaneMapPointVariable::LaneMapPointVariable(
         IEndogenousVariable<uint64_t> *endogenous_parent,
-        IVariable<geometry::Vec> *other_parent, map::IMap const *map) :
+        IVariable<geometry::Vec> *other_parent, map::IDrivingMap const *map) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent), map(map) {}
 
 bool LaneMapPointVariable::get_value(geometry::Vec &val) const

@@ -5,6 +5,7 @@
 #include <ori/simcars/causal/variable_types/endogenous/scalar_time_conditional.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_norm.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_time_conditional.hpp>
+#include <ori/simcars/agents/point_mass_sim.hpp>
 #include <ori/simcars/agents/rect_rigid_body.hpp>
 
 namespace ori
@@ -14,16 +15,12 @@ namespace simcars
 namespace agents
 {
 
-class RectRigidBodySim : public virtual RectRigidBody
+class RectRigidBodySim : public virtual RectRigidBody, public virtual PointMassSim
 {
+    RectRigidBody const* const original_rect_rigid_body;
+
 protected:
     simcars::causal::ScalarTimeConditionalVariable sim_dist_headway;
-
-    simcars::causal::VectorTimeConditionalVariable sim_env_force;
-    simcars::causal::VectorTimeConditionalVariable sim_other_force;
-    simcars::causal::VectorTimeConditionalVariable sim_lin_acc;
-    simcars::causal::VectorTimeConditionalVariable sim_lin_vel;
-    simcars::causal::VectorTimeConditionalVariable sim_pos;
 
     simcars::causal::ScalarTimeConditionalVariable sim_env_torque;
     simcars::causal::ScalarTimeConditionalVariable sim_other_torque;
@@ -31,32 +28,18 @@ protected:
     simcars::causal::ScalarTimeConditionalVariable sim_ang_vel;
     simcars::causal::ScalarTimeConditionalVariable sim_rot;
 
-    simcars::causal::ScalarFixedVariable zero_max_env_force_mag;
-    simcars::causal::ScalarProxyVariable zero_max_env_force_mag_proxy;
-
-    simcars::causal::VectorNormVariable env_force_mag;
-
-    simcars::causal::ScalarTimeConditionalVariable sim_max_env_force_mag;
-    simcars::causal::ScalarPreviousTimeStepVariable prev_max_env_force_mag;
-
-    simcars::causal::ScalarMaxVariable max_env_force_mag;
-
 public:
     RectRigidBodySim(RectRigidBody *rect_rigid_body, temporal::Time start_time);
 
+    temporal::Time get_min_time() const override;
+    temporal::Time get_max_time() const override;
+
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_dist_headway_variable() override;
-    simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force_variable() override;
-    simcars::causal::IEndogenousVariable<geometry::Vec>* get_other_force_variable() override;
-    simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_acc_variable() override;
-    simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_vel_variable() override;
-    simcars::causal::IEndogenousVariable<geometry::Vec>* get_pos_variable() override;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_env_torque_variable() override;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_other_torque_variable() override;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_ang_acc_variable() override;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_ang_vel_variable() override;
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_rot_variable() override;
-
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_max_env_force_mag_variable();
 };
 
 }

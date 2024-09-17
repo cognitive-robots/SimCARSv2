@@ -7,12 +7,12 @@
 #include <ori/simcars/agents/fwd_car_action_extractor.hpp>
 #include <ori/simcars/agents/fwd_car_sim.hpp>
 #include <ori/simcars/agents/full_control_fwd_car_sim.hpp>
-#include <ori/simcars/agents/fwd_car_action_intervention.hpp>
+#include <ori/simcars/agents/action_intervention_fwd_car.hpp>
 #include <ori/simcars/agents/default_fwd_car_outcome_sim.hpp>
 #include <ori/simcars/agents/default_fwd_car_reward_calc.hpp>
 #include <ori/simcars/agents/greedy_plan_fwd_car.hpp>
 #include <ori/simcars/agents/highd/highd_fwd_car_scene.hpp>
-#include <ori/simcars/visualisation/qmap_agents_widget.hpp>
+#include <ori/simcars/visualisation/qdriving_map_agents_widget.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
@@ -187,9 +187,9 @@ int main(int argc, char *argv[])
             std::chrono::high_resolution_clock::now();
 
 
-    agents::FWDCarActionExtractor fwd_car_action_extractor(&map, temporal::Duration(500),
-                                                           temporal::Duration(2500), 0.1,
-                                                           1.0, temporal::Duration(500));
+    agents::FWDCarActionExtractor fwd_car_action_extractor(&map, temporal::Duration(480),
+                                                           temporal::Duration(2480), 0.1,
+                                                           1.0, temporal::Duration(480));
 
     structures::stl::STLDictionary<uint64_t, agents::FWDCar*> id_fwd_car_dict;
     structures::stl::STLDictionary<uint64_t, structures::IArray<agents::TimeFWDCarActionPair>*> id_action_dict;
@@ -419,11 +419,12 @@ int main(int argc, char *argv[])
                         // TODO: Integrate better information regarding braking
                         agents::FullControlFWDCar causing_control_fwd_car(&map, 163 * 20, -163, 0.616);
                         agents::FullControlFWDCarSim causing_control_fwd_car_sim(
-                                    &causing_control_fwd_car, causing_time_action_pair.first);
+                                    &causing_control_fwd_car, causing_time_action_pair.first -
+                                    causal::VariableContext::get_time_step_size());
 
-                        agents::FWDCarActionIntervention causing_plan_fwd_car(default_fwd_car_action);
+                        agents::ActionInterventionFWDCar causing_plan_fwd_car(default_fwd_car_action);
 
-                        causal::IEndogenousVariable<agents::FWDCarAction> *causing_fwd_car_action_intervention =
+                        causal::IEndogenousVariable<agents::FWDCarAction> *causing_action_intervention_fwd_car =
                                 causing_plan_fwd_car.get_action_intervention_variable();
                         for (l = 0; l < k; ++l)
                         {
@@ -433,7 +434,7 @@ int main(int argc, char *argv[])
                                  current_time += causal::VariableContext::get_time_step_size())
                             {
                                 causal::VariableContext::set_current_time(current_time);
-                                causing_fwd_car_action_intervention->set_value(current_action.second);
+                                causing_action_intervention_fwd_car->set_value(current_action.second);
                             }
                         }
 
@@ -448,7 +449,8 @@ int main(int argc, char *argv[])
                         agents::FWDCarSim affected_fwd_car_sim(affected_fwd_car, affected_time_action_pair.first);
 
                         agents::FullControlFWDCarSim affected_control_fwd_car_sim(
-                                    &affected_control_fwd_car, affected_time_action_pair.first);
+                                    &affected_control_fwd_car, affected_time_action_pair.first -
+                                    causal::VariableContext::get_time_step_size());
 
                         agents::DefaultFWDCarOutcomeSim outcome_sim(&affected_control_fwd_car_sim,
                                                                     original_env);

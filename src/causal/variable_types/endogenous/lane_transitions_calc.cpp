@@ -11,7 +11,7 @@ namespace causal
 LaneTransitionsCalcVariable::LaneTransitionsCalcVariable(
         IEndogenousVariable<structures::stl::STLStackArray<uint64_t>> *endogenous_parent,
         IVariable<structures::stl::STLStackArray<uint64_t>> *other_parent,
-        map::IMap const *map) :
+        map::IDrivingMap const *map) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent), map(map) {}
 
 bool LaneTransitionsCalcVariable::get_value(FP_DATA_TYPE &val) const

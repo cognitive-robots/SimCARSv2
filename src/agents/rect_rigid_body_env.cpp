@@ -10,7 +10,7 @@ namespace simcars
 namespace agents
 {
 
-RectRigidBodyEnv::Entity::Link::Link(uint64_t id, RectRigidBody *rigid_body, uint64_t other_id,
+RectRigidBodyEnv::RectRigidBodyEntity::RectRigidBodyLink::RectRigidBodyLink(uint64_t id, RectRigidBody *rigid_body, uint64_t other_id,
                                      RectRigidBody *other_rigid_body) :
     id(id),
     rigid_body(rigid_body),
@@ -60,22 +60,22 @@ RectRigidBodyEnv::Entity::Link::Link(uint64_t id, RectRigidBody *rigid_body, uin
 {
 }
 
-causal::IEndogenousVariable<geometry::Vec>* RectRigidBodyEnv::Entity::Link::get_coll_force()
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBodyEnv::RectRigidBodyEntity::RectRigidBodyLink::get_coll_force()
 {
     return &actual_coll_force;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::Link::get_coll_torque()
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::RectRigidBodyEntity::RectRigidBodyLink::get_coll_torque()
 {
     return &actual_coll_torque;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::Link::get_dist_headway()
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::RectRigidBodyEntity::RectRigidBodyLink::get_dist_headway()
 {
     return &dist_headway;
 }
 
-RectRigidBodyEnv::Entity::Entity(uint64_t id, RectRigidBody *rigid_body) :
+RectRigidBodyEnv::RectRigidBodyEntity::RectRigidBodyEntity(uint64_t id, RectRigidBody *rigid_body) :
     id(id),
     rigid_body(rigid_body),
 
@@ -91,8 +91,8 @@ RectRigidBodyEnv::Entity::Entity(uint64_t id, RectRigidBody *rigid_body) :
     lin_vel_dir(rigid_body->get_lin_vel_variable()),
     drag_force_dir(&lin_vel_dir),
 
-    lin_spd_squared(rigid_body->get_lin_vel_variable(), rigid_body->get_lin_vel_variable()),
-    dynamic_pressure(&drag_scaled_air_mass_density, &lin_spd_squared),
+    lin_vel_mag_squared(rigid_body->get_lin_vel_variable(), rigid_body->get_lin_vel_variable()),
+    dynamic_pressure(&drag_scaled_air_mass_density, &lin_vel_mag_squared),
     drag_force_mag(&dynamic_pressure, rigid_body->get_drag_area_variable()),
 
     drag_force(&drag_force_dir, &drag_force_mag),
@@ -106,31 +106,31 @@ RectRigidBodyEnv::Entity::Entity(uint64_t id, RectRigidBody *rigid_body) :
 {
 }
 
-RectRigidBodyEnv::Entity::~Entity()
+RectRigidBodyEnv::RectRigidBodyEntity::~RectRigidBodyEntity()
 {
-    structures::IArray<Link*> const *link_array = id_link_dict.get_values();
+    structures::IArray<RectRigidBodyLink*> const *link_array = id_link_dict.get_values();
     for (size_t i = 0; i < link_array->count(); ++i)
     {
         delete (*link_array)[i];
     }
 }
 
-causal::IEndogenousVariable<geometry::Vec>* RectRigidBodyEnv::Entity::get_env_force()
+causal::IEndogenousVariable<geometry::Vec>* RectRigidBodyEnv::RectRigidBodyEntity::get_env_force()
 {
     return &env_force;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::get_env_torque()
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::RectRigidBodyEntity::get_env_torque()
 {
     return &env_torque;
 }
 
-causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::Entity::get_dist_headway()
+causal::IEndogenousVariable<FP_DATA_TYPE>* RectRigidBodyEnv::RectRigidBodyEntity::get_dist_headway()
 {
     return &min_dist_headway;
 }
 
-bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
+bool RectRigidBodyEnv::RectRigidBodyEntity::add_link(RectRigidBody *other_rigid_body)
 {
     simcars::causal::IEndogenousVariable<uint64_t> *id_variable =
             other_rigid_body->get_id_variable();
@@ -144,7 +144,7 @@ bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
     }
     else
     {
-        Link *link = new Link(id, rigid_body, other_id, other_rigid_body);
+        RectRigidBodyLink *link = new RectRigidBodyLink(id, rigid_body, other_id, other_rigid_body);
 
         id_link_dict.update(other_id, link);
 
@@ -156,7 +156,7 @@ bool RectRigidBodyEnv::Entity::add_link(RectRigidBody *other_rigid_body)
     }
 }
 
-bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
+bool RectRigidBodyEnv::RectRigidBodyEntity::remove_link(RectRigidBody *other_rigid_body)
 {
     simcars::causal::IEndogenousVariable<uint64_t> *id_variable =
             other_rigid_body->get_id_variable();
@@ -170,7 +170,7 @@ bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
     }
     else
     {
-        Link *link = id_link_dict[other_id];
+        RectRigidBodyLink *link = id_link_dict[other_id];
 
         env_force.erase(link->get_coll_force());
         env_torque.erase(link->get_coll_torque());
@@ -186,7 +186,7 @@ bool RectRigidBodyEnv::Entity::remove_link(RectRigidBody *other_rigid_body)
 
 RectRigidBodyEnv::~RectRigidBodyEnv()
 {
-    structures::IArray<Entity*> const *entity_array = id_entity_dict.get_values();
+    structures::IArray<RectRigidBodyEntity*> const *entity_array = id_entity_dict.get_values();
     for (size_t i = 0; i < entity_array->count(); ++i)
     {
         delete (*entity_array)[i];
@@ -212,7 +212,7 @@ bool RectRigidBodyEnv::add_rigid_body(RectRigidBody *rigid_body)
     }
     else
     {
-        Entity *entity = new Entity(id, rigid_body);
+        RectRigidBodyEntity *entity = new RectRigidBodyEntity(id, rigid_body);
 
         structures::IArray<uint64_t> const *id_array = id_entity_dict.get_keys();
         for (size_t i = 0; i < id_array->count(); ++i)
@@ -251,7 +251,7 @@ bool RectRigidBodyEnv::remove_rigid_body(RectRigidBody *rigid_body)
     }
     else
     {
-        Entity *entity = id_entity_dict[id];
+        RectRigidBodyEntity *entity = id_entity_dict[id];
 
         rigid_body->env_force_buff.set_axiomatic(true);
         rigid_body->env_force.set_parent(nullptr);

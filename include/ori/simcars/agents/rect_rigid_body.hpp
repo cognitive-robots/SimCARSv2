@@ -22,6 +22,7 @@
 #include <ori/simcars/causal/variable_types/endogenous/vector_buffer.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/o_rect_construction.hpp>
 #include <ori/simcars/agents/declarations.hpp>
+#include <ori/simcars/agents/point_mass.hpp>
 #include <ori/simcars/agents/rect_rigid_body_env.hpp>
 
 namespace ori
@@ -31,16 +32,9 @@ namespace simcars
 namespace agents
 {
 
-class RectRigidBody
+class RectRigidBody : public virtual PointMass
 {
 protected:
-    simcars::causal::IdFixedVariable id;
-    simcars::causal::IdProxyVariable id_proxy;
-
-    simcars::causal::ScalarFixedVariable mass;
-    simcars::causal::ScalarProxyVariable mass_proxy;
-    simcars::causal::ScalarReciprocalVariable mass_recip;
-
     simcars::causal::ScalarFixedVariable length;
     simcars::causal::ScalarProxyVariable length_proxy;
     simcars::causal::ScalarProductVariable length_squared;
@@ -63,14 +57,9 @@ protected:
     simcars::causal::ScalarProductVariable moi;
     simcars::causal::ScalarReciprocalVariable moi_recip;
 
+    // TODO: Move distance headway related elements to the FWD car class
     simcars::causal::ScalarSocketVariable dist_headway;
     simcars::causal::ScalarBufferVariable dist_headway_buff;
-
-    simcars::causal::VectorSocketVariable env_force;
-    simcars::causal::VectorBufferVariable env_force_buff;
-    simcars::causal::VectorSocketVariable other_force;
-    simcars::causal::VectorBufferVariable other_force_buff;
-    simcars::causal::VectorSumVariable total_force;
 
     simcars::causal::ScalarSocketVariable env_torque;
     simcars::causal::ScalarBufferVariable env_torque_buff;
@@ -78,28 +67,14 @@ protected:
     simcars::causal::ScalarBufferVariable other_torque_buff;
     simcars::causal::ScalarSumVariable total_torque;
 
-    simcars::causal::VectorScalarProductVariable lin_acc;
-    simcars::causal::VectorBufferVariable lin_acc_buff;
-    simcars::causal::VectorPreviousTimeStepVariable prev_lin_acc;
-
     simcars::causal::ScalarProductVariable ang_acc;
     simcars::causal::ScalarBufferVariable ang_acc_buff;
     simcars::causal::ScalarPreviousTimeStepVariable prev_ang_acc;
-
-    simcars::causal::VectorTimeStepSizeProductVariable lin_vel_diff;
-    simcars::causal::VectorPreviousTimeStepVariable prev_lin_vel;
-    simcars::causal::VectorSumVariable lin_vel;
-    simcars::causal::VectorBufferVariable lin_vel_buff;
 
     simcars::causal::ScalarTimeStepSizeProductVariable ang_vel_diff;
     simcars::causal::ScalarPreviousTimeStepVariable prev_ang_vel;
     simcars::causal::ScalarSumVariable ang_vel;
     simcars::causal::ScalarBufferVariable ang_vel_buff;
-
-    simcars::causal::VectorTimeStepSizeProductVariable pos_diff;
-    simcars::causal::VectorPreviousTimeStepVariable prev_pos;
-    simcars::causal::VectorSumVariable pos;
-    simcars::causal::VectorBufferVariable pos_buff;
 
     simcars::causal::ScalarTimeStepSizeProductVariable rot_diff;
     simcars::causal::ScalarPreviousTimeStepVariable prev_rot;
@@ -114,13 +89,9 @@ public:
                   FP_DATA_TYPE drag_area_value = 0.631);
     RectRigidBody(RectRigidBody const &rect_rigid_body);
 
-    virtual ~RectRigidBody() = default;
+    temporal::Time get_min_time() const override;
+    temporal::Time get_max_time() const override;
 
-    temporal::Time get_min_time() const;
-    temporal::Time get_max_time() const;
-
-    simcars::causal::IEndogenousVariable<uint64_t>* get_id_variable();
-    simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_mass_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_length_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_width_variable();
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_height_variable();
@@ -128,11 +99,6 @@ public:
     simcars::causal::IEndogenousVariable<geometry::ORect>* get_rect_variable();
 
     virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_dist_headway_variable();
-    virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_env_force_variable();
-    virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_other_force_variable();
-    virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_acc_variable();
-    virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_lin_vel_variable();
-    virtual simcars::causal::IEndogenousVariable<geometry::Vec>* get_pos_variable();
     virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_env_torque_variable();
     virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_other_torque_variable();
     virtual simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* get_ang_acc_variable();
