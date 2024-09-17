@@ -24,7 +24,8 @@ structures::IArray<TimeGoalPair<uint64_t>>* PedActionExtractor::extract_node_goa
     simcars::causal::IEndogenousVariable<geometry::Vec> *pos =
             ped->get_pos_variable();
 
-    temporal::Time node_change_time = start_time;
+    temporal::Time node_change_time = start_time +
+            2 * simcars::causal::VariableContext::get_time_step_size();
     map::INode const *prev_node = nullptr;
     for (temporal::Time current_time = start_time;
          current_time <= end_time;
@@ -72,8 +73,12 @@ structures::IArray<TimeGoalPair<uint64_t>>* PedActionExtractor::extract_node_goa
             if (node_goals->count() == 0)
             {
                 // WARNING: Takes first node as the node goal
-                Goal<uint64_t> node_goal(prev_node->get_id(), start_time);
-                node_goals->push_back(TimeGoalPair<uint64_t>(start_time, node_goal));
+                Goal<uint64_t> node_goal(prev_node->get_id(), start_time +
+                                         2 * simcars::causal::VariableContext::get_time_step_size());
+                node_goals->push_back(
+                            TimeGoalPair<uint64_t>(start_time +
+                                                   2 * simcars::causal::VariableContext::get_time_step_size(),
+                                                   node_goal));
 
                 node_change_time = temporal::Time::max();
             }
@@ -118,7 +123,10 @@ PedActionExtractor::PedActionExtractor(map::IPedMap *map, temporal::Duration res
                                        temporal::Duration action_min_duration,
                                        temporal::Duration node_min_duration) :
     map(map), resolution(resolution), action_min_duration(action_min_duration),
-    node_min_duration(node_min_duration) {}
+    node_min_duration(node_min_duration)
+{
+    assert(resolution >= simcars::causal::VariableContext::get_time_step_size());
+}
 
 structures::IArray<TimePedActionPair>* PedActionExtractor::extract_actions(agents::Ped *ped) const
 {

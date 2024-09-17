@@ -240,7 +240,8 @@ int main(int argc, char *argv[])
 
     agents::FWDCarSim affected_fwd_car_sim(affected_fwd_car, affected_time_action_pair.first);
     agents::FullControlFWDCarSim affected_control_fwd_car_sim(
-                &affected_control_fwd_car, affected_time_action_pair.first);
+                &affected_control_fwd_car, affected_time_action_pair.first -
+                causal::VariableContext::get_time_step_size());
     agents::ActionInterventionFWDCar affected_best_alt_sim_action_intervention(
                 affected_best_sim_action);
     affected_control_fwd_car_sim.set_fwd_car(&affected_fwd_car_sim);

@@ -319,7 +319,8 @@ int main(int argc, char *argv[])
                         // TODO: Integrate better information regarding braking
                         agents::FullControlFWDCar causing_control_fwd_car(&map, 163 * 20, -163, 0.616);
                         agents::FullControlFWDCarSim causing_control_fwd_car_sim(
-                                    &causing_control_fwd_car, causing_time_action_pair.first);
+                                    &causing_control_fwd_car, causing_time_action_pair.first -
+                                    causal::VariableContext::get_time_step_size());
 
                         agents::ActionInterventionFWDCar causing_plan_fwd_car(default_fwd_car_action);
 
@@ -348,7 +349,8 @@ int main(int argc, char *argv[])
                         agents::FWDCarSim affected_fwd_car_sim(affected_fwd_car, affected_time_action_pair.first);
 
                         agents::FullControlFWDCarSim affected_control_fwd_car_sim(
-                                    &affected_control_fwd_car, affected_time_action_pair.first);
+                                    &affected_control_fwd_car, affected_time_action_pair.first -
+                                    causal::VariableContext::get_time_step_size());
 
                         agents::DefaultFWDCarOutcomeSim outcome_sim(&affected_control_fwd_car_sim,
                                                                     original_env);

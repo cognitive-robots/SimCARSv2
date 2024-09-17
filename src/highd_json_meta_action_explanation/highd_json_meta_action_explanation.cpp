@@ -187,9 +187,9 @@ int main(int argc, char *argv[])
             std::chrono::high_resolution_clock::now();
 
 
-    agents::FWDCarActionExtractor fwd_car_action_extractor(&map, temporal::Duration(500),
-                                                           temporal::Duration(2500), 0.1,
-                                                           1.0, temporal::Duration(500));
+    agents::FWDCarActionExtractor fwd_car_action_extractor(&map, temporal::Duration(480),
+                                                           temporal::Duration(2480), 0.1,
+                                                           1.0, temporal::Duration(480));
 
     structures::stl::STLDictionary<uint64_t, agents::FWDCar*> id_fwd_car_dict;
     structures::stl::STLDictionary<uint64_t, structures::IArray<agents::TimeFWDCarActionPair>*> id_action_dict;
@@ -419,7 +419,8 @@ int main(int argc, char *argv[])
                         // TODO: Integrate better information regarding braking
                         agents::FullControlFWDCar causing_control_fwd_car(&map, 163 * 20, -163, 0.616);
                         agents::FullControlFWDCarSim causing_control_fwd_car_sim(
-                                    &causing_control_fwd_car, causing_time_action_pair.first);
+                                    &causing_control_fwd_car, causing_time_action_pair.first -
+                                    causal::VariableContext::get_time_step_size());
 
                         agents::ActionInterventionFWDCar causing_plan_fwd_car(default_fwd_car_action);
 
@@ -448,7 +449,8 @@ int main(int argc, char *argv[])
                         agents::FWDCarSim affected_fwd_car_sim(affected_fwd_car, affected_time_action_pair.first);
 
                         agents::FullControlFWDCarSim affected_control_fwd_car_sim(
-                                    &affected_control_fwd_car, affected_time_action_pair.first);
+                                    &affected_control_fwd_car, affected_time_action_pair.first -
+                                    causal::VariableContext::get_time_step_size());
 
                         agents::DefaultFWDCarOutcomeSim outcome_sim(&affected_control_fwd_car_sim,
                                                                     original_env);

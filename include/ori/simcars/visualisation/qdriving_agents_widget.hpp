@@ -68,6 +68,7 @@ public:
 
     ~QDrivingAgentsWidget();
 
+    bool get_text_enabled() const;
     FP_DATA_TYPE get_realtime_factor() const;
     FP_DATA_TYPE get_pixels_per_metre() const;
     FocusMode get_focus_mode() const;
@@ -75,6 +76,7 @@ public:
     structures::IArray<uint64_t> const* get_focal_agent_ids() const;
     temporal::Time get_time() const;
 
+    void set_text_enabled(bool text_enabled);
     void set_realtime_factor(FP_DATA_TYPE realtime_factor);
     void set_pixels_per_metre(FP_DATA_TYPE pixels_per_metre);
     void set_focus_mode(FocusMode focus_mode);

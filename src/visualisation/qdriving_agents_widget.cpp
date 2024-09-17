@@ -270,6 +270,11 @@ QDrivingAgentsWidget::~QDrivingAgentsWidget()
     }
 }
 
+bool QDrivingAgentsWidget::get_text_enabled() const
+{
+    return text_enabled;
+}
+
 FP_DATA_TYPE QDrivingAgentsWidget::get_realtime_factor() const
 {
     return realtime_factor;
@@ -302,6 +307,13 @@ temporal::Time QDrivingAgentsWidget::get_time() const
     std::lock_guard<std::recursive_mutex> const lock(data_mutex);
 
     return current_time;
+}
+
+void QDrivingAgentsWidget::set_text_enabled(bool text_enabled)
+{
+    std::lock_guard<std::recursive_mutex> const lock(data_mutex);
+
+    this->text_enabled = text_enabled;
 }
 
 void QDrivingAgentsWidget::set_realtime_factor(FP_DATA_TYPE realtime_factor)

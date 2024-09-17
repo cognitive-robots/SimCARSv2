@@ -147,8 +147,9 @@ int main(int argc, char *argv[])
             }
 
             fwd_car_sim = new agents::FWDCarSim(fwd_car, intervention_time);
-            control_fwd_car_sim = new agents::FullControlFWDCarSim(&control_fwd_car,
-                                                                   intervention_time);
+            control_fwd_car_sim = new agents::FullControlFWDCarSim(
+                        &control_fwd_car,
+                        intervention_time - causal::VariableContext::get_time_step_size());
             control_fwd_car_sim->set_fwd_car(fwd_car_sim);
             plan_fwd_car.set_control_fwd_car(control_fwd_car_sim);
 

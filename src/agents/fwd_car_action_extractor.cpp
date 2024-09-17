@@ -24,11 +24,13 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
     simcars::causal::IEndogenousVariable<FP_DATA_TYPE> *lon_lin_vel =
             fwd_car->get_lon_lin_vel_variable();
 
-    temporal::Time action_start_time = start_time;
+    temporal::Time action_start_time = start_time +
+            2 * simcars::causal::VariableContext::get_time_step_size();
     FP_DATA_TYPE action_start_lon_lin_vel = std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
     FP_DATA_TYPE prev_lon_lin_vel = std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
     FP_DATA_TYPE prev_lon_lin_acc = std::numeric_limits<FP_DATA_TYPE>::quiet_NaN();
-    for (temporal::Time current_time = start_time;
+    for (temporal::Time current_time = start_time -
+         2 * simcars::causal::VariableContext::get_time_step_size();
          current_time <= end_time;
          current_time += resolution)
     {
@@ -272,7 +274,8 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
     Goal<FP_DATA_TYPE> last_speed_goal(prev_lon_lin_vel, end_time);
     speed_goals->push_back(TimeGoalPair<FP_DATA_TYPE>(action_start_time, last_speed_goal));
 
-    if ((*speed_goals)[0].first > start_time)
+    if ((*speed_goals)[0].first > start_time +
+            2 * simcars::causal::VariableContext::get_time_step_size())
     {
         temporal::Time reference_time;
 
@@ -291,7 +294,10 @@ structures::IArray<TimeGoalPair<FP_DATA_TYPE>>* FWDCarActionExtractor::extract_s
         if (lon_lin_vel->get_value(final_lon_lin_vel))
         {
             Goal<FP_DATA_TYPE> first_speed_goal(final_lon_lin_vel, reference_time);
-            speed_goals->push_front(TimeGoalPair<FP_DATA_TYPE>(start_time, first_speed_goal));
+            speed_goals->push_front(TimeGoalPair<FP_DATA_TYPE>(
+                                        start_time +
+                                        2 * simcars::causal::VariableContext::get_time_step_size(),
+                                        first_speed_goal));
         }
         else
         {
@@ -315,7 +321,8 @@ structures::IArray<TimeGoalPair<uint64_t>>* FWDCarActionExtractor::extract_lane_
     simcars::causal::IEndogenousVariable<geometry::Vec> *pos =
             fwd_car->get_pos_variable();
 
-    temporal::Time lane_change_time = start_time;
+    temporal::Time lane_change_time = start_time +
+            2 * simcars::causal::VariableContext::get_time_step_size();
     structures::IArray<map::ILane const*> *prev_lanes = nullptr;
     for (temporal::Time current_time = start_time;
          current_time <= end_time;
@@ -430,9 +437,11 @@ structures::IArray<TimeGoalPair<uint64_t>>* FWDCarActionExtractor::extract_lane_
             if (lane_goals->count() == 0)
             {
                 // WARNING: Takes first lane as the lane goal
-                Goal<uint64_t> lane_goal((*prev_lanes)[0]->get_id(), start_time);
+                Goal<uint64_t> lane_goal((*prev_lanes)[0]->get_id(), start_time +
+                        2 * simcars::causal::VariableContext::get_time_step_size());
                 lane_goals->push_back(TimeGoalPair<uint64_t>(
-                                          start_time,
+                                          start_time +
+                                          2 * simcars::causal::VariableContext::get_time_step_size(),
                                           lane_goal
                                           ));
 
@@ -491,7 +500,9 @@ FWDCarActionExtractor::FWDCarActionExtractor(map::IDrivingMap *map, temporal::Du
     map(map), resolution(resolution), action_min_duration(action_min_duration),
     action_min_lon_lin_acc(action_min_lon_lin_acc),
     action_min_lon_lin_vel_diff(action_min_lon_lin_vel_diff), lane_min_duration(lane_min_duration)
-{}
+{
+    assert(resolution >= simcars::causal::VariableContext::get_time_step_size());
+}
 
 structures::IArray<TimeFWDCarActionPair>* FWDCarActionExtractor::extract_actions(
         agents::FWDCar *fwd_car) const

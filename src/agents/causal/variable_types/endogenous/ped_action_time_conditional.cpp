@@ -19,7 +19,7 @@ PedActionTimeConditionalVariable::PedActionTimeConditionalVariable(
 
 bool PedActionTimeConditionalVariable::get_value(PedAction &val) const
 {
-    if (time > simcars::causal::VariableContext::get_current_time())
+    if (time >= simcars::causal::VariableContext::get_current_time())
     {
         return get_endogenous_parent()->get_value(val);
     }
@@ -31,7 +31,7 @@ bool PedActionTimeConditionalVariable::get_value(PedAction &val) const
 
 bool PedActionTimeConditionalVariable::set_value(PedAction const &val)
 {
-    if (time > simcars::causal::VariableContext::get_current_time())
+    if (time >= simcars::causal::VariableContext::get_current_time())
     {
         return get_endogenous_parent()->set_value(val);
     }

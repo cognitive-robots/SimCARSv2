@@ -19,7 +19,7 @@ FWDCarActionTimeConditionalVariable::FWDCarActionTimeConditionalVariable(
 
 bool FWDCarActionTimeConditionalVariable::get_value(FWDCarAction &val) const
 {
-    if (time > simcars::causal::VariableContext::get_current_time())
+    if (time >= simcars::causal::VariableContext::get_current_time())
     {
         return get_endogenous_parent()->get_value(val);
     }
@@ -31,7 +31,7 @@ bool FWDCarActionTimeConditionalVariable::get_value(FWDCarAction &val) const
 
 bool FWDCarActionTimeConditionalVariable::set_value(FWDCarAction const &val)
 {
-    if (time > simcars::causal::VariableContext::get_current_time())
+    if (time >= simcars::causal::VariableContext::get_current_time())
     {
         return get_endogenous_parent()->set_value(val);
     }

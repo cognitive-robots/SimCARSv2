@@ -13,6 +13,7 @@ namespace causal
 bool VectorPreviousTimeStepVariable::get_value(geometry::Vec &val) const
 {
     VariableContext::decrement_time_step();
+    temporal::Time current_time = VariableContext::get_current_time();
     bool res = get_parent()->get_value(val);
     VariableContext::increment_time_step();
     return res;

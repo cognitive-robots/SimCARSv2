@@ -24,11 +24,12 @@ PedOutcome DefaultPedOutcomeSim::sim_outcome(PedAction const *action,
                                              PedSimParameters const *parameters) const
 {
     temporal::Time start_time = simcars::causal::VariableContext::get_current_time();
+    temporal::Duration time_step_size = simcars::causal::VariableContext::get_time_step_size();
 
     Ped *ped = control_ped->get_ped();
 
     PedSim *ped_sim = new PedSim(ped, start_time);
-    GoalForceControlPedSim control_ped_sim(control_ped, start_time);
+    GoalForceControlPedSim control_ped_sim(control_ped, start_time - time_step_size);
     ActionInterventionPed plan_ped_intervention(*action);
     control_ped_sim.set_ped(ped_sim);
     plan_ped_intervention.set_control_ped(&control_ped_sim);
