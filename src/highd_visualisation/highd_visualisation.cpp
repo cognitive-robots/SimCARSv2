@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
                 visualisation::QDrivingMapAgentsWidget::FocusMode::FIXED);
 
     map_scene_widget->set_focal_position(map.get_map_centre());
+    map_scene_widget->set_text_enabled(false);
 
     if (argc > 6)
     {

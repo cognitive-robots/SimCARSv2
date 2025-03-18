@@ -86,6 +86,18 @@ GreedyPlanPed::GreedyPlanPed(GreedyPlanPed const &plan_ped) :
 {
 }
 
+PedTask GreedyPlanPed::get_task() const
+{
+    PedTask task_val;
+    task.get_value(task_val);
+    return task_val;
+}
+
+void GreedyPlanPed::set_task(PedTask const &task_val)
+{
+    task.set_value(task_val);
+}
+
 simcars::causal::IEndogenousVariable<PedRewardParameters>* GreedyPlanPed::get_reward_params_variable()
 {
     return &reward_params_proxy;

@@ -23,7 +23,7 @@ template<typename T_old, typename T_new>
 void cast_array(IArray<T_old> const &old_array, IArray<T_new> &new_array)
 {
     size_t i;
-    for (i = 0; i < old_array.count() || i < new_array.count(); ++i)
+    for (i = 0; i < old_array.count() && i < new_array.count(); ++i)
     {
         new_array[i] = static_cast<T_new>(old_array[i]);
     }
@@ -34,7 +34,7 @@ void map_array(IArray<T_old> const &old_array, IArray<T_new> &new_array,
                std::function<T_new(T_old const&)> func)
 {
     size_t i;
-    for (i = 0; i < old_array.count() || i < new_array.count(); ++i)
+    for (i = 0; i < old_array.count() && i < new_array.count(); ++i)
     {
         new_array[i] = func(old_array[i]);
     }

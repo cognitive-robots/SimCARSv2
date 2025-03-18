@@ -46,10 +46,13 @@ PointMassEnv::PointMassEntity::PointMassEntity(uint64_t id, PointMass *point_mas
     id(id),
     point_mass(point_mass),
 
+    zero_force(geometry::Vec(0, 0)),
+    zero_force_proxy(&zero_force),
+
     neighbour_dist_limit(2.0),
     neighbour_dist_limit_proxy(&neighbour_dist_limit),
 
-    env_force({}),
+    env_force({ &zero_force_proxy }),
 
     min_neighbour_dist({ &neighbour_dist_limit_proxy })
 {

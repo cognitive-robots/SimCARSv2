@@ -48,12 +48,13 @@ public:
 
 int main(int argc, char *argv[])
 {
-    if (argc < 10)
+    if (argc < 10 || (argc > 10 && argc < 14))
     {
         std::cerr << "Usage: ./highd_alt_visualisation recording_meta_file_path "
                      "tracks_meta_file_path tracks_file_path start_frame "
                      "end_frame causing_agent_id causing_agent_action affected_agent_id "
-                     "affected_agent_action" <<
+                     "affected_agent_action [speed_goal_val speed_goal_time lane_goal_val "
+                     "lane_goal_time]" <<
                      std::endl;
         return -1;
     }
@@ -132,6 +133,15 @@ int main(int argc, char *argv[])
             id_action_dict[affected_agent_id];
 
     agents::FWDCarAction default_fwd_car_action;
+
+    if (argc > 10)
+    {
+        default_fwd_car_action.speed_goal.val = atof(argv[10]);
+        default_fwd_car_action.speed_goal.time = temporal::Time(temporal::Duration(atoi(argv[11])));
+        default_fwd_car_action.lane_goal.val = atoi(argv[12]);
+        default_fwd_car_action.lane_goal.time = temporal::Time(temporal::Duration(atoi(argv[13])));
+    }
+
     agents::RectRigidBodyEnv *original_env = scene.get_env();
     temporal::Time end_time = scene.get_max_time();
 
@@ -350,11 +360,11 @@ int main(int argc, char *argv[])
     map_scene_widget->set_agent_colour(causing_agent_id, sf::Color::Cyan);
     map_scene_widget->set_agent_colour(affected_agent_id, sf::Color::Magenta);
 
-    for (size_t i = 10; i < argc; ++i)
-    {
-        uint64_t other_rel_agent_id = std::atoll(argv[i]);
-        map_scene_widget->set_agent_colour(other_rel_agent_id, sf::Color::Yellow);
-    }
+    //for (size_t i = 10; i < argc; ++i)
+    //{
+    //    uint64_t other_rel_agent_id = std::atoll(argv[i]);
+    //    map_scene_widget->set_agent_colour(other_rel_agent_id, sf::Color::Yellow);
+    //}
 
     for (size_t i = 0; i < fwd_cars->count(); ++i)
     {

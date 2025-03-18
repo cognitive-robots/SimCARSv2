@@ -23,8 +23,12 @@ class ThorMagniPedScene : public IPedScene
     structures::stl::STLDictionary<uint32_t, Ped*> id_ped_dict;
 
 public:
-    ThorMagniPedScene(std::string const &scene_path_str);
-    ThorMagniPedScene(rapidcsv::Document const &scene_doc);
+    ThorMagniPedScene(std::string const &scene_path_str,
+                      size_t start_frame = std::numeric_limits<size_t>::min(),
+                      size_t end_frame = std::numeric_limits<size_t>::max());
+    ThorMagniPedScene(rapidcsv::Document const &scene_doc,
+                      size_t start_frame = std::numeric_limits<size_t>::min(),
+                      size_t end_frame = std::numeric_limits<size_t>::max());
 
     ~ThorMagniPedScene() override;
 

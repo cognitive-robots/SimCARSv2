@@ -70,6 +70,10 @@ public:
                   FP_DATA_TYPE time_interval_value);
     GreedyPlanPed(GreedyPlanPed const &plan_ped);
 
+    PedTask get_task() const;
+
+    void set_task(PedTask const &task_val);
+
     simcars::causal::IEndogenousVariable<PedRewardParameters>* get_reward_params_variable();
     simcars::causal::IEndogenousVariable<PedOutcomeActionPair>* get_best_outcome_action_pair_variable();
 };

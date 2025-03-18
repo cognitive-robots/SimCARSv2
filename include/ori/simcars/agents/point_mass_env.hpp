@@ -2,11 +2,13 @@
 
 #include <ori/simcars/structures/stl/stl_dictionary.hpp>
 #include <ori/simcars/causal/variable_types/exogenous/scalar_fixed.hpp>
+#include <ori/simcars/causal/variable_types/exogenous/vector_fixed.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_proxy.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_negation.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_product.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_exponent.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/scalar_set_min.hpp>
+#include <ori/simcars/causal/variable_types/endogenous/vector_proxy.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_negation.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_norm.hpp>
 #include <ori/simcars/causal/variable_types/endogenous/vector_normalisation.hpp>
@@ -59,6 +61,9 @@ class PointMassEnv
         structures::stl::STLDictionary<uint64_t, PointMassLink*> id_link_dict;
 
     protected:
+        simcars::causal::VectorFixedVariable zero_force;
+        simcars::causal::VectorProxyVariable zero_force_proxy;
+
         simcars::causal::ScalarFixedVariable neighbour_dist_limit;
         simcars::causal::ScalarProxyVariable neighbour_dist_limit_proxy;
 

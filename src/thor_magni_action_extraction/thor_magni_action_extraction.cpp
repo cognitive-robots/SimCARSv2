@@ -13,10 +13,11 @@ using namespace ori::simcars;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 6)
+    if (argc < 6 || (argc > 6 && argc < 8))
     {
         std::cerr << "Usage: ./thor_magni_action_extraction texture_file_path "
-                     "offset_json_file_path scene_file_path goals_file_path agent_id" << std::endl;
+                     "offset_json_file_path scene_file_path goals_file_path agent_id [start_frame "
+                     "end_frame]" << std::endl;
         return -1;
     }
 
@@ -34,7 +35,16 @@ int main(int argc, char *argv[])
 
     agents::IPedScene *scene;
 
-    scene = new agents::thor_magni::ThorMagniPedScene(argv[3]);
+    if (argc > 6)
+    {
+        size_t start_frame = atoi(argv[6]);
+        size_t end_frame = atoi(argv[7]);
+        scene = new agents::thor_magni::ThorMagniPedScene(argv[3], start_frame, end_frame);
+    }
+    else
+    {
+        scene = new agents::thor_magni::ThorMagniPedScene(argv[3]);
+    }
 
     std::cout << "Finished scene load" << std::endl;
 

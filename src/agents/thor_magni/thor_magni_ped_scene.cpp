@@ -12,10 +12,12 @@ namespace agents
 namespace thor_magni
 {
 
-ThorMagniPedScene::ThorMagniPedScene(std::string const &scene_path_str)
-    : ThorMagniPedScene(rapidcsv::Document(scene_path_str)) {}
+ThorMagniPedScene::ThorMagniPedScene(std::string const &scene_path_str, size_t start_frame,
+                                     size_t end_frame)
+    : ThorMagniPedScene(rapidcsv::Document(scene_path_str), start_frame, end_frame) {}
 
-ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc)
+ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc, size_t start_frame,
+                                     size_t end_frame)
 {
     min_time = temporal::Time::max();
     max_time = temporal::Time::min();
@@ -26,6 +28,13 @@ ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc)
     uint64_t next_id = 1;
     for (size_t i = 0; i < scene_doc.GetRowCount(); ++i)
     {
+        size_t const frame = scene_doc.GetCell<size_t>("frame_id", i);
+
+        if (((frame - 1) / 20) < start_frame || ((frame - 1) / 20) > end_frame)
+        {
+            continue;
+        }
+
         std::string const id_str = scene_doc.GetCell<std::string>("ag_id", i);
 
         uint64_t id;
@@ -40,7 +49,6 @@ ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc)
             id_map_dict.update(id_str, id);
         }
 
-        size_t const frame = scene_doc.GetCell<size_t>("frame_id", i);
         temporal::Time const time(((frame - 1) / 20) * get_time_step_size());
         min_time = std::min(time, min_time);
         max_time = std::max(time, max_time);
