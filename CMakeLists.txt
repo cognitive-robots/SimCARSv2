@@ -517,6 +517,8 @@ PUBLIC
   $<INSTALL_INTERFACE:include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   ${RAPIDJSON_INCLUDE_DIRS}
+PRIVATE
+  magic_enum::magic_enum
 )
 target_link_libraries(simcars_agents
 PUBLIC
@@ -527,7 +529,6 @@ PUBLIC
   simcars_map
   simcars_causal
   rapidcsv
-PRIVATE
   magic_enum::magic_enum
 )
 add_dependencies(simcars_agents simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_causal)
@@ -661,3 +662,7 @@ add_dependencies(thor_magni_action_extraction simcars_utils simcars_structures s
 add_executable(thor_magni_visualisation src/thor_magni_visualisation/thor_magni_visualisation.cpp)
 target_link_libraries(thor_magni_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
 add_dependencies(thor_magni_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
+
+add_executable(thor_magni_sim_visualisation src/thor_magni_sim_visualisation/thor_magni_sim_visualisation.cpp)
+target_link_libraries(thor_magni_sim_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)
+add_dependencies(thor_magni_sim_visualisation simcars_utils simcars_structures simcars_geometry simcars_temporal simcars_map simcars_agents simcars_visualisation)

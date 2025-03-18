@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
                 visualisation::QDrivingMapAgentsWidget::FocusMode::FIXED);
 
     map_scene_widget->set_focal_position(focal_position);
+    map_scene_widget->set_text_enabled(false);
 
     uint64_t agent_id = atoi(argv[6]);
     map_scene_widget->set_agent_colour(agent_id, sf::Color::Cyan);

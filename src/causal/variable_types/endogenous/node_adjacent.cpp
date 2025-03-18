@@ -30,8 +30,10 @@ bool NodeAdjacentVariable::get_value(structures::stl::STLStackArray<uint64_t> &v
         }
         else
         {
-            map_array<map::INode const*, uint64_t>(*(node->get_adjacent()), val,
-                                                   [](map::INode const *node) { return node->get_id(); });
+            structures::IArray<map::INode const*> const *node_array = node->get_adjacent();
+            val.resize(node_array->count());
+            map_array<map::INode const*, uint64_t>(
+                        *node_array, val, [](map::INode const *node) { return node->get_id(); });
         }
 
         // NOTE: Despite the variable being named adjacent, it includes the parent node id itself
