@@ -1,5 +1,5 @@
 
-#include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp>
+#include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_sim_parameters_fixed.hpp>
 
 namespace ori
 {

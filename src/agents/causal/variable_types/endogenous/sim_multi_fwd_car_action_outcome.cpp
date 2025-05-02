@@ -1,5 +1,5 @@
 
-#include <ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/sim_multi_fwd_car_action_outcome.hpp>
 
 namespace ori
 {
@@ -10,14 +10,14 @@ namespace agents
 namespace causal
 {
 
-SimFWDCarActionOutcomeVariable::SimFWDCarActionOutcomeVariable(
+SimMultiFWDCarActionOutcomeVariable::SimMultiFWDCarActionOutcomeVariable(
         simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<FWDCarAction>> *endogenous_parent,
         simcars::causal::IVariable<FWDCarSimParameters> *other_parent,
         IFWDCarOutcomeSim const *fwd_car_outcome_sim) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent),
     fwd_car_outcome_sim(fwd_car_outcome_sim) {}
 
-bool SimFWDCarActionOutcomeVariable::get_value(FWDCarOutcomeActionPairs &val) const
+bool SimMultiFWDCarActionOutcomeVariable::get_value(FWDCarOutcomeActionPairs &val) const
 {
     structures::stl::STLStackArray<FWDCarAction> actions;
     FWDCarSimParameters sim_parameters;
@@ -40,7 +40,7 @@ bool SimFWDCarActionOutcomeVariable::get_value(FWDCarOutcomeActionPairs &val) co
     }
 }
 
-bool SimFWDCarActionOutcomeVariable::set_value(FWDCarOutcomeActionPairs const &val)
+bool SimMultiFWDCarActionOutcomeVariable::set_value(FWDCarOutcomeActionPairs const &val)
 {
     structures::stl::STLStackArray<FWDCarAction> actions;
     FWDCarSimParameters sim_parameters;

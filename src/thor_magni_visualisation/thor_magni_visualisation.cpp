@@ -19,7 +19,8 @@ int main(int argc, char *argv[])
     if (argc < 5 || (argc > 5 && argc < 7))
     {
         std::cerr << "Usage: ./thor_magni_visualisation texture_file_path offset_json_file_path "
-                     "scene_file_path goals_file_path [start_frame end_frame]" << std::endl;
+                     "scene_file_path goals_file_path [start_frame end_frame] "
+                     "[causing_agent_id] [affected_agent_id]" << std::endl;
         return -1;
     }
 
@@ -52,6 +53,17 @@ int main(int argc, char *argv[])
 
     std::cout << "Finished scene load" << std::endl;
 
+    uint64_t causing_agent_id;
+    if (argc > 7)
+    {
+        causing_agent_id = std::atoll(argv[7]);
+    }
+    uint64_t affected_agent_id;
+    if (argc > 8)
+    {
+        affected_agent_id = std::atoll(argv[8]);
+    }
+
     QFrame *frame = new QFrame();
     frame->setWindowTitle("SIMCARS Demo");
     frame->setFixedSize(1280, 1280);
@@ -69,6 +81,15 @@ int main(int argc, char *argv[])
                 visualisation::QPedMapAgentsWidget::FocusMode::FIXED);
 
     map_scene_widget->set_focal_position(map.get_map_centre());
+
+    if (argc > 7)
+    {
+        map_scene_widget->set_agent_colour(causing_agent_id, sf::Color::Cyan);
+    }
+    if (argc > 8)
+    {
+        map_scene_widget->set_agent_colour(affected_agent_id, sf::Color::Magenta);
+    }
 
     for (size_t i = 0; i < agents->count(); ++i)
     {

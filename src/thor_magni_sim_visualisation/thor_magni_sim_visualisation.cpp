@@ -8,6 +8,7 @@
 #include <ori/simcars/agents/ped_sim.hpp>
 #include <ori/simcars/agents/goal_force_control_ped_sim.hpp>
 #include <ori/simcars/agents/action_intervention_ped.hpp>
+#include <ori/simcars/agents/default_ped_outcome_calc.hpp>
 #include <ori/simcars/agents/default_ped_outcome_sim.hpp>
 #include <ori/simcars/agents/default_ped_reward_calc.hpp>
 #include <ori/simcars/agents/greedy_plan_ped.hpp>
@@ -18,6 +19,8 @@
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/ostreamwrapper.h>
 #include <rapidjson/writer.h>
+
+//#include <rapidcsv.h>
 
 #include <QApplication>
 #include <QFrame>
@@ -178,13 +181,15 @@ int main(int argc, char *argv[])
 
     // TODO: Integrate better information regarding braking
     agents::GoalForceControlPed affected_control_ped(&map, 200.0);
+    agents::DefaultPedOutcomeCalc original_outcome_calc(&affected_control_ped);
     agents::DefaultPedOutcomeSim original_outcome_sim(&affected_control_ped,
                                                       original_env);
     agents::PedSimParameters outcome_sim_params = {
         .sim_horizon_secs = std::chrono::duration_cast<std::chrono::duration<FP_DATA_TYPE>>(
-        sim_horizon).count(),
-        .action_done_node_dist_threshold = 0.375
+        sim_horizon).count()
     };
+    // Cannot be set during initialisation due to this parameter belonging to a base class
+    outcome_sim_params.action_done_node_dist_threshold = 0.375;
     agents::DefaultPedRewardCalc reward_calc(&map);
     agents::PedRewardParameters reward_calc_params = {
         .task_goal_weight = 0.5,
@@ -192,8 +197,8 @@ int main(int argc, char *argv[])
         .bias_weight = 0.0
     };
     agents::GreedyPlanPed affected_original_plan_ped(&map, &original_outcome_sim,
-                                                            outcome_sim_params, &reward_calc,
-                                                            reward_calc_params, 5, 2.5);
+                                                     &original_outcome_calc, outcome_sim_params,
+                                                     &reward_calc, reward_calc_params, 5, 2.5);
     affected_control_ped.set_ped(affected_ped);
     affected_original_plan_ped.set_control_ped(&affected_control_ped);
 
@@ -229,12 +234,47 @@ int main(int argc, char *argv[])
      *  some inconsistencies that arise from making the visualisation itself call the
      *  simulation
      */
+    /*
+    if (argc > 13)
+    {
+        std::string const output_csv_file_path_str(argv[13]);
+        rapidcsv::Document output_csv_document;
+
+        std::vector<FP_DATA_TYPE> time_vector;
+        std::vector<FP_DATA_TYPE> magenta_reward_vector;
+
+        causal::IEndogenousVariable<FP_DATA_TYPE> *magenta_reward_variable =
+                affected_original_plan_ped.get_real_reward_variable();
+
+        FP_DATA_TYPE magenta_reward;
+        temporal::Time time;
+        for (time = scene->get_min_time(); time <= scene->get_max_time();
+             time += scene->get_time_step_size())
+        {
+            causal::VariableContext::set_current_time(time);
+
+            magenta_reward_variable->get_value(magenta_reward);
+
+            time_vector.push_back(std::chrono::duration_cast<std::chrono::duration<FP_DATA_TYPE>>(
+                                      time.time_since_epoch()).count());
+            magenta_reward_vector.push_back(magenta_reward);
+        }
+
+        output_csv_document.InsertColumn(0, time_vector, "time");
+        output_csv_document.InsertColumn(1, magenta_reward_vector, "magenta_reward");
+
+        output_csv_document.Save(output_csv_file_path_str);
+    }
+    else
+    {
+    */
     causal::VariableContext::set_current_time(scene->get_max_time());
 
     agents::PedOutcome outcome;
 
     affected_ped_sim.get_pos_variable()->get_value(outcome.pos);
     affected_ped_sim.get_min_neighbour_dist_variable()->get_value(outcome.min_neighbour_dist);
+    //}
 
     causal::VariableContext::set_current_time(scene->get_min_time());
 
@@ -274,7 +314,7 @@ int main(int argc, char *argv[])
 
         if (!res)
         {
-            throw std::runtime_error("Could not get FWD car id");
+            throw std::runtime_error("Could not get ped id");
         }
 
         if (id == affected_agent_id)

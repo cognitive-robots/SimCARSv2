@@ -55,13 +55,16 @@ PedOutcome DefaultPedOutcomeSim::sim_outcome(PedAction const *action,
     {
         throw std::runtime_error("Could not get minimum neighbour distance");
     }
-    geometry::Vec pos_diff;
-    res = control_ped_sim.get_pos_diff_variable()->get_value(pos_diff);
-    if (!res)
-    {
-        throw std::runtime_error("Could not get position difference");
-    }
-    outcome.action_done = pos_diff.norm() <= parameters->action_done_node_dist_threshold;
+    // Temporarily removed while carrying out experiments, since it is not easy to calculate this
+    // for pre-simulation time steps, and we are not doing reward profile estimation within this
+    // domain
+    //geometry::Vec pos_diff;
+    //res = control_ped_sim.get_pos_diff_variable()->get_value(pos_diff);
+    //if (!res)
+    //{
+    //    throw std::runtime_error("Could not get position difference");
+    //}
+    //outcome.action_done = pos_diff.norm() <= parameters->action_done_node_dist_threshold;
 
 
     point_mass_env->remove_point_mass(ped_sim);

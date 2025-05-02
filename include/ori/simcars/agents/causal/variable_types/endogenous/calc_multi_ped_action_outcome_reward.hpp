@@ -17,22 +17,22 @@ namespace agents
 namespace causal
 {
 
-class CalcPedActionOutcomeRewardVariable :
-        public simcars::causal::ATernaryEndogenousVariable<RewardPedOutcomeActionTuple,
-        PedOutcomeActionPair, PedTask, PedRewardParameters>
+class CalcMultiPedActionOutcomeRewardVariable :
+        public simcars::causal::ATernaryEndogenousVariable<RewardPedOutcomeActionTuples,
+        PedOutcomeActionPairs, PedTask, PedRewardParameters>
 {
     IPedRewardCalc const *ped_reward_calculator;
 
 public:
-    CalcPedActionOutcomeRewardVariable(
-            simcars::causal::IEndogenousVariable<PedOutcomeActionPair> *endogenous_parent_1,
+    CalcMultiPedActionOutcomeRewardVariable(
+            simcars::causal::IEndogenousVariable<PedOutcomeActionPairs> *endogenous_parent_1,
             simcars::causal::IEndogenousVariable<PedTask> *endogenous_parent_2,
             simcars::causal::IVariable<PedRewardParameters> *other_parent,
             IPedRewardCalc const *ped_reward_calculator);
 
-    bool get_value(RewardPedOutcomeActionTuple &val) const override;
+    bool get_value(RewardPedOutcomeActionTuples &val) const override;
 
-    bool set_value(RewardPedOutcomeActionTuple const &val) override;
+    bool set_value(RewardPedOutcomeActionTuples const &val) override;
 };
 
 }

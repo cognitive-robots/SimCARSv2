@@ -1,5 +1,5 @@
 
-#include <ori/simcars/agents/causal/variable_types/exogenous/ped_outcome_parameters_fixed.hpp>
+#include <ori/simcars/agents/causal/variable_types/exogenous/ped_sim_parameters_fixed.hpp>
 
 namespace ori
 {

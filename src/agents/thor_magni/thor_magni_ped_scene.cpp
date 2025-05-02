@@ -49,6 +49,13 @@ ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc, size_t
             id_map_dict.update(id_str, id);
         }
 
+        // WARNING: This is just used to remove a particular agent from the scene for the purpose of
+        // a specific experiment, and should be removed for normal usage
+        //if (id == 5)
+        //{
+        //    continue;
+        //}
+
         temporal::Time const time(((frame - 1) / 20) * get_time_step_size());
         min_time = std::min(time, min_time);
         max_time = std::max(time, max_time);
@@ -66,6 +73,7 @@ ThorMagniPedScene::ThorMagniPedScene(rapidcsv::Document const &scene_doc, size_t
         {
             ped = new Ped(id, approx_mass);
             id_ped_dict.update(id, ped);
+            scene_env.add_point_mass(ped);
         }
 
         simcars::causal::VariableContext::set_current_time(time);

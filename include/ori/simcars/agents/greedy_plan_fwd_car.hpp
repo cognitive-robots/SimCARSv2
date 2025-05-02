@@ -10,15 +10,15 @@
 #include <ori/simcars/agents/fwd_car_sim_parameters.hpp>
 #include <ori/simcars/agents/fwd_car_reward_parameters.hpp>
 #include <ori/simcars/agents/plan_fwd_car.hpp>
-#include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_outcome_parameters_fixed.hpp>
+#include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_sim_parameters_fixed.hpp>
 #include <ori/simcars/agents/causal/variable_types/exogenous/fwd_car_reward_parameters_fixed.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_reward_parameters_proxy.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/generate_fwd_car_actions.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_outcome_action_pair_action_part.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/fwd_car_outcome_action_pairs_buffer.hpp>
 #include <ori/simcars/agents/causal/variable_types/endogenous/max_reward_fwd_car_action.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp>
-#include <ori/simcars/agents/causal/variable_types/endogenous/sim_fwd_car_action_outcome.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/calc_multi_fwd_car_action_outcome_reward.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/sim_multi_fwd_car_action_outcome.hpp>
 
 namespace ori
 {
@@ -54,12 +54,12 @@ protected:
     causal::GenerateFWDCarActionsVariable actions;
 
     causal::FWDCarSimParametersFixedVariable sim_params;
-    causal::SimFWDCarActionOutcomeVariable sim_action_outcomes;
+    causal::SimMultiFWDCarActionOutcomeVariable sim_action_outcomes;
     causal::FWDCarOutcomeActionPairsBufferVariable sim_action_outcomes_buff;
 
     causal::FWDCarRewardParametersFixedVariable reward_params;
     causal::FWDCarRewardParametersProxyVariable reward_params_proxy;
-    causal::CalcFWDCarActionOutcomeRewardVariable action_outcome_rewards;
+    causal::CalcMultiFWDCarActionOutcomeRewardVariable action_outcome_rewards;
 
     causal::MaxRewardFWDCarActionVariable best_outcome_action_pair;
     causal::FWDCarOutcomeActionPairActionPartVariable best_action;

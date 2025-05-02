@@ -17,7 +17,7 @@ namespace agents
 namespace causal
 {
 
-class SimPedActionOutcomeVariable :
+class SimMultiPedActionOutcomeVariable :
         public simcars::causal::ABinaryEndogenousVariable<
         PedOutcomeActionPairs,
         structures::stl::STLStackArray<PedAction>, PedSimParameters>
@@ -25,7 +25,7 @@ class SimPedActionOutcomeVariable :
     IPedOutcomeSim const *ped_outcome_sim;
 
 public:
-    SimPedActionOutcomeVariable(
+    SimMultiPedActionOutcomeVariable(
             simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<PedAction>> *endogenous_parent,
             simcars::causal::IVariable<PedSimParameters> *other_parent,
             IPedOutcomeSim const *ped_outcome_sim);

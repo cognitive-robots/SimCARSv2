@@ -1,7 +1,7 @@
 
 #include <ori/simcars/agents/default_ped_reward_calc.hpp>
 
-#define TASK_GOAL_VARIANCE 100
+#define TASK_GOAL_VARIANCE 1
 #define SPACE_VARIANCE 0.5
 
 namespace ori

@@ -1,5 +1,5 @@
 
-#include <ori/simcars/agents/causal/variable_types/endogenous/calc_fwd_car_action_outcome_reward.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/calc_multi_fwd_car_action_outcome_reward.hpp>
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -15,14 +15,14 @@ namespace agents
 namespace causal
 {
 
-CalcFWDCarActionOutcomeRewardVariable::CalcFWDCarActionOutcomeRewardVariable(
+CalcMultiFWDCarActionOutcomeRewardVariable::CalcMultiFWDCarActionOutcomeRewardVariable(
         simcars::causal::IEndogenousVariable<FWDCarOutcomeActionPairs> *endogenous_parent,
         simcars::causal::IVariable<FWDCarRewardParameters> *other_parent,
         IFWDCarRewardCalc const *fwd_car_reward_calculator) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent),
     fwd_car_reward_calculator(fwd_car_reward_calculator) {}
 
-bool CalcFWDCarActionOutcomeRewardVariable::get_value(RewardFWDCarOutcomeActionTuples &val) const
+bool CalcMultiFWDCarActionOutcomeRewardVariable::get_value(RewardFWDCarOutcomeActionTuples &val) const
 {
     FWDCarOutcomeActionPairs outcome_action_pairs;
     FWDCarRewardParameters reward_parameters;
@@ -51,8 +51,10 @@ bool CalcFWDCarActionOutcomeRewardVariable::get_value(RewardFWDCarOutcomeActionT
     }
 }
 
-bool CalcFWDCarActionOutcomeRewardVariable::set_value(RewardFWDCarOutcomeActionTuples const &val)
+bool CalcMultiFWDCarActionOutcomeRewardVariable::set_value(RewardFWDCarOutcomeActionTuples const &val)
 {
+    // Unlike the singular version of this class, cannot just back-propagate a single outcome and
+    // action, instead approximates a reward profile based upon the reward-outcome-action tuples
     // WARNING: Assumes action ordering is the same in both arrays
     // TODO: Potentially consider separating reward weightings from other reward parameters
     FWDCarRewardParameters reward_parameters;

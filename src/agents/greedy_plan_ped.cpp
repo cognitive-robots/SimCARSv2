@@ -19,11 +19,13 @@ void GreedyPlanPed::init_links()
 }
 
 GreedyPlanPed::GreedyPlanPed(map::IPedMap const *map, IPedOutcomeSim const *ped_outcome_sim,
+                             IPedOutcomeCalc const *ped_outcome_calc,
                              PedSimParameters ped_sim_parameters,
                              IPedRewardCalc const *ped_reward_calc,
                              PedRewardParameters ped_reward_parameters,
                              FP_DATA_TYPE time_horizon_value, FP_DATA_TYPE time_interval_value) :
     map(map),
+    outcome_calc(ped_outcome_calc),
     outcome_sim(ped_outcome_sim),
     reward_calc(ped_reward_calc),
 
@@ -42,6 +44,7 @@ GreedyPlanPed::GreedyPlanPed(map::IPedMap const *map, IPedOutcomeSim const *ped_
     actions(&time_options, &node_options),
 
     sim_params(ped_sim_parameters),
+    sim_params_proxy(&sim_params),
     sim_action_outcomes(&actions, &sim_params, ped_outcome_sim),
     sim_action_outcomes_buff(&sim_action_outcomes),
 
@@ -50,12 +53,18 @@ GreedyPlanPed::GreedyPlanPed(map::IPedMap const *map, IPedOutcomeSim const *ped_
     action_outcome_rewards(&sim_action_outcomes_buff, &task_proxy, &reward_params, ped_reward_calc),
 
     best_outcome_action_pair(&action_outcome_rewards),
-    best_action(&best_outcome_action_pair)
+    best_action(&best_outcome_action_pair),
+
+    real_outcome_action(&sim_params_proxy, ped_outcome_calc),
+    real_outcome_action_reward(&real_outcome_action, &task_proxy, &reward_params, ped_reward_calc),
+    real_reward(&real_outcome_action_reward),
+    real_reward_metrics(&real_outcome_action, &task_proxy, &reward_params, ped_reward_calc)
 {
 }
 
 GreedyPlanPed::GreedyPlanPed(GreedyPlanPed const &plan_ped) :
     map(plan_ped.map),
+    outcome_calc(plan_ped.outcome_calc),
     outcome_sim(plan_ped.outcome_sim),
     reward_calc(plan_ped.reward_calc),
 
@@ -74,6 +83,7 @@ GreedyPlanPed::GreedyPlanPed(GreedyPlanPed const &plan_ped) :
     actions(&time_options, &node_options),
 
     sim_params(plan_ped.sim_params),
+    sim_params_proxy(&sim_params),
     sim_action_outcomes(&actions, &sim_params, plan_ped.outcome_sim),
     sim_action_outcomes_buff(&sim_action_outcomes),
 
@@ -82,7 +92,12 @@ GreedyPlanPed::GreedyPlanPed(GreedyPlanPed const &plan_ped) :
     action_outcome_rewards(&sim_action_outcomes_buff, &task_proxy, &reward_params, plan_ped.reward_calc),
 
     best_outcome_action_pair(&action_outcome_rewards),
-    best_action(&best_outcome_action_pair)
+    best_action(&best_outcome_action_pair),
+
+    real_outcome_action(&sim_params_proxy, plan_ped.outcome_calc),
+    real_outcome_action_reward(&real_outcome_action, &task_proxy, &reward_params, plan_ped.reward_calc),
+    real_reward(&real_outcome_action_reward),
+    real_reward_metrics(&real_outcome_action, &task_proxy, &reward_params, plan_ped.reward_calc)
 {
 }
 
@@ -106,6 +121,16 @@ simcars::causal::IEndogenousVariable<PedRewardParameters>* GreedyPlanPed::get_re
 simcars::causal::IEndogenousVariable<PedOutcomeActionPair>* GreedyPlanPed::get_best_outcome_action_pair_variable()
 {
     return &best_outcome_action_pair;
+}
+
+simcars::causal::IEndogenousVariable<FP_DATA_TYPE>* GreedyPlanPed::get_real_reward_variable()
+{
+    return &real_reward;
+}
+
+simcars::causal::IEndogenousVariable<PedRewards>* GreedyPlanPed::get_real_reward_metrics_variable()
+{
+    return &real_reward_metrics;
 }
 
 }

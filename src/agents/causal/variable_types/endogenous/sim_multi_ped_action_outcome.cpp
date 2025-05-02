@@ -1,5 +1,5 @@
 
-#include <ori/simcars/agents/causal/variable_types/endogenous/sim_ped_action_outcome.hpp>
+#include <ori/simcars/agents/causal/variable_types/endogenous/sim_multi_ped_action_outcome.hpp>
 
 namespace ori
 {
@@ -10,14 +10,14 @@ namespace agents
 namespace causal
 {
 
-SimPedActionOutcomeVariable::SimPedActionOutcomeVariable(
+SimMultiPedActionOutcomeVariable::SimMultiPedActionOutcomeVariable(
         simcars::causal::IEndogenousVariable<structures::stl::STLStackArray<PedAction>> *endogenous_parent,
         simcars::causal::IVariable<PedSimParameters> *other_parent,
         IPedOutcomeSim const *ped_outcome_sim) :
     ABinaryEndogenousVariable(endogenous_parent, other_parent),
     ped_outcome_sim(ped_outcome_sim) {}
 
-bool SimPedActionOutcomeVariable::get_value(PedOutcomeActionPairs &val) const
+bool SimMultiPedActionOutcomeVariable::get_value(PedOutcomeActionPairs &val) const
 {
     structures::stl::STLStackArray<PedAction> actions;
     PedSimParameters sim_parameters;
@@ -39,7 +39,7 @@ bool SimPedActionOutcomeVariable::get_value(PedOutcomeActionPairs &val) const
     }
 }
 
-bool SimPedActionOutcomeVariable::set_value(PedOutcomeActionPairs const &val)
+bool SimMultiPedActionOutcomeVariable::set_value(PedOutcomeActionPairs const &val)
 {
     structures::stl::STLStackArray<PedAction> actions;
     PedSimParameters sim_parameters;
