@@ -1,2 +1,2 @@
 # Simulation-based Causal Analysis and Reasoning System (SimCARSv2)
-TO BE UPDATED
+The SimCARSv2 architecture provides a framework for identifying behavioural interactions between autonomous agents --- primarily autonomous vehicles --- via the application of causal inference. In addition to several core libraries this codebase offers several executables for working with the highD, exiD, inD, and THÖR-MAGNI datasets.
